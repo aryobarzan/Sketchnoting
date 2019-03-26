@@ -3,18 +3,69 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 51;
 	objects = {
 
 /* Begin PBXBuildFile section */
+		9F5010CC22491FC000425424 /* SketchnoteView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9F5010CB22491FC000425424 /* SketchnoteView.xib */; };
+		9F5010CE22491FD000425424 /* SketchnoteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5010CD22491FD000425424 /* SketchnoteView.swift */; };
+		9F5010D0224930E400425424 /* NoteCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5010CF224930E400425424 /* NoteCollection.swift */; };
+		9F5010D22249325300425424 /* NoteCollectionView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9F5010D12249325300425424 /* NoteCollectionView.xib */; };
+		9F5010D42249326D00425424 /* NoteCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5010D32249326D00425424 /* NoteCollectionView.swift */; };
 		9FD29BA72220524D00CC969A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29BA62220524D00CC969A /* AppDelegate.swift */; };
 		9FD29BA92220524D00CC969A /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29BA82220524D00CC969A /* ViewController.swift */; };
 		9FD29BAC2220524D00CC969A /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9FD29BAA2220524D00CC969A /* Main.storyboard */; };
 		9FD29BAE2220525000CC969A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9FD29BAD2220525000CC969A /* Assets.xcassets */; };
 		9FD29BB12220525000CC969A /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9FD29BAF2220525000CC969A /* LaunchScreen.storyboard */; };
+		9FD29BC522249D9500CC969A /* Note.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29BC422249D9500CC969A /* Note.swift */; };
+		9FD29BC72224B58600CC969A /* Document.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29BC62224B58600CC969A /* Document.swift */; };
+		9FD29BCB2224B89800CC969A /* Sketchnote.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29BCA2224B89800CC969A /* Sketchnote.swift */; };
+		9FD29BCD2226BAD700CC969A /* SemanticHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29BCC2226BAD600CC969A /* SemanticHelper.swift */; };
+		9FD29C0E2236C5BA00CC969A /* JotUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9FD29C0D2236C5BA00CC969A /* JotUI.framework */; };
+		9FD29C122236C66800CC969A /* quad.vsh in Resources */ = {isa = PBXBuildFile; fileRef = 9FD29C0F2236C66700CC969A /* quad.vsh */; };
+		9FD29C132236C66800CC969A /* colorlesspoint.vsh in Resources */ = {isa = PBXBuildFile; fileRef = 9FD29C102236C66700CC969A /* colorlesspoint.vsh */; };
+		9FD29C142236C66800CC969A /* coloredpoint.vsh in Resources */ = {isa = PBXBuildFile; fileRef = 9FD29C112236C66700CC969A /* coloredpoint.vsh */; };
+		9FD29C172236C7E100CC969A /* JotViewSwift.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29C162236C7E100CC969A /* JotViewSwift.swift */; };
+		9FD29C192236DCFC00CC969A /* SketchNoteViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29C182236DCFC00CC969A /* SketchNoteViewController.swift */; };
+		9FD29C1E2236EA2800CC969A /* SketchTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29C1B2236EA2800CC969A /* SketchTool.swift */; };
+		9FD29C1F2236EA2800CC969A /* SketchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29C1C2236EA2800CC969A /* SketchView.swift */; };
+		9FD29C202236EA2800CC969A /* UIImage+fill.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29C1D2236EA2800CC969A /* UIImage+fill.swift */; };
+		9FD29C2822370DF000CC969A /* GradientView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29C2322370DF000CC969A /* GradientView.swift */; };
+		9FD29C2922370DF000CC969A /* ColorSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29C2422370DF000CC969A /* ColorSlider.swift */; };
+		9FD29C2A22370DF000CC969A /* PreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29C2522370DF000CC969A /* PreviewView.swift */; };
+		9FD29C2B22370DF000CC969A /* DefaultPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29C2622370DF000CC969A /* DefaultPreviewView.swift */; };
+		9FD29C2D22370E1800CC969A /* ColorSliderExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29C2C22370E1800CC969A /* ColorSliderExtensions.swift */; };
+		9FD29C2F22370E1B00CC969A /* Gradient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29C2E22370E1A00CC969A /* Gradient.swift */; };
+		9FD29C3122370E2000CC969A /* HSBColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29C3022370E2000CC969A /* HSBColor.swift */; };
+		9FD29C342237FD2B00CC969A /* GMStepper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29C332237FD2B00CC969A /* GMStepper.swift */; };
+		9FD29C362238539200CC969A /* PhotoRequestManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29C352238539200CC969A /* PhotoRequestManager.swift */; };
+		9FD29C38223853C300CC969A /* PhotoAuthorization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29C37223853C300CC969A /* PhotoAuthorization.swift */; };
+		9FD29C392238571700CC969A /* Pods_Sketchnoting.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9DC8B7BD96FB5DF71C8C0CA0 /* Pods_Sketchnoting.framework */; };
+		9FD29C3F223861E100CC969A /* ExpandableButtonItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29C3B223861E000CC969A /* ExpandableButtonItem.swift */; };
+		9FD29C40223861E100CC969A /* ExpandableButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29C3C223861E000CC969A /* ExpandableButtonView.swift */; };
+		9FD29C41223861E100CC969A /* ArrowButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29C3D223861E000CC969A /* ArrowButton.swift */; };
+		9FD29C42223861E100CC969A /* ActionButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29C3E223861E100CC969A /* ActionButton.swift */; };
+		9FD29C442239525A00CC969A /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 9FD29C432239525900CC969A /* GoogleService-Info.plist */; };
+		9FD29C472239588E00CC969A /* UIViewExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29C462239588E00CC969A /* UIViewExtensions.swift */; };
+		9FD29C4E223998BC00CC969A /* UIViewControllerExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29C4D223998BC00CC969A /* UIViewControllerExtensions.swift */; };
+		9FD29C502239ADC100CC969A /* DocumentView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9FD29C4F2239ADC100CC969A /* DocumentView.xib */; };
+		9FD29C522239ADE700CC969A /* DocumentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29C512239ADE700CC969A /* DocumentView.swift */; };
+		9FD29C54223C3B6F00CC969A /* OCRHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29C53223C3B6F00CC969A /* OCRHelper.swift */; };
+		9FD29C56223C3C3900CC969A /* StringExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29C55223C3C3900CC969A /* StringExtensions.swift */; };
+		9FD29C58223C3CF700CC969A /* UIImageExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29C57223C3CF700CC969A /* UIImageExtensions.swift */; };
+		9FD29C6422431BFA00CC969A /* DrawnImageClassifier.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29C6322431BFA00CC969A /* DrawnImageClassifier.mlmodel */; };
+		9FD29C6622431C0000CC969A /* labels.txt in Resources */ = {isa = PBXBuildFile; fileRef = 9FD29C6522431C0000CC969A /* labels.txt */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		2789948FCEC9A9800B2E515F /* Pods-Sketchnoting.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Sketchnoting.debug.xcconfig"; path = "Target Support Files/Pods-Sketchnoting/Pods-Sketchnoting.debug.xcconfig"; sourceTree = "<group>"; };
+		9DC8B7BD96FB5DF71C8C0CA0 /* Pods_Sketchnoting.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Sketchnoting.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		9E978D993668D59B2DBBC9F4 /* Pods-Sketchnoting.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Sketchnoting.release.xcconfig"; path = "Target Support Files/Pods-Sketchnoting/Pods-Sketchnoting.release.xcconfig"; sourceTree = "<group>"; };
+		9F5010CB22491FC000425424 /* SketchnoteView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SketchnoteView.xib; sourceTree = "<group>"; };
+		9F5010CD22491FD000425424 /* SketchnoteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SketchnoteView.swift; sourceTree = "<group>"; };
+		9F5010CF224930E400425424 /* NoteCollection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteCollection.swift; sourceTree = "<group>"; };
+		9F5010D12249325300425424 /* NoteCollectionView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NoteCollectionView.xib; sourceTree = "<group>"; };
+		9F5010D32249326D00425424 /* NoteCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteCollectionView.swift; sourceTree = "<group>"; };
 		9FD29BA32220524D00CC969A /* Sketchnoting.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Sketchnoting.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9FD29BA62220524D00CC969A /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		9FD29BA82220524D00CC969A /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -22,6 +73,44 @@
 		9FD29BAD2220525000CC969A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		9FD29BB02220525000CC969A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		9FD29BB22220525000CC969A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		9FD29BC422249D9500CC969A /* Note.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Note.swift; sourceTree = "<group>"; };
+		9FD29BC62224B58600CC969A /* Document.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Document.swift; sourceTree = "<group>"; };
+		9FD29BCA2224B89800CC969A /* Sketchnote.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sketchnote.swift; sourceTree = "<group>"; };
+		9FD29BCC2226BAD600CC969A /* SemanticHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SemanticHelper.swift; sourceTree = "<group>"; };
+		9FD29C0D2236C5BA00CC969A /* JotUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = JotUI.framework; sourceTree = "<group>"; };
+		9FD29C0F2236C66700CC969A /* quad.vsh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = quad.vsh; sourceTree = "<group>"; };
+		9FD29C102236C66700CC969A /* colorlesspoint.vsh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = colorlesspoint.vsh; sourceTree = "<group>"; };
+		9FD29C112236C66700CC969A /* coloredpoint.vsh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = coloredpoint.vsh; sourceTree = "<group>"; };
+		9FD29C152236C6A100CC969A /* JotUI-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "JotUI-Bridging-Header.h"; sourceTree = "<group>"; };
+		9FD29C162236C7E100CC969A /* JotViewSwift.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JotViewSwift.swift; sourceTree = "<group>"; };
+		9FD29C182236DCFC00CC969A /* SketchNoteViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SketchNoteViewController.swift; sourceTree = "<group>"; };
+		9FD29C1B2236EA2800CC969A /* SketchTool.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SketchTool.swift; sourceTree = "<group>"; };
+		9FD29C1C2236EA2800CC969A /* SketchView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SketchView.swift; sourceTree = "<group>"; };
+		9FD29C1D2236EA2800CC969A /* UIImage+fill.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIImage+fill.swift"; sourceTree = "<group>"; };
+		9FD29C2322370DF000CC969A /* GradientView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GradientView.swift; sourceTree = "<group>"; };
+		9FD29C2422370DF000CC969A /* ColorSlider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ColorSlider.swift; sourceTree = "<group>"; };
+		9FD29C2522370DF000CC969A /* PreviewView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PreviewView.swift; sourceTree = "<group>"; };
+		9FD29C2622370DF000CC969A /* DefaultPreviewView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DefaultPreviewView.swift; sourceTree = "<group>"; };
+		9FD29C2C22370E1800CC969A /* ColorSliderExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorSliderExtensions.swift; sourceTree = "<group>"; };
+		9FD29C2E22370E1A00CC969A /* Gradient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Gradient.swift; sourceTree = "<group>"; };
+		9FD29C3022370E2000CC969A /* HSBColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HSBColor.swift; sourceTree = "<group>"; };
+		9FD29C332237FD2B00CC969A /* GMStepper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GMStepper.swift; sourceTree = "<group>"; };
+		9FD29C352238539200CC969A /* PhotoRequestManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoRequestManager.swift; sourceTree = "<group>"; };
+		9FD29C37223853C300CC969A /* PhotoAuthorization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoAuthorization.swift; sourceTree = "<group>"; };
+		9FD29C3B223861E000CC969A /* ExpandableButtonItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExpandableButtonItem.swift; sourceTree = "<group>"; };
+		9FD29C3C223861E000CC969A /* ExpandableButtonView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExpandableButtonView.swift; sourceTree = "<group>"; };
+		9FD29C3D223861E000CC969A /* ArrowButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ArrowButton.swift; sourceTree = "<group>"; };
+		9FD29C3E223861E100CC969A /* ActionButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ActionButton.swift; sourceTree = "<group>"; };
+		9FD29C432239525900CC969A /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		9FD29C462239588E00CC969A /* UIViewExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIViewExtensions.swift; sourceTree = "<group>"; };
+		9FD29C4D223998BC00CC969A /* UIViewControllerExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIViewControllerExtensions.swift; sourceTree = "<group>"; };
+		9FD29C4F2239ADC100CC969A /* DocumentView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DocumentView.xib; sourceTree = "<group>"; };
+		9FD29C512239ADE700CC969A /* DocumentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentView.swift; sourceTree = "<group>"; };
+		9FD29C53223C3B6F00CC969A /* OCRHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OCRHelper.swift; sourceTree = "<group>"; };
+		9FD29C55223C3C3900CC969A /* StringExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringExtensions.swift; sourceTree = "<group>"; };
+		9FD29C57223C3CF700CC969A /* UIImageExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIImageExtensions.swift; sourceTree = "<group>"; };
+		9FD29C6322431BFA00CC969A /* DrawnImageClassifier.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = DrawnImageClassifier.mlmodel; sourceTree = "<group>"; };
+		9FD29C6522431C0000CC969A /* labels.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = labels.txt; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -29,17 +118,44 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9FD29C392238571700CC969A /* Pods_Sketchnoting.framework in Frameworks */,
+				9FD29C0E2236C5BA00CC969A /* JotUI.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		124769D1803E7C4AE8A1F382 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				9FD29C0D2236C5BA00CC969A /* JotUI.framework */,
+				9DC8B7BD96FB5DF71C8C0CA0 /* Pods_Sketchnoting.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		9F5010CA22491F8900425424 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				9F5010CB22491FC000425424 /* SketchnoteView.xib */,
+				9F5010CD22491FD000425424 /* SketchnoteView.swift */,
+				9F5010D12249325300425424 /* NoteCollectionView.xib */,
+				9F5010D32249326D00425424 /* NoteCollectionView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
 		9FD29B9A2220524D00CC969A = {
 			isa = PBXGroup;
 			children = (
+				9FD29C112236C66700CC969A /* coloredpoint.vsh */,
+				9FD29C102236C66700CC969A /* colorlesspoint.vsh */,
+				9FD29C0F2236C66700CC969A /* quad.vsh */,
 				9FD29BA52220524D00CC969A /* Sketchnoting */,
 				9FD29BA42220524D00CC969A /* Products */,
+				A42EF4785A4BE0D5AC7720A5 /* Pods */,
+				124769D1803E7C4AE8A1F382 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -54,14 +170,139 @@
 		9FD29BA52220524D00CC969A /* Sketchnoting */ = {
 			isa = PBXGroup;
 			children = (
+				9FD29BB22220525000CC969A /* Info.plist */,
+				9FD29C432239525900CC969A /* GoogleService-Info.plist */,
 				9FD29BA62220524D00CC969A /* AppDelegate.swift */,
-				9FD29BA82220524D00CC969A /* ViewController.swift */,
+				9FD29BAF2220525000CC969A /* LaunchScreen.storyboard */,
 				9FD29BAA2220524D00CC969A /* Main.storyboard */,
 				9FD29BAD2220525000CC969A /* Assets.xcassets */,
-				9FD29BAF2220525000CC969A /* LaunchScreen.storyboard */,
-				9FD29BB22220525000CC969A /* Info.plist */,
+				9FD29C67224589BE00CC969A /* Application */,
+				9FD29C6222431BDD00CC969A /* DrawingRecognition */,
+				9FD29C48223994A800CC969A /* CustomPanels */,
+				9FD29C452239587D00CC969A /* Extensions */,
+				9FD29C3A223861D200CC969A /* ExpandableButton */,
+				9FD29C322237FD1600CC969A /* GMStepper */,
+				9FD29C2122370DE300CC969A /* ColorSlider */,
+				9FD29C1A2236EA1700CC969A /* Sketch */,
+				9FD29C152236C6A100CC969A /* JotUI-Bridging-Header.h */,
+				9FD29C162236C7E100CC969A /* JotViewSwift.swift */,
 			);
 			path = Sketchnoting;
+			sourceTree = "<group>";
+		};
+		9FD29C1A2236EA1700CC969A /* Sketch */ = {
+			isa = PBXGroup;
+			children = (
+				9FD29C1B2236EA2800CC969A /* SketchTool.swift */,
+				9FD29C1C2236EA2800CC969A /* SketchView.swift */,
+				9FD29C1D2236EA2800CC969A /* UIImage+fill.swift */,
+				9FD29C352238539200CC969A /* PhotoRequestManager.swift */,
+				9FD29C37223853C300CC969A /* PhotoAuthorization.swift */,
+			);
+			path = Sketch;
+			sourceTree = "<group>";
+		};
+		9FD29C2122370DE300CC969A /* ColorSlider */ = {
+			isa = PBXGroup;
+			children = (
+				9FD29C2422370DF000CC969A /* ColorSlider.swift */,
+				9FD29C2622370DF000CC969A /* DefaultPreviewView.swift */,
+				9FD29C2322370DF000CC969A /* GradientView.swift */,
+				9FD29C2C22370E1800CC969A /* ColorSliderExtensions.swift */,
+				9FD29C2E22370E1A00CC969A /* Gradient.swift */,
+				9FD29C3022370E2000CC969A /* HSBColor.swift */,
+				9FD29C2522370DF000CC969A /* PreviewView.swift */,
+			);
+			path = ColorSlider;
+			sourceTree = "<group>";
+		};
+		9FD29C322237FD1600CC969A /* GMStepper */ = {
+			isa = PBXGroup;
+			children = (
+				9FD29C332237FD2B00CC969A /* GMStepper.swift */,
+			);
+			path = GMStepper;
+			sourceTree = "<group>";
+		};
+		9FD29C3A223861D200CC969A /* ExpandableButton */ = {
+			isa = PBXGroup;
+			children = (
+				9FD29C3E223861E100CC969A /* ActionButton.swift */,
+				9FD29C3D223861E000CC969A /* ArrowButton.swift */,
+				9FD29C3B223861E000CC969A /* ExpandableButtonItem.swift */,
+				9FD29C3C223861E000CC969A /* ExpandableButtonView.swift */,
+			);
+			path = ExpandableButton;
+			sourceTree = "<group>";
+		};
+		9FD29C452239587D00CC969A /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				9FD29C462239588E00CC969A /* UIViewExtensions.swift */,
+				9FD29C4D223998BC00CC969A /* UIViewControllerExtensions.swift */,
+				9FD29C55223C3C3900CC969A /* StringExtensions.swift */,
+				9FD29C57223C3CF700CC969A /* UIImageExtensions.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		9FD29C48223994A800CC969A /* CustomPanels */ = {
+			isa = PBXGroup;
+			children = (
+				9FD29C4F2239ADC100CC969A /* DocumentView.xib */,
+				9FD29C512239ADE700CC969A /* DocumentView.swift */,
+			);
+			path = CustomPanels;
+			sourceTree = "<group>";
+		};
+		9FD29C6222431BDD00CC969A /* DrawingRecognition */ = {
+			isa = PBXGroup;
+			children = (
+				9FD29C6322431BFA00CC969A /* DrawnImageClassifier.mlmodel */,
+				9FD29C6522431C0000CC969A /* labels.txt */,
+			);
+			path = DrawingRecognition;
+			sourceTree = "<group>";
+		};
+		9FD29C67224589BE00CC969A /* Application */ = {
+			isa = PBXGroup;
+			children = (
+				9F5010CA22491F8900425424 /* Views */,
+				9FD29C69224589FE00CC969A /* Helpers */,
+				9FD29C68224589DA00CC969A /* Data */,
+				9FD29BA82220524D00CC969A /* ViewController.swift */,
+				9FD29C182236DCFC00CC969A /* SketchNoteViewController.swift */,
+			);
+			path = Application;
+			sourceTree = "<group>";
+		};
+		9FD29C68224589DA00CC969A /* Data */ = {
+			isa = PBXGroup;
+			children = (
+				9FD29BC422249D9500CC969A /* Note.swift */,
+				9FD29BCA2224B89800CC969A /* Sketchnote.swift */,
+				9FD29BC62224B58600CC969A /* Document.swift */,
+				9F5010CF224930E400425424 /* NoteCollection.swift */,
+			);
+			path = Data;
+			sourceTree = "<group>";
+		};
+		9FD29C69224589FE00CC969A /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				9FD29C53223C3B6F00CC969A /* OCRHelper.swift */,
+				9FD29BCC2226BAD600CC969A /* SemanticHelper.swift */,
+			);
+			path = Helpers;
+			sourceTree = "<group>";
+		};
+		A42EF4785A4BE0D5AC7720A5 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				2789948FCEC9A9800B2E515F /* Pods-Sketchnoting.debug.xcconfig */,
+				9E978D993668D59B2DBBC9F4 /* Pods-Sketchnoting.release.xcconfig */,
+			);
+			path = Pods;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -71,9 +312,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 9FD29BB52220525000CC969A /* Build configuration list for PBXNativeTarget "Sketchnoting" */;
 			buildPhases = (
+				76AF5EC1F5285F1B32A711B9 /* [CP] Check Pods Manifest.lock */,
 				9FD29B9F2220524D00CC969A /* Sources */,
 				9FD29BA02220524D00CC969A /* Frameworks */,
 				9FD29BA12220524D00CC969A /* Resources */,
+				1B37628CDE3140951BF90E39 /* [CP] Embed Pods Frameworks */,
+				7BA25DAC743874BAA4E9C5AC /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -122,21 +366,121 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9F5010D22249325300425424 /* NoteCollectionView.xib in Resources */,
+				9FD29C122236C66800CC969A /* quad.vsh in Resources */,
+				9FD29C442239525A00CC969A /* GoogleService-Info.plist in Resources */,
+				9FD29C132236C66800CC969A /* colorlesspoint.vsh in Resources */,
+				9FD29C142236C66800CC969A /* coloredpoint.vsh in Resources */,
 				9FD29BB12220525000CC969A /* LaunchScreen.storyboard in Resources */,
 				9FD29BAE2220525000CC969A /* Assets.xcassets in Resources */,
 				9FD29BAC2220524D00CC969A /* Main.storyboard in Resources */,
+				9FD29C6622431C0000CC969A /* labels.txt in Resources */,
+				9F5010CC22491FC000425424 /* SketchnoteView.xib in Resources */,
+				9FD29C502239ADC100CC969A /* DocumentView.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		1B37628CDE3140951BF90E39 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Sketchnoting/Pods-Sketchnoting-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Sketchnoting/Pods-Sketchnoting-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Sketchnoting/Pods-Sketchnoting-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		76AF5EC1F5285F1B32A711B9 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-Sketchnoting-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		7BA25DAC743874BAA4E9C5AC /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Sketchnoting/Pods-Sketchnoting-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Sketchnoting/Pods-Sketchnoting-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Sketchnoting/Pods-Sketchnoting-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		9FD29B9F2220524D00CC969A /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9FD29C3F223861E100CC969A /* ExpandableButtonItem.swift in Sources */,
+				9FD29C2D22370E1800CC969A /* ColorSliderExtensions.swift in Sources */,
+				9FD29C58223C3CF700CC969A /* UIImageExtensions.swift in Sources */,
+				9FD29C192236DCFC00CC969A /* SketchNoteViewController.swift in Sources */,
+				9F5010D42249326D00425424 /* NoteCollectionView.swift in Sources */,
+				9FD29C202236EA2800CC969A /* UIImage+fill.swift in Sources */,
+				9FD29C40223861E100CC969A /* ExpandableButtonView.swift in Sources */,
 				9FD29BA92220524D00CC969A /* ViewController.swift in Sources */,
+				9FD29C522239ADE700CC969A /* DocumentView.swift in Sources */,
+				9FD29C2922370DF000CC969A /* ColorSlider.swift in Sources */,
 				9FD29BA72220524D00CC969A /* AppDelegate.swift in Sources */,
+				9FD29C6422431BFA00CC969A /* DrawnImageClassifier.mlmodel in Sources */,
+				9FD29C2822370DF000CC969A /* GradientView.swift in Sources */,
+				9FD29C3122370E2000CC969A /* HSBColor.swift in Sources */,
+				9FD29C362238539200CC969A /* PhotoRequestManager.swift in Sources */,
+				9FD29C342237FD2B00CC969A /* GMStepper.swift in Sources */,
+				9F5010D0224930E400425424 /* NoteCollection.swift in Sources */,
+				9FD29BCD2226BAD700CC969A /* SemanticHelper.swift in Sources */,
+				9FD29C56223C3C3900CC969A /* StringExtensions.swift in Sources */,
+				9FD29C4E223998BC00CC969A /* UIViewControllerExtensions.swift in Sources */,
+				9FD29C2B22370DF000CC969A /* DefaultPreviewView.swift in Sources */,
+				9FD29C472239588E00CC969A /* UIViewExtensions.swift in Sources */,
+				9FD29C1F2236EA2800CC969A /* SketchView.swift in Sources */,
+				9F5010CE22491FD000425424 /* SketchnoteView.swift in Sources */,
+				9FD29C172236C7E100CC969A /* JotViewSwift.swift in Sources */,
+				9FD29C42223861E100CC969A /* ActionButton.swift in Sources */,
+				9FD29C38223853C300CC969A /* PhotoAuthorization.swift in Sources */,
+				9FD29C2A22370DF000CC969A /* PreviewView.swift in Sources */,
+				9FD29C54223C3B6F00CC969A /* OCRHelper.swift in Sources */,
+				9FD29BC522249D9500CC969A /* Note.swift in Sources */,
+				9FD29C41223861E100CC969A /* ArrowButton.swift in Sources */,
+				9FD29C2F22370E1B00CC969A /* Gradient.swift in Sources */,
+				9FD29C1E2236EA2800CC969A /* SketchTool.swift in Sources */,
+				9FD29BC72224B58600CC969A /* Document.swift in Sources */,
+				9FD29BCB2224B89800CC969A /* Sketchnote.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -280,17 +624,25 @@
 		};
 		9FD29BB62220525000CC969A /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 2789948FCEC9A9800B2E515F /* Pods-Sketchnoting.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 2HCVML6F73;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				INFOPLIST_FILE = Sketchnoting/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = aryo.Sketchnoting;
+				PRODUCT_BUNDLE_IDENTIFIER = lu.uni.coast.Sketchnoting;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_OBJC_BRIDGING_HEADER = "/Users/aryobarzan/Projects/Swift/ios/Sketchnoting/Sketchnoting/JotUI-Bridging-Header.h";
 				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -298,17 +650,25 @@
 		};
 		9FD29BB72220525000CC969A /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 9E978D993668D59B2DBBC9F4 /* Pods-Sketchnoting.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 2HCVML6F73;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				INFOPLIST_FILE = Sketchnoting/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = aryo.Sketchnoting;
+				PRODUCT_BUNDLE_IDENTIFIER = lu.uni.coast.Sketchnoting;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_OBJC_BRIDGING_HEADER = "/Users/aryobarzan/Projects/Swift/ios/Sketchnoting/Sketchnoting/JotUI-Bridging-Header.h";
 				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
