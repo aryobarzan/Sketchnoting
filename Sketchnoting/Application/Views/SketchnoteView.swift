@@ -31,10 +31,43 @@ class SketchnoteView : UIView {
         //self.heightAnchor.constraint(equalToConstant: 300).isActive = true
         contentView.fixInView(self)
         
+        self.layer.borderWidth = 1
+        self.layer.borderColor = UIColor.black.cgColor        
     }
     
     func setNote(note: Sketchnote) {
         self.sketchnote = note
         self.imageView.image = note.image
+    }
+    
+    public func setDeleteAction(action: (() -> Void)?) {
+        longPressAction = action
+        isUserInteractionEnabled = true
+        let selector = #selector(handleLongPress)
+        let recognizer = UILongPressGestureRecognizer(target: self, action: selector)
+        addGestureRecognizer(recognizer)
+    }
+}
+
+fileprivate extension UIView {
+    
+    typealias Action = (() -> Void)
+    
+    struct Key { static var id = "longPressAction" }
+    
+    var longPressAction: Action? {
+        get {
+            return objc_getAssociatedObject(self, &Key.id) as? Action
+        }
+        set {
+            guard let value = newValue else { return }
+            let policy = objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN
+            objc_setAssociatedObject(self, &Key.id, value, policy)
+        }
+    }
+    
+    @objc func handleLongPress(sender: UILongPressGestureRecognizer) {
+        guard sender.state == .began else { return }
+        longPressAction?()
     }
 }

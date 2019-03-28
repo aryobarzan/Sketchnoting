@@ -14,7 +14,7 @@ import CTSlidingUpPanel
 class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, SketchViewDelegate {
 
     @IBOutlet weak var topContainer: UIView!
-    @IBOutlet weak var sketchView: SketchView!
+    @IBOutlet var sketchView: SketchView!
     @IBOutlet weak var colorPickerContainer: UIView!
     @IBOutlet weak var toolsView: UIView!
     @IBOutlet weak var clearButton: UIBarButtonItem!
@@ -34,6 +34,9 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     
     var sketchnote: Sketchnote?
     var new = false
+    
+    var helpLines = [SimpleLine]()
+    var helpLinesShown = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -95,6 +98,22 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         } else {
             sketchnote = Sketchnote(image: sketchView.asImage(), relatedDocuments: nil, drawings: nil)
         }
+        
+        setupHelpLines()
+    }
+    
+    private func setupHelpLines() {
+        var height = CGFloat(40)
+        while (CGFloat(height) < self.sketchView.frame.height) {
+            let line = SimpleLine(frame: CGRect(x: 0, y: height, width: self.sketchView.frame.width, height: 2))
+            line.isUserInteractionEnabled = false
+            line.isHidden = true
+            self.sketchView.addSubview(line)
+            self.helpLines.append(line)
+            
+            height = height + 40
+        }
+        
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -107,6 +126,9 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
             guard let button = sender as? UIBarButtonItem, button === closeButton else {
                 print("Close button not pressed, cancelling")
                 return
+            }
+            for helpLine in self.helpLines {
+                helpLine.removeFromSuperview()
             }
             sketchnote?.image = sketchView.asImage()
             sketchnote?.setUpdateDate()
@@ -253,12 +275,21 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     
     @IBAction func clearTapped(_ sender: UIBarButtonItem) {
         sketchView.clear()
+        sketchView.subviews.forEach { $0.removeFromSuperview() }
+        self.setupHelpLines()
     }
     @IBAction func redoTapped(_ sender: UIBarButtonItem) {
         sketchView.redo()
     }
     @IBAction func undoTapped(_ sender: UIBarButtonItem) {
         sketchView.undo()
+    }
+    @IBAction func linesTapped(_ sender: UIBarButtonItem) {
+        self.helpLinesShown = !self.helpLinesShown
+        
+        for helpLine in self.helpLines {
+            helpLine.isHidden = !self.helpLinesShown
+        }
     }
     @IBAction func documentsTapped(_ sender: LGButton) {
         documentsButton.isLoading = true
@@ -399,6 +430,12 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
                         node.center.x = docsContentView.center.x
                         docsContentView.insertArrangedSubview(node, at: 0)
                         documentViews.append(node)
+                        
+                        let document = Document(title: concept, description: nil, URL: conceptURL, type: .Spotlight)
+                        if document != nil {
+                            print("Adding document: " + document!.title)
+                            self.sketchnote!.addDocument(document: document!)
+                        }
                     }
                 }
             }
@@ -423,8 +460,9 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
                 print(top5.map { $0.key + "(" + String($0.value) + ")"}.joined(separator: ", "))
                 
                 for (label, score) in top5 {
-                    if score > 0.8 {
-                        self.sketchnote?.drawings?.append(label)
+                    if score > 0.5 {
+                        print("Adding drawing: " + label)
+                        self.sketchnote!.addDrawing(drawing: label)
                     }
                 }
             }
@@ -446,14 +484,18 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     private func recognizeSketch(tool: PenTool) {
         let rectView = UIView(frame: CGRect(x: 0, y: 0, width: 500, height: 500))
         rectView.backgroundColor = .black
-        let translation = CGAffineTransform(translationX: -tool.path.boundingBox.minX + 150, y: -tool.path.boundingBox.minY + 150)
+        let translation = CGAffineTransform(translationX: -tool.path.boundingBox.minX, y: -tool.path.boundingBox.minY)
         let scale = CGAffineTransform(scaleX: 1, y: 1)
         let newPath = tool.path.copy(strokingWithWidth: 500 * 0.04, lineCap: .round, lineJoin: .round, miterLimit: 0, transform: translation.concatenating(scale))
         let layer = CAShapeLayer()
         layer.path = newPath
         layer.strokeColor = UIColor.white.cgColor
         layer.fillColor = UIColor.white.cgColor
+        layer.frame = newPath.boundingBox
+        layer.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+        layer.position = CGPoint(x: rectView.layer.bounds.midX, y: rectView.layer.bounds.midY)
         rectView.layer.addSublayer(layer)
+        
         
         let croppedCGImage:CGImage = (rectView.asImage().cgImage)!
         let croppedImage = UIImage(cgImage: croppedCGImage)
@@ -514,5 +556,30 @@ extension UIView
         NSLayoutConstraint(item: self, attribute: .trailing, relatedBy: .equal, toItem: container, attribute: .trailing, multiplier: 1.0, constant: 0).isActive = true
         NSLayoutConstraint(item: self, attribute: .top, relatedBy: .equal, toItem: container, attribute: .top, multiplier: 1.0, constant: 0).isActive = true
         NSLayoutConstraint(item: self, attribute: .bottom, relatedBy: .equal, toItem: container, attribute: .bottom, multiplier: 1.0, constant: 0).isActive = true
+    }
+}
+public class SimpleLine: UIView  {
+    
+    public init() {
+        super.init(frame: CGRect(x: 0, y: 0, width: 320, height: 480))
+        backgroundColor = .clear
+    }
+    
+    public required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    public override init(frame: CGRect) {
+        super.init(frame: frame)
+        backgroundColor = .clear
+    }
+    
+    public override func draw(_ rect: CGRect) {
+        guard let context = UIGraphicsGetCurrentContext() else { return }
+        context.setLineWidth(2.0)
+        context.setStrokeColor(UIColor.black.cgColor)
+        context.move(to: CGPoint(x: 0, y: 0))
+        context.addLine(to: CGPoint(x: self.frame.width, y: 0))
+        context.strokePath()
     }
 }

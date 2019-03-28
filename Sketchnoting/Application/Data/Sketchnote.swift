@@ -93,6 +93,21 @@ class Sketchnote: Note {
             relatedDocuments!.append(document)
         }
     }
+    func addDrawing(drawing: String) {
+        var exists = false
+        if drawings == nil {
+            drawings = [String]()
+        }
+        for d in drawings! {
+            if d == drawing.lowercased() {
+                exists = true
+                break
+            }
+        }
+        if !exists {
+            drawings!.append(drawing.lowercased())
+        }
+    }
     
     func setUpdateDate() {
         self.updateDate = Date.init(timeIntervalSinceNow: 0)

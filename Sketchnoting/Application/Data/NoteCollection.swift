@@ -51,4 +51,17 @@ class NoteCollection: Codable {
             notes.append(note)
         }
     }
+    
+    func removeSketchnote(note: Sketchnote) {
+        var toDeleteIndex = -1
+        for i in 0..<notes.count {
+            if notes[i].creationDate == note.creationDate {
+                toDeleteIndex = i
+                break
+            }
+        }
+        if toDeleteIndex != -1 {
+            self.notes.remove(at: toDeleteIndex)
+        }
+    }
 }

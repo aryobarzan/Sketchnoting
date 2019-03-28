@@ -12,6 +12,7 @@ enum DocumentType: String, Codable {
     case Wikipedia
     case Map
     case Babelfy
+    case Spotlight
     case Other
 }
 

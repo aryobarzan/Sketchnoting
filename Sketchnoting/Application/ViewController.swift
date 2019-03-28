@@ -12,6 +12,8 @@ import LGButton
 class ViewController: UIViewController, UIGestureRecognizerDelegate {
     
 
+    @IBOutlet var searchField: UITextField!
+    @IBOutlet var searchButton: LGButton!
     @IBOutlet var scrollView: UIScrollView!
     var notesStackView = UIStackView()
     
@@ -46,8 +48,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
         super.prepare(for: segue, sender: sender)
         switch(segue.identifier ?? "") {
         case "NewSketchnote":
@@ -87,7 +87,8 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
             }
         }
     }
-    private func saveNoteCollections() {
+    
+    func saveNoteCollections() {
         let encoder = JSONEncoder()
         
         if let encoded = try? encoder.encode(noteCollections) {
@@ -111,37 +112,36 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         return nil
     }
     
-    private func displaySketchnote(note: Sketchnote, collectionView: inout NoteCollectionView) {
+    func displaySketchnote(note: Sketchnote, collectionView: NoteCollectionView) {
         let sketchnoteView = SketchnoteView(frame: collectionView.stackView.frame)
         sketchnoteView.setNote(note: note)
         collectionView.sketchnoteViews.append(sketchnoteView)
-        collectionView.stackView.addArrangedSubview(sketchnoteView)
-        //collectionView.stackView.insertArrangedSubview(sketchnoteView, at: 0)
+        collectionView.stackView.insertArrangedSubview(sketchnoteView, at: 0)
         
         let tap = UITapGestureRecognizer(target: self, action: #selector(self.handleSketchnoteTap(_:)))
         sketchnoteView.isUserInteractionEnabled = true
         sketchnoteView.addGestureRecognizer(tap)
+        sketchnoteView.setDeleteAction {
+            let alert = UIAlertController(title: "Sketchnote", message: "", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "Delete", style: .default, handler: { action in
+                collectionView.noteCollection!.removeSketchnote(note: note)
+                sketchnoteView.removeFromSuperview()
+                self.saveNoteCollections()
+            }))
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+            self.present(alert, animated: true)
+        }
     }
     
     private func displayNoteCollection(collection: NoteCollection) {
-        var noteCollectionView = NoteCollectionView(frame: notesStackView.frame)
+        let noteCollectionView = NoteCollectionView(frame: notesStackView.frame)
+        noteCollectionView.parentViewController = self
         noteCollectionView.setNoteCollection(collection: collection)
         self.noteCollectionViews.append(noteCollectionView)
-        self.notesStackView.addArrangedSubview(noteCollectionView)
-        //self.notesStackView.insertArrangedSubview(noteCollectionView, at: 0)
-        
-        noteCollectionView.setNewSketchnoteAction(for: .touchUpInside) {
-            let newNote = Sketchnote(image: nil, relatedDocuments: nil, drawings: nil)!
-            self.selectedSketchnote = newNote
-            
-            collection.addSketchnote(note: newNote)
-            self.performSegue(withIdentifier: "NewSketchnote", sender: self)
-            
-            self.displaySketchnote(note: newNote, collectionView: &noteCollectionView)
-        }
-        
+        self.notesStackView.insertArrangedSubview(noteCollectionView, at: 0)
+   
         for n in collection.notes {
-            displaySketchnote(note: n, collectionView: &noteCollectionView)
+            displaySketchnote(note: n, collectionView: noteCollectionView)
         }
     }
     
@@ -150,27 +150,45 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         self.selectedSketchnote = noteView.sketchnote
         self.performSegue(withIdentifier: "EditSketchnote", sender: self)
     }
+    
 
     @IBAction func newNoteCollectionTapped(_ sender: LGButton) {
         let noteCollection = NoteCollection(title: "Untitled", notes: nil)!
         self.noteCollections.append(noteCollection)
         
-        var noteCollectionView = NoteCollectionView(frame: notesStackView.frame)
+        let noteCollectionView = NoteCollectionView(frame: notesStackView.frame)
         noteCollectionView.setNoteCollection(collection: noteCollection)
         self.noteCollectionViews.append(noteCollectionView)
         
         notesStackView.insertArrangedSubview(noteCollectionView, at: 0)
         
-        noteCollectionView.setNewSketchnoteAction(for: .touchUpInside) {
-            let newNote = Sketchnote(image: nil, relatedDocuments: nil, drawings: nil)!
-            self.selectedSketchnote = newNote
-            
-            noteCollection.addSketchnote(note: newNote)
-            self.displaySketchnote(note: newNote, collectionView: &noteCollectionView)
-            
-            self.performSegue(withIdentifier: "NewSketchnote", sender: self)
-        }
         saveNoteCollections()
     }
+    
+    @IBAction func searchButtonTapped(_ sender: LGButton) {
+        if !searchField.text!.isEmpty {
+            let searchString = searchField.text!.lowercased()
+            for i in 0..<noteCollectionViews.count {
+                for j in 0..<noteCollectionViews[i].sketchnoteViews.count {
+                    var documentLabels = [String]()
+                    for doc in noteCollectionViews[i].sketchnoteViews[j].sketchnote?.relatedDocuments ?? [Document]() {
+                        documentLabels.append(doc.title.lowercased())
+                    }
+                    if (noteCollectionViews[i].sketchnoteViews[j].sketchnote?.recognizedText?.lowercased().contains(searchString) ?? false) || (noteCollectionViews[i].sketchnoteViews[j].sketchnote?.drawings?.contains(searchString) ?? false) || (documentLabels.contains(searchString)) {
+                        noteCollectionViews[i].sketchnoteViews[j].isHidden = false
+                    }
+                    else {
+                        noteCollectionViews[i].sketchnoteViews[j].isHidden = true
+                    }
+                }
+            }
+        }
+        else {
+            for i in 0..<noteCollectionViews.count {
+                for j in 0..<noteCollectionViews[i].sketchnoteViews.count {
+                        noteCollectionViews[i].sketchnoteViews[j].isHidden = false
+                }
+            }
+        }
+    }
 }
-

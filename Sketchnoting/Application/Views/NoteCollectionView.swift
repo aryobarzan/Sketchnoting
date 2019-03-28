@@ -9,13 +9,15 @@
 import UIKit
 import LGButton
 
-class NoteCollectionView : UIView {
+class NoteCollectionView : UIView, UITextFieldDelegate {
     let kCONTENT_XIB_NAME = "NoteCollectionView"
     @IBOutlet var contentView: UIView!
     @IBOutlet var scrollView: UIScrollView!
-    @IBOutlet var stackView: UIStackView!
-    @IBOutlet var titleLabel: UILabel!
+    var stackView = UIStackView()
+    @IBOutlet var titleField: UITextField!
     @IBOutlet var newSketchnoteButton: LGButton!
+    
+    var parentViewController: ViewController!
     
     var noteCollection: NoteCollection?
     
@@ -36,19 +38,52 @@ class NoteCollectionView : UIView {
         self.widthAnchor.constraint(equalToConstant: 600).isActive = true
         self.heightAnchor.constraint(equalToConstant: 335).isActive = true
         contentView.fixInView(self)
-        
+        stackView.axis = .horizontal
+        stackView.distribution = .equalSpacing
+        stackView.alignment = .fill
+        stackView.spacing = 15
+        scrollView.addSubview(stackView)
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            stackView.topAnchor.constraint(equalTo: scrollView.topAnchor),
+            stackView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
+            stackView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
+            stackView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
+            stackView.heightAnchor.constraint(equalTo: scrollView.heightAnchor)
+            ])
+        titleField.delegate = self
+    }
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        // Hide the keyboard.
+        textField.resignFirstResponder()
+        if titleField.text == nil || titleField.text!.isEmpty {
+            titleField.text = "Untitled"
+        }
+        self.noteCollection?.title = titleField.text!
+        parentViewController.saveNoteCollections()
+        return true
     }
     
     func setNoteCollection(collection: NoteCollection) {
-        self.titleLabel.text = collection.title
+        self.titleField.text = collection.title
         self.noteCollection = collection
     }
     
-    func setNewSketchnoteAction(for controlEvents: UIControl.Event, _ closure: @escaping ()->()) {
+    @IBAction func newSketchnoteTapped(_ sender: LGButton) {
+        let newNote = Sketchnote(image: nil, relatedDocuments: nil, drawings: nil)!
+        noteCollection!.addSketchnote(note: newNote)
+        
+        parentViewController.selectedSketchnote = newNote
+        parentViewController.performSegue(withIdentifier: "NewSketchnote", sender: self)
+        parentViewController.displaySketchnote(note: newNote, collectionView: self)
+    }
+    
+    /*func setNewSketchnoteAction(for controlEvents: UIControl.Event, _ closure: @escaping ()->()) {
         let sleeve = ClosureSleeve(closure)
         newSketchnoteButton.addTarget(sleeve, action: #selector(ClosureSleeve.invoke), for: controlEvents)
         objc_setAssociatedObject(self, String(format: "[%d]", arc4random()), sleeve, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
-    }
+    }*/
 }
 class ClosureSleeve {
     let closure: ()->()
