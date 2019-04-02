@@ -249,7 +249,8 @@ class SemanticHelper {
         let chunks = text.split(by: 6000)
         
         for chunk in chunks {
-            let parameters: Parameters = ["text": chunk, "confidence": 0.3]
+            let (confidence, _) = calculate_confidence_support(l: Double(chunk.count))
+            let parameters: Parameters = ["text": chunk, "confidence": confidence]
             let headers: HTTPHeaders = [
                 "Accept": "application/json"
             ]
@@ -261,6 +262,55 @@ class SemanticHelper {
             }
         }
     }
+    static func performSpotlightUniandesOnSketchnote(text: String, viewController: SketchNoteViewController) {
+        let (confidence, support) = calculate_confidence_support(l: Double(text.count))
+        print("confidence \(confidence)")
+        print("support \(support)")
+
+        let parameters: Parameters = ["text": text, "language": "EN", "confidence": confidence, "support": support, "canonical": 1]
+        let headers: HTTPHeaders = [
+            "Accept": "application/json"
+        ]
+        Manager.request("http://172.24.99.127:8081/spotlight", method: .post, parameters: parameters, encoding: URLEncoding(destination: .queryString), headers: headers).responseJSON { response in
+            if let json = response.result.value {
+                let result = json as! NSArray
+                print(result)
+            }
+        }
+    }
+    
+    private static func get_slope_intercept(x1: Double, x2: Double, y1: Double, y2: Double) -> (Double, Double) {
+        let slope = (y2 - y1) / (x2 - x1)
+        let intercept = y1 - slope * x1
+        return (slope, intercept)
+    }
+    
+    
+    private static func interpolate(xRange: [Double], yRange: [Double], x: Double) -> Double {
+        let (slope, intercept) = get_slope_intercept(x1: xRange[0], x2: xRange[1], y1: yRange[0], y2: yRange[1])
+        let y = slope * x + intercept
+        return y
+    }
+    
+    private static func calculate_confidence_support(l: Double) -> (Double, Double) {
+        var confidence = 0.5
+        var support = 20.0
+        if (0 ... 500).contains(l) {
+            confidence = interpolate(xRange: [0, 500], yRange: [0.1, 0.25], x: l)
+            support = interpolate(xRange: [0, 500], yRange: [5, 10], x: l)
+        }
+        else if (500 ... 1000).contains(l) {
+            confidence = interpolate(xRange: [500, 1000], yRange: [0.2, 0.35], x: l)
+            support = interpolate(xRange: [500, 1000], yRange: [5, 10], x: l)
+        }
+        else {
+            confidence = 0.4
+            support = 20
+        }
+    
+    return (confidence, support)
+    }
+
 }
 
 

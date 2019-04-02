@@ -277,6 +277,9 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         sketchView.clear()
         sketchView.subviews.forEach { $0.removeFromSuperview() }
         self.setupHelpLines()
+        sketchnote?.relatedDocuments = [Document]()
+        sketchnote?.drawings = [String]()
+        sketchnote?.recognizedText = ""
     }
     @IBAction func redoTapped(_ sender: UIBarButtonItem) {
         sketchView.redo()
@@ -293,6 +296,9 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     }
     @IBAction func documentsTapped(_ sender: LGButton) {
         documentsButton.isLoading = true
+        for helpLine in self.helpLines {
+            helpLine.isHidden = true
+        }
         self.processOCR(image: sketchView.asImage())
     }
     
@@ -350,6 +356,11 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         
         textRecognizer.process(image) { result, error in
             self.documentsButton.isLoading = false
+            if self.helpLinesShown {
+                for helpLine in self.helpLines {
+                    helpLine.isHidden = false
+                }
+            }
             guard error == nil, let result = result else {
                 let alertController = UIAlertController(title: "Error", message: "No documents could be found.", preferredStyle: .alert)
                 let alertAction = UIAlertAction(title: "Close", style: .default)
@@ -431,7 +442,29 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
                         docsContentView.insertArrangedSubview(node, at: 0)
                         documentViews.append(node)
                         
-                        let document = Document(title: concept, description: nil, URL: conceptURL, type: .Spotlight)
+                        // Fetch a short description
+                        var description = ""
+                        let url = URL(string: conceptURL)
+                        if url != nil {
+                            do {
+                                let html = try NSString(contentsOf: url!, encoding: String.Encoding.utf8.rawValue)
+                                if let regex = try? NSRegularExpression(pattern: "<li><span class=\"literal\"><span property=\"dbo:abstract\" xmlns:dbo=\"http://dbpedia.org/ontology/\" xml:lang=\"en\">.*</span>", options: .caseInsensitive)
+                                {
+                                    
+                                    let matches = regex.matches(in: html as String, options: [], range: NSRange(location: 0, length: html.length)).map {
+                                        html.substring(with: $0.range)
+                                    }
+                                    if matches.count > 0 {
+                                        description = matches[0]
+                                        print(description)
+                                    }
+                                }
+                            } catch {
+                                
+                            }
+                        }
+                        
+                        let document = Document(title: concept, description: description, URL: conceptURL, type: .Spotlight)
                         if document != nil {
                             print("Adding document: " + document!.title)
                             self.sketchnote!.addDocument(document: document!)

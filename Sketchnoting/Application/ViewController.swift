@@ -45,6 +45,9 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
                 displayNoteCollection(collection: collection)
             }
         }
+        
+        //SemanticHelper.performSpotlightUniandesOnSketchnote(text: "Bach was a composer of Baroque music", viewController: SketchNoteViewController())
+        //SemanticHelper.performSpotlightOnSketchnote(text: "Bach was a composer of Baroque music", viewController: SketchNoteViewController())
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -171,14 +174,22 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
             for i in 0..<noteCollectionViews.count {
                 for j in 0..<noteCollectionViews[i].sketchnoteViews.count {
                     var documentLabels = [String]()
+                    var found = false
                     for doc in noteCollectionViews[i].sketchnoteViews[j].sketchnote?.relatedDocuments ?? [Document]() {
+                        if doc.title.lowercased().contains(searchString) || (doc.description != nil && !doc.description!.isEmpty && doc.description!.lowercased().contains(searchString)) {
+                            noteCollectionViews[i].sketchnoteViews[j].isHidden = false
+                            found = true
+                            break
+                        }
                         documentLabels.append(doc.title.lowercased())
                     }
-                    if (noteCollectionViews[i].sketchnoteViews[j].sketchnote?.recognizedText?.lowercased().contains(searchString) ?? false) || (noteCollectionViews[i].sketchnoteViews[j].sketchnote?.drawings?.contains(searchString) ?? false) || (documentLabels.contains(searchString)) {
-                        noteCollectionViews[i].sketchnoteViews[j].isHidden = false
-                    }
-                    else {
-                        noteCollectionViews[i].sketchnoteViews[j].isHidden = true
+                    if !found {
+                        if (noteCollectionViews[i].sketchnoteViews[j].sketchnote?.recognizedText?.lowercased().contains(searchString) ?? false) || (noteCollectionViews[i].sketchnoteViews[j].sketchnote?.drawings?.contains(searchString) ?? false) || (documentLabels.contains(searchString)) {
+                            noteCollectionViews[i].sketchnoteViews[j].isHidden = false
+                        }
+                        else {
+                            noteCollectionViews[i].sketchnoteViews[j].isHidden = true
+                        }
                     }
                 }
             }
