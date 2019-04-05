@@ -16,6 +16,7 @@ class Sketchnote: Note {
     var relatedDocuments: [Document]?
     var drawings: [String]?
     var recognizedText: String?
+    var drawingViewRects: [CGRect]?
     
     static let DocumentsDirectory = FileManager().urls(for: .documentDirectory, in: .userDomainMask).first!
     static let ArchiveURL = DocumentsDirectory.appendingPathComponent("sketchnotes")
@@ -27,6 +28,7 @@ class Sketchnote: Note {
         case relatedDocuments = "relatedDocuments"
         case drawings = "drawings"
         case recognizedText
+        case drawingViewRects = "drawingViewRects"
     }
     
     //MARK: Initialization
@@ -45,13 +47,12 @@ class Sketchnote: Note {
         try container.encode(relatedDocuments, forKey: .relatedDocuments)
         try container.encode(drawings, forKey: .drawings)
         try container.encode(recognizedText, forKey: .recognizedText)
-        
+        try container.encode(drawingViewRects, forKey: .drawingViewRects)
         if image != nil {
             let imageData: Data = image!.pngData()!
             let strBase64 = imageData.base64EncodedString(options: .lineLength64Characters)
             try container.encode(strBase64, forKey: .image)
         }
-        
     }
     
     required init(from decoder: Decoder) throws {
@@ -68,7 +69,7 @@ class Sketchnote: Note {
         relatedDocuments = try? container.decode([Document].self, forKey: .relatedDocuments) 
         drawings = try? container.decode([String].self, forKey: .drawings)
         recognizedText = try? container.decode(String.self, forKey: .recognizedText)
-
+        drawingViewRects = try? container.decode([CGRect].self, forKey: .drawingViewRects)
         do {
             let strBase64: String = try container.decode(String.self, forKey: .image)
             let dataDecoded: Data = Data(base64Encoded: strBase64, options: .ignoreUnknownCharacters)!
@@ -106,6 +107,21 @@ class Sketchnote: Note {
         }
         if !exists {
             drawings!.append(drawing.lowercased())
+        }
+    }
+    func addDrawingViewRect(rect: CGRect) {
+        var exists = false
+        if drawingViewRects == nil {
+            drawingViewRects = [CGRect]()
+        }
+        for r in drawingViewRects! {
+            if r == rect {
+                exists = true
+                break
+            }
+        }
+        if !exists {
+            drawingViewRects!.append(rect)
         }
     }
     

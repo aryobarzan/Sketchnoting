@@ -10,4 +10,5 @@ target 'Sketchnoting' do
   pod 'Firebase/MLVisionTextModel'
   pod 'CTSlidingUpPanel'
   pod 'GPUImage'
+  pod 'NewPopMenu'
 end

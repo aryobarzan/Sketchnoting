@@ -19,6 +19,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     
     var noteCollections = [NoteCollection]()
     var noteCollectionViews = [NoteCollectionView]()
+    var pathArrayDictionary = [TimeInterval: NSMutableArray]()
     
     var selectedSketchnote: Sketchnote?
 
@@ -46,6 +47,10 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
             }
         }
         
+        if let savedPathArrayDictionary = loadPathArrayDictionary() {
+            self.pathArrayDictionary = savedPathArrayDictionary
+        }
+        
         //SemanticHelper.performSpotlightUniandesOnSketchnote(text: "Bach was a composer of Baroque music", viewController: SketchNoteViewController())
         //SemanticHelper.performSpotlightOnSketchnote(text: "Bach was a composer of Baroque music", viewController: SketchNoteViewController())
     }
@@ -65,6 +70,9 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
             }
             sketchnoteViewController.new = false
             sketchnoteViewController.sketchnote = selectedSketchnote
+            if let pathArray = self.pathArrayDictionary[selectedSketchnote!.creationDate.timeIntervalSince1970] {
+                sketchnoteViewController.storedPathArray = pathArray
+            }
         default:
             print("Not creating or editing sketchnote. (ignore this)")
         }
@@ -88,6 +96,18 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
                     break
                 }
             }
+            var pathArrayExists = false
+            for (key, _) in self.pathArrayDictionary {
+                if key == note.creationDate.timeIntervalSince1970 {
+                    self.pathArrayDictionary[key] = sourceViewController.sketchView.pathArray
+                    pathArrayExists = true
+                    break
+                }
+            }
+            if !pathArrayExists {
+                self.pathArrayDictionary[note.creationDate.timeIntervalSince1970] = sourceViewController.sketchView.pathArray
+            }
+            savePathArrayDictionary()
         }
     }
     
@@ -101,6 +121,26 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         else {
             print("Encoding failed for note collections")
         }
+    }
+    
+    func savePathArrayDictionary() {
+        let DocumentsDirectory = FileManager().urls(for: .documentDirectory, in: .userDomainMask).first!
+        let ArchiveURLPathArray = DocumentsDirectory.appendingPathComponent("PathArrayDictionary")
+        if let encoded = try? NSKeyedArchiver.archivedData(withRootObject: self.pathArrayDictionary, requiringSecureCoding: false) {
+            try! encoded.write(to: ArchiveURLPathArray)
+            print("Path Array Dictionary saved..")
+        }
+        else {
+            print("Failed to encode path array dictionary.")
+        }
+    }
+    private func loadPathArrayDictionary() -> [TimeInterval: NSMutableArray]? {
+        let DocumentsDirectory = FileManager().urls(for: .documentDirectory, in: .userDomainMask).first!
+        let ArchiveURLPathArray = DocumentsDirectory.appendingPathComponent("PathArrayDictionary")
+        guard let codedData = try? Data(contentsOf: ArchiveURLPathArray) else { return nil }
+        guard let data = try? NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(codedData) as?
+            [TimeInterval: NSMutableArray] else { return nil }
+        return data
     }
     
     private func loadNoteCollections() -> [NoteCollection]? {
@@ -173,7 +213,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
             let searchString = searchField.text!.lowercased()
             for i in 0..<noteCollectionViews.count {
                 for j in 0..<noteCollectionViews[i].sketchnoteViews.count {
-                    var documentLabels = [String]()
                     var found = false
                     for doc in noteCollectionViews[i].sketchnoteViews[j].sketchnote?.relatedDocuments ?? [Document]() {
                         if doc.title.lowercased().contains(searchString) || (doc.description != nil && !doc.description!.isEmpty && doc.description!.lowercased().contains(searchString)) {
@@ -181,10 +220,9 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
                             found = true
                             break
                         }
-                        documentLabels.append(doc.title.lowercased())
                     }
                     if !found {
-                        if (noteCollectionViews[i].sketchnoteViews[j].sketchnote?.recognizedText?.lowercased().contains(searchString) ?? false) || (noteCollectionViews[i].sketchnoteViews[j].sketchnote?.drawings?.contains(searchString) ?? false) || (documentLabels.contains(searchString)) {
+                        if (noteCollectionViews[i].sketchnoteViews[j].sketchnote?.recognizedText?.lowercased().contains(searchString) ?? false) || (noteCollectionViews[i].sketchnoteViews[j].sketchnote?.drawings?.contains(searchString) ?? false) {
                             noteCollectionViews[i].sketchnoteViews[j].isHidden = false
                         }
                         else {

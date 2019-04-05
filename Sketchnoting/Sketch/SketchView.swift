@@ -257,6 +257,17 @@ public class SketchView: UIView {
             setNeedsDisplay()
         }
     }
+    
+    public func reloadPathArray(array: NSMutableArray) {
+        for obj in array.reversed() {
+            guard let tool = obj as? SketchTool else { return }
+            resetTool()
+            pathArray.add(tool)
+            updateCacheImage(true)
+            
+            setNeedsDisplay()
+        }
+    }
 
     public func canUndo() -> Bool {
         return pathArray.count > 0
