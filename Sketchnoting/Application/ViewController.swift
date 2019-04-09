@@ -8,6 +8,7 @@
 
 import UIKit
 import LGButton
+import PopMenu
 
 class ViewController: UIViewController, UIGestureRecognizerDelegate {
     
@@ -16,15 +17,29 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     @IBOutlet var searchButton: LGButton!
     @IBOutlet var scrollView: UIScrollView!
     var notesStackView = UIStackView()
+    @IBOutlet var dimView: UIView!
     
     var noteCollections = [NoteCollection]()
     var noteCollectionViews = [NoteCollectionView]()
     var pathArrayDictionary = [TimeInterval: NSMutableArray]()
     
     var selectedSketchnote: Sketchnote?
+    
+    var drawingSearchView: DrawingSearchView!
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        self.drawingSearchView = DrawingSearchView(frame: CGRect(x: 0, y: 0, width: 490, height: 600))
+        drawingSearchView.center = self.view.center
+        drawingSearchView.alpha = 1
+        drawingSearchView.transform = CGAffineTransform(scaleX: 0.8, y: 1.2)
+        drawingSearchView.setCloseAction(for: .touchUpInside) {
+            self.hideDrawingSearchView()
+        }
+        drawingSearchView.setSearchAction(for: .touchUpInside) {
+            self.searchByDrawing()
+        }
  
         notesStackView.axis = .vertical
         notesStackView.distribution = .equalSpacing
@@ -50,6 +65,18 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         if let savedPathArrayDictionary = loadPathArrayDictionary() {
             self.pathArrayDictionary = savedPathArrayDictionary
         }
+        
+        //Drawing Recognition
+        if let path = Bundle.main.path(forResource: "labels", ofType: "txt") {
+            do {
+                let data = try String(contentsOfFile: path, encoding: .utf8)
+                let labelNames = data.components(separatedBy: .newlines).filter { $0.count > 0 }
+                self.labelNames.append(contentsOf: labelNames)
+            } catch {
+                print("error loading labels: \(error)")
+            }
+        }
+        //Drawing Recognition
         
         //SemanticHelper.performSpotlightUniandesOnSketchnote(text: "Bach was a composer of Baroque music", viewController: SketchNoteViewController())
         //SemanticHelper.performSpotlightOnSketchnote(text: "Bach was a composer of Baroque music", viewController: SketchNoteViewController())
@@ -128,7 +155,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         let ArchiveURLPathArray = DocumentsDirectory.appendingPathComponent("PathArrayDictionary")
         if let encoded = try? NSKeyedArchiver.archivedData(withRootObject: self.pathArrayDictionary, requiringSecureCoding: false) {
             try! encoded.write(to: ArchiveURLPathArray)
-            print("Path Array Dictionary saved..")
+            print("Path Array Dictionary saved.")
         }
         else {
             print("Failed to encode path array dictionary.")
@@ -140,6 +167,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         guard let codedData = try? Data(contentsOf: ArchiveURLPathArray) else { return nil }
         guard let data = try? NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(codedData) as?
             [TimeInterval: NSMutableArray] else { return nil }
+        print("Path Array Dictionary loaded.")
         return data
     }
     
@@ -165,14 +193,17 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         sketchnoteView.isUserInteractionEnabled = true
         sketchnoteView.addGestureRecognizer(tap)
         sketchnoteView.setDeleteAction {
-            let alert = UIAlertController(title: "Sketchnote", message: "", preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: "Delete", style: .default, handler: { action in
+            let popMenu = PopMenuViewController(sourceView: sketchnoteView, actions: [PopMenuAction](), appearance: nil)
+            popMenu.appearance.popMenuBackgroundStyle = .blurred(.dark)
+            let closeAction = PopMenuDefaultAction(title: "Cancel")
+            let action = PopMenuDefaultAction(title: "Delete", color: .red, didSelect: { action in
                 collectionView.noteCollection!.removeSketchnote(note: note)
                 sketchnoteView.removeFromSuperview()
                 self.saveNoteCollections()
-            }))
-            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
-            self.present(alert, animated: true)
+            })
+            popMenu.addAction(action)
+            popMenu.addAction(closeAction)
+            self.present(popMenu, animated: true, completion: nil)
         }
     }
     
@@ -182,6 +213,17 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         noteCollectionView.setNoteCollection(collection: collection)
         self.noteCollectionViews.append(noteCollectionView)
         self.notesStackView.insertArrangedSubview(noteCollectionView, at: 0)
+        
+        noteCollectionView.setDeleteAction(for: .touchUpInside) {
+            let alert = UIAlertController(title: "Delete Note Collection?", message: "", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "Confirm", style: .destructive, handler: { action in
+                self.deleteNoteCollection(collection: collection)
+                noteCollectionView.removeFromSuperview()
+                self.saveNoteCollections()
+            }))
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+            self.present(alert, animated: true)
+        }
    
         for n in collection.notes {
             displaySketchnote(note: n, collectionView: noteCollectionView)
@@ -209,6 +251,10 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     }
     
     @IBAction func searchButtonTapped(_ sender: LGButton) {
+        self.performSearch()
+    }
+    
+    private func performSearch() {
         if !searchField.text!.isEmpty {
             let searchString = searchField.text!.lowercased()
             for i in 0..<noteCollectionViews.count {
@@ -235,9 +281,93 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         else {
             for i in 0..<noteCollectionViews.count {
                 for j in 0..<noteCollectionViews[i].sketchnoteViews.count {
-                        noteCollectionViews[i].sketchnoteViews[j].isHidden = false
+                    noteCollectionViews[i].sketchnoteViews[j].isHidden = false
                 }
             }
+        }
+    }
+    
+    @IBAction func searchByDrawingTapped(_ sender: LGButton) {
+        self.view.addSubview(self.drawingSearchView)
+        UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 0, options: [],  animations: {
+            self.dimView.isHidden = false
+            self.dimView.alpha = 0.8
+            self.drawingSearchView.transform = .identity
+        })
+    }
+    
+    private var labelNames: [String] = []
+    private let drawnImageClassifier = DrawnImageClassifier()
+    private var currentPrediction: DrawnImageClassifierOutput? {
+        didSet {
+            if let currentPrediction = currentPrediction {
+                
+                let sorted = currentPrediction.category_softmax_scores.sorted { $0.value > $1.value }
+                let top5 = sorted.prefix(5)
+                print(top5.map { $0.key + "(" + String($0.value) + ")"}.joined(separator: ", "))
+                var found = false
+                for (label, score) in top5 {
+                    if score > 0.5 {
+                        self.hideDrawingSearchView()
+                        self.searchField.text = label
+                        self.performSearch()
+                        found = true
+                        break
+                    }
+                }
+                if !found {
+                    let alert = UIAlertController(title: "No drawing recognized", message: "Try drawing again and make sure the drawing isn't too small.", preferredStyle: .alert)
+                    alert.addAction(UIAlertAction(title: "Okay", style: .cancel, handler: nil))
+                    self.present(alert, animated: true)
+                }
+            }
+            else {
+                print("Waiting for drawing")
+            }
+        }
+    }
+    private func searchByDrawing() {
+        let croppedCGImage:CGImage = (drawingSearchView.sketchView.asImage().cgImage)!
+        let croppedImage = UIImage(cgImage: croppedCGImage)
+        
+        let resized = croppedImage.resize(newSize: CGSize(width: 28, height: 28))
+        
+        guard let pixelBuffer = resized.grayScalePixelBuffer() else {
+            print("couldn't create pixel buffer")
+            return
+        }
+        do {
+            currentPrediction = try drawnImageClassifier.prediction(image: pixelBuffer)
+        }
+        catch {
+            print("error making prediction: \(error)")
+        }
+    }
+    private func hideDrawingSearchView() {
+        UIView.animate(withDuration: 0.0, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 0, options: [], animations: {
+            self.dimView.alpha = 0
+            self.dimView.isHidden = true
+            self.drawingSearchView.transform = CGAffineTransform(scaleX: 0.2, y: 0.2)
+            
+        }) { (success) in
+            self.drawingSearchView.removeFromSuperview()
+        }
+    }
+
+    
+    // Other helper actions
+    
+    private func deleteNoteCollection(collection: NoteCollection) {
+        var index = -1
+        for i in 0..<self.noteCollections.count {
+            if self.noteCollections[i] == collection {
+                index = i
+                break
+            }
+        }
+        if index != -1 {
+            print("Deleted")
+            self.noteCollections.remove(at: index)
         }
     }
 }

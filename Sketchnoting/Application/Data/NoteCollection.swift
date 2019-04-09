@@ -8,7 +8,8 @@
 
 import UIKit
 
-class NoteCollection: Codable {
+class NoteCollection: Codable, Equatable {
+    
     var title: String
     var notes: [Sketchnote]
     
@@ -63,5 +64,12 @@ class NoteCollection: Codable {
         if toDeleteIndex != -1 {
             self.notes.remove(at: toDeleteIndex)
         }
+    }
+    
+    static func == (lhs: NoteCollection, rhs: NoteCollection) -> Bool {
+        if lhs.title == rhs.title && lhs.notes == rhs.notes {
+            return true
+        }
+        return false
     }
 }

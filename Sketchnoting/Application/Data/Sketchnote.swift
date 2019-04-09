@@ -8,7 +8,7 @@
 
 import UIKit
 
-class Sketchnote: Note {
+class Sketchnote: Note, Equatable {
     
     var creationDate: Date!
     var updateDate: Date?
@@ -129,4 +129,10 @@ class Sketchnote: Note {
         self.updateDate = Date.init(timeIntervalSinceNow: 0)
     }
     
+    static func == (lhs: Sketchnote, rhs: Sketchnote) -> Bool {
+        if lhs.creationDate == rhs.creationDate {
+            return true
+        }
+        return false
+    }
 }

@@ -13,6 +13,7 @@
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="NoteCollectionView" customModule="Sketchnoting" customModuleProvider="target">
             <connections>
                 <outlet property="contentView" destination="iN0-l3-epB" id="px9-L8-6s1"/>
+                <outlet property="deleteButton" destination="smR-au-Zef" id="eNs-R1-3Cy"/>
                 <outlet property="newSketchnoteButton" destination="dhX-lE-C2o" id="VEc-ZR-yas"/>
                 <outlet property="scrollView" destination="nUo-io-NMh" id="iVi-K0-dkr"/>
                 <outlet property="titleField" destination="3aW-OP-zLQ" id="rBx-Hf-KR1"/>
@@ -61,12 +62,38 @@
                     <fontDescription key="fontDescription" type="system" pointSize="14"/>
                     <textInputTraits key="textInputTraits" enablesReturnKeyAutomatically="YES"/>
                 </textField>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="smR-au-Zef" customClass="LGButton" customModule="LGButton">
+                    <rect key="frame" x="400" y="2" width="50" height="28"/>
+                    <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="50" id="JU4-c8-5Xa"/>
+                        <constraint firstAttribute="height" constant="28" id="kx9-L5-Xmh"/>
+                    </constraints>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="string" keyPath="leftIconString" value="delete_forever"/>
+                        <userDefinedRuntimeAttribute type="string" keyPath="leftIconFontName" value="ma"/>
+                        <userDefinedRuntimeAttribute type="color" keyPath="gradientStartColor">
+                            <color key="value" red="0.89803921568627454" green="0.7124117892430627" blue="0.42573544258966467" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        </userDefinedRuntimeAttribute>
+                        <userDefinedRuntimeAttribute type="color" keyPath="gradientEndColor">
+                            <color key="value" red="0.89803921568627454" green="0.014848595534565818" blue="0.45708394631872085" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        </userDefinedRuntimeAttribute>
+                        <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                            <real key="value" value="14"/>
+                        </userDefinedRuntimeAttribute>
+                        <userDefinedRuntimeAttribute type="number" keyPath="leftIconFontSize">
+                            <real key="value" value="20"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
+                </view>
             </subviews>
             <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
             <constraints>
                 <constraint firstItem="3aW-OP-zLQ" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="9nP-Wv-drO"/>
+                <constraint firstItem="smR-au-Zef" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" constant="2" id="EQR-6J-ecv"/>
                 <constraint firstItem="nUo-io-NMh" firstAttribute="top" secondItem="3aW-OP-zLQ" secondAttribute="bottom" constant="3" id="Ex0-5D-B8B"/>
                 <constraint firstItem="dhX-lE-C2o" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" constant="2" id="MJB-MQ-09g"/>
+                <constraint firstItem="dhX-lE-C2o" firstAttribute="leading" secondItem="smR-au-Zef" secondAttribute="trailing" constant="8" id="MP2-6j-ewx"/>
                 <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="dhX-lE-C2o" secondAttribute="trailing" constant="7" id="TFv-5Q-mNb"/>
                 <constraint firstItem="nUo-io-NMh" firstAttribute="top" secondItem="dhX-lE-C2o" secondAttribute="bottom" constant="5" id="UQU-9v-pod"/>
                 <constraint firstAttribute="trailing" secondItem="nUo-io-NMh" secondAttribute="trailing" id="ec5-vE-6vK"/>

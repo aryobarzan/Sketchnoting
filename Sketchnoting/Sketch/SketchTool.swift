@@ -29,48 +29,6 @@ class PenTool: UIBezierPath, SketchTool {
     var lineColor: UIColor
     var lineAlpha: CGFloat
     var drawingPenType: PenType
-    
-    enum CodingKeys: String, CodingKey {
-        case lineWidth
-        case lineColorRed
-        case lineColorGreen
-        case lineColorBlue
-        case lineAlpha
-        case path = "path"
-    }
-    /*func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(lineWidth, forKey: .lineWidth)
-        try container.encode(lineColor.ciColor.red, forKey: .lineColorRed)
-        try container.encode(lineColor.ciColor.green, forKey: .lineColorGreen)
-        try container.encode(lineColor.ciColor.blue, forKey: .lineColorBlue)
-        try container.encode(lineAlpha, forKey: .lineAlpha)
-        try container.encode(UIBezierPath(cgPath: path)., forKey: .path)
-    }
-    
-    required init(from decoder: Decoder) throws {
-        print("Decoding sketchnote")
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        
-        creationDate = Date(timeIntervalSince1970: try container.decode(TimeInterval.self, forKey: .creationDate))
-        do {
-            _ = try container.decode(TimeInterval.self, forKey: .updateDate)
-            updateDate = Date(timeIntervalSince1970: try container.decode(TimeInterval.self, forKey: .updateDate))
-        } catch {
-        }
-        
-        relatedDocuments = try? container.decode([Document].self, forKey: .relatedDocuments)
-        drawings = try? container.decode([String].self, forKey: .drawings)
-        recognizedText = try? container.decode(String.self, forKey: .recognizedText)
-        
-        do {
-            let strBase64: String = try container.decode(String.self, forKey: .image)
-            let dataDecoded: Data = Data(base64Encoded: strBase64, options: .ignoreUnknownCharacters)!
-            image = UIImage(data: dataDecoded)
-        } catch {
-        }
-        print("Sketchnote decoded")
-    }*/
 
     override init() {
         path = CGMutablePath.init()

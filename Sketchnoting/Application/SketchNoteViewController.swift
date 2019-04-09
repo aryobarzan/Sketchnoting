@@ -80,6 +80,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
                 print("error loading labels: \(error)")
             }
         }
+        //Drawing Recognition
         
         if sketchnote != nil {
             if new == true {
@@ -87,6 +88,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
             }
             else {
                 if self.storedPathArray != nil {
+                    print("Reloading")
                     self.sketchView.reloadPathArray(array: self.storedPathArray!)
                 }
                 else if sketchnote?.image != nil {
@@ -116,9 +118,10 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
                 drawingView.isHidden = true
                 drawingView.isUserInteractionEnabled = false
                 self.drawingViews.append(drawingView)
-                if !self.drawingViewsShown {
-                    self.toggleDrawingViews()
-                }
+                
+            }
+            if sketchnote!.drawingViewRects!.count > 0 && !self.drawingViewsShown {
+                self.toggleDrawingViews()
             }
         }
         

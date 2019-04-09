@@ -16,6 +16,7 @@ class NoteCollectionView : UIView, UITextFieldDelegate {
     var stackView = UIStackView()
     @IBOutlet var titleField: UITextField!
     @IBOutlet var newSketchnoteButton: LGButton!
+    @IBOutlet var deleteButton: LGButton!
     
     var parentViewController: ViewController!
     
@@ -79,10 +80,18 @@ class NoteCollectionView : UIView, UITextFieldDelegate {
         parentViewController.displaySketchnote(note: newNote, collectionView: self)
     }
     
-    /*func setNewSketchnoteAction(for controlEvents: UIControl.Event, _ closure: @escaping ()->()) {
+    func setDeleteAction(for controlEvents: UIControl.Event, _ closure: @escaping ()->()) {
         let sleeve = ClosureSleeve(closure)
-        newSketchnoteButton.addTarget(sleeve, action: #selector(ClosureSleeve.invoke), for: controlEvents)
+        deleteButton.addTarget(sleeve, action: #selector(ClosureSleeve.invoke), for: controlEvents)
         objc_setAssociatedObject(self, String(format: "[%d]", arc4random()), sleeve, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
+    }
+    
+   /* public func setDeleteAction(action: (() -> Void)?) {
+        deleteTapAction = action
+        isUserInteractionEnabled = true
+        let selector = #selector(handleDeleteTap)
+        let recognizer = UITapGestureRecognizer(target: self, action: selector)
+        addGestureRecognizer(recognizer)
     }*/
 }
 class ClosureSleeve {
@@ -96,3 +105,27 @@ class ClosureSleeve {
         closure()
     }
 }
+
+fileprivate extension UIView {
+    
+    typealias Action = (() -> Void)
+    
+    struct Key { static var id = "deleteTapAction" }
+    
+    var deleteTapAction: Action? {
+        get {
+            return objc_getAssociatedObject(self, &Key.id) as? Action
+        }
+        set {
+            guard let value = newValue else { return }
+            let policy = objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN
+            objc_setAssociatedObject(self, &Key.id, value, policy)
+        }
+    }
+    
+    @objc func handleDeleteTap(sender: UITapGestureRecognizer) {
+        guard sender.state == .began else { return }
+        deleteTapAction?()
+    }
+}
+
