@@ -87,7 +87,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
                 sketchnote?.image = sketchView.asImage()
             }
             else {
-                if self.storedPathArray != nil {
+                if self.storedPathArray != nil && self.storedPathArray!.count > 0 {
                     print("Reloading")
                     self.sketchView.reloadPathArray(array: self.storedPathArray!)
                 }
@@ -275,6 +275,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
             self.processDrawingRecognition()
             sketchnote?.image = sketchView.asImage()
             sketchnote?.setUpdateDate()
+            self.storedPathArray = sketchView.pathArray
             print("Closing & Saving sketchnote")
         }
     }

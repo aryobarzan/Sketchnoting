@@ -264,7 +264,6 @@ public class SketchView: UIView {
             resetTool()
             pathArray.add(tool)
             updateCacheImage(true)
-            
             setNeedsDisplay()
         }
     }

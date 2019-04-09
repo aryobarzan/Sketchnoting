@@ -41,7 +41,7 @@ class PenTool: UIBezierPath, SketchTool {
 
     required init?(coder aDecoder: NSCoder) {
         lineColor = aDecoder.decodeObject(forKey: "lineColor") as! UIColor
-        lineAlpha = 0
+        lineAlpha = 1
         path = (aDecoder.decodeObject(forKey: "path") as! UIBezierPath).cgPath as! CGMutablePath
         drawingPenType = .normal
         super.init()
@@ -82,7 +82,6 @@ class PenTool: UIBezierPath, SketchTool {
     
     func draw() {
         guard let ctx = UIGraphicsGetCurrentContext() else { return }
-        
         switch drawingPenType {
         case .normal:
             ctx.addPath(path)

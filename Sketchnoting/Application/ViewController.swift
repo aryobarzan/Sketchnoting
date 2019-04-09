@@ -95,11 +95,12 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
             guard let sketchnoteViewController = segue.destination as? SketchNoteViewController else {
                 fatalError("Unexpected destination")
             }
-            sketchnoteViewController.new = false
-            sketchnoteViewController.sketchnote = selectedSketchnote
             if let pathArray = self.pathArrayDictionary[selectedSketchnote!.creationDate.timeIntervalSince1970] {
                 sketchnoteViewController.storedPathArray = pathArray
             }
+            sketchnoteViewController.new = false
+            sketchnoteViewController.sketchnote = selectedSketchnote
+            
         default:
             print("Not creating or editing sketchnote. (ignore this)")
         }
@@ -123,17 +124,8 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
                     break
                 }
             }
-            var pathArrayExists = false
-            for (key, _) in self.pathArrayDictionary {
-                if key == note.creationDate.timeIntervalSince1970 {
-                    self.pathArrayDictionary[key] = sourceViewController.sketchView.pathArray
-                    pathArrayExists = true
-                    break
-                }
-            }
-            if !pathArrayExists {
-                self.pathArrayDictionary[note.creationDate.timeIntervalSince1970] = sourceViewController.sketchView.pathArray
-            }
+            saveNoteCollections()
+            self.pathArrayDictionary[note.creationDate.timeIntervalSince1970] = sourceViewController.storedPathArray
             savePathArrayDictionary()
         }
     }
@@ -241,11 +233,12 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         let noteCollection = NoteCollection(title: "Untitled", notes: nil)!
         self.noteCollections.append(noteCollection)
         
-        let noteCollectionView = NoteCollectionView(frame: notesStackView.frame)
+        displayNoteCollection(collection: noteCollection)
+        /**let noteCollectionView = NoteCollectionView(frame: notesStackView.frame)
         noteCollectionView.setNoteCollection(collection: noteCollection)
         self.noteCollectionViews.append(noteCollectionView)
         
-        notesStackView.insertArrangedSubview(noteCollectionView, at: 0)
+        notesStackView.insertArrangedSubview(noteCollectionView, at: 0)*/
         
         saveNoteCollections()
     }
