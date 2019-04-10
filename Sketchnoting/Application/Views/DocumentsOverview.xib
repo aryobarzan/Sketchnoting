@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="ipad9_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14490.49"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="DocumentsOverview" customModule="Sketchnoting" customModuleProvider="target">
+            <connections>
+                <outlet property="closeButton" destination="ONO-fK-5rY" id="ZGX-2I-gUE"/>
+                <outlet property="mainView" destination="iN0-l3-epB" id="pQp-X7-19V"/>
+                <outlet property="scrollView" destination="qz0-Je-cIT" id="1ci-ho-2lt"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="iN0-l3-epB">
+            <rect key="frame" x="0.0" y="0.0" width="500" height="570"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Efo-Im-PoR">
+                    <rect key="frame" x="0.0" y="0.0" width="500" height="50"/>
+                    <subviews>
+                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ONO-fK-5rY" customClass="LGButton" customModule="LGButton">
+                            <rect key="frame" x="396" y="11" width="96" height="28"/>
+                            <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            <constraints>
+                                <constraint firstAttribute="width" constant="96" id="4nU-ia-WgX"/>
+                                <constraint firstAttribute="height" constant="28" id="eVu-En-tWZ"/>
+                            </constraints>
+                            <userDefinedRuntimeAttributes>
+                                <userDefinedRuntimeAttribute type="string" keyPath="titleString" value="Close"/>
+                                <userDefinedRuntimeAttribute type="string" keyPath="leftIconString" value="close"/>
+                                <userDefinedRuntimeAttribute type="string" keyPath="leftIconFontName" value="ma"/>
+                                <userDefinedRuntimeAttribute type="color" keyPath="gradientStartColor">
+                                    <color key="value" red="0.37254901959999998" green="0.75686274509999996" blue="0.58039215690000001" alpha="0.84999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
+                                </userDefinedRuntimeAttribute>
+                                <userDefinedRuntimeAttribute type="color" keyPath="gradientEndColor">
+                                    <color key="value" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                </userDefinedRuntimeAttribute>
+                                <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                    <real key="value" value="14"/>
+                                </userDefinedRuntimeAttribute>
+                            </userDefinedRuntimeAttributes>
+                        </view>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Documents" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Zux-51-jCH">
+                            <rect key="frame" x="197" y="13" width="106" height="24"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="20"/>
+                            <nil key="textColor"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                    </subviews>
+                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    <constraints>
+                        <constraint firstItem="ONO-fK-5rY" firstAttribute="top" secondItem="Efo-Im-PoR" secondAttribute="top" constant="11" id="NSv-AC-7io"/>
+                        <constraint firstAttribute="bottom" secondItem="ONO-fK-5rY" secondAttribute="bottom" constant="11" id="Vcf-gX-jpC"/>
+                        <constraint firstAttribute="trailing" secondItem="ONO-fK-5rY" secondAttribute="trailing" constant="8" id="cOu-lU-AAO"/>
+                        <constraint firstAttribute="height" constant="50" id="sCh-8g-6xX"/>
+                        <constraint firstAttribute="width" constant="500" id="yXa-Tm-C2R"/>
+                    </constraints>
+                </view>
+                <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="qz0-Je-cIT">
+                    <rect key="frame" x="0.0" y="58" width="500" height="512"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="512" id="ECN-pG-fJb"/>
+                        <constraint firstAttribute="width" constant="500" id="x0W-Rh-NpM"/>
+                    </constraints>
+                </scrollView>
+            </subviews>
+            <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+            <constraints>
+                <constraint firstItem="Efo-Im-PoR" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="34w-Hj-YfS"/>
+                <constraint firstItem="qz0-Je-cIT" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="C69-pW-Vb8"/>
+                <constraint firstItem="Efo-Im-PoR" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="MPo-zx-x2C"/>
+                <constraint firstItem="qz0-Je-cIT" firstAttribute="top" secondItem="Efo-Im-PoR" secondAttribute="bottom" constant="8" id="a89-hz-NJJ"/>
+                <constraint firstItem="Efo-Im-PoR" firstAttribute="trailing" secondItem="vUN-kp-3ea" secondAttribute="trailing" id="fRk-RY-Eyd"/>
+                <constraint firstItem="qz0-Je-cIT" firstAttribute="trailing" secondItem="vUN-kp-3ea" secondAttribute="trailing" id="oZV-cP-OAM"/>
+                <constraint firstItem="qz0-Je-cIT" firstAttribute="bottom" secondItem="vUN-kp-3ea" secondAttribute="bottom" id="vHV-q2-fqf"/>
+            </constraints>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
+            <point key="canvasLocation" x="29.6875" y="192.1875"/>
+        </view>
+    </objects>
+</document>

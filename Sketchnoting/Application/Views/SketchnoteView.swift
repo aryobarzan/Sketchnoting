@@ -12,6 +12,8 @@ class SketchnoteView : UIView {
     let kCONTENT_XIB_NAME = "SketchnoteView"
     @IBOutlet var contentView: UIView!
     @IBOutlet var imageView: UIImageView!
+    @IBOutlet var creationDateView: UIView!
+    @IBOutlet var creationDateLabel: UILabel!
     
     var sketchnote: Sketchnote?
     
@@ -32,12 +34,20 @@ class SketchnoteView : UIView {
         contentView.fixInView(self)
         
         self.layer.borderWidth = 1
-        self.layer.borderColor = UIColor.black.cgColor        
+        self.layer.borderColor = UIColor.black.cgColor
+        creationDateView.layer.cornerRadius = 12
     }
     
     func setNote(note: Sketchnote) {
         self.sketchnote = note
         self.imageView.image = note.image
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+        let dateAsString = formatter.string(from: Date())
+        let date = formatter.date(from: dateAsString)
+        formatter.dateFormat = "dd MMM yyyy"
+        let formattedDateAsString = formatter.string(from: date!)
+        self.creationDateLabel.text = formattedDateAsString
     }
     
     public func setDeleteAction(action: (() -> Void)?) {

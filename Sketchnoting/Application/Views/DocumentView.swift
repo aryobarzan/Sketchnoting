@@ -15,6 +15,7 @@ class DocumentView: UIView {
     @IBOutlet var contentView: UIView!
     @IBOutlet var titleLabel: UILabel!
     @IBOutlet var viewButton: LGButton!
+    @IBOutlet var descriptionLabel: UILabel!
     
     var urlString: String?
     
@@ -31,8 +32,10 @@ class DocumentView: UIView {
     func commonInit() {
         Bundle.main.loadNibNamed(kCONTENT_XIB_NAME, owner: self, options: nil)
         contentView.fixInView(self)
-        //self.widthAnchor.constraint(equalToConstant: contentView.frame.size.width).isActive = true //contentView.frame.size.width
-        //self.heightAnchor.constraint(equalToConstant: 100).isActive = true
+        self.heightAnchor.constraint(equalToConstant: 400).isActive = true
+        self.heightAnchor.constraint(equalToConstant: 280).isActive = true
+        self.layer.borderColor = UIColor.black.cgColor
+        self.layer.borderWidth = 1
     }
     @IBAction func viewTapped(_ sender: LGButton) {
         guard let url = URL(string: urlString ?? "") else { return }

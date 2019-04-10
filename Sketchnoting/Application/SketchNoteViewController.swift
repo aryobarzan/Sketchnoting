@@ -9,7 +9,6 @@
 import UIKit
 import LGButton
 import Firebase
-import CTSlidingUpPanel
 import PopMenu
 
 class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, SketchViewDelegate {
@@ -25,10 +24,8 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     @IBOutlet var helpLinesButton: LGButton!
     @IBOutlet var drawingsButton: LGButton!
     
-    var bottomController:CTBottomSlideController?;
-    @IBOutlet var docsView: UIView!
-    @IBOutlet var docsContentView: UIStackView!
     var documentViews = [DocumentView]()
+    var documentsOverview: DocumentsOverview!
     
     var colorSlider: ColorSlider!
     var toolsMenu: ExpandableButtonView!
@@ -47,15 +44,13 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        docsView.addBlurBackground()
-        docsView.curveTopCorners()
-        
-        bottomController = CTBottomSlideController(parent: view, bottomView: docsView,
-                                                   tabController: nil,
-                                                   navController: self.navigationController, visibleHeight: 65)
-        //0 is bottom and 1 is top. 0.5 would be center
-        bottomController?.setAnchorPoint(anchor: 0.7)
-        bottomController?.hidePanel()
+        documentsOverview = DocumentsOverview(frame: CGRect(x: 0, y: 0, width: 500, height: 570))
+        documentsOverview.center = self.view.center
+        documentsOverview.alpha = 1
+        documentsOverview.transform = CGAffineTransform(scaleX: 0.8, y: 1.2)
+        documentsOverview.setCloseAction(for: .touchUpInside) {
+            self.hideDocumentsOverview()
+        }
 
         colorSlider = ColorSlider(orientation: .horizontal, previewSide: .bottom)
         colorSlider.color = .black
@@ -88,7 +83,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
             }
             else {
                 if self.storedPathArray != nil && self.storedPathArray!.count > 0 {
-                    print("Reloading")
+                    print("Debug: Reloading path array")
                     self.sketchView.reloadPathArray(array: self.storedPathArray!)
                 }
                 else if sketchnote?.image != nil {
@@ -443,7 +438,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     
     func displayBabelfyDocuments(text: String, json: NSArray) {
         documentsButton.isLoading = false
-        bottomController?.expandPanel()
+        //bottomController?.expandPanel()
         
         /*var results = [String: String]()
         for item in json {
@@ -472,78 +467,54 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         }
         documentViews = [DocumentView]()
         
-        for item in json {
+        /*for item in json {
             let array2 = item as! NSArray
             let node = DocumentView(frame: docsContentView.frame)
             node.titleLabel.text = array2[0] as? String
             node.center.x = docsContentView.center.x
             docsContentView.addArrangedSubview(node)
             documentViews.append(node)
-        }
+        }*/
     }
     
-    func displaySpotlightDocuments(text: String, json: Any) {
+    func displaySpotlightDocuments(documents: [Document]) {
         documentsButton.isLoading = false
-        bottomController?.expandPanel()
+        //bottomController?.expandPanel()
+        self.view.addSubview(self.documentsOverview)
+        self.view.bringSubviewToFront(documentsOverview)
+        UIView.animate(withDuration: 0.0, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 0, options: [],  animations: {
+            //self.dimView.isHidden = false
+            //self.dimView.alpha = 0.8
+            self.documentsOverview.transform = .identity
+        })
 
         for docView in documentViews {
             docView.removeFromSuperview()
         }
         documentViews = [DocumentView]()
         
-        var results = [String: String]()
-        let result = json as! [String: Any]
-        let resources = result["Resources"] as? [[String: Any]]
-        if resources != nil {
-            for res in resources! {
-                let concept = res["@surfaceForm"] as! String
-                let conceptURL = res["@URI"] as! String
-                if results[concept] == nil && !concept.isEmpty {
-                    if !conceptURL.isEmpty {
-                        results[concept] = conceptURL
-                        let node = DocumentView(frame: docsContentView.frame)
-                        node.titleLabel.text = concept
-                        node.urlString = conceptURL
-                        node.center.x = docsContentView.center.x
-                        docsContentView.insertArrangedSubview(node, at: 0)
-                        documentViews.append(node)
-                        
-                        // Fetch a short description
-                        var description = ""
-                        let url = URL(string: conceptURL)
-                        if url != nil {
-                            do {
-                                let html = try NSString(contentsOf: url!, encoding: String.Encoding.utf8.rawValue)
-                                if let regex = try? NSRegularExpression(pattern: "<li><span class=\"literal\"><span property=\"dbo:abstract\" xmlns:dbo=\"http://dbpedia.org/ontology/\" xml:lang=\"en\">.*</span>", options: .caseInsensitive)
-                                {
-                                    
-                                    let matches = regex.matches(in: html as String, options: [], range: NSRange(location: 0, length: html.length)).map {
-                                        html.substring(with: $0.range)
-                                    }
-                                    if matches.count > 0 {
-                                        description = matches[0]
-                                        print(description)
-                                    }
-                                }
-                            } catch {
-                                
-                            }
-                        }
-                        
-                        let document = Document(title: concept, description: description, URL: conceptURL, type: .Spotlight)
-                        if document != nil {
-                            print("Adding document: " + document!.title)
-                            self.sketchnote!.addDocument(document: document!)
-                        }
-                    }
-                }
-            }
-            
+        for doc in documents.sorted(by: { $0.rankPercentage > $1.rankPercentage }) {
+            let documentView = DocumentView(frame: CGRect(x: 0, y: 0, width: 400, height: 280))
+            documentView.titleLabel.text = doc.title
+            documentView.descriptionLabel.text = doc.description
+            documentView.urlString = doc.URL
+            documentView.center.x = documentsOverview.center.x
+            documentsOverview.contentView.insertArrangedSubview(documentView, at: 0)
+            documentViews.append(documentView)
+            print("Adding document: " + doc.title)
+            self.sketchnote!.addDocument(document: doc)
         }
     }
     
-    @IBAction func docsOkayButton(_ sender: LGButton) {
-        bottomController?.hidePanel()
+    private func hideDocumentsOverview() {
+        UIView.animate(withDuration: 0.0, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 0, options: [], animations: {
+            //self.dimView.alpha = 0
+            //self.dimView.isHidden = true
+            self.documentsOverview.transform = CGAffineTransform(scaleX: 0.2, y: 0.2)
+            
+        }) { (success) in
+            self.documentsOverview.removeFromSuperview()
+        }
     }
     
     // Drawing recognition
@@ -570,46 +541,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
             }
         }
     }
-    func drawView(_ view: SketchView, didEndDrawUsingTool tool: AnyObject) {
-        /*guard let tool = tool as? PenTool else { return }
-        recognizeSketch(tool: tool)
-        let croppedCGImage:CGImage = (newView.asImage().cgImage?.cropping(to: newPath.boundingBox.applying(CGAffineTransform(scaleX: 1.5, y: 1.5))))!
-        let croppedImage = UIImage(cgImage: croppedCGImage)
-        */
-    }
     
-    /*private func recognizeSketch(tool: PenTool) {
-        let rectView = UIView(frame: CGRect(x: 0, y: 0, width: 500, height: 500))
-        rectView.backgroundColor = .black
-        let translation = CGAffineTransform(translationX: -tool.path.boundingBox.minX, y: -tool.path.boundingBox.minY)
-        let scale = CGAffineTransform(scaleX: 1, y: 1)
-        let newPath = tool.path.copy(strokingWithWidth: 500 * 0.04, lineCap: .round, lineJoin: .round, miterLimit: 0, transform: translation.concatenating(scale))
-        let layer = CAShapeLayer()
-        layer.path = newPath
-        layer.strokeColor = UIColor.white.cgColor
-        layer.fillColor = UIColor.white.cgColor
-        layer.frame = newPath.boundingBox
-        layer.anchorPoint = CGPoint(x: 0.5, y: 0.5)
-        layer.position = CGPoint(x: rectView.layer.bounds.midX, y: rectView.layer.bounds.midY)
-        rectView.layer.addSublayer(layer)
-        
-        let croppedCGImage:CGImage = (rectView.asImage().cgImage)!
-        let croppedImage = UIImage(cgImage: croppedCGImage)
-        
-        let resized = croppedImage.resize(newSize: CGSize(width: 28, height: 28))
-        //sketchView.addSubview(rectView)
-        
-        guard let pixelBuffer = resized.grayScalePixelBuffer() else {
-            print("couldn't create pixel buffer")
-            return
-        }
-        do {
-            currentPrediction = try drawnImageClassifier.prediction(image: pixelBuffer)
-        }
-        catch {
-            print("error making prediction: \(error)")
-        }
-    }*/
     // **************************
     // MARK: View Setup Functions
     private func setupToolsMenu() {

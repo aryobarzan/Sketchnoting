@@ -257,7 +257,47 @@ class SemanticHelper {
             AF.request("http://api.dbpedia-spotlight.org/en/annotate", parameters: parameters, headers: headers).responseJSON { response in
                 if let json = response.result.value {
                     print("JSON: \(json)")
-                    viewController.displaySpotlightDocuments(text: text, json: json)
+                    var results = [String: String]()
+                    var documents = [Document]()
+                    let result = json as! [String: Any]
+                    let resources = result["Resources"] as? [[String: Any]]
+                    if resources != nil {
+                        for res in resources! {
+                            let concept = res["@surfaceForm"] as! String
+                            let conceptURL = res["@URI"] as! String
+                            let rankPercentage = Double(res["@percentageOfSecondRank"] as! String)
+                            if results[concept] == nil && !concept.isEmpty {
+                                if !conceptURL.isEmpty {
+                                    results[concept] = conceptURL
+                                    
+                                    // Fetch a short description
+                                    var description = ""
+                                    let url = URL(string: conceptURL)
+                                    if url != nil {
+                                        do {
+                                            let html = try NSString(contentsOf: url!, encoding: String.Encoding.utf8.rawValue)
+                                            if let regex = try? NSRegularExpression(pattern: "<li><span class=\"literal\"><span property=\"dbo:abstract\" xmlns:dbo=\"http://dbpedia.org/ontology/\" xml:lang=\"en\">.*</span>", options: .caseInsensitive)
+                                            {
+                                                
+                                                let matches = regex.matches(in: html as String, options: [], range: NSRange(location: 0, length: html.length)).map {
+                                                    html.substring(with: $0.range)
+                                                }
+                                                if matches.count > 0 {
+                                                    description = matches[0].replacingOccurrences(of: "<li><span class=\"literal\"><span property=\"dbo:abstract\" xmlns:dbo=\"http://dbpedia.org/ontology/\" xml:lang=\"en\">", with: "").replacingOccurrences(of: "</span>", with: "")
+                                                }
+                                            }
+                                        } catch {
+                                        }
+                                    }
+                                    let document = Document(title: concept, description: description, URL: conceptURL, type: .Spotlight, rank: rankPercentage ?? Double(0))
+                                    if document != nil {
+                                        documents.append(document!)
+                                    }
+                                }
+                            }
+                        }
+                        viewController.displaySpotlightDocuments(documents: documents)
+                    }
                 }
             }
         }

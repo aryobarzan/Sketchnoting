@@ -22,15 +22,17 @@ class Document: Codable {
     var description: String?
     var URL: String
     var documentType: DocumentType
+    var rankPercentage: Double
     
     enum CodingKeys: String, CodingKey {
         case title
         case description
         case URL
         case documentType
+        case rankPercentage
     }
     
-    init?(title: String, description: String?, URL: String, type: DocumentType){
+    init?(title: String, description: String?, URL: String, type: DocumentType, rank: Double){
         guard !title.isEmpty && !URL.isEmpty else {
             return nil
         }
@@ -38,6 +40,7 @@ class Document: Codable {
         self.description = description
         self.URL = URL
         self.documentType = type
+        self.rankPercentage = rank
     }
     
     func encode(to encoder: Encoder) throws {
@@ -46,6 +49,7 @@ class Document: Codable {
         try container.encode(description, forKey: .description)
         try container.encode(URL, forKey: .URL)
         try container.encode(documentType, forKey: .documentType)
+        try container.encode(rankPercentage, forKey: .rankPercentage)
     }
     
     required init(from decoder: Decoder) throws {
@@ -54,5 +58,6 @@ class Document: Codable {
         description = try container.decode(String.self, forKey: .description)
         URL = try container.decode(String.self, forKey: .URL)
         documentType = DocumentType(rawValue: try container.decode(String.self, forKey: .documentType)) ?? .Other
+        rankPercentage = try container.decode(Double.self, forKey: .rankPercentage)
     }
 }

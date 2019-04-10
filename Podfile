@@ -8,7 +8,6 @@ target 'Sketchnoting' do
   pod 'Firebase/MLVision'
   # If using an on-device API:
   pod 'Firebase/MLVisionTextModel'
-  pod 'CTSlidingUpPanel'
   pod 'GPUImage'
   pod 'NewPopMenu'
 end
