@@ -10,7 +10,7 @@ import UIKit
 import LGButton
 import PopMenu
 
-class ViewController: UIViewController, UIGestureRecognizerDelegate {
+class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextFieldDelegate {
     
 
     @IBOutlet var searchField: UITextField!
@@ -18,6 +18,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     @IBOutlet var scrollView: UIScrollView!
     var notesStackView = UIStackView()
     @IBOutlet var dimView: UIView!
+    @IBOutlet var clearSearchButton: LGButton!
     
     var noteCollections = [NoteCollection]()
     var noteCollectionViews = [NoteCollectionView]()
@@ -30,7 +31,9 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        self.drawingSearchView = DrawingSearchView(frame: CGRect(x: 0, y: 0, width: 490, height: 600))
+        self.searchField.delegate = self
+        
+        drawingSearchView = DrawingSearchView(frame: CGRect(x: 0, y: 0, width: 490, height: 600))
         drawingSearchView.center = self.view.center
         drawingSearchView.alpha = 1
         drawingSearchView.transform = CGAffineTransform(scaleX: 0.8, y: 1.2)
@@ -103,30 +106,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
             
         default:
             print("Not creating or editing sketchnote. (ignore this)")
-        }
-    }
-    
-    //MARK: Actions
-    @IBAction func unwindToHome(sender: UIStoryboardSegue) {
-        if let sourceViewController = sender.source as? SketchNoteViewController, let note = sourceViewController.sketchnote {
-            
-            var alreadyExists = false
-            for i in 0..<noteCollectionViews.count {
-                for j in 0..<noteCollectionViews[i].sketchnoteViews.count {
-                    if noteCollectionViews[i].sketchnoteViews[j].sketchnote?.creationDate == note.creationDate {
-                        noteCollectionViews[i].sketchnoteViews[j].setNote(note: note)
-                        saveNoteCollections()
-                        alreadyExists = true
-                        break
-                    }
-                }
-                if alreadyExists {
-                    break
-                }
-            }
-            saveNoteCollections()
-            self.pathArrayDictionary[note.creationDate.timeIntervalSince1970] = sourceViewController.storedPathArray
-            savePathArrayDictionary()
         }
     }
     
@@ -216,10 +195,41 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
             alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
             self.present(alert, animated: true)
         }
-   
+        
         for n in collection.notes {
             displaySketchnote(note: n, collectionView: noteCollectionView)
         }
+    }
+    
+    //MARK: Actions
+    @IBAction func unwindToHome(sender: UIStoryboardSegue) {
+        if let sourceViewController = sender.source as? SketchNoteViewController, let note = sourceViewController.sketchnote {
+            
+            var alreadyExists = false
+            for i in 0..<noteCollectionViews.count {
+                for j in 0..<noteCollectionViews[i].sketchnoteViews.count {
+                    if noteCollectionViews[i].sketchnoteViews[j].sketchnote?.creationDate == note.creationDate {
+                        noteCollectionViews[i].sketchnoteViews[j].setNote(note: note)
+                        saveNoteCollections()
+                        alreadyExists = true
+                        break
+                    }
+                }
+                if alreadyExists {
+                    break
+                }
+            }
+            saveNoteCollections()
+            self.pathArrayDictionary[note.creationDate.timeIntervalSince1970] = sourceViewController.storedPathArray
+            savePathArrayDictionary()
+        }
+    }
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        // Hide the keyboard.
+        searchField.resignFirstResponder()
+        performSearch()
+        return true
     }
     
     @objc func handleSketchnoteTap(_ sender: UITapGestureRecognizer) {
@@ -234,12 +244,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         self.noteCollections.append(noteCollection)
         
         displayNoteCollection(collection: noteCollection)
-        /**let noteCollectionView = NoteCollectionView(frame: notesStackView.frame)
-        noteCollectionView.setNoteCollection(collection: noteCollection)
-        self.noteCollectionViews.append(noteCollectionView)
-        
-        notesStackView.insertArrangedSubview(noteCollectionView, at: 0)*/
-        
         saveNoteCollections()
     }
     
@@ -270,6 +274,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
                     }
                 }
             }
+            clearSearchButton.isHidden = false
         }
         else {
             for i in 0..<noteCollectionViews.count {
@@ -277,6 +282,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
                     noteCollectionViews[i].sketchnoteViews[j].isHidden = false
                 }
             }
+            clearSearchButton.isHidden = true
         }
     }
     
@@ -287,6 +293,15 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
             self.dimView.alpha = 0.8
             self.drawingSearchView.transform = .identity
         })
+    }
+    @IBAction func clearSearchTapped(_ sender: LGButton) {
+        for i in 0..<noteCollectionViews.count {
+            for j in 0..<noteCollectionViews[i].sketchnoteViews.count {
+                noteCollectionViews[i].sketchnoteViews[j].isHidden = false
+            }
+        }
+        clearSearchButton.isHidden = true
+        searchField.text = ""
     }
     
     private var labelNames: [String] = []

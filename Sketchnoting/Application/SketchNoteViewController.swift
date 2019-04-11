@@ -123,6 +123,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         setupHelpLines()
         // Setup long press on canvas for inserting drawing region
         let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(self.handleSketchViewLongPress(_:)))
+        longPressGesture.minimumPressDuration = 1.5
         self.sketchView.addGestureRecognizer(longPressGesture)
     }
     
@@ -359,13 +360,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     
     @IBAction func documentsTapped(_ sender: LGButton) {
         documentsButton.isLoading = true
-        if self.helpLinesShown {
-            self.toggleHelpLines()
-        }
-        if self.drawingViewsShown {
-            self.toggleDrawingViews()
-        }
-        self.processOCR(image: sketchView.asImage())
+        self.processOCR(image: self.generateOCRImage())
     }
     
     func tapCameraButton() {
@@ -414,12 +409,38 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         }
     }
     
+    private func generateOCRImage() -> UIImage {
+        let canvas = UIView(frame: self.sketchView.frame)
+        canvas.backgroundColor = .black
+        for pathObject in self.sketchView.pathArray {
+            if let penTool = pathObject as? PenTool {
+                let path = penTool.path
+                var isDrawing = false
+                for drawingView in self.drawingViews {
+                    if drawingView.frame.contains(path.boundingBox) {
+                        isDrawing = true
+                        break
+                    }
+                }
+                if !isDrawing {
+                    let newPath = path.copy(strokingWithWidth: penTool.lineWidth, lineCap: .round, lineJoin: .round, miterLimit: 0)
+                    let layer = CAShapeLayer()
+                    layer.path = newPath
+                    layer.strokeColor = UIColor.white.cgColor
+                    layer.fillColor = UIColor.white.cgColor
+                    canvas.layer.addSublayer(layer)
+                }
+            }
+            else {
+            }
+        }
+        return canvas.asImage()
+    }
+    
     private func processOCR(image: UIImage) {
         let vision = Vision.vision()
         let textRecognizer = vision.onDeviceTextRecognizer()
-        
         let image = VisionImage(image: image)
-        
         textRecognizer.process(image) { result, error in
             self.documentsButton.isLoading = false
             guard error == nil, let result = result else {
@@ -431,6 +452,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
             }
             let resultText = result.text
             self.sketchnote?.recognizedText = resultText
+            print(resultText)
             //SemanticHelper.performBabelfyOnSketchnote(text: resultText, viewController: self)
             SemanticHelper.performSpotlightOnSketchnote(text: resultText, viewController: self)
         }
