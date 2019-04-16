@@ -11,7 +11,7 @@ import LGButton
 import Firebase
 import PopMenu
 
-class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, SketchViewDelegate {
+class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, SketchViewDelegate, UIPencilInteractionDelegate {
 
     @IBOutlet weak var topContainer: UIView!
     @IBOutlet var sketchView: SketchView!
@@ -23,6 +23,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     @IBOutlet var undoButton: LGButton!
     @IBOutlet var helpLinesButton: LGButton!
     @IBOutlet var drawingsButton: LGButton!
+    @IBOutlet var forceSensitivityButton: LGButton!
     
     var documentViews = [DocumentView]()
     var documentsOverview: DocumentsOverview!
@@ -125,6 +126,35 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(self.handleSketchViewLongPress(_:)))
         longPressGesture.minimumPressDuration = 1.5
         self.sketchView.addGestureRecognizer(longPressGesture)
+        
+        let interaction = UIPencilInteraction()
+        interaction.delegate = self
+        view.addInteraction(interaction)
+    }
+    
+    func pencilInteractionDidTap(_ interaction: UIPencilInteraction) {
+        switch UIPencilInteraction.preferredTapAction {
+        case .ignore:
+            break
+        case .showColorPalette:
+            print("Color Palette Apple Pencil interaction. This has no effect in this app")
+        case .switchEraser:
+            self.toggleDrawTool()
+            break
+        case .switchPrevious:
+            self.toggleDrawTool()
+            break
+        }
+    }
+    
+    private func toggleDrawTool() {
+        if self.sketchView.drawTool == .eraser {
+            self.sketchView.drawTool = .pen
+            self.toolSelected(image: #imageLiteral(resourceName: "Pencil"))
+        } else {
+            self.sketchView.drawTool = .eraser
+            self.toolSelected(image: #imageLiteral(resourceName: "Eraser"))
+        }
     }
     
     @objc func handleSketchViewLongPress(_ sender: UILongPressGestureRecognizer) {
@@ -357,6 +387,19 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
             drawingsButton.gradientHorizontal = false
         }
     }
+    @IBAction func forceSensitivityTapped(_ sender: LGButton) {
+        self.sketchView.forceSensitive = !self.sketchView.forceSensitive
+        
+        if self.sketchView.forceSensitive {
+            forceSensitivityButton.gradientStartColor = UIColor(red: 95.0/255.0, green: 193.0/255.0, blue: 148.0/255.0, alpha: 1)
+            forceSensitivityButton.gradientEndColor = UIColor(red: 0.0, green: 122.0/255.0, blue: 255.0/255.0, alpha: 1)
+        }
+        else {
+            forceSensitivityButton.gradientEndColor = nil
+            forceSensitivityButton.gradientStartColor = nil
+            forceSensitivityButton.gradientHorizontal = false
+        }
+    }
     
     @IBAction func documentsTapped(_ sender: LGButton) {
         documentsButton.isLoading = true
@@ -453,55 +496,12 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
             let resultText = result.text
             self.sketchnote?.recognizedText = resultText
             print(resultText)
-            //SemanticHelper.performBabelfyOnSketchnote(text: resultText, viewController: self)
             SemanticHelper.performSpotlightOnSketchnote(text: resultText, viewController: self)
         }
     }
     
-    func displayBabelfyDocuments(text: String, json: NSArray) {
-        documentsButton.isLoading = false
-        //bottomController?.expandPanel()
-        
-        /*var results = [String: String]()
-        for item in json {
-            let coherenceScore = item["coherenceScore"] as! Double
-            let score = item["score"] as! Double
-            if coherenceScore >= 0.4 || score >= 0.4 {
-                let startIndex = (item["charFragment"] as! [String: Int])["start"]
-                let endIndex = (item["charFragment"] as! [String: Int])["end"]
-                
-                let concept = text[startIndex!..<(endIndex!+1)]
-                let conceptURL = item["DBpediaURL"] as! String
-                if results[concept] == nil && !concept.isEmpty {
-                    if !conceptURL.isEmpty {
-                        results[concept] = conceptURL
-                        let node = DocumentView(frame: panel.scrollView.frame)
-                        node.titleLabel.text = concept
-                        panel.scrollView.addSubview(node)
-                        //documentsView.addBabelfyDocument(title: concept, url: conceptURL)
-                    }
-                }
-            }
-        }*/
-        //let array = json.flatMap { $0 as? String }
-        for docView in documentViews {
-            docView.removeFromSuperview()
-        }
-        documentViews = [DocumentView]()
-        
-        /*for item in json {
-            let array2 = item as! NSArray
-            let node = DocumentView(frame: docsContentView.frame)
-            node.titleLabel.text = array2[0] as? String
-            node.center.x = docsContentView.center.x
-            docsContentView.addArrangedSubview(node)
-            documentViews.append(node)
-        }*/
-    }
-    
     func displaySpotlightDocuments(documents: [Document]) {
         documentsButton.isLoading = false
-        //bottomController?.expandPanel()
         self.view.addSubview(self.documentsOverview)
         self.view.bringSubviewToFront(documentsOverview)
         UIView.animate(withDuration: 0.0, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 0, options: [],  animations: {
@@ -526,6 +526,13 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
             print("Adding document: " + doc.title)
             self.sketchnote!.addDocument(document: doc)
         }
+    }
+    
+    func displayNoDocumentsFound() {
+        let alertController = UIAlertController(title: "No documents found.", message: "", preferredStyle: .alert)
+        let alertAction = UIAlertAction(title: "Close", style: .default)
+        alertController.addAction(alertAction)
+        self.present(alertController, animated: true)
     }
     
     private func hideDocumentsOverview() {

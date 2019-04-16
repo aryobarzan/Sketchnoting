@@ -19,6 +19,9 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     var notesStackView = UIStackView()
     @IBOutlet var dimView: UIView!
     @IBOutlet var clearSearchButton: LGButton!
+    @IBOutlet var searchFiltersScrollView: UIScrollView!
+    @IBOutlet var searchSeparator: UIView!
+    var searchFiltersStackView = UIStackView()
     
     var noteCollections = [NoteCollection]()
     var noteCollectionViews = [NoteCollectionView]()
@@ -27,11 +30,29 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     var selectedSketchnote: Sketchnote?
     
     var drawingSearchView: DrawingSearchView!
+    
+    var searchFilters = [String]()
+    var searchFilterButtons = [LGButton]()
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.navigationController?.setNavigationBarHidden(true, animated: false)
         
         self.searchField.delegate = self
+        searchFiltersStackView.isUserInteractionEnabled = true
+        searchFiltersStackView.axis = .horizontal
+        searchFiltersStackView.distribution = .equalSpacing
+        searchFiltersStackView.alignment = .fill
+        searchFiltersStackView.spacing = 5
+        searchFiltersScrollView.addSubview(searchFiltersStackView)
+        searchFiltersStackView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            searchFiltersStackView.topAnchor.constraint(equalTo: searchFiltersScrollView.topAnchor),
+            searchFiltersStackView.leadingAnchor.constraint(equalTo: searchFiltersScrollView.leadingAnchor),
+            searchFiltersStackView.trailingAnchor.constraint(equalTo: searchFiltersScrollView.trailingAnchor),
+            searchFiltersStackView.bottomAnchor.constraint(equalTo: searchFiltersScrollView.bottomAnchor),
+            searchFiltersStackView.heightAnchor.constraint(equalTo: searchFiltersScrollView.heightAnchor)
+            ])
         
         drawingSearchView = DrawingSearchView(frame: CGRect(x: 0, y: 0, width: 490, height: 600))
         drawingSearchView.center = self.view.center
@@ -136,8 +157,8 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         let DocumentsDirectory = FileManager().urls(for: .documentDirectory, in: .userDomainMask).first!
         let ArchiveURLPathArray = DocumentsDirectory.appendingPathComponent("PathArrayDictionary")
         guard let codedData = try? Data(contentsOf: ArchiveURLPathArray) else { return nil }
-        guard let data = try? NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(codedData) as?
-            [TimeInterval: NSMutableArray] else { return nil }
+        guard let data = ((try? NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(codedData) as?
+            [TimeInterval: NSMutableArray]) as [TimeInterval : NSMutableArray]??) else { return nil }
         print("Path Array Dictionary loaded.")
         return data
     }
@@ -173,6 +194,12 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
                 self.saveNoteCollections()
             })
             popMenu.addAction(action)
+            if sketchnoteView.sketchnote != nil && sketchnoteView.sketchnote!.recognizedText != nil && !sketchnoteView.sketchnote!.recognizedText!.isEmpty {
+                let copyTextAction = PopMenuDefaultAction(title: "Copy Text", color: .white, didSelect: { action in
+                    UIPasteboard.general.string = sketchnoteView.sketchnote!.recognizedText!
+                })
+                popMenu.addAction(copyTextAction)
+            }
             popMenu.addAction(closeAction)
             self.present(popMenu, animated: true, completion: nil)
         }
@@ -254,36 +281,40 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     private func performSearch() {
         if !searchField.text!.isEmpty {
             let searchString = searchField.text!.lowercased()
-            for i in 0..<noteCollectionViews.count {
-                for j in 0..<noteCollectionViews[i].sketchnoteViews.count {
-                    var found = false
-                    for doc in noteCollectionViews[i].sketchnoteViews[j].sketchnote?.relatedDocuments ?? [Document]() {
-                        if doc.title.lowercased().contains(searchString) || (doc.description != nil && !doc.description!.isEmpty && doc.description!.lowercased().contains(searchString)) {
-                            noteCollectionViews[i].sketchnoteViews[j].isHidden = false
-                            found = true
-                            break
-                        }
-                    }
-                    if !found {
-                        if (noteCollectionViews[i].sketchnoteViews[j].sketchnote?.recognizedText?.lowercased().contains(searchString) ?? false) || (noteCollectionViews[i].sketchnoteViews[j].sketchnote?.drawings?.contains(searchString) ?? false) {
-                            noteCollectionViews[i].sketchnoteViews[j].isHidden = false
-                        }
-                        else {
-                            noteCollectionViews[i].sketchnoteViews[j].isHidden = true
-                        }
-                    }
-                }
+            if !searchFilters.contains(searchString) {
+                let filterButton = LGButton()
+                filterButton.frame = CGRect(x: 0, y: 0, width: 75, height: 35)
+                filterButton.titleString = searchString
+                filterButton.leftIconString = "close"
+                filterButton.leftIconFontName = "ma"
+                searchFiltersStackView.insertArrangedSubview(filterButton, at: 0)
+                searchFilterButtons.append(filterButton)
+                filterButton.isUserInteractionEnabled = true
+                let filterTapGesture = UITapGestureRecognizer(target: self, action: #selector(self.handleFilterTap(_:)))
+                filterButton.addGestureRecognizer(filterTapGesture)
+                
+                searchFilters.append(searchString)
+            }
+            for noteCollectionView in noteCollectionViews {
+                noteCollectionView.applySearchFilters(filters: self.searchFilters)
             }
             clearSearchButton.isHidden = false
+            searchSeparator.isHidden = false
+            searchField.text = ""
         }
-        else {
-            for i in 0..<noteCollectionViews.count {
-                for j in 0..<noteCollectionViews[i].sketchnoteViews.count {
-                    noteCollectionViews[i].sketchnoteViews[j].isHidden = false
+    }
+    
+    @objc func handleFilterTap(_ sender: UITapGestureRecognizer) {
+        let filterButton = sender.view as! LGButton
+        if searchFilters.contains(filterButton.titleString) {
+            for i in 0..<searchFilters.count {
+                if searchFilters[i] == filterButton.titleString {
+                    searchFilters.remove(at: i)
+                    break
                 }
             }
-            clearSearchButton.isHidden = true
         }
+        filterButton.removeFromSuperview()
     }
     
     @IBAction func searchByDrawingTapped(_ sender: LGButton) {
@@ -295,13 +326,17 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         })
     }
     @IBAction func clearSearchTapped(_ sender: LGButton) {
-        for i in 0..<noteCollectionViews.count {
-            for j in 0..<noteCollectionViews[i].sketchnoteViews.count {
-                noteCollectionViews[i].sketchnoteViews[j].isHidden = false
-            }
+        for noteCollectionView in noteCollectionViews {
+            noteCollectionView.showSketchnotes()
         }
+        searchFilters = [String]()
+        for searchFilterButton in searchFilterButtons {
+            searchFilterButton.removeFromSuperview()
+        }
+        searchFilterButtons = [LGButton]()
         clearSearchButton.isHidden = true
         searchField.text = ""
+        searchSeparator.isHidden = true
     }
     
     private var labelNames: [String] = []

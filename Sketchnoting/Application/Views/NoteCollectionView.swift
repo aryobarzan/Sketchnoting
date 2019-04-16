@@ -86,6 +86,44 @@ class NoteCollectionView : UIView, UITextFieldDelegate {
         objc_setAssociatedObject(self, String(format: "[%d]", arc4random()), sleeve, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
     }
     
+    func applySearchFilters(filters: [String]) {
+        for j in 0..<sketchnoteViews.count {
+            
+            var matchingFilters = 0
+            for filter in filters {
+                var found = false
+                for doc in sketchnoteViews[j].sketchnote?.relatedDocuments ?? [Document]() {
+                    if doc.title.lowercased().contains(filter) || (doc.description != nil && !doc.description!.isEmpty && doc.description!.lowercased().contains(filter)) {
+                        found = true
+                        matchingFilters += 1
+                        break
+                    }
+                }
+                if !found {
+                    if (sketchnoteViews[j].sketchnote?.recognizedText?.lowercased().contains(filter) ?? false) || (sketchnoteViews[j].sketchnote?.drawings?.contains(filter) ?? false) {
+                        found = true
+                        matchingFilters += 1
+                    }
+                    else {
+                        found = false
+                    }
+                }
+            }
+            if matchingFilters == filters.count {
+                sketchnoteViews[j].isHidden = false
+            }
+            else {
+                sketchnoteViews[j].isHidden = true
+            }
+        }
+    }
+    
+    func showSketchnotes() {
+        for view in sketchnoteViews {
+            view.isHidden = false
+        }
+    }
+    
 }
 class ClosureSleeve {
     let closure: ()->()

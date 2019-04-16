@@ -87,7 +87,7 @@ class SemanticHelper {
         return r
     }*/
     
-    static func frequencyService(URL: String, dataImmutable: [String: Any], chunkSize: Int = 6000) -> [String: Int] {
+    /*static func frequencyService(URL: String, dataImmutable: [String: Any], chunkSize: Int = 6000) -> [String: Int] {
         let text = dataImmutable["text"] as! String
         let chunks = text.split(by: chunkSize)
         
@@ -122,53 +122,10 @@ class SemanticHelper {
             }*/
         }
         return results
-    }
+    }*/
     
-    /*static func babelfy(text: String, documentsView: DocumentsViewController, textNote: TextNote) {
-        /*var data = [String: Any]()
-        data["text"] = text
-        data["language"] = "EN"
-        let results = frequencyService(URL: "http://172.24.99.127:8082/babelfy", dataImmutable: data)
-        print(results)
-        for (concept, f) in results {
-            print(concept + " - " + String(f))
-        }*/
-        let chunks = text.split(by: 6000)
-        
-        var results = [String: String]()
-        
-        for chunk in chunks {
-            AF.request("https://babelfy.io/v1/disambiguate?text=" + chunk.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed)! + "&lang=EN&key=f940e5b5-35a0-4dce-bcad-c3756e8eaad2").responseJSON { response in
-                
-                if let json = response.result.value {
-                    print("JSON: \(json)")
-                    
-                    let result = json as! [[String: Any]]
-                    for item in result {
-                        let coherenceScore = item["coherenceScore"] as! Double
-                        let score = item["score"] as! Double
-                        if coherenceScore >= 0.4 || score >= 0.4 {
-                            let startIndex = (item["charFragment"] as! [String: Int])["start"]
-                            let endIndex = (item["charFragment"] as! [String: Int])["end"]
-                            
-                            let concept = chunk[startIndex!..<(endIndex!+1)]
-                            let conceptURL = item["DBpediaURL"] as! String
-                            if results[concept] == nil && !concept.isEmpty {
-                                if !conceptURL.isEmpty {
-                                    results[concept] = conceptURL
-                                    documentsView.addBabelfyDocument(title: concept, url: conceptURL)
-                                    let document = Document(title: concept, description: nil, URL: conceptURL, type: DocumentType.Babelfy)
-                                    textNote.addDocument(document: document!)
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
     
-    static func spotlight(text: String, documentsView: DocumentsViewController, textNote: TextNote) {
+    /*static func spotlight(text: String, documentsView: DocumentsViewController, textNote: TextNote) {
         let chunks = text.split(by: 6000)
         
         var results = [String: String]()
@@ -224,24 +181,10 @@ class SemanticHelper {
             "Accept": "application/json"
         ]
         Manager.request("http://172.24.99.127:8082/babelfy", method: .post, parameters: parameters, encoding: URLEncoding(destination: .queryString), headers: headers).responseJSON { response in
-            if let json = response.result.value {
+            /*if let json = response.result {
                 print(json)
-            }
+            }*/
             print(response.debugDescription)
-        }
-    }
-    
-    static func performBabelfyOnSketchnote(text: String, viewController: SketchNoteViewController) {
-        let parameters: Parameters = ["text": text, "language": "EN"]
-        let headers: HTTPHeaders = [
-            "Accept": "application/json"
-        ]
-        Manager.request("http://172.24.99.127:8082/babelfy", method: .post, parameters: parameters, encoding: URLEncoding(destination: .queryString), headers: headers).responseJSON { response in
-            if let json = response.result.value {
-                let result = json as! NSArray
-                print(result)
-                viewController.displayBabelfyDocuments(text: text, json: result)
-            }
         }
     }
     
@@ -255,11 +198,18 @@ class SemanticHelper {
                 "Accept": "application/json"
             ]
             AF.request("http://api.dbpedia-spotlight.org/en/annotate", parameters: parameters, headers: headers).responseJSON { response in
-                if let json = response.result.value {
+                let responseResult = response.result
+                var json = [String : Any]()
+                switch responseResult {
+                case .success(let res):
+                    json = res as! [String: Any]
+                case .failure(let error):
+                    print(error.localizedDescription)
+                }
                     print("JSON: \(json)")
                     var results = [String: String]()
                     var documents = [Document]()
-                    let result = json as! [String: Any]
+                    let result = json
                     let resources = result["Resources"] as? [[String: Any]]
                     if resources != nil {
                         for res in resources! {
@@ -298,11 +248,13 @@ class SemanticHelper {
                         }
                         viewController.displaySpotlightDocuments(documents: documents)
                     }
-                }
+                    else {
+                        viewController.displayNoDocumentsFound()
+                    }
             }
         }
     }
-    static func performSpotlightUniandesOnSketchnote(text: String, viewController: SketchNoteViewController) {
+    /*static func performSpotlightUniandesOnSketchnote(text: String, viewController: SketchNoteViewController) {
         let (confidence, support) = calculate_confidence_support(l: Double(text.count))
         print("confidence \(confidence)")
         print("support \(support)")
@@ -317,7 +269,7 @@ class SemanticHelper {
                 print(result)
             }
         }
-    }
+    }*/
     
     private static func get_slope_intercept(x1: Double, x2: Double, y1: Double, y2: Double) -> (Double, Double) {
         let slope = (y2 - y1) / (x2 - x1)

@@ -49,6 +49,8 @@ public class SketchView: UIView {
     private var image: UIImage?
     private var backgroundImage: UIImage?
     private var drawMode: ImageRenderingMode = .original
+    
+    public var forceSensitive = false
 
     public override init(frame: CGRect) {
         super.init(frame: frame)
@@ -153,7 +155,16 @@ public class SketchView: UIView {
         currentTool?.lineWidth = lineWidth
         currentTool?.lineColor = lineColor
         currentTool?.lineAlpha = lineAlpha
-
+        
+        if self.forceSensitive {
+            if touch.type == .direct {
+                currentTool?.lineWidth = lineWidth * touch.majorRadius * 0.25
+            }
+            else if touch.type == .pencil {
+                currentTool?.lineWidth = lineWidth * touch.force * 0.25
+            }
+        }
+        
         switch currentTool! {
         case is PenTool:
             guard let penTool = currentTool as? PenTool else { return }

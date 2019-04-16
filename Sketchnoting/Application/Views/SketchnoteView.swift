@@ -41,13 +41,15 @@ class SketchnoteView : UIView {
     func setNote(note: Sketchnote) {
         self.sketchnote = note
         self.imageView.image = note.image
+        if sketchnote != nil {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
-        let dateAsString = formatter.string(from: Date())
+        let dateAsString = formatter.string(from: sketchnote!.creationDate)
         let date = formatter.date(from: dateAsString)
         formatter.dateFormat = "dd MMM yyyy"
         let formattedDateAsString = formatter.string(from: date!)
         self.creationDateLabel.text = formattedDateAsString
+        }
     }
     
     public func setDeleteAction(action: (() -> Void)?) {
