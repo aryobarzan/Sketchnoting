@@ -44,6 +44,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.navigationController?.setNavigationBarHidden(false, animated: false)
         
         documentsOverview = DocumentsOverview(frame: CGRect(x: 0, y: 0, width: 500, height: 570))
         documentsOverview.center = self.view.center

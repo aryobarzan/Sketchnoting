@@ -191,13 +191,23 @@
                                     <action selector="newNoteCollectionTapped:" destination="BYZ-38-t0r" eventType="touchUpInside" id="EMY-UH-KG2"/>
                                 </connections>
                             </view>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Sketchnoting" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="3w6-Bn-Awa">
-                                <rect key="frame" x="20" y="35" width="145" height="29"/>
-                                <fontDescription key="fontDescription" name="Helvetica" family="Helvetica" pointSize="25"/>
+                            <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="0XI-LD-C53">
+                                <rect key="frame" x="20" y="24" width="49" height="31"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="47" id="3sW-IV-MxR"/>
+                                    <constraint firstAttribute="height" constant="31" id="Kc9-S4-S1q"/>
+                                </constraints>
+                                <connections>
+                                    <action selector="noteSharingTapped:" destination="BYZ-38-t0r" eventType="touchUpInside" id="ACi-lm-0za"/>
+                                </connections>
+                            </switch>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Allow note sharing with you" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="OnN-Xq-VG1">
+                                <rect key="frame" x="75" y="29" width="210" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <view hidden="YES" alpha="0.0" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="hOS-hQ-kVi">
+                            <view hidden="YES" alpha="0.80000000000000004" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="hOS-hQ-kVi">
                                 <rect key="frame" x="0.0" y="20" width="768" height="1004"/>
                                 <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </view>
@@ -206,15 +216,17 @@
                         <constraints>
                             <constraint firstItem="hOS-hQ-kVi" firstAttribute="trailing" secondItem="6Tk-OE-BBY" secondAttribute="trailing" id="0jq-nQ-lne"/>
                             <constraint firstItem="hOS-hQ-kVi" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="64y-oD-SMI"/>
+                            <constraint firstItem="OnN-Xq-VG1" firstAttribute="leading" secondItem="0XI-LD-C53" secondAttribute="trailing" constant="8" id="8Kl-hY-Z1I"/>
                             <constraint firstItem="jNa-OV-Rlb" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="9UU-rQ-DIO"/>
+                            <constraint firstItem="0XI-LD-C53" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="4" id="J1A-ed-2Vb"/>
                             <constraint firstItem="hOS-hQ-kVi" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="XX0-tK-MG4"/>
                             <constraint firstItem="jNa-OV-Rlb" firstAttribute="bottom" secondItem="6Tk-OE-BBY" secondAttribute="bottom" id="Yzx-Y5-d5Y"/>
                             <constraint firstItem="2wc-S9-gDw" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="4" id="csl-py-8rS"/>
                             <constraint firstItem="jfx-Y6-PqO" firstAttribute="top" secondItem="2wc-S9-gDw" secondAttribute="bottom" constant="34" id="g7E-TG-A2U"/>
+                            <constraint firstItem="0XI-LD-C53" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="20" id="hkw-aq-yNF"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="2wc-S9-gDw" secondAttribute="trailing" constant="20" id="iUi-61-V6D"/>
+                            <constraint firstItem="OnN-Xq-VG1" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="9" id="kRs-rf-NOz"/>
                             <constraint firstItem="hOS-hQ-kVi" firstAttribute="bottom" secondItem="6Tk-OE-BBY" secondAttribute="bottom" id="lO0-dO-8vw"/>
-                            <constraint firstItem="3w6-Bn-Awa" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="15" id="nxr-Uu-Zcg"/>
-                            <constraint firstItem="3w6-Bn-Awa" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="20" id="pZp-Pm-HAQ"/>
                             <constraint firstItem="jfx-Y6-PqO" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="20" id="tMw-ir-7y9"/>
                             <constraint firstItem="jNa-OV-Rlb" firstAttribute="top" secondItem="jfx-Y6-PqO" secondAttribute="bottom" constant="8" id="viq-pM-gOt"/>
                             <constraint firstAttribute="trailing" secondItem="jNa-OV-Rlb" secondAttribute="trailing" id="xtX-OF-HeV"/>
@@ -227,6 +239,7 @@
                     <connections>
                         <outlet property="clearSearchButton" destination="jH0-gW-c2y" id="MIz-6q-yBI"/>
                         <outlet property="dimView" destination="hOS-hQ-kVi" id="cmS-jI-kXl"/>
+                        <outlet property="noteSharingSwitch" destination="0XI-LD-C53" id="KCh-kB-Au7"/>
                         <outlet property="scrollView" destination="jNa-OV-Rlb" id="unR-zF-K4f"/>
                         <outlet property="searchButton" destination="fW1-Ud-Ycc" id="Ahz-je-40T"/>
                         <outlet property="searchField" destination="kB5-c2-JaK" id="bJo-4g-hfF"/>

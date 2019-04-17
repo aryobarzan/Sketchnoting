@@ -9,8 +9,9 @@
 import UIKit
 import LGButton
 import PopMenu
+import MultipeerConnectivity
 
-class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextFieldDelegate {
+class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextFieldDelegate, MCSessionDelegate, MCBrowserViewControllerDelegate {
     
 
     @IBOutlet var searchField: UITextField!
@@ -22,6 +23,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     @IBOutlet var searchFiltersScrollView: UIScrollView!
     @IBOutlet var searchSeparator: UIView!
     var searchFiltersStackView = UIStackView()
+    @IBOutlet var noteSharingSwitch: UISwitch!
     
     var noteCollections = [NoteCollection]()
     var noteCollectionViews = [NoteCollectionView]()
@@ -33,10 +35,35 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     
     var searchFilters = [String]()
     var searchFilterButtons = [LGButton]()
+    
+    var peerID: MCPeerID!
+    var mcSession: MCSession!
+    var mcAdvertiserAssistant: MCAdvertiserAssistant!
+    
+    var sketchnoteToShare: Sketchnote?
+    var pathArrayToShare: NSMutableArray?
+    var receivedSketchnote: Sketchnote?
+    var receivedPathArray: NSMutableArray?
+    var noteShareView: NoteShareView!
+    var dataToShare = [Data]()
 
     override func viewDidLoad() {
         super.viewDidLoad()
         self.navigationController?.setNavigationBarHidden(true, animated: false)
+        
+        peerID = MCPeerID(displayName: UIDevice.current.name)
+        mcSession = MCSession(peer: peerID, securityIdentity: nil, encryptionPreference: .required)
+        mcSession.delegate = self
+        noteShareView = NoteShareView(frame: CGRect(x: 0, y: 0, width: 300, height: 400))
+        noteShareView.center = self.view.center
+        noteShareView.alpha = 1
+        noteShareView.transform = CGAffineTransform(scaleX: 0.8, y: 1.2)
+        noteShareView.setAcceptAction {
+            self.acceptSharedNote()
+        }
+        noteShareView.setRejectAction {
+            self.hideNoteShareView()
+        }
         
         self.searchField.delegate = self
         searchFiltersStackView.isUserInteractionEnabled = true
@@ -194,11 +221,23 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
                 self.saveNoteCollections()
             })
             popMenu.addAction(action)
-            if sketchnoteView.sketchnote != nil && sketchnoteView.sketchnote!.recognizedText != nil && !sketchnoteView.sketchnote!.recognizedText!.isEmpty {
-                let copyTextAction = PopMenuDefaultAction(title: "Copy Text", color: .white, didSelect: { action in
-                    UIPasteboard.general.string = sketchnoteView.sketchnote!.recognizedText!
+            if sketchnoteView.sketchnote != nil {
+                if sketchnoteView.sketchnote!.recognizedText != nil && !sketchnoteView.sketchnote!.recognizedText!.isEmpty {
+                    let copyTextAction = PopMenuDefaultAction(title: "Copy Text", color: .white, didSelect: { action in
+                        UIPasteboard.general.string = sketchnoteView.sketchnote!.recognizedText!
+                    })
+                    popMenu.addAction(copyTextAction)
+                }
+                let shareAction = PopMenuDefaultAction(title: "Share", color: .white, didSelect: { action in
+                    self.sketchnoteToShare = sketchnoteView.sketchnote!
+                    if let pathArray = self.pathArrayDictionary[self.sketchnoteToShare!.creationDate.timeIntervalSince1970] {
+                        self.pathArrayToShare = pathArray
+                    }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                        self.joinSession()
+                    }
                 })
-                popMenu.addAction(copyTextAction)
+                popMenu.addAction(shareAction)
             }
             popMenu.addAction(closeAction)
             self.present(popMenu, animated: true, completion: nil)
@@ -412,5 +451,142 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             print("Deleted")
             self.noteCollections.remove(at: index)
         }
+    }
+    
+    // Multipeer Connectivity
+    @IBAction func noteSharingTapped(_ sender: UISwitch) {
+        if sender.isOn {
+            startHosting()
+        }
+        else {
+            if mcAdvertiserAssistant != nil {
+                mcAdvertiserAssistant.stop()
+            }
+        }
+    }
+    func session(_ session: MCSession, didReceive stream: InputStream, withName streamName: String, fromPeer peerID: MCPeerID) {
+    }
+    
+    func session(_ session: MCSession, didStartReceivingResourceWithName resourceName: String, fromPeer peerID: MCPeerID, with progress: Progress) {
+    }
+    
+    func session(_ session: MCSession, didFinishReceivingResourceWithName resourceName: String, fromPeer peerID: MCPeerID, at localURL: URL?, withError error: Error?) {
+    }
+    
+    func browserViewControllerDidFinish(_ browserViewController: MCBrowserViewController) {
+        dismiss(animated: true)
+        if sketchnoteToShare != nil && pathArrayToShare != nil {
+            self.shareNote(note: sketchnoteToShare!, pathArray: pathArrayToShare!)
+        }
+    }
+    
+    func browserViewControllerWasCancelled(_ browserViewController: MCBrowserViewController) {
+        dismiss(animated: true)
+        sketchnoteToShare = nil
+    }
+    
+    func session(_ session: MCSession, peer peerID: MCPeerID, didChange state: MCSessionState) {
+        switch state {
+        case MCSessionState.connected:
+            print("Connected: \(peerID.displayName)")
+            
+        case MCSessionState.connecting:
+            print("Connecting: \(peerID.displayName)")
+            
+        case MCSessionState.notConnected:
+            print("Not Connected: \(peerID.displayName)")
+        default:
+            print("Non recognized state of session")
+        }
+    }
+    
+    func shareNote(note: Sketchnote, pathArray: NSMutableArray) {
+        if mcSession.connectedPeers.count > 0 {
+            dataToShare = [Data]()
+            let encoder = JSONEncoder()
+            if let encoded = try? encoder.encode(note) {
+                dataToShare.append(encoded)
+            }
+            else {
+                print("Encoding failed for note.")
+            }
+            if let encoded = try? NSKeyedArchiver.archivedData(withRootObject: pathArray, requiringSecureCoding: false) {
+                dataToShare.append(encoded)
+            }
+            else {
+                print("Failed to encode path array.")
+            }
+            do {
+                let dataEncoded = try? NSKeyedArchiver.archivedData(withRootObject: dataToShare, requiringSecureCoding: false)
+                if dataEncoded != nil {
+                    try mcSession.send(dataEncoded!, toPeers: mcSession.connectedPeers, with: .reliable)
+                }
+            } catch let error as NSError {
+                let ac = UIAlertController(title: "Could not send the note", message: error.localizedDescription, preferredStyle: .alert)
+                ac.addAction(UIAlertAction(title: "Close", style: .default))
+                present(ac, animated: true)
+            }
+        }
+    }
+    
+    func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
+        guard let receivedData = ((try? NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(data) as?
+            [Data]) as [Data]??) else { return }
+        let decoder = JSONDecoder()
+        guard let received = try? decoder.decode(Sketchnote.self, from: receivedData![0]) else {
+            print("wrong data")
+            return
+        }
+        self.receivedSketchnote = received
+        guard let receivedPath = ((try? NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(receivedData![1]) as?
+            NSMutableArray) as NSMutableArray??) else { return }
+        self.receivedPathArray = receivedPath
+        if self.receivedSketchnote != nil && self.receivedPathArray != nil {
+            DispatchQueue.main.async {
+                self.displayNoteShareView()
+            }
+        }
+    }
+    
+    func startHosting() {
+        mcAdvertiserAssistant = MCAdvertiserAssistant(serviceType: "hws-kb", discoveryInfo: nil, session: mcSession)
+        mcAdvertiserAssistant.start()
+        print("Started hosting session")
+    }
+    
+    func joinSession() {
+        let mcBrowser = MCBrowserViewController(serviceType: "hws-kb", session: mcSession)
+        mcBrowser.delegate = self
+        present(mcBrowser, animated: true)
+        print("Joining sessions...")
+    }
+    
+    private func displayNoteShareView() {
+        noteShareView.sketchnoteView.setNote(note: self.receivedSketchnote!)
+        self.view.addSubview(self.noteShareView)
+        self.dimView.isHidden = false
+        self.noteShareView.transform = .identity
+    }
+    
+    private func hideNoteShareView() {
+        self.receivedSketchnote = nil
+        self.receivedPathArray = nil
+        self.dimView.isHidden = true
+        self.noteShareView.removeFromSuperview()
+    }
+    
+    private func acceptSharedNote() {
+        print("Accepted shared note")
+        if receivedSketchnote != nil && receivedPathArray != nil {
+            let noteCollection = NoteCollection(title: "Shared Note", notes: nil)!
+            self.noteCollections.append(noteCollection)
+            noteCollection.addSketchnote(note: receivedSketchnote!)
+            self.pathArrayDictionary[receivedSketchnote!.creationDate.timeIntervalSince1970] = receivedPathArray!
+
+            displayNoteCollection(collection: noteCollection)
+            saveNoteCollections()
+            savePathArrayDictionary()
+        }
+        hideNoteShareView()
     }
 }

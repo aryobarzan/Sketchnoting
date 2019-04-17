@@ -59,6 +59,8 @@
 		9FD29C58223C3CF700CC969A /* UIImageExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29C57223C3CF700CC969A /* UIImageExtensions.swift */; };
 		9FD29C6422431BFA00CC969A /* DrawnImageClassifier.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29C6322431BFA00CC969A /* DrawnImageClassifier.mlmodel */; };
 		9FD29C6622431C0000CC969A /* labels.txt in Resources */ = {isa = PBXBuildFile; fileRef = 9FD29C6522431C0000CC969A /* labels.txt */; };
+		9FD9BD1022678D41007F4A2D /* NoteShareView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9FD9BD0F22678D41007F4A2D /* NoteShareView.xib */; };
+		9FD9BD1422678D79007F4A2D /* NoteShareView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD9BD1322678D79007F4A2D /* NoteShareView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -119,6 +121,8 @@
 		9FD29C57223C3CF700CC969A /* UIImageExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIImageExtensions.swift; sourceTree = "<group>"; };
 		9FD29C6322431BFA00CC969A /* DrawnImageClassifier.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = DrawnImageClassifier.mlmodel; sourceTree = "<group>"; };
 		9FD29C6522431C0000CC969A /* labels.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = labels.txt; sourceTree = "<group>"; };
+		9FD9BD0F22678D41007F4A2D /* NoteShareView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NoteShareView.xib; sourceTree = "<group>"; };
+		9FD9BD1322678D79007F4A2D /* NoteShareView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteShareView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -156,6 +160,8 @@
 				9FC788F7225E32FB0074BD16 /* DocumentsOverview.swift */,
 				9FD29C4F2239ADC100CC969A /* DocumentView.xib */,
 				9FD29C512239ADE700CC969A /* DocumentView.swift */,
+				9FD9BD0F22678D41007F4A2D /* NoteShareView.xib */,
+				9FD9BD1322678D79007F4A2D /* NoteShareView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -377,6 +383,7 @@
 				9FC788F6225E32E10074BD16 /* DocumentsOverview.xib in Resources */,
 				9FD29C132236C66800CC969A /* colorlesspoint.vsh in Resources */,
 				9FD29C142236C66800CC969A /* coloredpoint.vsh in Resources */,
+				9FD9BD1022678D41007F4A2D /* NoteShareView.xib in Resources */,
 				9FD29BB12220525000CC969A /* LaunchScreen.storyboard in Resources */,
 				9FD29BAE2220525000CC969A /* Assets.xcassets in Resources */,
 				9FD29BAC2220524D00CC969A /* Main.storyboard in Resources */,
@@ -453,6 +460,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9FD9BD1422678D79007F4A2D /* NoteShareView.swift in Sources */,
 				9FD29C3F223861E100CC969A /* ExpandableButtonItem.swift in Sources */,
 				9FD29C2D22370E1800CC969A /* ColorSliderExtensions.swift in Sources */,
 				9FD29C58223C3CF700CC969A /* UIImageExtensions.swift in Sources */,
@@ -644,6 +652,7 @@
 					"$(PROJECT_DIR)",
 				);
 				INFOPLIST_FILE = Sketchnoting/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -670,6 +679,7 @@
 					"$(PROJECT_DIR)",
 				);
 				INFOPLIST_FILE = Sketchnoting/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
