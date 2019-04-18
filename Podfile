@@ -10,4 +10,6 @@ target 'Sketchnoting' do
   pod 'Firebase/MLVisionTextModel'
   pod 'GPUImage'
   pod 'NewPopMenu'
+  pod 'PDFGenerator'
+  pod 'GSMessages'
 end

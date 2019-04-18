@@ -10,6 +10,8 @@ import UIKit
 import LGButton
 import PopMenu
 import MultipeerConnectivity
+import PDFGenerator
+import GSMessages
 
 class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextFieldDelegate, MCSessionDelegate, MCBrowserViewControllerDelegate {
     
@@ -34,7 +36,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     var drawingSearchView: DrawingSearchView!
     
     var searchFilters = [String]()
-    var searchFilterButtons = [LGButton]()
+    var searchFilterButtons = [UIButton]()
     
     var peerID: MCPeerID!
     var mcSession: MCSession!
@@ -225,10 +227,11 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
                 if sketchnoteView.sketchnote!.recognizedText != nil && !sketchnoteView.sketchnote!.recognizedText!.isEmpty {
                     let copyTextAction = PopMenuDefaultAction(title: "Copy Text", color: .white, didSelect: { action in
                         UIPasteboard.general.string = sketchnoteView.sketchnote!.recognizedText!
+                        self.showMessage("Text copied to clipboard.", type: .success)
                     })
                     popMenu.addAction(copyTextAction)
                 }
-                let shareAction = PopMenuDefaultAction(title: "Share", color: .white, didSelect: { action in
+                let sendAction = PopMenuDefaultAction(title: "Send", color: .white, didSelect: { action in
                     self.sketchnoteToShare = sketchnoteView.sketchnote!
                     if let pathArray = self.pathArrayDictionary[self.sketchnoteToShare!.creationDate.timeIntervalSince1970] {
                         self.pathArrayToShare = pathArray
@@ -237,7 +240,15 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
                         self.joinSession()
                     }
                 })
-                popMenu.addAction(shareAction)
+                popMenu.addAction(sendAction)
+                if sketchnoteView.sketchnote!.image != nil {
+                    let shareAction = PopMenuDefaultAction(title: "Share", color: .white, didSelect: { action in
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                            self.generatePDF(sketchnoteView: sketchnoteView)
+                        }
+                    })
+                    popMenu.addAction(shareAction)
+                }
             }
             popMenu.addAction(closeAction)
             self.present(popMenu, animated: true, completion: nil)
@@ -321,39 +332,42 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         if !searchField.text!.isEmpty {
             let searchString = searchField.text!.lowercased()
             if !searchFilters.contains(searchString) {
-                let filterButton = LGButton()
-                filterButton.frame = CGRect(x: 0, y: 0, width: 75, height: 35)
-                filterButton.titleString = searchString
-                filterButton.leftIconString = "close"
-                filterButton.leftIconFontName = "ma"
+                let filterButton = UIButton(frame: CGRect(x: 0, y: 0, width: 75, height: 30))
+                filterButton.backgroundColor = .gray
+                filterButton.setTitle(searchString, for: .normal)
                 searchFiltersStackView.insertArrangedSubview(filterButton, at: 0)
                 searchFilterButtons.append(filterButton)
                 filterButton.isUserInteractionEnabled = true
                 let filterTapGesture = UITapGestureRecognizer(target: self, action: #selector(self.handleFilterTap(_:)))
+                filterTapGesture.cancelsTouchesInView = false
                 filterButton.addGestureRecognizer(filterTapGesture)
                 
                 searchFilters.append(searchString)
-            }
-            for noteCollectionView in noteCollectionViews {
-                noteCollectionView.applySearchFilters(filters: self.searchFilters)
             }
             clearSearchButton.isHidden = false
             searchSeparator.isHidden = false
             searchField.text = ""
         }
+        for noteCollectionView in noteCollectionViews {
+            noteCollectionView.applySearchFilters(filters: self.searchFilters)
+        }
+        if noteCollectionViews.count == 0 {
+            self.clearSearch()
+        }
     }
     
     @objc func handleFilterTap(_ sender: UITapGestureRecognizer) {
-        let filterButton = sender.view as! LGButton
-        if searchFilters.contains(filterButton.titleString) {
+        let filterButton = sender.view as! UIButton
+        if searchFilters.contains(filterButton.title(for: .normal) ?? "") {
             for i in 0..<searchFilters.count {
-                if searchFilters[i] == filterButton.titleString {
+                if searchFilters[i] == filterButton.title(for: .normal) {
                     searchFilters.remove(at: i)
                     break
                 }
             }
         }
         filterButton.removeFromSuperview()
+        self.performSearch()
     }
     
     @IBAction func searchByDrawingTapped(_ sender: LGButton) {
@@ -365,6 +379,9 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         })
     }
     @IBAction func clearSearchTapped(_ sender: LGButton) {
+        clearSearch()
+    }
+    private func clearSearch() {
         for noteCollectionView in noteCollectionViews {
             noteCollectionView.showSketchnotes()
         }
@@ -372,7 +389,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         for searchFilterButton in searchFilterButtons {
             searchFilterButton.removeFromSuperview()
         }
-        searchFilterButtons = [LGButton]()
+        searchFilterButtons = [UIButton]()
         clearSearchButton.isHidden = true
         searchField.text = ""
         searchSeparator.isHidden = true
@@ -588,5 +605,22 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             savePathArrayDictionary()
         }
         hideNoteShareView()
+    }
+    
+    // PDF Generation
+    
+    func generatePDF(sketchnoteView: SketchnoteView) {
+        if sketchnoteView.sketchnote != nil && sketchnoteView.sketchnote!.image != nil {
+            do {
+                let data = try PDFGenerator.generated(by: [sketchnoteView.sketchnote!.image!])
+                let activityController = UIActivityViewController(activityItems: [data], applicationActivities: nil)
+                self.present(activityController, animated: true, completion: nil)
+                if let popOver = activityController.popoverPresentationController {
+                    popOver.sourceView = sketchnoteView
+                }
+            } catch (let error) {
+                print(error)
+            }
+        }
     }
 }

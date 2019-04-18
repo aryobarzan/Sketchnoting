@@ -10,6 +10,7 @@ import UIKit
 import LGButton
 import Firebase
 import PopMenu
+import GSMessages
 
 class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, SketchViewDelegate, UIPencilInteractionDelegate {
 
@@ -145,7 +146,10 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         case .switchPrevious:
             self.toggleDrawTool()
             break
+        default:
+            print("Unknown Pen action")
         }
+        
     }
     
     private func toggleDrawTool() {
@@ -488,15 +492,13 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         textRecognizer.process(image) { result, error in
             self.documentsButton.isLoading = false
             guard error == nil, let result = result else {
-                let alertController = UIAlertController(title: "Error", message: "No documents could be found.", preferredStyle: .alert)
-                let alertAction = UIAlertAction(title: "Close", style: .default)
-                alertController.addAction(alertAction)
-                self.present(alertController, animated: true)
+                self.showMessage("No documents could be found.", type: .error)
                 return
             }
             let resultText = result.text
             self.sketchnote?.recognizedText = resultText
             print(resultText)
+            self.parseForTime(text: resultText)
             SemanticHelper.performSpotlightOnSketchnote(text: resultText, viewController: self)
         }
     }
@@ -569,6 +571,29 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
             else {
                 print("Waiting for drawing")
             }
+        }
+    }
+    
+    // Detect time in text
+    private func parseForTime(text: String) {
+        var days = 0
+        var hours = 0
+        var minutes = 0
+        let parsedDay = text.groups(for: "in\\s*([\\d]+)\\s*days*.*")
+        if parsedDay.count > 0 && parsedDay[0].count > 0 {
+            days = Int(parsedDay[0][1]) ?? 0
+        }
+        let parsedHour = text.groups(for: "in\\s*([\\d]+)\\s*hours*.*")
+        if parsedHour.count > 0 && parsedHour[0].count > 0 {
+            hours = Int(parsedHour[0][1]) ?? 0
+        }
+        let parsedMinute = text.groups(for: "in\\s*([\\d]+)\\s*minutes*.*")
+        if parsedMinute.count > 0 && parsedMinute[0].count > 0 {
+            minutes = Int(parsedMinute[0][1]) ?? 0
+        }
+        
+        if days > 0 || hours > 0 || minutes > 0 {
+            self.showMessage("Remind you in \(days) days \(hours) hours \(minutes) minutes?", type: .info)
         }
     }
     
@@ -693,5 +718,27 @@ public class SimpleLine: UIView  {
         context.move(to: CGPoint(x: 0, y: 0))
         context.addLine(to: CGPoint(x: self.frame.width, y: 0))
         context.strokePath()
+    }
+}
+extension String {
+    func groups(for regexPattern: String) -> [[String]] {
+        do {
+            let text = self
+            let regex = try NSRegularExpression(pattern: regexPattern)
+            let matches = regex.matches(in: text,
+                                        range: NSRange(text.startIndex..., in: text))
+            return matches.map { match in
+                return (0..<match.numberOfRanges).map {
+                    let rangeBounds = match.range(at: $0)
+                    guard let range = Range(rangeBounds, in: text) else {
+                        return ""
+                    }
+                    return String(text[range])
+                }
+            }
+        } catch let error {
+            print("invalid regex: \(error.localizedDescription)")
+            return []
+        }
     }
 }
