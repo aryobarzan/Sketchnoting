@@ -451,16 +451,24 @@
                                 <rect key="frame" x="0.0" y="143" width="768" height="881"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </view>
+                            <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="bkc-RB-blk">
+                                <rect key="frame" x="0.0" y="0.0" width="768" height="1024"/>
+                                <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            </view>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="Nvg-e1-5lr" firstAttribute="top" secondItem="aMI-wG-bBD" secondAttribute="bottom" constant="8" id="4pm-9H-j2K"/>
                             <constraint firstItem="Nvg-e1-5lr" firstAttribute="leading" secondItem="aqH-yZ-g7K" secondAttribute="leading" id="BRc-iK-NFw"/>
+                            <constraint firstItem="bkc-RB-blk" firstAttribute="leading" secondItem="e9U-eQ-c5r" secondAttribute="leading" id="HHD-vT-C0d"/>
                             <constraint firstAttribute="bottom" secondItem="Nvg-e1-5lr" secondAttribute="bottom" id="IM4-Zx-quF"/>
+                            <constraint firstItem="bkc-RB-blk" firstAttribute="top" secondItem="e9U-eQ-c5r" secondAttribute="top" id="Pbo-qk-BJM"/>
                             <constraint firstItem="aMI-wG-bBD" firstAttribute="top" secondItem="aqH-yZ-g7K" secondAttribute="top" id="Xz0-aY-1ms"/>
                             <constraint firstItem="aMI-wG-bBD" firstAttribute="trailing" secondItem="aqH-yZ-g7K" secondAttribute="trailing" id="ZXd-gL-vT8"/>
                             <constraint firstItem="Nvg-e1-5lr" firstAttribute="trailing" secondItem="aqH-yZ-g7K" secondAttribute="trailing" id="d96-oa-5n9"/>
                             <constraint firstItem="aMI-wG-bBD" firstAttribute="leading" secondItem="aqH-yZ-g7K" secondAttribute="leading" id="hUa-Y1-IQn"/>
+                            <constraint firstAttribute="bottom" secondItem="bkc-RB-blk" secondAttribute="bottom" id="xeC-fn-qzX"/>
+                            <constraint firstAttribute="trailing" secondItem="bkc-RB-blk" secondAttribute="trailing" id="xsM-W7-3Ya"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="aqH-yZ-g7K"/>
                     </view>
@@ -505,6 +513,7 @@
                     <connections>
                         <outlet property="clearButton" destination="fGp-qI-8jR" id="MrF-N0-ogz"/>
                         <outlet property="closeButton" destination="1KW-JE-ed3" id="F9k-S4-cl9"/>
+                        <outlet property="dimView" destination="bkc-RB-blk" id="1rV-xR-BWr"/>
                         <outlet property="documentsButton" destination="zQH-8L-NbQ" id="1ST-fD-BW8"/>
                         <outlet property="drawingsButton" destination="PbO-cQ-nbQ" id="Z5N-BA-2AB"/>
                         <outlet property="forceSensitivityButton" destination="y7P-W3-djw" id="m1M-Qo-4z4"/>

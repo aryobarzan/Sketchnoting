@@ -25,6 +25,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     @IBOutlet var helpLinesButton: LGButton!
     @IBOutlet var drawingsButton: LGButton!
     @IBOutlet var forceSensitivityButton: LGButton!
+    @IBOutlet var dimView: UIView!
     
     var documentViews = [DocumentView]()
     var documentsOverview: DocumentsOverview!
@@ -498,7 +499,8 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
             let resultText = result.text
             self.sketchnote?.recognizedText = resultText
             print(resultText)
-            self.parseForTime(text: resultText)
+            //self.parseForTime(text: resultText)
+            self.parseForTitle(visionResult: result)
             SemanticHelper.performSpotlightOnSketchnote(text: resultText, viewController: self)
         }
     }
@@ -508,8 +510,8 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         self.view.addSubview(self.documentsOverview)
         self.view.bringSubviewToFront(documentsOverview)
         UIView.animate(withDuration: 0.0, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 0, options: [],  animations: {
-            //self.dimView.isHidden = false
-            //self.dimView.alpha = 0.8
+            self.dimView.isHidden = false
+            self.dimView.alpha = 0.8
             self.documentsOverview.transform = .identity
         })
 
@@ -540,8 +542,8 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     
     private func hideDocumentsOverview() {
         UIView.animate(withDuration: 0.0, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 0, options: [], animations: {
-            //self.dimView.alpha = 0
-            //self.dimView.isHidden = true
+            self.dimView.alpha = 0
+            self.dimView.isHidden = true
             self.documentsOverview.transform = CGAffineTransform(scaleX: 0.2, y: 0.2)
             
         }) { (success) in
@@ -594,6 +596,29 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         
         if days > 0 || hours > 0 || minutes > 0 {
             self.showMessage("Remind you in \(days) days \(hours) hours \(minutes) minutes?", type: .info)
+        }
+    }
+    
+    // Detect title in text
+    private func parseForTitle(visionResult: VisionText) {
+        var title = ""
+        for block in visionResult.blocks {
+            for line in block.lines {
+                for word in line.elements {
+                    for pathObject in self.sketchView.pathArray {
+                        if let penTool = pathObject as? PenTool {
+                            if penTool.lineWidth >= 8 {
+                                title = word.text
+                            }
+                        }
+                        else {
+                        }
+                    }
+                }
+            }
+        }
+        if !title.isEmpty {
+            self.showMessage("Title detected as \(title)", type: .info)
         }
     }
     
