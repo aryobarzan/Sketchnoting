@@ -496,7 +496,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
                 self.showMessage("No documents could be found.", type: .error)
                 return
             }
-            let resultText = result.text
+            let resultText = OCRHelper.postprocess(text: result.text)
             self.sketchnote?.recognizedText = resultText
             print(resultText)
             //self.parseForTime(text: resultText)
@@ -607,8 +607,15 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
                 for word in line.elements {
                     for pathObject in self.sketchView.pathArray {
                         if let penTool = pathObject as? PenTool {
-                            if penTool.lineWidth >= 8 {
-                                title = word.text
+                            if word.frame.contains(penTool.path.boundingBox) {
+                                
+                                if penTool.lineWidth >= 8 || word.frame.height >= 100 || penTool.lineColor.cgColor.components?[0] ?? 100 >= 200 {
+                                    title = word.text
+                                    print(word.text)
+                                    print(word.frame.height)
+                                    print(penTool.lineWidth)
+                                    print(penTool.lineColor.cgColor.components?[0] ?? 1)
+                                }
                             }
                         }
                         else {

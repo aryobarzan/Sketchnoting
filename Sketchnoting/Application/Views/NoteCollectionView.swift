@@ -17,6 +17,7 @@ class NoteCollectionView : UIView, UITextFieldDelegate {
     @IBOutlet var titleField: UITextField!
     @IBOutlet var newSketchnoteButton: LGButton!
     @IBOutlet var deleteButton: LGButton!
+    @IBOutlet var shareButton: LGButton!
     
     var parentViewController: ViewController!
     
@@ -83,6 +84,12 @@ class NoteCollectionView : UIView, UITextFieldDelegate {
     func setDeleteAction(for controlEvents: UIControl.Event, _ closure: @escaping ()->()) {
         let sleeve = ClosureSleeve(closure)
         deleteButton.addTarget(sleeve, action: #selector(ClosureSleeve.invoke), for: controlEvents)
+        objc_setAssociatedObject(self, String(format: "[%d]", arc4random()), sleeve, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
+    }
+    
+    func setShareAction(_ closure: @escaping ()->()) {
+        let sleeve = ClosureSleeve(closure)
+        shareButton.addTarget(sleeve, action: #selector(ClosureSleeve.invoke), for: .touchUpInside)
         objc_setAssociatedObject(self, String(format: "[%d]", arc4random()), sleeve, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
     }
     

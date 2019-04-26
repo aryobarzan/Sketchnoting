@@ -272,6 +272,19 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
             self.present(alert, animated: true)
         }
+        noteCollectionView.setShareAction {
+            if noteCollectionView.noteCollection != nil && noteCollectionView.noteCollection!.notes.count > 0 {
+                self.generatePDF(noteCollectionView: noteCollectionView)
+            }
+            let alert = UIAlertController(title: "Delete Note Collection?", message: "", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "Confirm", style: .destructive, handler: { action in
+                self.deleteNoteCollection(collection: collection)
+                noteCollectionView.removeFromSuperview()
+                self.saveNoteCollections()
+            }))
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+            self.present(alert, animated: true)
+        }
         
         for n in collection.notes {
             displaySketchnote(note: n, collectionView: noteCollectionView)
@@ -617,6 +630,28 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
                 self.present(activityController, animated: true, completion: nil)
                 if let popOver = activityController.popoverPresentationController {
                     popOver.sourceView = sketchnoteView
+                }
+            } catch (let error) {
+                print(error)
+            }
+        }
+    }
+    func generatePDF(noteCollectionView: NoteCollectionView) {
+        if noteCollectionView.noteCollection != nil && noteCollectionView.noteCollection!.notes.count > 0 {
+            do {
+                var pages = [UIImage]()
+                for note in noteCollectionView.noteCollection!.notes {
+                    if note.image != nil {
+                        pages.append(note.image!)
+                    }
+                }
+                if pages.count > 0 {
+                    let data = try PDFGenerator.generated(by: pages)
+                    let activityController = UIActivityViewController(activityItems: [data], applicationActivities: nil)
+                    self.present(activityController, animated: true, completion: nil)
+                    if let popOver = activityController.popoverPresentationController {
+                        popOver.sourceView = noteCollectionView
+                    }
                 }
             } catch (let error) {
                 print(error)
