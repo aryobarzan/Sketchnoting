@@ -30,7 +30,6 @@ class SketchnoteView : UIView {
     func commonInit() {
         Bundle.main.loadNibNamed(kCONTENT_XIB_NAME, owner: self, options: nil)
         self.widthAnchor.constraint(equalToConstant: 200).isActive = true
-        //self.heightAnchor.constraint(equalToConstant: 300).isActive = true
         contentView.fixInView(self)
         
         self.layer.borderWidth = 1

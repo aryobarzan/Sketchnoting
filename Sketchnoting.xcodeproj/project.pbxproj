@@ -25,11 +25,6 @@
 		9FD29BC72224B58600CC969A /* Document.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29BC62224B58600CC969A /* Document.swift */; };
 		9FD29BCB2224B89800CC969A /* Sketchnote.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29BCA2224B89800CC969A /* Sketchnote.swift */; };
 		9FD29BCD2226BAD700CC969A /* SemanticHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29BCC2226BAD600CC969A /* SemanticHelper.swift */; };
-		9FD29C0E2236C5BA00CC969A /* JotUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9FD29C0D2236C5BA00CC969A /* JotUI.framework */; };
-		9FD29C122236C66800CC969A /* quad.vsh in Resources */ = {isa = PBXBuildFile; fileRef = 9FD29C0F2236C66700CC969A /* quad.vsh */; };
-		9FD29C132236C66800CC969A /* colorlesspoint.vsh in Resources */ = {isa = PBXBuildFile; fileRef = 9FD29C102236C66700CC969A /* colorlesspoint.vsh */; };
-		9FD29C142236C66800CC969A /* coloredpoint.vsh in Resources */ = {isa = PBXBuildFile; fileRef = 9FD29C112236C66700CC969A /* coloredpoint.vsh */; };
-		9FD29C172236C7E100CC969A /* JotViewSwift.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29C162236C7E100CC969A /* JotViewSwift.swift */; };
 		9FD29C192236DCFC00CC969A /* SketchNoteViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29C182236DCFC00CC969A /* SketchNoteViewController.swift */; };
 		9FD29C1E2236EA2800CC969A /* SketchTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29C1B2236EA2800CC969A /* SketchTool.swift */; };
 		9FD29C1F2236EA2800CC969A /* SketchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29C1C2236EA2800CC969A /* SketchView.swift */; };
@@ -72,6 +67,8 @@
 		9F5010CF224930E400425424 /* NoteCollection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteCollection.swift; sourceTree = "<group>"; };
 		9F5010D12249325300425424 /* NoteCollectionView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NoteCollectionView.xib; sourceTree = "<group>"; };
 		9F5010D32249326D00425424 /* NoteCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteCollectionView.swift; sourceTree = "<group>"; };
+		9F5D8B2B228B9D7000F56FEC /* CREDITS.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CREDITS.md; sourceTree = "<group>"; };
+		9F5D8B2C228B9EF800F56FEC /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		9FC788F1225CEC230074BD16 /* DrawingSearchView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DrawingSearchView.xib; sourceTree = "<group>"; };
 		9FC788F3225CEC4C0074BD16 /* DrawingSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrawingSearchView.swift; sourceTree = "<group>"; };
 		9FC788F5225E32E10074BD16 /* DocumentsOverview.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DocumentsOverview.xib; sourceTree = "<group>"; };
@@ -87,12 +84,6 @@
 		9FD29BC62224B58600CC969A /* Document.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Document.swift; sourceTree = "<group>"; };
 		9FD29BCA2224B89800CC969A /* Sketchnote.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sketchnote.swift; sourceTree = "<group>"; };
 		9FD29BCC2226BAD600CC969A /* SemanticHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SemanticHelper.swift; sourceTree = "<group>"; };
-		9FD29C0D2236C5BA00CC969A /* JotUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = JotUI.framework; sourceTree = "<group>"; };
-		9FD29C0F2236C66700CC969A /* quad.vsh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = quad.vsh; sourceTree = "<group>"; };
-		9FD29C102236C66700CC969A /* colorlesspoint.vsh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = colorlesspoint.vsh; sourceTree = "<group>"; };
-		9FD29C112236C66700CC969A /* coloredpoint.vsh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = coloredpoint.vsh; sourceTree = "<group>"; };
-		9FD29C152236C6A100CC969A /* JotUI-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "JotUI-Bridging-Header.h"; sourceTree = "<group>"; };
-		9FD29C162236C7E100CC969A /* JotViewSwift.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JotViewSwift.swift; sourceTree = "<group>"; };
 		9FD29C182236DCFC00CC969A /* SketchNoteViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SketchNoteViewController.swift; sourceTree = "<group>"; };
 		9FD29C1B2236EA2800CC969A /* SketchTool.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SketchTool.swift; sourceTree = "<group>"; };
 		9FD29C1C2236EA2800CC969A /* SketchView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SketchView.swift; sourceTree = "<group>"; };
@@ -131,7 +122,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				9FD29C392238571700CC969A /* Pods_Sketchnoting.framework in Frameworks */,
-				9FD29C0E2236C5BA00CC969A /* JotUI.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -141,7 +131,6 @@
 		124769D1803E7C4AE8A1F382 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				9FD29C0D2236C5BA00CC969A /* JotUI.framework */,
 				9DC8B7BD96FB5DF71C8C0CA0 /* Pods_Sketchnoting.framework */,
 			);
 			name = Frameworks;
@@ -169,9 +158,6 @@
 		9FD29B9A2220524D00CC969A = {
 			isa = PBXGroup;
 			children = (
-				9FD29C112236C66700CC969A /* coloredpoint.vsh */,
-				9FD29C102236C66700CC969A /* colorlesspoint.vsh */,
-				9FD29C0F2236C66700CC969A /* quad.vsh */,
 				9FD29BA52220524D00CC969A /* Sketchnoting */,
 				9FD29BA42220524D00CC969A /* Products */,
 				A42EF4785A4BE0D5AC7720A5 /* Pods */,
@@ -203,8 +189,8 @@
 				9FD29C322237FD1600CC969A /* GMStepper */,
 				9FD29C2122370DE300CC969A /* ColorSlider */,
 				9FD29C1A2236EA1700CC969A /* Sketch */,
-				9FD29C152236C6A100CC969A /* JotUI-Bridging-Header.h */,
-				9FD29C162236C7E100CC969A /* JotViewSwift.swift */,
+				9F5D8B2B228B9D7000F56FEC /* CREDITS.md */,
+				9F5D8B2C228B9EF800F56FEC /* README.md */,
 			);
 			path = Sketchnoting;
 			sourceTree = "<group>";
@@ -378,11 +364,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				9F5010D22249325300425424 /* NoteCollectionView.xib in Resources */,
-				9FD29C122236C66800CC969A /* quad.vsh in Resources */,
 				9FD29C442239525A00CC969A /* GoogleService-Info.plist in Resources */,
 				9FC788F6225E32E10074BD16 /* DocumentsOverview.xib in Resources */,
-				9FD29C132236C66800CC969A /* colorlesspoint.vsh in Resources */,
-				9FD29C142236C66800CC969A /* coloredpoint.vsh in Resources */,
 				9FD9BD1022678D41007F4A2D /* NoteShareView.xib in Resources */,
 				9FD29BB12220525000CC969A /* LaunchScreen.storyboard in Resources */,
 				9FD29BAE2220525000CC969A /* Assets.xcassets in Resources */,
@@ -485,7 +468,6 @@
 				9FD29C472239588E00CC969A /* UIViewExtensions.swift in Sources */,
 				9FD29C1F2236EA2800CC969A /* SketchView.swift in Sources */,
 				9F5010CE22491FD000425424 /* SketchnoteView.swift in Sources */,
-				9FD29C172236C7E100CC969A /* JotViewSwift.swift in Sources */,
 				9FD29C42223861E100CC969A /* ActionButton.swift in Sources */,
 				9FD29C38223853C300CC969A /* PhotoAuthorization.swift in Sources */,
 				9FC788F4225CEC4C0074BD16 /* DrawingSearchView.swift in Sources */,
@@ -660,7 +642,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = lu.uni.coast.Sketchnoting;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				SWIFT_OBJC_BRIDGING_HEADER = "/Users/aryobarzan/Projects/Swift/ios/Sketchnoting/Sketchnoting/JotUI-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -687,7 +669,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = lu.uni.coast.Sketchnoting;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				SWIFT_OBJC_BRIDGING_HEADER = "/Users/aryobarzan/Projects/Swift/ios/Sketchnoting/Sketchnoting/JotUI-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};

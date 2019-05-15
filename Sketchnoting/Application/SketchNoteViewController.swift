@@ -499,7 +499,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
             let resultText = OCRHelper.postprocess(text: result.text)
             self.sketchnote?.recognizedText = resultText
             print(resultText)
-            //self.parseForTime(text: resultText)
+            self.parseForTime(text: resultText)
             self.parseForTitle(visionResult: result)
             SemanticHelper.performSpotlightOnSketchnote(text: resultText, viewController: self)
         }
@@ -610,11 +610,11 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
                             if word.frame.contains(penTool.path.boundingBox) {
                                 
                                 if penTool.lineWidth >= 8 || word.frame.height >= 100 || penTool.lineColor.cgColor.components?[0] ?? 100 >= 200 {
-                                    title = word.text
-                                    print(word.text)
+                                    title = word.text.lowercased()
+                                    /*print(word.text)
                                     print(word.frame.height)
                                     print(penTool.lineWidth)
-                                    print(penTool.lineColor.cgColor.components?[0] ?? 1)
+                                    print(penTool.lineColor.cgColor.components?[0] ?? 1)*/
                                 }
                             }
                         }
