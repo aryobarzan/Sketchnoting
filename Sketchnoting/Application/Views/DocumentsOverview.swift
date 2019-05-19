@@ -9,6 +9,9 @@
 import UIKit
 import LGButton
 
+// This is the view that pops up in the SketchnoteView where related documents are displayed
+// It contains a DocumentView for each related document
+
 class DocumentsOverview: UIView {
     let kCONTENT_XIB_NAME = "DocumentsOverview"
     @IBOutlet var closeButton: LGButton!

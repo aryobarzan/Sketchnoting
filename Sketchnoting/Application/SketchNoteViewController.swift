@@ -12,6 +12,8 @@ import Firebase
 import PopMenu
 import GSMessages
 
+// This is the controller for the other page of the application, i.e. not the home page, for the page displayed when the user wants to edit a note.
+
 class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, SketchViewDelegate, UIPencilInteractionDelegate {
 
     @IBOutlet weak var topContainer: UIView!
@@ -24,7 +26,6 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     @IBOutlet var undoButton: LGButton!
     @IBOutlet var helpLinesButton: LGButton!
     @IBOutlet var drawingsButton: LGButton!
-    @IBOutlet var forceSensitivityButton: LGButton!
     @IBOutlet var dimView: UIView!
     
     var documentViews = [DocumentView]()
@@ -44,6 +45,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     var drawingViews = [UIView]()
     var drawingViewsShown = false
     
+    // This function sets up the page and every element contained within it.
     override func viewDidLoad() {
         super.viewDidLoad()
         self.navigationController?.setNavigationBarHidden(false, animated: false)
@@ -69,7 +71,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         sketchView.lineColor = colorSlider.color
         sketchView.drawTool = .pen
         sketchView.lineWidth = 2
-        //Drawing Recognition
+        //Drawing Recognition - This loads the labels for the drawing recognition's CoreML model.
         if let path = Bundle.main.path(forResource: "labels", ofType: "txt") {
             do {
                 let data = try String(contentsOfFile: path, encoding: .utf8)
@@ -79,8 +81,9 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
                 print("error loading labels: \(error)")
             }
         }
-        //Drawing Recognition
         
+        // If the user has not created a new note, but is trying to edit an existing note, this existing note is reloaded.
+        // This reload consists of redrawing the user's strokes for that note on the note's canvas on this page.
         if sketchnote != nil {
             if new == true {
                 sketchnote?.image = sketchView.asImage()
@@ -90,6 +93,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
                     print("Debug: Reloading path array")
                     self.sketchView.reloadPathArray(array: self.storedPathArray!)
                 }
+                    // If the app does not manage to reload the user's drawn strokes (for any reason), the app simply loads a screenshot of the note's last state as a background for the note's canvas on the page.
                 else if sketchnote?.image != nil {
                     let imageView = UIImageView(image: sketchnote!.image!)
                     sketchView.addSubview(imageView)
@@ -104,10 +108,12 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
                         ])
                 }
             }
+            // This is the case where the user has created a new note and is not editing an existing one.
         } else {
             sketchnote = Sketchnote(image: sketchView.asImage(), relatedDocuments: nil, drawings: nil)
         }
         
+        // The inserted drawing regions for the existing note are reloaded on the canvas.
         if sketchnote != nil && sketchnote!.drawingViewRects != nil {
             for rect in sketchnote!.drawingViewRects! {
                 let drawingView = UIView(frame: rect)
@@ -124,7 +130,9 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
             }
         }
         
+        // Help lines are horizontal lines displayed as a help to the user on the canvas, in order to let them write in straight lines.
         setupHelpLines()
+        
         // Setup long press on canvas for inserting drawing region
         let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(self.handleSketchViewLongPress(_:)))
         longPressGesture.minimumPressDuration = 1.5
@@ -163,6 +171,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         }
     }
     
+    // This function handles the insertion of a drawing region on the note's canvas.
     @objc func handleSketchViewLongPress(_ sender: UILongPressGestureRecognizer) {
         if (sender.state == UIGestureRecognizer.State.began)
         {
@@ -209,6 +218,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         }
     }
     
+    // When the user closes the note, this function loops through each drawing region inserted on the note's canvas and generates an input image of the drawing within that drawing region for the drawing recognition model.
     private func processDrawingRecognition() {
         if self.helpLinesShown {
             self.toggleHelpLines()
@@ -290,6 +300,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         }
     }
     
+    // This function is called when the user closes the page, i.e. stops editing the note, and the app returns to the home page.
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         super.prepare(for: segue, sender: sender)
         
@@ -393,71 +404,13 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
             drawingsButton.gradientHorizontal = false
         }
     }
-    @IBAction func forceSensitivityTapped(_ sender: LGButton) {
-        self.sketchView.forceSensitive = !self.sketchView.forceSensitive
-        
-        if self.sketchView.forceSensitive {
-            forceSensitivityButton.gradientStartColor = UIColor(red: 95.0/255.0, green: 193.0/255.0, blue: 148.0/255.0, alpha: 1)
-            forceSensitivityButton.gradientEndColor = UIColor(red: 0.0, green: 122.0/255.0, blue: 255.0/255.0, alpha: 1)
-        }
-        else {
-            forceSensitivityButton.gradientEndColor = nil
-            forceSensitivityButton.gradientStartColor = nil
-            forceSensitivityButton.gradientHorizontal = false
-        }
-    }
     
     @IBAction func documentsTapped(_ sender: LGButton) {
         documentsButton.isLoading = true
         self.processOCR(image: self.generateOCRImage())
     }
     
-    func tapCameraButton() {
-        // Camera
-        let cameraAction = UIAlertAction(title: "Camera", style: .default) { _ in
-            self.setImageFromCamera()
-        }
-        // Gallery
-        let galleryAction = UIAlertAction(title: "Gallery", style: .default) { _ in
-            self.setImageFromGallery()
-        }
-        // Cancel
-        let cancelAction = UIAlertAction(title: "Cancel", style: .default) { _ in }
-        
-        let alertController = UIAlertController(title: "Please select a Picture", message: nil, preferredStyle: .alert)
-        alertController.addAction(cameraAction)
-        alertController.addAction(galleryAction)
-        alertController.addAction(cancelAction)
-        
-        present(alertController, animated: true, completion: nil)
-    }
-    
-    private func setImageFromCamera() {
-        PhotoRequestManager.requestPhotoFromCamera(self){ [weak self] result in
-            switch result {
-            case .success(let image):
-                self?.sketchView.loadImage(image: image)
-            case .faild:
-                print("failed")
-            case .cancel:
-                break
-            }
-        }
-    }
-    
-    private func setImageFromGallery() {
-        PhotoRequestManager.requestPhotoLibrary(self){ [weak self] result in
-            switch result {
-            case .success(let image):
-                self?.sketchView.loadImage(image: image)
-            case .faild:
-                print("failed")
-            case .cancel:
-                break
-            }
-        }
-    }
-    
+    // This function generates the input image for the handwriting recognition model.
     private func generateOCRImage() -> UIImage {
         let canvas = UIView(frame: self.sketchView.frame)
         canvas.backgroundColor = .black
@@ -486,6 +439,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         return canvas.asImage()
     }
     
+    // This function in turn calls the OCR engine (Google Firebase ML Kit) with the generated input image (previous function).
     private func processOCR(image: UIImage) {
         let vision = Vision.vision()
         let textRecognizer = vision.onDeviceTextRecognizer()
@@ -499,12 +453,11 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
             let resultText = OCRHelper.postprocess(text: result.text)
             self.sketchnote?.recognizedText = resultText
             print(resultText)
-            self.parseForTime(text: resultText)
-            self.parseForTitle(visionResult: result)
             SemanticHelper.performSpotlightOnSketchnote(text: resultText, viewController: self)
         }
     }
     
+    // This function displays related documents found for the note.
     func displaySpotlightDocuments(documents: [Document]) {
         documentsButton.isLoading = false
         self.view.addSubview(self.documentsOverview)
@@ -552,6 +505,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     }
     
     // Drawing recognition
+    // In case the user's drawing has been recognized with at least a >50% confidence, the recognized drawing's label, e.g. "light bulb", is stored for the sketchnote.
     private var labelNames: [String] = []
     private let drawnImageClassifier = DrawnImageClassifier()
     private var currentPrediction: DrawnImageClassifierOutput? {
@@ -576,61 +530,9 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         }
     }
     
-    // Detect time in text
-    private func parseForTime(text: String) {
-        var days = 0
-        var hours = 0
-        var minutes = 0
-        let parsedDay = text.groups(for: "in\\s*([\\d]+)\\s*days*.*")
-        if parsedDay.count > 0 && parsedDay[0].count > 0 {
-            days = Int(parsedDay[0][1]) ?? 0
-        }
-        let parsedHour = text.groups(for: "in\\s*([\\d]+)\\s*hours*.*")
-        if parsedHour.count > 0 && parsedHour[0].count > 0 {
-            hours = Int(parsedHour[0][1]) ?? 0
-        }
-        let parsedMinute = text.groups(for: "in\\s*([\\d]+)\\s*minutes*.*")
-        if parsedMinute.count > 0 && parsedMinute[0].count > 0 {
-            minutes = Int(parsedMinute[0][1]) ?? 0
-        }
-        
-        if days > 0 || hours > 0 || minutes > 0 {
-            self.showMessage("Remind you in \(days) days \(hours) hours \(minutes) minutes?", type: .info)
-        }
-    }
-    
-    // Detect title in text
-    private func parseForTitle(visionResult: VisionText) {
-        var title = ""
-        for block in visionResult.blocks {
-            for line in block.lines {
-                for word in line.elements {
-                    for pathObject in self.sketchView.pathArray {
-                        if let penTool = pathObject as? PenTool {
-                            if word.frame.contains(penTool.path.boundingBox) {
-                                
-                                if penTool.lineWidth >= 8 || word.frame.height >= 100 || penTool.lineColor.cgColor.components?[0] ?? 100 >= 200 {
-                                    title = word.text.lowercased()
-                                    /*print(word.text)
-                                    print(word.frame.height)
-                                    print(penTool.lineWidth)
-                                    print(penTool.lineColor.cgColor.components?[0] ?? 1)*/
-                                }
-                            }
-                        }
-                        else {
-                        }
-                    }
-                }
-            }
-        }
-        if !title.isEmpty {
-            self.showMessage("Title detected as \(title)", type: .info)
-        }
-    }
     
     // **************************
-    // MARK: View Setup Functions
+    // MARK: View Setup Functions - The following functions are used to setup some views of the page.
     private func setupToolsMenu() {
         let insets = UIEdgeInsets(top: 16, left: 16, bottom: 16, right: 16)
         

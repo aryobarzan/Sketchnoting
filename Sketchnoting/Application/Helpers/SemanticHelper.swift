@@ -9,6 +9,11 @@
 import UIKit
 import Alamofire
 
+// The functions for calling the DBpedia Spotlight API (used for semantic annotation, i.e. for retrieving documents related to a note's text) are contained in this file
+// The functions are static to make them accessible across the application and not just in the SketchNoteViewController.
+// Additionally, a static alamofire* session has been created to avoid a performance degradation, as the application would only be making a single call at a given time either way.
+// *Alamofire is a third party library that facilitates http requests
+
 class SemanticHelper {
     
     private static var Manager : Alamofire.Session = {

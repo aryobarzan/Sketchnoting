@@ -9,6 +9,8 @@
 import UIKit
 import LGButton
 
+// This is the view displayed as a pop up when the user wants to search by drawing (button located on the home page)
+
 class DrawingSearchView: UIView {
     let kCONTENT_XIB_NAME = "DrawingSearchView"
     

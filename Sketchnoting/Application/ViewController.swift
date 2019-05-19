@@ -12,9 +12,12 @@ import PopMenu
 import MultipeerConnectivity
 import PDFGenerator
 import GSMessages
+// This is the controller for the app's home page view.
+// It contains the search bar and all the buttons related to it.
+// It also contains note collection views, which in turn contain sketchnote views.
 
+//This controller handles all interactions of the user on the home page, including creating new note collections and new notes, searching, sharing notes, and generating pdfs from notes.
 class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextFieldDelegate, MCSessionDelegate, MCBrowserViewControllerDelegate {
-    
 
     @IBOutlet var searchField: UITextField!
     @IBOutlet var searchButton: LGButton!
@@ -27,32 +30,53 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     var searchFiltersStackView = UIStackView()
     @IBOutlet var noteSharingSwitch: UISwitch!
     
+    // This property holds the user's note collections.
     var noteCollections = [NoteCollection]()
     var noteCollectionViews = [NoteCollectionView]()
+    // (!!!!) This property maps the identifier (TimeInterval) of a sketchnote to its array of strokes drawn on its canvas.
+    // As explained in the Sketchnote.swift file, the strokes drawn on a note's canvas are saved separately, as the strokes conform to a different encoding protocol.
+    // Thus, when opening a sketchnote for editing, its identifier is used to retrieve its corresponing strokes (NSMutableArray) in this dictionary.
     var pathArrayDictionary = [TimeInterval: NSMutableArray]()
     
+    // When the user taps a sketchnote to open it for editing, the app stores it in this property to remember which note is currently being edited.
     var selectedSketchnote: Sketchnote?
-    
+    // The view that is displayed as a pop-up for the user to draw a shape which is used for searching.
     var drawingSearchView: DrawingSearchView!
     
+    // Each search term entered is stored.
     var searchFilters = [String]()
+    // Each search term is displayed as a button, which when tapped, removes the search term.
     var searchFilterButtons = [UIButton]()
     
+    // This properties are related to note-sharing.
+    // Each device is given an ID (peerID).
+    // If the user has enabled sharing for its own device, i.e. made their device visible to others, mcSession is instantiated and activated
+    // mcAdvertiserAssistant is used internally by the Multipeer Connectivity module.
     var peerID: MCPeerID!
     var mcSession: MCSession!
     var mcAdvertiserAssistant: MCAdvertiserAssistant!
     
+    // The note the user has selected to send to other devices is stored here.
     var sketchnoteToShare: Sketchnote?
+    // Since the strokes of a note are stored separately from the note itself, the strokes linked to the above variable are stored in this following variable.
     var pathArrayToShare: NSMutableArray?
-    var receivedSketchnote: Sketchnote?
-    var receivedPathArray: NSMutableArray?
-    var noteShareView: NoteShareView!
+    // The two above variables are added to this following array and this array is sent to the receiving device(s)
     var dataToShare = [Data]()
-
+    
+    // Similarly, a received note from some other device is stored here.
+    var receivedSketchnote: Sketchnote?
+    // The strokes linked to that received note are stored here.
+    var receivedPathArray: NSMutableArray?
+    // This view is displayed to a shared note's recipient, which allows the user to accept or reject the shared note.
+    var noteShareView: NoteShareView!
+    
+    
+    // This function initializes the home page view.
     override func viewDidLoad() {
         super.viewDidLoad()
         self.navigationController?.setNavigationBarHidden(true, animated: false)
         
+        // The note-sharing related variables are instantiated
         peerID = MCPeerID(displayName: UIDevice.current.name)
         mcSession = MCSession(peer: peerID, securityIdentity: nil, encryptionPreference: .required)
         mcSession.delegate = self
@@ -67,6 +91,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             self.hideNoteShareView()
         }
         
+        // The search views are setup, including the search field and the pop-up view for searching by drawing
         self.searchField.delegate = self
         searchFiltersStackView.isUserInteractionEnabled = true
         searchFiltersStackView.axis = .horizontal
@@ -108,6 +133,8 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             notesStackView.widthAnchor.constraint(equalTo: scrollView.widthAnchor)
             ])
         
+        // The application attempts to load saved note collections from the device's disk here.
+        // If any could be loaded, these are consequently displayed on the home page.
         if let savedNoteCollections = loadNoteCollections() {
             noteCollections += savedNoteCollections
             for collection in noteCollections {
@@ -115,11 +142,13 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             }
         }
         
+        // This loads the strokes array for each sketchnote saved to the device's disk.
+        // See Sketchnote.swift file for more information as to why a sketchnote and the strokes on its canvas are stored separately
         if let savedPathArrayDictionary = loadPathArrayDictionary() {
             self.pathArrayDictionary = savedPathArrayDictionary
         }
         
-        //Drawing Recognition
+        //Drawing Recognition - This loads the labels for the drawing recognition's CoreML model.
         if let path = Bundle.main.path(forResource: "labels", ofType: "txt") {
             do {
                 let data = try String(contentsOfFile: path, encoding: .utf8)
@@ -129,12 +158,10 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
                 print("error loading labels: \(error)")
             }
         }
-        //Drawing Recognition
-        
-        //SemanticHelper.performSpotlightUniandesOnSketchnote(text: "Bach was a composer of Baroque music", viewController: SketchNoteViewController())
-        //SemanticHelper.performSpotlightOnSketchnote(text: "Bach was a composer of Baroque music", viewController: SketchNoteViewController())
     }
     
+    // This function handles the cases where the user either creates a new note or wants to edit an existing note.
+    // In both cases, the SketchNoteViewController page is loaded and displayed to the user and the note's information is passed on to that page.
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         super.prepare(for: segue, sender: sender)
         switch(segue.identifier ?? "") {
@@ -155,10 +182,11 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             sketchnoteViewController.sketchnote = selectedSketchnote
             
         default:
-            print("Not creating or editing sketchnote. (ignore this)")
+            print("Not creating or editing sketchnote.")
         }
     }
     
+    // Function used to save note collections to the device's disk for persistence.
     func saveNoteCollections() {
         let encoder = JSONEncoder()
         
@@ -171,6 +199,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         }
     }
     
+    // Function used to save the strokes for each sketchnote as an entire dictionary to the device's disk for peristence.
     func savePathArrayDictionary() {
         let DocumentsDirectory = FileManager().urls(for: .documentDirectory, in: .userDomainMask).first!
         let ArchiveURLPathArray = DocumentsDirectory.appendingPathComponent("PathArrayDictionary")
@@ -182,6 +211,8 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             print("Failed to encode path array dictionary.")
         }
     }
+    
+    // Consequently, this function is used to reload the dictionary (saved in the previous function) from the device's disk.
     private func loadPathArrayDictionary() -> [TimeInterval: NSMutableArray]? {
         let DocumentsDirectory = FileManager().urls(for: .documentDirectory, in: .userDomainMask).first!
         let ArchiveURLPathArray = DocumentsDirectory.appendingPathComponent("PathArrayDictionary")
@@ -192,6 +223,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         return data
     }
     
+    // This function reloads saved note collections from the device's disk.
     private func loadNoteCollections() -> [NoteCollection]? {
         let decoder = JSONDecoder()
         
@@ -204,6 +236,9 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         return nil
     }
     
+    // This function sets up a SketchnoteView for a sketchnote, displays it on the home page and sets up interaction with it.
+    // When the view is tapped, the note is opened for editing.
+    // When the view is long pressed, a pop-up menu is displayed for other actions such as sharing, deleting, etc.
     func displaySketchnote(note: Sketchnote, collectionView: NoteCollectionView) {
         let sketchnoteView = SketchnoteView(frame: collectionView.stackView.frame)
         sketchnoteView.setNote(note: note)
@@ -255,6 +290,8 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         }
     }
     
+    // This function sets up a NoteCollectionView for a given note collection and displays it on the homepage.
+    // Interactions with the view's buttons are also set up, such as creating a new sketchnote in that note collection.
     private func displayNoteCollection(collection: NoteCollection) {
         let noteCollectionView = NoteCollectionView(frame: notesStackView.frame)
         noteCollectionView.parentViewController = self
@@ -291,7 +328,8 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         }
     }
     
-    //MARK: Actions
+    // This function is called when the user closes a note they were editing and the user returns to the homepage.
+    // Upon return, the edited note is saved to disk.
     @IBAction func unwindToHome(sender: UIStoryboardSegue) {
         if let sourceViewController = sender.source as? SketchNoteViewController, let note = sourceViewController.sketchnote {
             
@@ -315,6 +353,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         }
     }
     
+    // When the user taps Return on the on-screen keyboard when the search field is in focus, the entered text is used as a search term and the application runs the search.
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         // Hide the keyboard.
         searchField.resignFirstResponder()
@@ -322,6 +361,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         return true
     }
     
+    // This function is called when the user taps a sketchnote's preview image to open it for editing.
     @objc func handleSketchnoteTap(_ sender: UITapGestureRecognizer) {
         let noteView = sender.view as! SketchnoteView
         self.selectedSketchnote = noteView.sketchnote
@@ -329,6 +369,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     }
     
 
+    // This function is called when the user presses the "New Sketchnote" button in a NoteCollectionView.
     @IBAction func newNoteCollectionTapped(_ sender: LGButton) {
         let noteCollection = NoteCollection(title: "Untitled", notes: nil)!
         self.noteCollections.append(noteCollection)
@@ -341,6 +382,8 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         self.performSearch()
     }
     
+    // This function loops through each search term and checks each sketchnote on the homepage.
+    // If a sketchnote matches EVERY search term, the sketchnote remains visible. Otherwise it is hidden and not considered a matchin result.
     private func performSearch() {
         if !searchField.text!.isEmpty {
             let searchString = searchField.text!.lowercased()
@@ -369,6 +412,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         }
     }
     
+    // By pressing a search term, the search term is removed and the application re-runs the search with the remaining search terms.
     @objc func handleFilterTap(_ sender: UITapGestureRecognizer) {
         let filterButton = sender.view as! UIButton
         if searchFilters.contains(filterButton.title(for: .normal) ?? "") {
@@ -408,7 +452,11 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         searchSeparator.isHidden = true
     }
     
+    // Drawing recognition
     private var labelNames: [String] = []
+    // THis variable is used to run predictions using the drawing recognition model.
+    // In this case, this model is used when the user searches by drawing. The user's drawing is fed to the recognition model.
+    // If the model recognizes the drawing with at least a >50% confidence, the drawing's label is used as a search term.
     private let drawnImageClassifier = DrawnImageClassifier()
     private var currentPrediction: DrawnImageClassifierOutput? {
         didSet {
@@ -483,12 +531,14 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         }
     }
     
-    // Multipeer Connectivity
+    // Multipeer Connectivity - The following functions are related to the note-sharing feature.
     @IBAction func noteSharingTapped(_ sender: UISwitch) {
+        // The user's device is made visible to nearby devices for sharing
         if sender.isOn {
             startHosting()
         }
         else {
+            // The user's device is no longer visible to other nearby devices
             if mcAdvertiserAssistant != nil {
                 mcAdvertiserAssistant.stop()
             }
@@ -505,6 +555,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     
     func browserViewControllerDidFinish(_ browserViewController: MCBrowserViewController) {
         dismiss(animated: true)
+        // After the user has selected the nearby devices to send a note to, the main sharing function shareNote is called
         if sketchnoteToShare != nil && pathArrayToShare != nil {
             self.shareNote(note: sketchnoteToShare!, pathArray: pathArrayToShare!)
         }
@@ -549,6 +600,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             do {
                 let dataEncoded = try? NSKeyedArchiver.archivedData(withRootObject: dataToShare, requiringSecureCoding: false)
                 if dataEncoded != nil {
+                    // The note to share is sent to each nearby device that was selected by the user.
                     try mcSession.send(dataEncoded!, toPeers: mcSession.connectedPeers, with: .reliable)
                 }
             } catch let error as NSError {
@@ -559,6 +611,9 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         }
     }
     
+    
+    // When the user's device receives a shared note, this function is called to let the device know and to handle it.
+    // In turn, a NoteShareView is displayed for the user to let them know.
     func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
         guard let receivedData = ((try? NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(data) as?
             [Data]) as [Data]??) else { return }
@@ -620,7 +675,8 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         hideNoteShareView()
     }
     
-    // PDF Generation
+    // PDF Generation - The following functions are used for generating a pdf from either a single sketchnote or a note collection.
+    // This generated pdf can then be saved to the device's disk.
     
     func generatePDF(sketchnoteView: SketchnoteView) {
         if sketchnoteView.sketchnote != nil && sketchnoteView.sketchnote!.image != nil {

@@ -393,37 +393,6 @@
                                             <action selector="drawingsTapped:" destination="lDo-DG-9fX" eventType="touchUpInside" id="eEt-4z-arx"/>
                                         </connections>
                                     </view>
-                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="y7P-W3-djw" customClass="LGButton" customModule="LGButton">
-                                        <rect key="frame" x="457" y="10" width="50" height="35"/>
-                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                        <constraints>
-                                            <constraint firstAttribute="height" constant="35" id="fjW-JK-2iV"/>
-                                            <constraint firstAttribute="width" constant="50" id="mBk-yg-p9n"/>
-                                        </constraints>
-                                        <userDefinedRuntimeAttributes>
-                                            <userDefinedRuntimeAttribute type="string" keyPath="leftIconString" value="touch_app"/>
-                                            <userDefinedRuntimeAttribute type="string" keyPath="leftIconFontName" value="ma"/>
-                                            <userDefinedRuntimeAttribute type="number" keyPath="leftIconFontSize">
-                                                <real key="value" value="18"/>
-                                            </userDefinedRuntimeAttribute>
-                                            <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
-                                                <real key="value" value="17"/>
-                                            </userDefinedRuntimeAttribute>
-                                        </userDefinedRuntimeAttributes>
-                                        <connections>
-                                            <action selector="forceSensitivityTapped:" destination="lDo-DG-9fX" eventType="touchUpInside" id="0WI-qD-51b"/>
-                                        </connections>
-                                    </view>
-                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="tRD-5Z-r9d">
-                                        <rect key="frame" x="512" y="7" width="2" height="40"/>
-                                        <color key="backgroundColor" white="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                        <constraints>
-                                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="2" id="5Q9-0Y-wgh"/>
-                                            <constraint firstAttribute="width" constant="2" id="KhW-dA-sBN"/>
-                                            <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="40" id="gqF-lJ-umd"/>
-                                            <constraint firstAttribute="height" constant="40" id="jUz-GH-a3T"/>
-                                        </constraints>
-                                    </view>
                                 </subviews>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
@@ -431,15 +400,11 @@
                                     <constraint firstItem="lp1-fn-Ljv" firstAttribute="top" secondItem="aMI-wG-bBD" secondAttribute="top" constant="7" id="4S4-6V-Edb"/>
                                     <constraint firstItem="Pv4-3o-khD" firstAttribute="top" secondItem="aMI-wG-bBD" secondAttribute="top" id="949-qA-pbX"/>
                                     <constraint firstItem="Nvo-Or-dri" firstAttribute="leading" secondItem="PbO-cQ-nbQ" secondAttribute="trailing" constant="8" id="Eun-7R-XY2"/>
-                                    <constraint firstItem="y7P-W3-djw" firstAttribute="top" secondItem="aMI-wG-bBD" secondAttribute="top" constant="10" id="OVH-9R-HxZ"/>
                                     <constraint firstAttribute="trailing" secondItem="Pv4-3o-khD" secondAttribute="trailing" constant="333" id="Obe-vX-M0D"/>
-                                    <constraint firstItem="tRD-5Z-r9d" firstAttribute="top" secondItem="aMI-wG-bBD" secondAttribute="top" constant="7" id="Q4T-9U-sFA"/>
                                     <constraint firstItem="5ja-5Q-pIX" firstAttribute="leading" secondItem="gk5-k0-mFo" secondAttribute="trailing" constant="8" id="Ub0-Zv-1b4"/>
                                     <constraint firstItem="gk5-k0-mFo" firstAttribute="top" secondItem="aMI-wG-bBD" secondAttribute="top" constant="10" id="Wxl-Ic-kRz"/>
                                     <constraint firstItem="lp1-fn-Ljv" firstAttribute="leading" secondItem="Nvo-Or-dri" secondAttribute="trailing" constant="8" id="Z7g-WB-dQV"/>
-                                    <constraint firstItem="PbO-cQ-nbQ" firstAttribute="leading" secondItem="tRD-5Z-r9d" secondAttribute="trailing" constant="8" id="beS-bJ-rcd"/>
                                     <constraint firstItem="PbO-cQ-nbQ" firstAttribute="top" secondItem="aMI-wG-bBD" secondAttribute="top" constant="10" id="gHM-35-W8o"/>
-                                    <constraint firstItem="tRD-5Z-r9d" firstAttribute="leading" secondItem="y7P-W3-djw" secondAttribute="trailing" constant="5" id="irw-rz-rEy"/>
                                     <constraint firstItem="Nvo-Or-dri" firstAttribute="top" secondItem="aMI-wG-bBD" secondAttribute="top" constant="10" id="kI4-sC-j5z"/>
                                     <constraint firstItem="Pv4-3o-khD" firstAttribute="leading" secondItem="aMI-wG-bBD" secondAttribute="leading" id="ljP-au-rRZ"/>
                                     <constraint firstAttribute="height" constant="65" id="mjf-cP-ug5"/>
@@ -516,7 +481,6 @@
                         <outlet property="dimView" destination="bkc-RB-blk" id="1rV-xR-BWr"/>
                         <outlet property="documentsButton" destination="zQH-8L-NbQ" id="1ST-fD-BW8"/>
                         <outlet property="drawingsButton" destination="PbO-cQ-nbQ" id="Z5N-BA-2AB"/>
-                        <outlet property="forceSensitivityButton" destination="y7P-W3-djw" id="m1M-Qo-4z4"/>
                         <outlet property="helpLinesButton" destination="Nvo-Or-dri" id="cfe-Fr-zyn"/>
                         <outlet property="redoButton" destination="5ja-5Q-pIX" id="cj6-tm-Qxz"/>
                         <outlet property="sketchView" destination="Nvg-e1-5lr" id="UFp-1k-pn5"/>

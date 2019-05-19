@@ -7,7 +7,8 @@
 //
 
 import UIKit
-
+// This class contains every information related to a single sketchnote, except for the strokes drawn on the note's canvas.
+// Where and how the strokes are stored&saved is explained in the ViewController.swift file
 class Sketchnote: Note, Equatable {
     
     var creationDate: Date!
@@ -40,6 +41,7 @@ class Sketchnote: Note, Equatable {
         self.image = image
     }
     
+    // This function is used to transform the instance of this class into a format that can be saved to the device's disk for persistence
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(creationDate.timeIntervalSince1970, forKey: .creationDate)
@@ -55,6 +57,7 @@ class Sketchnote: Note, Equatable {
         }
     }
     
+    // This function is used to reload a saved note from the device's disk and to load each property contained in this class
     required init(from decoder: Decoder) throws {
         print("Decoding sketchnote")
         let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -79,6 +82,7 @@ class Sketchnote: Note, Equatable {
         print("Sketchnote decoded")
     }
     
+    // A related document that has been found for this note is added to the note here.
     func addDocument(document: Document) {
         var exists = false
         if relatedDocuments == nil {
@@ -94,6 +98,8 @@ class Sketchnote: Note, Equatable {
             relatedDocuments!.append(document)
         }
     }
+    // This function only stores a recognized drawing's label for a note. The drawing itself (i.e. an image) is not stored.
+    // Only the label is necessary, as it is used for search results.
     func addDrawing(drawing: String) {
         var exists = false
         if drawings == nil {
@@ -109,6 +115,7 @@ class Sketchnote: Note, Equatable {
             drawings!.append(drawing.lowercased())
         }
     }
+    // This function stores a drawing region's location and size for the note. This drawing region is manually inserted somewhere on the note's canvas by the user.
     func addDrawingViewRect(rect: CGRect) {
         var exists = false
         if drawingViewRects == nil {
@@ -128,7 +135,8 @@ class Sketchnote: Note, Equatable {
     func setUpdateDate() {
         self.updateDate = Date.init(timeIntervalSinceNow: 0)
     }
-    
+    // The == function is overriden to allow comparing two instances of a Sketchnote class with each other, to check if they are equal to each other
+    // The unique identifier of a sketchnote is its creation date.
     static func == (lhs: Sketchnote, rhs: Sketchnote) -> Bool {
         if lhs.creationDate == rhs.creationDate {
             return true

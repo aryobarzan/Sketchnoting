@@ -9,6 +9,9 @@
 import UIKit
 import LGButton
 
+// This is the corresponding controller for a note collection view.
+// This view contains every SketchnoteView that is displayed, as well as the note collection specific buttons such as Delete, Share, and New Sketchnote
+
 class NoteCollectionView : UIView, UITextFieldDelegate {
     let kCONTENT_XIB_NAME = "NoteCollectionView"
     @IBOutlet var contentView: UIView!

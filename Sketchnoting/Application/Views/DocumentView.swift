@@ -9,6 +9,8 @@
 import UIKit
 import LGButton
 
+// This is the view used for displaying a single related document
+
 class DocumentView: UIView {
     let kCONTENT_XIB_NAME = "DocumentView"
     

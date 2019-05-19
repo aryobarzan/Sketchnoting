@@ -1,5 +1,6 @@
 #  Sketchnoting
 
+## Installing the app and running
 To build and run the application on a physical iPad or on an iPad simulator, follow these steps: (Note that you need a Mac and the Xcode software)
 
 - Delete 'Podfile' file (but keep a copy somewhere) & 'Podfile.lock' file & 'Pods' folder in the project's main folder
@@ -12,7 +13,7 @@ To build and run the application on a physical iPad or on an iPad simulator, fol
 - Run the app! (In case you want to run the app on a physical device, open the root 'Sketchnoting' file in the Project Navigator in Xcode and setup an Apple Provisioning Profile under General>Signing)
 
 --------------
-
+## Code structure
 There is documentation in the various .swift files, but the general structure of the project is as follows:
 
 - Under the root 'Sketchnoting' folder, the required application files, as well as the interface files (storyboards) are included
@@ -24,4 +25,4 @@ There is documentation in the various .swift files, but the general structure of
 Outside of the Application folder, there are various other folders related to the third-party libraries used by the app (see CREDITS.md), except for the Extensions folder, which adds some extra functions to existing Swift classes
 
 
-The main code is thus under the Sketchnoting/Application folder
+The main code is thus under the Sketchnoting/Application folder.

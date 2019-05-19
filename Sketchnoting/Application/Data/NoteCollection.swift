@@ -7,7 +7,7 @@
 //
 
 import UIKit
-
+// A note collection contains sketchnotes and has a title property.
 class NoteCollection: Codable, Equatable {
     
     var title: String
@@ -66,6 +66,10 @@ class NoteCollection: Codable, Equatable {
         }
     }
     
+    // The equality function is overriden to be able to properly compare 2 note collections with each other to check if they are equal or not.
+    // A unique identifier is not generated for a note collection. Instead, the title and all of the contained notes are used together as an identifier.
+    // This cannot lead to possible identifier conflicts, as a sketchnote is always added to a single note collection and cannot be part of multiple note collections.
+    // A sketchnote itself has a unique identifier generated, which is explained in the Sketchnote.swift file
     static func == (lhs: NoteCollection, rhs: NoteCollection) -> Bool {
         if lhs.title == rhs.title && lhs.notes == rhs.notes {
             return true

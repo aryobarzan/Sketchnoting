@@ -8,6 +8,8 @@
 
 import UIKit
 
+// This enum is used to let the user know the type of a found document.
+// Currently only the case Spotlight is used, as that is the only source for retrieving related documents.
 enum DocumentType: String, Codable {
     case Wikipedia
     case Map
@@ -15,7 +17,9 @@ enum DocumentType: String, Codable {
     case Spotlight
     case Other
 }
-
+// This class contains the information for a document that is related to a note's text.
+// All of its properties are required, except for 'description', which is the abstract text of the found document.
+// As this abstract text is manually fetched from the document's page source code via a regular expression, it may at times fail, hence why it is an optional property.
 class Document: Codable {
     
     var title: String

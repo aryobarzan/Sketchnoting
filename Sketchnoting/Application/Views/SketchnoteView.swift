@@ -8,6 +8,9 @@
 
 import UIKit
 
+// This is the corresponding controller for the SketchnoteView.xib
+// This view displays a single note with its preview image
+
 class SketchnoteView : UIView {
     let kCONTENT_XIB_NAME = "SketchnoteView"
     @IBOutlet var contentView: UIView!

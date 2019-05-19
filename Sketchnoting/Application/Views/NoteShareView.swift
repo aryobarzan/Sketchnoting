@@ -9,6 +9,9 @@
 import UIKit
 import LGButton
 
+// This is the view displayed to a recipient of a shared note
+// It displays a preview of the received note and lets the receiver reject or accept the shared note
+
 class NoteShareView: UIView {
     let kCONTENT_XIB_NAME = "NoteShareView"
     
