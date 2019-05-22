@@ -270,10 +270,20 @@ public class SketchView: UIView {
     }
     
     public func reloadPathArray(array: NSMutableArray) {
-        for obj in array.reversed() {
+        for obj in array {
             guard let tool = obj as? SketchTool else { return }
             resetTool()
-            pathArray.add(tool)
+            if let eraserTool = tool as? EraserTool {
+                eraserTool.lineAlpha = 0
+                pathArray.add(eraserTool)
+            }
+            else if let penTool = tool as? PenTool {
+                pathArray.add(penTool)
+            }
+            else {
+                pathArray.add(tool)
+            }
+            
             updateCacheImage(true)
             setNeedsDisplay()
         }

@@ -231,7 +231,24 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
             drawingView.layer.borderColor = UIColor.clear.cgColor
         }
         for pathObject in self.sketchView.pathArray {
-            if let penTool = pathObject as? PenTool {
+            if let penTool = pathObject as? EraserTool {
+                let path = penTool.path
+                for drawingView in self.drawingViews {
+                    if drawingView.frame.contains(path.boundingBox) {
+                        let absoluteFrame = sketchView.convert(sketchView.bounds, to: drawingView)
+                        let newPath = path.copy(strokingWithWidth: 150 * 0.04, lineCap: .round, lineJoin: .round, miterLimit: 0)
+                        let layer = CAShapeLayer()
+                        layer.frame = absoluteFrame
+                        layer.path = newPath
+                        layer.strokeColor = UIColor.black.cgColor
+                        layer.fillColor = UIColor.black.cgColor
+                        drawingView.layer.addSublayer(layer)
+                        drawingView.setNeedsDisplay()
+                        drawingView.isHidden = false
+                    }
+                }
+            }
+            else if let penTool = pathObject as? PenTool {
                 let path = penTool.path
                 for drawingView in self.drawingViews {
                     if drawingView.frame.contains(path.boundingBox) {
@@ -274,7 +291,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     private func setupHelpLines() {
         var height = CGFloat(40)
         while (CGFloat(height) < self.sketchView.frame.height) {
-            let line = SimpleLine(frame: CGRect(x: 0, y: height, width: self.sketchView.frame.width, height: 2))
+            let line = SimpleLine(frame: CGRect(x: 0, y: height, width: self.view.frame.width, height: 2))
             line.isUserInteractionEnabled = false
             line.isHidden = true
             self.sketchView.addSubview(line)

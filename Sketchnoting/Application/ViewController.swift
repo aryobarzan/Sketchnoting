@@ -608,6 +608,9 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
                 ac.addAction(UIAlertAction(title: "Close", style: .default))
                 present(ac, animated: true)
             }
+            let alert = UIAlertController(title: "Note shared", message: "The note has been sent to the selected device(s).", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "Okay", style: .cancel, handler: nil))
+            self.present(alert, animated: true)
         }
     }
     
