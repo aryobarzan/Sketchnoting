@@ -462,8 +462,9 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         let textRecognizer = vision.onDeviceTextRecognizer()
         let image = VisionImage(image: image)
         textRecognizer.process(image) { result, error in
-            self.documentsButton.isLoading = false
+            
             guard error == nil, let result = result else {
+                self.documentsButton.isLoading = false
                 self.showMessage("No documents could be found.", type: .error)
                 return
             }
@@ -476,7 +477,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     
     // This function displays related documents found for the note.
     func displaySpotlightDocuments(documents: [Document]) {
-        documentsButton.isLoading = false
+        self.documentsButton.isLoading = false
         self.view.addSubview(self.documentsOverview)
         self.view.bringSubviewToFront(documentsOverview)
         UIView.animate(withDuration: 0.0, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 0, options: [],  animations: {
