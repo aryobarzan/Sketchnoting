@@ -65,26 +65,26 @@ class SemanticHelper {
                                 if !conceptURL.isEmpty {
                                     results[concept] = conceptURL
                                     
-                                    // Fetch a short description
+                                    // Fetch the abstract text from the found resource's page source & fetch its entity type (e.g. person, place, ...)
                                     var description = ""
+                                    var entityType = ""
                                     let url = URL(string: conceptURL)
                                     if url != nil {
                                         do {
                                             let html = try NSString(contentsOf: url!, encoding: String.Encoding.utf8.rawValue)
-                                            if let regex = try? NSRegularExpression(pattern: "<li><span class=\"literal\"><span property=\"dbo:abstract\" xmlns:dbo=\"http://dbpedia.org/ontology/\" xml:lang=\"en\">.*</span>", options: .caseInsensitive)
-                                            {
-                                                
-                                                let matches = regex.matches(in: html as String, options: [], range: NSRange(location: 0, length: html.length)).map {
-                                                    html.substring(with: $0.range)
-                                                }
-                                                if matches.count > 0 {
-                                                    description = matches[0].replacingOccurrences(of: "<li><span class=\"literal\"><span property=\"dbo:abstract\" xmlns:dbo=\"http://dbpedia.org/ontology/\" xml:lang=\"en\">", with: "").replacingOccurrences(of: "</span>", with: "")
-                                                }
+                                            let abstract = extractAbstract(pageSource: html)
+                                            if abstract != nil {
+                                                description = abstract ?? ""
+                                            }
+                                            
+                                            let dboType = extractType(pageSource: html)
+                                            if dboType != nil {
+                                                entityType = dboType ?? ""
                                             }
                                         } catch {
                                         }
                                     }
-                                    let document = Document(title: concept, description: description, URL: conceptURL, type: .Spotlight, rank: rankPercentage ?? Double(0))
+                                    let document = Document(title: concept, description: description, entityType: entityType, URL: conceptURL, type: .Spotlight, rank: rankPercentage ?? Double(0))
                                     if document != nil {
                                         documents.append(document!)
                                     }
@@ -130,6 +130,34 @@ class SemanticHelper {
         }
     
     return (confidence, support)
+    }
+    
+    private static func extractAbstract(pageSource: NSString) -> String? {
+        if let regex = try? NSRegularExpression(pattern: "<li><span class=\"literal\"><span property=\"dbo:abstract\" xmlns:dbo=\"http://dbpedia.org/ontology/\" xml:lang=\"en\">.*</span>", options: .caseInsensitive)
+        {
+            
+            let matches = regex.matches(in: pageSource as String, options: [], range: NSRange(location: 0, length: pageSource.length)).map {
+                pageSource.substring(with: $0.range)
+            }
+            if matches.count > 0 {
+                return matches[0].replacingOccurrences(of: "<li><span class=\"literal\"><span property=\"dbo:abstract\" xmlns:dbo=\"http://dbpedia.org/ontology/\" xml:lang=\"en\">", with: "").replacingOccurrences(of: "</span>", with: "")
+            }
+            return nil
+        }
+        return nil
+    }
+    
+    private static func extractType(pageSource: NSString) -> String? {
+        let pattern = "An Entity of Type : <a href=.*>(.*)</a>,"
+        let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive)
+        let str = pageSource as String
+        if let match = regex?.firstMatch(in: str, options: [], range: NSRange(location: 0, length: str.utf16.count)) {
+            if let typeRange = Range(match.range(at: 1), in: str) {
+                let type = str[typeRange].lowercased()
+                return type
+            }
+        }
+        return nil
     }
 
 }

@@ -103,7 +103,7 @@ class NoteCollectionView : UIView, UITextFieldDelegate {
             for filter in filters {
                 var found = false
                 for doc in sketchnoteViews[j].sketchnote?.relatedDocuments ?? [Document]() {
-                    if doc.title.lowercased().contains(filter) || (doc.description != nil && !doc.description!.isEmpty && doc.description!.lowercased().contains(filter)) {
+                    if doc.title.lowercased().contains(filter) || (doc.description != nil && !doc.description!.isEmpty && doc.description!.lowercased().contains(filter)) || (doc.entityType != nil && !doc.entityType!.isEmpty && doc.entityType!.contains(filter)) {
                         found = true
                         matchingFilters += 1
                         break
