@@ -30,13 +30,8 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     var searchFiltersStackView = UIStackView()
     @IBOutlet var noteSharingSwitch: UISwitch!
     
-    // This property holds the user's note collections.
-    var noteCollections = [NoteCollection]()
+    // This property holds the user's note collection views displayed on this home page.
     var noteCollectionViews = [NoteCollectionView]()
-    // (!!!!) This property maps the identifier (TimeInterval) of a sketchnote to its array of strokes drawn on its canvas.
-    // As explained in the Sketchnote.swift file, the strokes drawn on a note's canvas are saved separately, as the strokes conform to a different encoding protocol.
-    // Thus, when opening a sketchnote for editing, its identifier is used to retrieve its corresponing strokes (NSMutableArray) in this dictionary.
-    var pathArrayDictionary = [TimeInterval: NSMutableArray]()
     
     // When the user taps a sketchnote to open it for editing, the app stores it in this property to remember which note is currently being edited.
     var selectedSketchnote: Sketchnote?
@@ -132,20 +127,9 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             notesStackView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
             notesStackView.widthAnchor.constraint(equalTo: scrollView.widthAnchor)
             ])
-        
-        // The application attempts to load saved note collections from the device's disk here.
-        // If any could be loaded, these are consequently displayed on the home page.
-        if let savedNoteCollections = loadNoteCollections() {
-            noteCollections += savedNoteCollections
-            for collection in noteCollections {
-                displayNoteCollection(collection: collection)
-            }
-        }
-        
-        // This loads the strokes array for each sketchnote saved to the device's disk.
-        // See Sketchnote.swift file for more information as to why a sketchnote and the strokes on its canvas are stored separately
-        if let savedPathArrayDictionary = loadPathArrayDictionary() {
-            self.pathArrayDictionary = savedPathArrayDictionary
+
+        for collection in NotesManager.shared.noteCollections {
+            displayNoteCollection(collection: collection)
         }
         
         //Drawing Recognition - This loads the labels for the drawing recognition's CoreML model.
@@ -175,7 +159,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             guard let sketchnoteViewController = segue.destination as? SketchNoteViewController else {
                 fatalError("Unexpected destination")
             }
-            if let pathArray = self.pathArrayDictionary[selectedSketchnote!.creationDate.timeIntervalSince1970] {
+            if let pathArray = NotesManager.shared.pathArrayDictionary[selectedSketchnote!.creationDate.timeIntervalSince1970] {
                 sketchnoteViewController.storedPathArray = pathArray
             }
             sketchnoteViewController.new = false
@@ -184,56 +168,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         default:
             print("Not creating or editing sketchnote.")
         }
-    }
-    
-    // Function used to save note collections to the device's disk for persistence.
-    func saveNoteCollections() {
-        let encoder = JSONEncoder()
-        
-        if let encoded = try? encoder.encode(noteCollections) {
-            UserDefaults.standard.set(encoded, forKey: "NoteCollections")
-            print("Note Collections saved.")
-        }
-        else {
-            print("Encoding failed for note collections")
-        }
-    }
-    
-    // Function used to save the strokes for each sketchnote as an entire dictionary to the device's disk for peristence.
-    func savePathArrayDictionary() {
-        let DocumentsDirectory = FileManager().urls(for: .documentDirectory, in: .userDomainMask).first!
-        let ArchiveURLPathArray = DocumentsDirectory.appendingPathComponent("PathArrayDictionary")
-        if let encoded = try? NSKeyedArchiver.archivedData(withRootObject: self.pathArrayDictionary, requiringSecureCoding: false) {
-            try! encoded.write(to: ArchiveURLPathArray)
-            print("Path Array Dictionary saved.")
-        }
-        else {
-            print("Failed to encode path array dictionary.")
-        }
-    }
-    
-    // Consequently, this function is used to reload the dictionary (saved in the previous function) from the device's disk.
-    private func loadPathArrayDictionary() -> [TimeInterval: NSMutableArray]? {
-        let DocumentsDirectory = FileManager().urls(for: .documentDirectory, in: .userDomainMask).first!
-        let ArchiveURLPathArray = DocumentsDirectory.appendingPathComponent("PathArrayDictionary")
-        guard let codedData = try? Data(contentsOf: ArchiveURLPathArray) else { return nil }
-        guard let data = ((try? NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(codedData) as?
-            [TimeInterval: NSMutableArray]) as [TimeInterval : NSMutableArray]??) else { return nil }
-        print("Path Array Dictionary loaded.")
-        return data
-    }
-    
-    // This function reloads saved note collections from the device's disk.
-    private func loadNoteCollections() -> [NoteCollection]? {
-        let decoder = JSONDecoder()
-        
-        if let data = UserDefaults.standard.data(forKey: "NoteCollections"),
-            let loadedNoteCollections = try? decoder.decode([NoteCollection].self, from: data) {
-            print("Note Collections loaded")
-            return loadedNoteCollections
-        }
-        print("Failed to load note collections.")
-        return nil
     }
     
     // This function sets up a SketchnoteView for a sketchnote, displays it on the home page and sets up interaction with it.
@@ -253,9 +187,11 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             popMenu.appearance.popMenuBackgroundStyle = .blurred(.dark)
             let closeAction = PopMenuDefaultAction(title: "Cancel")
             let action = PopMenuDefaultAction(title: "Delete", color: .red, didSelect: { action in
-                collectionView.noteCollection!.removeSketchnote(note: note)
-                sketchnoteView.removeFromSuperview()
-                self.saveNoteCollections()
+                if collectionView.noteCollection != nil {
+                    NotesManager.shared.delete(noteCollection: collectionView.noteCollection!, note: note)
+                    sketchnoteView.removeFromSuperview()
+                }
+                
             })
             popMenu.addAction(action)
             if sketchnoteView.sketchnote != nil {
@@ -268,7 +204,8 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
                 }
                 let sendAction = PopMenuDefaultAction(title: "Send", color: .white, didSelect: { action in
                     self.sketchnoteToShare = sketchnoteView.sketchnote!
-                    if let pathArray = self.pathArrayDictionary[self.sketchnoteToShare!.creationDate.timeIntervalSince1970] {
+                    
+                    if let pathArray = NotesManager.shared.pathArrayDictionary[self.sketchnoteToShare!.creationDate.timeIntervalSince1970] {
                         self.pathArrayToShare = pathArray
                     }
                     DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
@@ -302,9 +239,8 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         noteCollectionView.setDeleteAction(for: .touchUpInside) {
             let alert = UIAlertController(title: "Delete Note Collection?", message: "", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "Confirm", style: .destructive, handler: { action in
-                self.deleteNoteCollection(collection: collection)
+                NotesManager.shared.delete(noteCollection: collection)
                 noteCollectionView.removeFromSuperview()
-                self.saveNoteCollections()
             }))
             alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
             self.present(alert, animated: true)
@@ -313,14 +249,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             if noteCollectionView.noteCollection != nil && noteCollectionView.noteCollection!.notes.count > 0 {
                 self.generatePDF(noteCollectionView: noteCollectionView)
             }
-            let alert = UIAlertController(title: "Delete Note Collection?", message: "", preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: "Confirm", style: .destructive, handler: { action in
-                self.deleteNoteCollection(collection: collection)
-                noteCollectionView.removeFromSuperview()
-                self.saveNoteCollections()
-            }))
-            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
-            self.present(alert, animated: true)
         }
         
         for n in collection.notes {
@@ -333,12 +261,12 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     @IBAction func unwindToHome(sender: UIStoryboardSegue) {
         if let sourceViewController = sender.source as? SketchNoteViewController, let note = sourceViewController.sketchnote {
             
+            NotesManager.shared.update(note: note, pathArray: sourceViewController.storedPathArray)
             var alreadyExists = false
             for i in 0..<noteCollectionViews.count {
                 for j in 0..<noteCollectionViews[i].sketchnoteViews.count {
                     if noteCollectionViews[i].sketchnoteViews[j].sketchnote?.creationDate == note.creationDate {
                         noteCollectionViews[i].sketchnoteViews[j].setNote(note: note)
-                        saveNoteCollections()
                         alreadyExists = true
                         break
                     }
@@ -347,9 +275,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
                     break
                 }
             }
-            saveNoteCollections()
-            self.pathArrayDictionary[note.creationDate.timeIntervalSince1970] = sourceViewController.storedPathArray
-            savePathArrayDictionary()
         }
     }
     
@@ -372,10 +297,8 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     // This function is called when the user presses the "New Sketchnote" button in a NoteCollectionView.
     @IBAction func newNoteCollectionTapped(_ sender: LGButton) {
         let noteCollection = NoteCollection(title: "Untitled", notes: nil)!
-        self.noteCollections.append(noteCollection)
-        
+        NotesManager.shared.add(noteCollection: noteCollection)
         displayNoteCollection(collection: noteCollection)
-        saveNoteCollections()
     }
     
     @IBAction func searchButtonTapped(_ sender: LGButton) {
@@ -482,7 +405,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
                 }
             }
             else {
-                print("Waiting for drawing")
+                print("Waiting for drawing...")
             }
         }
     }
@@ -511,23 +434,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             
         }) { (success) in
             self.drawingSearchView.removeFromSuperview()
-        }
-    }
-
-    
-    // Other helper actions
-    
-    private func deleteNoteCollection(collection: NoteCollection) {
-        var index = -1
-        for i in 0..<self.noteCollections.count {
-            if self.noteCollections[i] == collection {
-                index = i
-                break
-            }
-        }
-        if index != -1 {
-            print("Deleted")
-            self.noteCollections.remove(at: index)
         }
     }
     
@@ -667,13 +573,11 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         print("Accepted shared note")
         if receivedSketchnote != nil && receivedPathArray != nil {
             let noteCollection = NoteCollection(title: "Shared Note", notes: nil)!
-            self.noteCollections.append(noteCollection)
             noteCollection.addSketchnote(note: receivedSketchnote!)
-            self.pathArrayDictionary[receivedSketchnote!.creationDate.timeIntervalSince1970] = receivedPathArray!
+            NotesManager.shared.add(noteCollection: noteCollection)
+            NotesManager.shared.add(note: receivedSketchnote!, pathArray: receivedPathArray!)
 
             displayNoteCollection(collection: noteCollection)
-            saveNoteCollections()
-            savePathArrayDictionary()
         }
         hideNoteShareView()
     }

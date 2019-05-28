@@ -66,7 +66,9 @@ class NoteCollectionView : UIView, UITextFieldDelegate {
             titleField.text = "Untitled"
         }
         self.noteCollection?.title = titleField.text!
-        parentViewController.saveNoteCollections()
+        if self.noteCollection != nil {
+            NotesManager.shared.updateTitle(noteCollection: self.noteCollection!)
+        }
         return true
     }
     

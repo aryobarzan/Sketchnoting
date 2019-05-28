@@ -12,6 +12,7 @@
 		9F5010D0224930E400425424 /* NoteCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5010CF224930E400425424 /* NoteCollection.swift */; };
 		9F5010D22249325300425424 /* NoteCollectionView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9F5010D12249325300425424 /* NoteCollectionView.xib */; };
 		9F5010D42249326D00425424 /* NoteCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5010D32249326D00425424 /* NoteCollectionView.swift */; };
+		9F5D0FC8229CBC4100BCA451 /* NotesManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5D0FC7229CBC4100BCA451 /* NotesManager.swift */; };
 		9FC788F2225CEC230074BD16 /* DrawingSearchView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9FC788F1225CEC230074BD16 /* DrawingSearchView.xib */; };
 		9FC788F4225CEC4C0074BD16 /* DrawingSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FC788F3225CEC4C0074BD16 /* DrawingSearchView.swift */; };
 		9FC788F6225E32E10074BD16 /* DocumentsOverview.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9FC788F5225E32E10074BD16 /* DocumentsOverview.xib */; };
@@ -67,6 +68,7 @@
 		9F5010CF224930E400425424 /* NoteCollection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteCollection.swift; sourceTree = "<group>"; };
 		9F5010D12249325300425424 /* NoteCollectionView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NoteCollectionView.xib; sourceTree = "<group>"; };
 		9F5010D32249326D00425424 /* NoteCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteCollectionView.swift; sourceTree = "<group>"; };
+		9F5D0FC7229CBC4100BCA451 /* NotesManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotesManager.swift; sourceTree = "<group>"; };
 		9F5D8B2B228B9D7000F56FEC /* CREDITS.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CREDITS.md; sourceTree = "<group>"; };
 		9F5D8B2C228B9EF800F56FEC /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		9FC788F1225CEC230074BD16 /* DrawingSearchView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DrawingSearchView.xib; sourceTree = "<group>"; };
@@ -153,6 +155,14 @@
 				9FD9BD1322678D79007F4A2D /* NoteShareView.swift */,
 			);
 			path = Views;
+			sourceTree = "<group>";
+		};
+		9F5D0FC6229CBC2A00BCA451 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				9F5D0FC7229CBC4100BCA451 /* NotesManager.swift */,
+			);
+			path = Models;
 			sourceTree = "<group>";
 		};
 		9FD29B9A2220524D00CC969A = {
@@ -275,6 +285,7 @@
 		9FD29C68224589DA00CC969A /* Data */ = {
 			isa = PBXGroup;
 			children = (
+				9F5D0FC6229CBC2A00BCA451 /* Models */,
 				9FD29BC422249D9500CC969A /* Note.swift */,
 				9FD29BCA2224B89800CC969A /* Sketchnote.swift */,
 				9FD29BC62224B58600CC969A /* Document.swift */,
@@ -470,6 +481,7 @@
 				9F5010CE22491FD000425424 /* SketchnoteView.swift in Sources */,
 				9FD29C42223861E100CC969A /* ActionButton.swift in Sources */,
 				9FD29C38223853C300CC969A /* PhotoAuthorization.swift in Sources */,
+				9F5D0FC8229CBC4100BCA451 /* NotesManager.swift in Sources */,
 				9FC788F4225CEC4C0074BD16 /* DrawingSearchView.swift in Sources */,
 				9FD29C2A22370DF000CC969A /* PreviewView.swift in Sources */,
 				9FD29C54223C3B6F00CC969A /* OCRHelper.swift in Sources */,
