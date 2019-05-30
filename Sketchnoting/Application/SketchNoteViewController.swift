@@ -536,7 +536,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
                 print(top5.map { $0.key + "(" + String($0.value) + ")"}.joined(separator: ", "))
                 
                 for (label, score) in top5 {
-                    if score > 0.5 {
+                    if score > 0.4 {
                         print("Adding drawing: " + label)
                         self.sketchnote!.addDrawing(drawing: label)
                     }

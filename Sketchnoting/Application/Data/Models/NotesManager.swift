@@ -10,6 +10,7 @@ import UIKit
 
 class NotesManager {
     
+    // Singleton pattern - Only a single instance of this class can exist, as it holds the user's data (notes). Any other classes hoping to fetch data, update data, or delete data, access this static property.
     static let shared = NotesManager()
     
     // This property holds the user's note collections.
@@ -19,9 +20,9 @@ class NotesManager {
     // Thus, when opening a sketchnote for editing, its identifier is used to retrieve its corresponing strokes (NSMutableArray) in this dictionary.
     public var pathArrayDictionary = [TimeInterval: NSMutableArray]()
     
+    // The class' initializer has been set to private to prevent instantiation anywhere else except the static instance "shared".
     private init() {
         // The application attempts to load saved note collections from the device's disk here.
-        // If any could be loaded, these are consequently displayed on the home page.
         if let savedNoteCollections = loadNoteCollections() {
             self.noteCollections += savedNoteCollections
         }
@@ -84,7 +85,7 @@ class NotesManager {
         return nil
     }
     
-    // MARK : Access and usage of data
+    // MARK : Updating data
     public func delete(noteCollection: NoteCollection) {
         var index = -1
         for i in 0..<self.noteCollections.count {
@@ -99,12 +100,15 @@ class NotesManager {
             self.saveNoteCollections()
         }
     }
+    
+    // To delete a sketchnote, you also need to know the note collection that contains it. Essentially, it is the note collection that has to remove the note from itself, not this NotesManager class.
     public func delete(noteCollection: NoteCollection, note: Sketchnote) {
         noteCollection.removeSketchnote(note: note)
         self.saveNoteCollections()
         print("Note deleted from note collection.")
     }
     
+    // When the user saves and closes a note after editing it, the note and its corresponding strokes array are updated and stored to the device's disk.
     public func update(note: Sketchnote, pathArray: NSMutableArray?) {
         for i in 0..<noteCollections.count {
             for j in 0..<noteCollections[i].notes.count {
@@ -118,6 +122,8 @@ class NotesManager {
             }
         }
     }
+    
+    // When the user renames a note collection's title on the home page, the note collections are re-saved to the device's disk.
     public func updateTitle(noteCollection: NoteCollection) {
         for collection in noteCollections {
             if collection == noteCollection {
