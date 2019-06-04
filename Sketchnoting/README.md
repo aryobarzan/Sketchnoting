@@ -3,13 +3,13 @@
 ## Installing the app and running
 To build and run the application on a physical iPad or on an iPad simulator, follow these steps: (Note that you need a Mac and the Xcode software)
 
-- Delete 'Podfile' file (but keep a copy somewhere) & 'Podfile.lock' file & 'Pods' folder in the project's main folder
 - Open the Sketchnoting project in Xcode, find the 'Pods' project and remove all references to this project
 - Close Xcode
-- Open up a Terminal and change your current working directory to the project's main directory
-- Run 'pod init' & 'pod install'
-- Paste the old Podfile (which you deleted in the first step) in the project folder and re-run 'pod install'
-- Open the Sketchnoting workspace file (NOT project) in Xcode and build the project (cmd+B)
+- Open up a Terminal and change your current working directory to the project's main directory (the directory which contains the file 'Podfile')
+- Run 'pod install' (You first need to install Cocoapods on your machine to make use of the pod command)
+- Open the Sketchnoting workspace file (NOT project) that has been generated in the main folder now in Xcode: Upon first opening the workspace, Xcode may take a while to index the project's files before you can build it
+- In case it says "No scheme" next to the play/stop buttons at the top left of Xcode, select "No scheme">"New scheme...">"Create"
+- Select your prefered simulator / physical device to build the app for (note - iPad only)
 - Run the app! (In case you want to run the app on a physical device, open the root 'Sketchnoting' file in the Project Navigator in Xcode and setup an Apple Provisioning Profile under General>Signing)
 
 --------------

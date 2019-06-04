@@ -12,6 +12,7 @@ import PopMenu
 import MultipeerConnectivity
 import PDFGenerator
 import GSMessages
+
 // This is the controller for the app's home page view.
 // It contains the search bar and all the buttons related to it.
 // It also contains note collection views, which in turn contain sketchnote views.
