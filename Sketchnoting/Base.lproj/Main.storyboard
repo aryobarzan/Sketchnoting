@@ -416,6 +416,76 @@
                                 <rect key="frame" x="0.0" y="143" width="768" height="881"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </view>
+                            <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="oqt-gq-XGG">
+                                <rect key="frame" x="400" y="143" width="368" height="831"/>
+                                <subviews>
+                                    <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="e1x-ty-UM0">
+                                        <rect key="frame" x="8" y="8" width="49" height="31"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="31" id="Y1f-tO-3cQ"/>
+                                            <constraint firstAttribute="width" constant="47" id="Zhp-qn-ttx"/>
+                                        </constraints>
+                                        <color key="onTintColor" red="0.8980392157" green="0.01484859553" blue="0.45708394629999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <connections>
+                                            <action selector="bookshelfHighlightTapped:" destination="lDo-DG-9fX" eventType="valueChanged" id="nH3-9t-XmP"/>
+                                        </connections>
+                                    </switch>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Highlight Topics" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Hw6-ha-FLR">
+                                        <rect key="frame" x="63" y="11" width="140" height="24"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="140" id="gAx-OV-2MC"/>
+                                            <constraint firstAttribute="height" constant="24" id="tB6-Hw-tEj"/>
+                                        </constraints>
+                                        <fontDescription key="fontDescription" type="system" pointSize="20"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="xu3-sE-eIT" customClass="LGButton" customModule="LGButton">
+                                        <rect key="frame" x="307" y="3" width="53" height="41"/>
+                                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="41" id="PlV-Oc-eaX"/>
+                                            <constraint firstAttribute="width" constant="53" id="eiu-mo-3Ue"/>
+                                        </constraints>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="string" keyPath="leftIconString" value="close"/>
+                                            <userDefinedRuntimeAttribute type="string" keyPath="leftIconFontName" value="ma"/>
+                                            <userDefinedRuntimeAttribute type="color" keyPath="bgColor">
+                                                <color key="value" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="color" keyPath="leftIconColor">
+                                                <color key="value" red="0.8980392157" green="0.01484859553" blue="0.45708394629999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="leftIconFontSize">
+                                                <real key="value" value="25"/>
+                                            </userDefinedRuntimeAttribute>
+                                        </userDefinedRuntimeAttributes>
+                                        <connections>
+                                            <action selector="bookshelfCloseTapped:" destination="lDo-DG-9fX" eventType="touchUpInside" id="2t7-Vh-KPg"/>
+                                        </connections>
+                                    </view>
+                                    <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="iWp-lm-Mye">
+                                        <rect key="frame" x="8" y="47" width="352" height="776"/>
+                                    </scrollView>
+                                </subviews>
+                                <color key="backgroundColor" red="0.78731757609999997" green="0.710316108" blue="0.67115597429999996" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <constraints>
+                                    <constraint firstItem="e1x-ty-UM0" firstAttribute="leading" secondItem="oqt-gq-XGG" secondAttribute="leading" constant="8" id="1Qg-mT-eBP"/>
+                                    <constraint firstAttribute="trailing" secondItem="xu3-sE-eIT" secondAttribute="trailing" constant="8" id="3Ao-NF-9VV"/>
+                                    <constraint firstAttribute="trailing" secondItem="iWp-lm-Mye" secondAttribute="trailing" constant="8" id="3UK-3W-Cph"/>
+                                    <constraint firstItem="iWp-lm-Mye" firstAttribute="leading" secondItem="oqt-gq-XGG" secondAttribute="leading" constant="8" id="92y-1B-FPZ"/>
+                                    <constraint firstItem="xu3-sE-eIT" firstAttribute="top" secondItem="oqt-gq-XGG" secondAttribute="top" constant="3" id="NEu-TD-CD1"/>
+                                    <constraint firstItem="e1x-ty-UM0" firstAttribute="top" secondItem="oqt-gq-XGG" secondAttribute="top" constant="8" id="SBx-A0-Mda"/>
+                                    <constraint firstItem="Hw6-ha-FLR" firstAttribute="leading" secondItem="e1x-ty-UM0" secondAttribute="trailing" constant="8" id="TUW-IA-Rlj"/>
+                                    <constraint firstItem="Hw6-ha-FLR" firstAttribute="top" secondItem="oqt-gq-XGG" secondAttribute="top" constant="11" id="WCT-N5-V3L"/>
+                                    <constraint firstAttribute="bottom" secondItem="iWp-lm-Mye" secondAttribute="bottom" constant="8" id="YV7-Ih-Qq2"/>
+                                    <constraint firstItem="Hw6-ha-FLR" firstAttribute="leading" secondItem="e1x-ty-UM0" secondAttribute="trailing" constant="8" id="iDx-Zb-EcL"/>
+                                    <constraint firstItem="iWp-lm-Mye" firstAttribute="top" secondItem="e1x-ty-UM0" secondAttribute="bottom" constant="8" id="knV-zh-d98"/>
+                                    <constraint firstItem="iWp-lm-Mye" firstAttribute="top" secondItem="xu3-sE-eIT" secondAttribute="bottom" constant="3" id="m59-Za-oNS"/>
+                                    <constraint firstItem="iWp-lm-Mye" firstAttribute="top" secondItem="Hw6-ha-FLR" secondAttribute="bottom" constant="12" id="p12-aZ-Pkp"/>
+                                    <constraint firstItem="iWp-lm-Mye" firstAttribute="top" secondItem="xu3-sE-eIT" secondAttribute="bottom" constant="3" id="xk1-fV-vRp"/>
+                                </constraints>
+                            </view>
                             <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="bkc-RB-blk">
                                 <rect key="frame" x="0.0" y="0.0" width="768" height="1024"/>
                                 <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -423,23 +493,32 @@
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
+                            <constraint firstItem="oqt-gq-XGG" firstAttribute="trailing" secondItem="aqH-yZ-g7K" secondAttribute="trailing" id="2E6-z5-ABj"/>
                             <constraint firstItem="Nvg-e1-5lr" firstAttribute="top" secondItem="aMI-wG-bBD" secondAttribute="bottom" constant="8" id="4pm-9H-j2K"/>
                             <constraint firstItem="Nvg-e1-5lr" firstAttribute="leading" secondItem="aqH-yZ-g7K" secondAttribute="leading" id="BRc-iK-NFw"/>
                             <constraint firstItem="bkc-RB-blk" firstAttribute="leading" secondItem="e9U-eQ-c5r" secondAttribute="leading" id="HHD-vT-C0d"/>
                             <constraint firstAttribute="bottom" secondItem="Nvg-e1-5lr" secondAttribute="bottom" id="IM4-Zx-quF"/>
                             <constraint firstItem="bkc-RB-blk" firstAttribute="top" secondItem="e9U-eQ-c5r" secondAttribute="top" id="Pbo-qk-BJM"/>
+                            <constraint firstItem="oqt-gq-XGG" firstAttribute="top" secondItem="aMI-wG-bBD" secondAttribute="bottom" constant="8" id="UVR-Cd-FKG"/>
                             <constraint firstItem="aMI-wG-bBD" firstAttribute="top" secondItem="aqH-yZ-g7K" secondAttribute="top" id="Xz0-aY-1ms"/>
                             <constraint firstItem="aMI-wG-bBD" firstAttribute="trailing" secondItem="aqH-yZ-g7K" secondAttribute="trailing" id="ZXd-gL-vT8"/>
                             <constraint firstItem="Nvg-e1-5lr" firstAttribute="trailing" secondItem="aqH-yZ-g7K" secondAttribute="trailing" id="d96-oa-5n9"/>
                             <constraint firstItem="aMI-wG-bBD" firstAttribute="leading" secondItem="aqH-yZ-g7K" secondAttribute="leading" id="hUa-Y1-IQn"/>
+                            <constraint firstItem="oqt-gq-XGG" firstAttribute="leading" secondItem="aqH-yZ-g7K" secondAttribute="leading" constant="400" id="iPF-V3-TgN"/>
+                            <constraint firstItem="oqt-gq-XGG" firstAttribute="bottom" secondItem="aqH-yZ-g7K" secondAttribute="bottom" id="xOZ-Oh-PM9"/>
                             <constraint firstAttribute="bottom" secondItem="bkc-RB-blk" secondAttribute="bottom" id="xeC-fn-qzX"/>
                             <constraint firstAttribute="trailing" secondItem="bkc-RB-blk" secondAttribute="trailing" id="xsM-W7-3Ya"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="aqH-yZ-g7K"/>
+                        <variation key="default">
+                            <mask key="subviews">
+                                <exclude reference="bkc-RB-blk"/>
+                            </mask>
+                        </variation>
                     </view>
                     <navigationItem key="navigationItem" id="ZJs-Mx-OT6">
                         <nil key="title"/>
-                        <barButtonItem key="leftBarButtonItem" title="Save &amp; Close" style="done" id="1KW-JE-ed3">
+                        <barButtonItem key="leftBarButtonItem" title="Close" style="done" id="1KW-JE-ed3">
                             <connections>
                                 <segue destination="MVO-Dc-8Sy" kind="unwind" unwindAction="unwindToHomeWithSender:" id="ZoP-O4-bI4"/>
                             </connections>
@@ -476,6 +555,10 @@
                     <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" prompted="NO"/>
                     <simulatedTabBarMetrics key="simulatedBottomBarMetrics"/>
                     <connections>
+                        <outlet property="bookshelf" destination="oqt-gq-XGG" id="T84-7q-c23"/>
+                        <outlet property="bookshelfCloseButton" destination="xu3-sE-eIT" id="ozA-v9-xJt"/>
+                        <outlet property="bookshelfHighlightSwitch" destination="e1x-ty-UM0" id="PLy-lg-xWS"/>
+                        <outlet property="bookshelfScrollView" destination="iWp-lm-Mye" id="oQN-E7-e8U"/>
                         <outlet property="clearButton" destination="fGp-qI-8jR" id="MrF-N0-ogz"/>
                         <outlet property="closeButton" destination="1KW-JE-ed3" id="F9k-S4-cl9"/>
                         <outlet property="dimView" destination="bkc-RB-blk" id="1rV-xR-BWr"/>

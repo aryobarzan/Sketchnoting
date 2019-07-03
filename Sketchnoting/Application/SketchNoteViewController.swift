@@ -28,8 +28,13 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     @IBOutlet var drawingsButton: LGButton!
     @IBOutlet var dimView: UIView!
     
+    @IBOutlet var bookshelf: UIView!
+    @IBOutlet var bookshelfCloseButton: LGButton!
+    @IBOutlet var bookshelfHighlightSwitch: UISwitch!
+    @IBOutlet var bookshelfScrollView: UIScrollView!
+    var bookshelfContentView = UIStackView()
+    
     var documentViews = [DocumentView]()
-    var documentsOverview: DocumentsOverview!
     
     var colorSlider: ColorSlider!
     var toolsMenu: ExpandableButtonView!
@@ -50,13 +55,19 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         super.viewDidLoad()
         self.navigationController?.setNavigationBarHidden(false, animated: false)
         
-        documentsOverview = DocumentsOverview(frame: CGRect(x: 0, y: 0, width: 500, height: 570))
-        documentsOverview.center = self.view.center
-        documentsOverview.alpha = 1
-        documentsOverview.transform = CGAffineTransform(scaleX: 0.8, y: 1.2)
-        documentsOverview.setCloseAction(for: .touchUpInside) {
-            self.hideDocumentsOverview()
-        }
+        bookshelfContentView.axis = .vertical
+        bookshelfContentView.distribution = .equalSpacing
+        bookshelfContentView.alignment = .fill
+        bookshelfContentView.spacing = 10
+        bookshelfScrollView.addSubview(bookshelfContentView)
+        bookshelfContentView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            bookshelfContentView.topAnchor.constraint(equalTo: bookshelfScrollView.topAnchor),
+            bookshelfContentView.leadingAnchor.constraint(equalTo: bookshelfScrollView.leadingAnchor),
+            bookshelfContentView.trailingAnchor.constraint(equalTo: bookshelfScrollView.trailingAnchor),
+            bookshelfContentView.bottomAnchor.constraint(equalTo: bookshelfScrollView.bottomAnchor),
+            bookshelfContentView.widthAnchor.constraint(equalTo: bookshelfScrollView.widthAnchor)
+            ])
 
         colorSlider = ColorSlider(orientation: .horizontal, previewSide: .bottom)
         colorSlider.color = .black
@@ -478,13 +489,14 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     // This function displays related documents found for the note.
     func displaySpotlightDocuments(documents: [Document]) {
         self.documentsButton.isLoading = false
-        self.view.addSubview(self.documentsOverview)
+        self.bookshelf.isHidden = false
+        /*self.view.addSubview(self.documentsOverview)
         self.view.bringSubviewToFront(documentsOverview)
         UIView.animate(withDuration: 0.0, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 0, options: [],  animations: {
             self.dimView.isHidden = false
             self.dimView.alpha = 0.8
             self.documentsOverview.transform = .identity
-        })
+        })*/
 
         for docView in documentViews {
             docView.removeFromSuperview()
@@ -496,8 +508,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
             documentView.titleLabel.text = doc.title
             documentView.descriptionLabel.text = doc.description
             documentView.urlString = doc.URL
-            documentView.center.x = documentsOverview.center.x
-            documentsOverview.contentView.insertArrangedSubview(documentView, at: 0)
+            bookshelfContentView.insertArrangedSubview(documentView, at: 0)
             documentViews.append(documentView)
             print("Adding document: " + doc.title)
             self.sketchnote!.addDocument(document: doc)
@@ -509,17 +520,6 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         let alertAction = UIAlertAction(title: "Close", style: .default)
         alertController.addAction(alertAction)
         self.present(alertController, animated: true)
-    }
-    
-    private func hideDocumentsOverview() {
-        UIView.animate(withDuration: 0.0, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 0, options: [], animations: {
-            self.dimView.alpha = 0
-            self.dimView.isHidden = true
-            self.documentsOverview.transform = CGAffineTransform(scaleX: 0.2, y: 0.2)
-            
-        }) { (success) in
-            self.documentsOverview.removeFromSuperview()
-        }
     }
     
     // Drawing recognition
@@ -646,6 +646,15 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         toolsView.addSubview(toolSizeMenu)
         toolSizeMenu.delegate = self
     }
+    
+    //MARK: Bookshelf actions
+    @IBAction func bookshelfCloseTapped(_ sender: LGButton) {
+        self.bookshelf.isHidden = true
+    }
+    @IBAction func bookshelfHighlightTapped(_ sender: UISwitch) {
+    }
+    
+    
 }
 public class SimpleLine: UIView  {
     
@@ -672,6 +681,7 @@ public class SimpleLine: UIView  {
         context.strokePath()
     }
 }
+
 extension String {
     func groups(for regexPattern: String) -> [[String]] {
         do {

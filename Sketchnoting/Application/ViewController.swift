@@ -614,7 +614,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
                     let activityController = UIActivityViewController(activityItems: [data], applicationActivities: nil)
                     self.present(activityController, animated: true, completion: nil)
                     if let popOver = activityController.popoverPresentationController {
-                        popOver.sourceView = noteCollectionView
+                        popOver.sourceView = noteCollectionView.shareButton
                     }
                 }
             } catch (let error) {

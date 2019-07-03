@@ -12,6 +12,7 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="DocumentView" customModule="Sketchnoting" customModuleProvider="target">
             <connections>
+                <outlet property="bottomLine" destination="Ie0-uZ-4Px" id="k2R-Gd-PEn"/>
                 <outlet property="contentView" destination="bUs-HB-eoD" id="FF1-gA-C1V"/>
                 <outlet property="descriptionLabel" destination="wbl-8Q-rxh" id="gw5-l2-6LS"/>
                 <outlet property="titleLabel" destination="yli-75-PQW" id="Ddi-LV-EN5"/>
@@ -61,11 +62,18 @@
                             </connections>
                         </view>
                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Description..." textAlignment="natural" lineBreakMode="wordWrap" numberOfLines="10" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wbl-8Q-rxh">
-                            <rect key="frame" x="8" y="61" width="384" height="211"/>
-                            <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                            <rect key="frame" x="8" y="61" width="384" height="196"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="15"/>
                             <nil key="textColor"/>
                             <nil key="highlightedColor"/>
                         </label>
+                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Ie0-uZ-4Px">
+                            <rect key="frame" x="8" y="265" width="384" height="7"/>
+                            <color key="backgroundColor" red="0.66799789669999998" green="0.47512125970000002" blue="0.25860109930000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="7" id="Kxp-vY-mco"/>
+                            </constraints>
+                        </view>
                     </subviews>
                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     <accessibility key="accessibilityConfiguration">
@@ -78,10 +86,13 @@
                         <constraint firstItem="6wD-ki-yWK" firstAttribute="top" secondItem="bUs-HB-eoD" secondAttribute="top" constant="6" id="FTJ-ty-LZD"/>
                         <constraint firstAttribute="trailing" secondItem="wbl-8Q-rxh" secondAttribute="trailing" constant="8" id="GXc-vP-VZm"/>
                         <constraint firstItem="yli-75-PQW" firstAttribute="top" secondItem="bUs-HB-eoD" secondAttribute="top" id="SR2-6v-KF9"/>
-                        <constraint firstAttribute="bottom" secondItem="wbl-8Q-rxh" secondAttribute="bottom" constant="8" id="Ur0-QH-Ugl"/>
+                        <constraint firstAttribute="bottom" secondItem="wbl-8Q-rxh" secondAttribute="bottom" constant="23" id="Ur0-QH-Ugl"/>
                         <constraint firstAttribute="width" constant="400" id="bzg-ol-Tjf"/>
+                        <constraint firstAttribute="bottom" secondItem="Ie0-uZ-4Px" secondAttribute="bottom" constant="8" id="eXR-dO-fsw"/>
+                        <constraint firstAttribute="trailing" secondItem="Ie0-uZ-4Px" secondAttribute="trailing" constant="8" id="gB0-nh-JTq"/>
                         <constraint firstAttribute="trailing" secondItem="6wD-ki-yWK" secondAttribute="trailing" constant="8" id="m3N-cD-gu6"/>
                         <constraint firstItem="wbl-8Q-rxh" firstAttribute="leading" secondItem="bUs-HB-eoD" secondAttribute="leading" constant="8" id="wmo-CI-ZWI"/>
+                        <constraint firstItem="Ie0-uZ-4Px" firstAttribute="leading" secondItem="bUs-HB-eoD" secondAttribute="leading" constant="8" id="yXc-Nx-JTh"/>
                     </constraints>
                 </view>
             </subviews>
