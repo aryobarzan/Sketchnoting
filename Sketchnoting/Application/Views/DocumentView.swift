@@ -7,20 +7,23 @@
 //
 
 import UIKit
-import LGButton
 
 // This is the view used for displaying a single related document
 
-class DocumentView: UIView {
+class DocumentView: UIView, UIActionSheetDelegate {
     let kCONTENT_XIB_NAME = "DocumentView"
     
     @IBOutlet var contentView: UIView!
     @IBOutlet var titleLabel: UILabel!
-    @IBOutlet var viewButton: LGButton!
-    @IBOutlet var descriptionLabel: UILabel!
     @IBOutlet var bottomLine: UIView!
-    
+    @IBOutlet var scrollView: UIScrollView!
+    var abstractLabel = UILabel()
+    @IBOutlet var imageView: UIImageView!
+    @IBOutlet var actionsButton: UIButton!
+    @IBOutlet var textMapSegment: UISegmentedControl!
+        
     var urlString: String?
+    var mapImage: UIImage?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -37,9 +40,38 @@ class DocumentView: UIView {
         contentView.fixInView(self)
         self.widthAnchor.constraint(equalToConstant: 400).isActive = true
         self.heightAnchor.constraint(equalToConstant: 280).isActive = true
+        
+        abstractLabel.numberOfLines = 50
+        scrollView.addSubview(abstractLabel)
+        abstractLabel.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            abstractLabel.topAnchor.constraint(equalTo: scrollView.topAnchor),
+            abstractLabel.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
+            abstractLabel.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
+            abstractLabel.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
+            abstractLabel.widthAnchor.constraint(equalTo: scrollView.widthAnchor)
+            ])
     }
-    @IBAction func viewTapped(_ sender: LGButton) {
-        guard let url = URL(string: urlString ?? "") else { return }
+    
+    @IBAction func actionsButtonTapped(_ sender: UIButton) {
+        guard let url = URL(string: self.urlString ?? "") else { return }
         UIApplication.shared.open(url)
+    }
+    
+    @IBAction func textMapSegmentTapped(_ sender: UISegmentedControl) {
+        if textMapSegment.selectedSegmentIndex == 0 {
+            self.imageView.isHidden = true
+            self.scrollView.isHidden = false
+        }
+        else {
+            self.imageView.isHidden = false
+            self.scrollView.isHidden = true
+        }
+    }
+    
+    func setMapImage(image: UIImage) {
+        self.mapImage = image
+        self.imageView.image = mapImage
+        self.textMapSegment.isHidden = false
     }
 }

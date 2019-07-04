@@ -58,7 +58,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         bookshelfContentView.axis = .vertical
         bookshelfContentView.distribution = .equalSpacing
         bookshelfContentView.alignment = .fill
-        bookshelfContentView.spacing = 10
+        bookshelfContentView.spacing = 5
         bookshelfScrollView.addSubview(bookshelfContentView)
         bookshelfContentView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
@@ -490,13 +490,6 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     func displaySpotlightDocuments(documents: [Document]) {
         self.documentsButton.isLoading = false
         self.bookshelf.isHidden = false
-        /*self.view.addSubview(self.documentsOverview)
-        self.view.bringSubviewToFront(documentsOverview)
-        UIView.animate(withDuration: 0.0, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 0, options: [],  animations: {
-            self.dimView.isHidden = false
-            self.dimView.alpha = 0.8
-            self.documentsOverview.transform = .identity
-        })*/
 
         for docView in documentViews {
             docView.removeFromSuperview()
@@ -504,14 +497,20 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         documentViews = [DocumentView]()
         
         for doc in documents.sorted(by: { $0.rankPercentage > $1.rankPercentage }) {
+            
             let documentView = DocumentView(frame: CGRect(x: 0, y: 0, width: 400, height: 280))
             documentView.titleLabel.text = doc.title
-            documentView.descriptionLabel.text = doc.description
+            documentView.abstractLabel.text = doc.description
             documentView.urlString = doc.URL
+           
             bookshelfContentView.insertArrangedSubview(documentView, at: 0)
             documentViews.append(documentView)
             print("Adding document: " + doc.title)
             self.sketchnote!.addDocument(document: doc)
+            
+            if doc.entityType != nil && doc.entityType!.lowercased().contains("place") || doc.entityType!.lowercased().contains("location") {
+                MapHelper.fetchMap(location: doc.title, documentView: documentView)
+            }
         }
     }
     

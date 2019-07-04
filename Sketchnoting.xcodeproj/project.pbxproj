@@ -13,6 +13,7 @@
 		9F5010D22249325300425424 /* NoteCollectionView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9F5010D12249325300425424 /* NoteCollectionView.xib */; };
 		9F5010D42249326D00425424 /* NoteCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5010D32249326D00425424 /* NoteCollectionView.swift */; };
 		9F5D0FC8229CBC4100BCA451 /* NotesManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5D0FC7229CBC4100BCA451 /* NotesManager.swift */; };
+		9FA6238822CEA7FE007ED794 /* MapHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA6238722CEA7FE007ED794 /* MapHelper.swift */; };
 		9FC788F2225CEC230074BD16 /* DrawingSearchView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9FC788F1225CEC230074BD16 /* DrawingSearchView.xib */; };
 		9FC788F4225CEC4C0074BD16 /* DrawingSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FC788F3225CEC4C0074BD16 /* DrawingSearchView.swift */; };
 		9FD29BA72220524D00CC969A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29BA62220524D00CC969A /* AppDelegate.swift */; };
@@ -69,6 +70,7 @@
 		9F5D0FC7229CBC4100BCA451 /* NotesManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotesManager.swift; sourceTree = "<group>"; };
 		9F5D8B2B228B9D7000F56FEC /* CREDITS.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CREDITS.md; sourceTree = "<group>"; };
 		9F5D8B2C228B9EF800F56FEC /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		9FA6238722CEA7FE007ED794 /* MapHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapHelper.swift; sourceTree = "<group>"; };
 		9FC788F1225CEC230074BD16 /* DrawingSearchView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DrawingSearchView.xib; sourceTree = "<group>"; };
 		9FC788F3225CEC4C0074BD16 /* DrawingSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrawingSearchView.swift; sourceTree = "<group>"; };
 		9FD29BA32220524D00CC969A /* Sketchnoting.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Sketchnoting.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -293,6 +295,7 @@
 			children = (
 				9FD29C53223C3B6F00CC969A /* OCRHelper.swift */,
 				9FD29BCC2226BAD600CC969A /* SemanticHelper.swift */,
+				9FA6238722CEA7FE007ED794 /* MapHelper.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -453,6 +456,7 @@
 				9FD29C58223C3CF700CC969A /* UIImageExtensions.swift in Sources */,
 				9FD29C192236DCFC00CC969A /* SketchNoteViewController.swift in Sources */,
 				9F5010D42249326D00425424 /* NoteCollectionView.swift in Sources */,
+				9FA6238822CEA7FE007ED794 /* MapHelper.swift in Sources */,
 				9FD29C202236EA2800CC969A /* UIImage+fill.swift in Sources */,
 				9FD29C40223861E100CC969A /* ExpandableButtonView.swift in Sources */,
 				9FD29BA92220524D00CC969A /* ViewController.swift in Sources */,
