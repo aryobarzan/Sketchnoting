@@ -13,7 +13,6 @@
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="NoteCollectionView" customModule="Sketchnoting" customModuleProvider="target">
             <connections>
                 <outlet property="contentView" destination="iN0-l3-epB" id="px9-L8-6s1"/>
-                <outlet property="deleteButton" destination="smR-au-Zef" id="eNs-R1-3Cy"/>
                 <outlet property="newSketchnoteButton" destination="dhX-lE-C2o" id="VEc-ZR-yas"/>
                 <outlet property="scrollView" destination="nUo-io-NMh" id="iVi-K0-dkr"/>
                 <outlet property="shareButton" destination="8SN-NV-FxF" id="876-v1-b14"/>
@@ -29,7 +28,7 @@
                     <rect key="frame" x="0.0" y="35" width="600" height="300"/>
                 </scrollView>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="dhX-lE-C2o" customClass="LGButton" customModule="LGButton">
-                    <rect key="frame" x="458" y="2" width="135" height="28"/>
+                    <rect key="frame" x="452" y="2" width="135" height="28"/>
                     <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="28" id="aAK-pK-TxZ"/>
@@ -39,7 +38,7 @@
                         <userDefinedRuntimeAttribute type="string" keyPath="leftIconString" value="add"/>
                         <userDefinedRuntimeAttribute type="string" keyPath="leftIconFontName" value="ma"/>
                         <userDefinedRuntimeAttribute type="color" keyPath="gradientStartColor">
-                            <color key="value" red="0.37345819359999999" green="0.75741592639999999" blue="0.58015881339999997" alpha="0.84705882349999995" colorSpace="custom" customColorSpace="sRGB"/>
+                            <color key="value" red="0.33255316369999999" green="0.45757836530000001" blue="0.75741592639999999" alpha="0.84705882349999995" colorSpace="custom" customColorSpace="sRGB"/>
                         </userDefinedRuntimeAttribute>
                         <userDefinedRuntimeAttribute type="color" keyPath="gradientEndColor">
                             <color key="value" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -50,6 +49,9 @@
                         <userDefinedRuntimeAttribute type="string" keyPath="titleString" value="Sketchnote"/>
                         <userDefinedRuntimeAttribute type="number" keyPath="leftIconFontSize">
                             <real key="value" value="15"/>
+                        </userDefinedRuntimeAttribute>
+                        <userDefinedRuntimeAttribute type="number" keyPath="gradientRotation">
+                            <real key="value" value="90"/>
                         </userDefinedRuntimeAttribute>
                     </userDefinedRuntimeAttributes>
                     <connections>
@@ -67,44 +69,23 @@
                     <textInputTraits key="textInputTraits" enablesReturnKeyAutomatically="YES"/>
                 </textField>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="8SN-NV-FxF" customClass="LGButton" customModule="LGButton">
-                    <rect key="frame" x="400" y="2" width="50" height="28"/>
-                    <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    <rect key="frame" x="389" y="2" width="55" height="28"/>
+                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     <constraints>
-                        <constraint firstAttribute="width" constant="50" id="7Jk-CP-4xb"/>
+                        <constraint firstAttribute="width" constant="55" id="7Jk-CP-4xb"/>
                         <constraint firstAttribute="height" constant="28" id="Xlt-PD-nni"/>
                     </constraints>
                     <userDefinedRuntimeAttributes>
-                        <userDefinedRuntimeAttribute type="string" keyPath="leftIconString" value="share"/>
+                        <userDefinedRuntimeAttribute type="string" keyPath="leftIconString" value="more_horiz"/>
                         <userDefinedRuntimeAttribute type="string" keyPath="leftIconFontName" value="ma"/>
-                        <userDefinedRuntimeAttribute type="color" keyPath="gradientStartColor">
-                            <color key="value" red="0.37254901959999998" green="0.75686274509999996" blue="0.58039215690000001" alpha="0.84999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
+                        <userDefinedRuntimeAttribute type="color" keyPath="bgColor">
+                            <color key="value" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         </userDefinedRuntimeAttribute>
-                        <userDefinedRuntimeAttribute type="color" keyPath="gradientEndColor">
+                        <userDefinedRuntimeAttribute type="color" keyPath="leftIconColor">
                             <color key="value" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         </userDefinedRuntimeAttribute>
-                        <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
-                            <real key="value" value="14"/>
-                        </userDefinedRuntimeAttribute>
-                    </userDefinedRuntimeAttributes>
-                </view>
-                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="smR-au-Zef" customClass="LGButton" customModule="LGButton">
-                    <rect key="frame" x="342" y="2" width="50" height="28"/>
-                    <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                    <constraints>
-                        <constraint firstAttribute="width" constant="50" id="JU4-c8-5Xa"/>
-                        <constraint firstAttribute="height" constant="28" id="kx9-L5-Xmh"/>
-                    </constraints>
-                    <userDefinedRuntimeAttributes>
-                        <userDefinedRuntimeAttribute type="string" keyPath="leftIconString" value="delete_forever"/>
-                        <userDefinedRuntimeAttribute type="string" keyPath="leftIconFontName" value="ma"/>
-                        <userDefinedRuntimeAttribute type="color" keyPath="gradientStartColor">
-                            <color key="value" red="0.89803921568627454" green="0.7124117892430627" blue="0.42573544258966467" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                        </userDefinedRuntimeAttribute>
-                        <userDefinedRuntimeAttribute type="color" keyPath="gradientEndColor">
-                            <color key="value" red="0.89803921568627454" green="0.014848595534565818" blue="0.45708394631872085" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                        </userDefinedRuntimeAttribute>
-                        <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
-                            <real key="value" value="14"/>
+                        <userDefinedRuntimeAttribute type="number" keyPath="leftIconFontSize">
+                            <real key="value" value="25"/>
                         </userDefinedRuntimeAttribute>
                     </userDefinedRuntimeAttributes>
                 </view>
@@ -115,15 +96,13 @@
                 <constraint firstItem="3aW-OP-zLQ" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="9nP-Wv-drO"/>
                 <constraint firstItem="nUo-io-NMh" firstAttribute="top" secondItem="3aW-OP-zLQ" secondAttribute="bottom" constant="3" id="Ex0-5D-B8B"/>
                 <constraint firstItem="dhX-lE-C2o" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" constant="2" id="MJB-MQ-09g"/>
-                <constraint firstItem="8SN-NV-FxF" firstAttribute="leading" secondItem="smR-au-Zef" secondAttribute="trailing" constant="8" id="Nfp-0U-iJ0"/>
-                <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="dhX-lE-C2o" secondAttribute="trailing" constant="7" id="TFv-5Q-mNb"/>
+                <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="dhX-lE-C2o" secondAttribute="trailing" constant="13" id="TFv-5Q-mNb"/>
                 <constraint firstItem="nUo-io-NMh" firstAttribute="top" secondItem="dhX-lE-C2o" secondAttribute="bottom" constant="5" id="UQU-9v-pod"/>
                 <constraint firstItem="dhX-lE-C2o" firstAttribute="leading" secondItem="8SN-NV-FxF" secondAttribute="trailing" constant="8" id="c4p-cq-mUj"/>
                 <constraint firstAttribute="trailing" secondItem="nUo-io-NMh" secondAttribute="trailing" id="ec5-vE-6vK"/>
                 <constraint firstItem="nUo-io-NMh" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="35" id="iCk-nP-CWE"/>
                 <constraint firstItem="nUo-io-NMh" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="nyy-VN-Egx"/>
                 <constraint firstItem="nUo-io-NMh" firstAttribute="bottom" secondItem="vUN-kp-3ea" secondAttribute="bottom" id="tl8-LC-P26"/>
-                <constraint firstItem="smR-au-Zef" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" constant="2" id="ubF-G3-cX5"/>
             </constraints>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
             <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>

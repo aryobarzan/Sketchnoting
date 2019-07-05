@@ -20,6 +20,7 @@ class NoteShareView: UIView {
     @IBOutlet var sketchnoteView: SketchnoteView!
     @IBOutlet var rejectButton: LGButton!
     @IBOutlet var acceptButton: LGButton!
+    @IBOutlet var closeButton: LGButton!
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -33,8 +34,8 @@ class NoteShareView: UIView {
     
     func commonInit() {
         Bundle.main.loadNibNamed(kCONTENT_XIB_NAME, owner: self, options: nil)
-        self.widthAnchor.constraint(equalToConstant: 300).isActive = true
-        self.heightAnchor.constraint(equalToConstant: 400).isActive = true
+        self.widthAnchor.constraint(equalToConstant: 326).isActive = true
+        self.heightAnchor.constraint(equalToConstant: 435).isActive = true
         contentView.fixInView(self)
         
         self.layer.borderWidth = 1
@@ -49,6 +50,11 @@ class NoteShareView: UIView {
     func setAcceptAction(_ closure: @escaping ()->()) {
         let sleeve = ClosureSleeve(closure)
         acceptButton.addTarget(sleeve, action: #selector(ClosureSleeve.invoke), for: .touchUpInside)
+        objc_setAssociatedObject(self, String(format: "[%d]", arc4random()), sleeve, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
+    }
+    func setCloseAction(_ closure: @escaping ()->()) {
+        let sleeve = ClosureSleeve(closure)
+        closeButton.addTarget(sleeve, action: #selector(ClosureSleeve.invoke), for: .touchUpInside)
         objc_setAssociatedObject(self, String(format: "[%d]", arc4random()), sleeve, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
     }
 }

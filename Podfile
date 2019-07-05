@@ -12,4 +12,6 @@ target 'Sketchnoting' do
   pod 'NewPopMenu'
   pod 'PDFGenerator'
   pod 'GSMessages'
+  pod 'RAMPaperSwitch'
+  pod 'BadgeHub'
 end

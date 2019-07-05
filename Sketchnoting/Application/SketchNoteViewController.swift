@@ -502,6 +502,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
             documentView.titleLabel.text = doc.title
             documentView.abstractLabel.text = doc.description
             documentView.urlString = doc.URL
+            documentView.viewController = self
            
             bookshelfContentView.insertArrangedSubview(documentView, at: 0)
             documentViews.append(documentView)

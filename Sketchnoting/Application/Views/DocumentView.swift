@@ -10,7 +10,7 @@ import UIKit
 
 // This is the view used for displaying a single related document
 
-class DocumentView: UIView, UIActionSheetDelegate {
+class DocumentView: UIView, UIGestureRecognizerDelegate {
     let kCONTENT_XIB_NAME = "DocumentView"
     
     @IBOutlet var contentView: UIView!
@@ -21,9 +21,11 @@ class DocumentView: UIView, UIActionSheetDelegate {
     @IBOutlet var imageView: UIImageView!
     @IBOutlet var actionsButton: UIButton!
     @IBOutlet var textMapSegment: UISegmentedControl!
-        
+    @IBOutlet var imageViewTapGesture: UITapGestureRecognizer!
+    
     var urlString: String?
     var mapImage: UIImage?
+    var viewController: UIViewController?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -51,6 +53,8 @@ class DocumentView: UIView, UIActionSheetDelegate {
             abstractLabel.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
             abstractLabel.widthAnchor.constraint(equalTo: scrollView.widthAnchor)
             ])
+        
+        imageViewTapGesture.delegate = self
     }
     
     @IBAction func actionsButtonTapped(_ sender: UIButton) {
@@ -67,6 +71,24 @@ class DocumentView: UIView, UIActionSheetDelegate {
             self.imageView.isHidden = false
             self.scrollView.isHidden = true
         }
+    }
+    @IBAction func imageViewTapped(_ sender: AnyObject) {
+        let newImageView = UIImageView(image: imageView.image)
+        newImageView.frame = UIScreen.main.bounds
+        newImageView.backgroundColor = .black
+        newImageView.contentMode = .scaleAspectFit
+        newImageView.isUserInteractionEnabled = true
+        let tap = UITapGestureRecognizer(target: self, action: #selector(dismissFullscreenImage))
+        newImageView.addGestureRecognizer(tap)
+        viewController!.view.addSubview(newImageView)
+        viewController!.navigationController?.isNavigationBarHidden = true
+        viewController!.tabBarController?.tabBar.isHidden = true
+    }
+    
+    @objc func dismissFullscreenImage(_ sender: UITapGestureRecognizer) {
+        viewController!.navigationController?.isNavigationBarHidden = false
+        viewController!.tabBarController?.tabBar.isHidden = false
+        sender.view?.removeFromSuperview()
     }
     
     func setMapImage(image: UIImage) {

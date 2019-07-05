@@ -19,7 +19,6 @@ class NoteCollectionView : UIView, UITextFieldDelegate {
     var stackView = UIStackView()
     @IBOutlet var titleField: UITextField!
     @IBOutlet var newSketchnoteButton: LGButton!
-    @IBOutlet var deleteButton: LGButton!
     @IBOutlet var shareButton: LGButton!
     
     var parentViewController: ViewController!
@@ -84,12 +83,6 @@ class NoteCollectionView : UIView, UITextFieldDelegate {
         parentViewController.selectedSketchnote = newNote
         parentViewController.performSegue(withIdentifier: "NewSketchnote", sender: self)
         parentViewController.displaySketchnote(note: newNote, collectionView: self)
-    }
-    
-    func setDeleteAction(for controlEvents: UIControl.Event, _ closure: @escaping ()->()) {
-        let sleeve = ClosureSleeve(closure)
-        deleteButton.addTarget(sleeve, action: #selector(ClosureSleeve.invoke), for: controlEvents)
-        objc_setAssociatedObject(self, String(format: "[%d]", arc4random()), sleeve, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
     }
     
     func setShareAction(_ closure: @escaping ()->()) {

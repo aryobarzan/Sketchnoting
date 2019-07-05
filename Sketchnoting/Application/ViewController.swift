@@ -12,6 +12,8 @@ import PopMenu
 import MultipeerConnectivity
 import PDFGenerator
 import GSMessages
+import RAMPaperSwitch
+import BadgeHub
 
 // This is the controller for the app's home page view.
 // It contains the search bar and all the buttons related to it.
@@ -30,6 +32,10 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     @IBOutlet var searchSeparator: UIView!
     var searchFiltersStackView = UIStackView()
     @IBOutlet var noteSharingSwitch: UISwitch!
+    @IBOutlet var sharedNotesButton: LGButton!
+    @IBOutlet var noteSharingLabel: UILabel!
+    
+    var sharedNotesBadge: BadgeHub!
     
     // This property holds the user's note collection views displayed on this home page.
     var noteCollectionViews = [NoteCollectionView]()
@@ -76,7 +82,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         peerID = MCPeerID(displayName: UIDevice.current.name)
         mcSession = MCSession(peer: peerID, securityIdentity: nil, encryptionPreference: .required)
         mcSession.delegate = self
-        noteShareView = NoteShareView(frame: CGRect(x: 0, y: 0, width: 300, height: 400))
+        noteShareView = NoteShareView(frame: CGRect(x: 0, y: 0, width: 326, height: 435))
         noteShareView.center = self.view.center
         noteShareView.alpha = 1
         noteShareView.transform = CGAffineTransform(scaleX: 0.8, y: 1.2)
@@ -84,8 +90,13 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             self.acceptSharedNote()
         }
         noteShareView.setRejectAction {
+            self.rejectSharedNote()
+        }
+        noteShareView.setCloseAction {
             self.hideNoteShareView()
         }
+        sharedNotesBadge = BadgeHub(view: sharedNotesButton)
+        sharedNotesBadge.moveCircleBy(x: -120, y: 0)
         
         // The search views are setup, including the search field and the pop-up view for searching by drawing
         self.searchField.delegate = self
@@ -237,19 +248,19 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         self.noteCollectionViews.append(noteCollectionView)
         self.notesStackView.insertArrangedSubview(noteCollectionView, at: 0)
         
-        noteCollectionView.setDeleteAction(for: .touchUpInside) {
-            let alert = UIAlertController(title: "Delete Note Collection?", message: "", preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: "Confirm", style: .destructive, handler: { action in
+        noteCollectionView.setShareAction {
+            let alert = UIAlertController(title: "Note Collection", message: "", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "Share", style: .default, handler: { action in
+                if noteCollectionView.noteCollection != nil && noteCollectionView.noteCollection!.notes.count > 0 {
+                    self.generatePDF(noteCollectionView: noteCollectionView)
+                }
+            }))
+            alert.addAction(UIAlertAction(title: "Delete", style: .destructive, handler: { action in
                 NotesManager.shared.delete(noteCollection: collection)
                 noteCollectionView.removeFromSuperview()
             }))
             alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
             self.present(alert, animated: true)
-        }
-        noteCollectionView.setShareAction {
-            if noteCollectionView.noteCollection != nil && noteCollectionView.noteCollection!.notes.count > 0 {
-                self.generatePDF(noteCollectionView: noteCollectionView)
-            }
         }
         
         for n in collection.notes {
@@ -443,12 +454,16 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         // The user's device is made visible to nearby devices for sharing
         if sender.isOn {
             startHosting()
+            sharedNotesButton.isHidden = false
+            noteSharingLabel.textColor = .white
         }
         else {
             // The user's device is no longer visible to other nearby devices
             if mcAdvertiserAssistant != nil {
                 mcAdvertiserAssistant.stop()
             }
+            sharedNotesButton.isHidden = true
+            noteSharingLabel.textColor = .black
         }
     }
     func session(_ session: MCSession, didReceive stream: InputStream, withName streamName: String, fromPeer peerID: MCPeerID) {
@@ -515,9 +530,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
                 ac.addAction(UIAlertAction(title: "Close", style: .default))
                 present(ac, animated: true)
             }
-            let alert = UIAlertController(title: "Note shared", message: "The note has been sent to the selected device(s).", preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: "Okay", style: .cancel, handler: nil))
-            self.present(alert, animated: true)
+            self.view.showMessage("Note shared with the selected device(s).", type: .success)
         }
     }
     
@@ -538,8 +551,22 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         self.receivedPathArray = receivedPath
         if self.receivedSketchnote != nil && self.receivedPathArray != nil {
             DispatchQueue.main.async {
-                self.displayNoteShareView()
+                self.pendingSharedNotes.append((received, receivedPath!))
+                self.view.showMessage("New note shared with you. Tap Shared Notes to preview it!", type: .info)
+                self.sharedNotesBadge.increment()
+                self.sharedNotesButton.isEnabled = true
             }
+        }
+    }
+    var pendingSharedNotes = [(Sketchnote, NSMutableArray)]()
+    @IBAction func sharedNotesButtonTapped(_ sender: LGButton) {
+        if pendingSharedNotes.count > 0 {
+            self.receivedSketchnote = pendingSharedNotes[0].0
+            self.receivedPathArray = pendingSharedNotes[0].1
+            self.displayNoteShareView()
+        }
+        else {
+            self.view.showMessage("There are no shared notes to preview.", type: .info)
         }
     }
     
@@ -568,11 +595,17 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         self.receivedPathArray = nil
         self.dimView.isHidden = true
         self.noteShareView.removeFromSuperview()
+        if pendingSharedNotes.count == 0 {
+            sharedNotesButton.isEnabled = false
+        }
     }
     
     private func acceptSharedNote() {
         print("Accepted shared note")
         if receivedSketchnote != nil && receivedPathArray != nil {
+            if pendingSharedNotes.count > 0 {
+                pendingSharedNotes.remove(at: 0)
+            }
             let noteCollection = NoteCollection(title: "Shared Note", notes: nil)!
             noteCollection.addSketchnote(note: receivedSketchnote!)
             NotesManager.shared.add(noteCollection: noteCollection)
@@ -581,6 +614,20 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             displayNoteCollection(collection: noteCollection)
         }
         hideNoteShareView()
+        self.view.showMessage("Shared note accepted and stored to your device.", type: .success)
+        sharedNotesBadge.decrement()
+    }
+    
+    private func rejectSharedNote() {
+        print("Rejected shared note")
+        if receivedSketchnote != nil && receivedPathArray != nil {
+            if pendingSharedNotes.count > 0 {
+                pendingSharedNotes.remove(at: 0)
+            }
+        }
+        hideNoteShareView()
+        self.view.showMessage("Shared note rejected.", type: .error)
+        sharedNotesBadge.decrement()
     }
     
     // PDF Generation - The following functions are used for generating a pdf from either a single sketchnote or a note collection.

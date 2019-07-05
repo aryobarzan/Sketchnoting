@@ -16,6 +16,7 @@
                 <outlet property="bottomLine" destination="Ie0-uZ-4Px" id="k2R-Gd-PEn"/>
                 <outlet property="contentView" destination="bUs-HB-eoD" id="FF1-gA-C1V"/>
                 <outlet property="imageView" destination="wae-Bu-uQ9" id="RBF-VQ-ktJ"/>
+                <outlet property="imageViewTapGesture" destination="Wq8-Sj-ryb" id="G9u-XS-ZpM"/>
                 <outlet property="scrollView" destination="VqI-zB-HKI" id="C3Y-FA-zXA"/>
                 <outlet property="textMapSegment" destination="531-iC-p1Z" id="U4P-gu-fQT"/>
                 <outlet property="titleLabel" destination="yli-75-PQW" id="Ddi-LV-EN5"/>
@@ -47,8 +48,12 @@
                         <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="VqI-zB-HKI">
                             <rect key="frame" x="8" y="42" width="384" height="215"/>
                         </scrollView>
-                        <imageView hidden="YES" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="wae-Bu-uQ9">
+                        <imageView hidden="YES" clipsSubviews="YES" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="wae-Bu-uQ9">
                             <rect key="frame" x="8" y="42" width="384" height="215"/>
+                            <gestureRecognizers/>
+                            <connections>
+                                <outletCollection property="gestureRecognizers" destination="Wq8-Sj-ryb" appends="YES" id="YCY-cd-8FS"/>
+                            </connections>
                         </imageView>
                         <segmentedControl hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="531-iC-p1Z">
                             <rect key="frame" x="269" y="9" width="85" height="29"/>
@@ -120,5 +125,10 @@
             <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
             <point key="canvasLocation" x="33.59375" y="-50.9765625"/>
         </view>
+        <tapGestureRecognizer id="Wq8-Sj-ryb">
+            <connections>
+                <action selector="imageViewTapped:" destination="-1" id="oPw-Gl-HYc"/>
+            </connections>
+        </tapGestureRecognizer>
     </objects>
 </document>
