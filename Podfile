@@ -14,4 +14,5 @@ target 'Sketchnoting' do
   pod 'GSMessages'
   pod 'RAMPaperSwitch'
   pod 'BadgeHub'
+  pod 'SwiftyJSON'
 end
