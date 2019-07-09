@@ -14,6 +14,7 @@
 		9F5010D42249326D00425424 /* NoteCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5010D32249326D00425424 /* NoteCollectionView.swift */; };
 		9F5D0FC8229CBC4100BCA451 /* NotesManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5D0FC7229CBC4100BCA451 /* NotesManager.swift */; };
 		9FA6238822CEA7FE007ED794 /* MapHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA6238722CEA7FE007ED794 /* MapHelper.swift */; };
+		9FA6238B22D37213007ED794 /* BioPortalHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA6238A22D37213007ED794 /* BioPortalHelper.swift */; };
 		9FC788F2225CEC230074BD16 /* DrawingSearchView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9FC788F1225CEC230074BD16 /* DrawingSearchView.xib */; };
 		9FC788F4225CEC4C0074BD16 /* DrawingSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FC788F3225CEC4C0074BD16 /* DrawingSearchView.swift */; };
 		9FD29BA72220524D00CC969A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29BA62220524D00CC969A /* AppDelegate.swift */; };
@@ -71,6 +72,7 @@
 		9F5D8B2B228B9D7000F56FEC /* CREDITS.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CREDITS.md; sourceTree = "<group>"; };
 		9F5D8B2C228B9EF800F56FEC /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		9FA6238722CEA7FE007ED794 /* MapHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapHelper.swift; sourceTree = "<group>"; };
+		9FA6238A22D37213007ED794 /* BioPortalHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BioPortalHelper.swift; sourceTree = "<group>"; };
 		9FC788F1225CEC230074BD16 /* DrawingSearchView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DrawingSearchView.xib; sourceTree = "<group>"; };
 		9FC788F3225CEC4C0074BD16 /* DrawingSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrawingSearchView.swift; sourceTree = "<group>"; };
 		9FD29BA32220524D00CC969A /* Sketchnoting.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Sketchnoting.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -159,6 +161,14 @@
 				9F5D0FC7229CBC4100BCA451 /* NotesManager.swift */,
 			);
 			path = Models;
+			sourceTree = "<group>";
+		};
+		9FA6238922D371F1007ED794 /* Semantic Annotation */ = {
+			isa = PBXGroup;
+			children = (
+				9FA6238A22D37213007ED794 /* BioPortalHelper.swift */,
+			);
+			path = "Semantic Annotation";
 			sourceTree = "<group>";
 		};
 		9FD29B9A2220524D00CC969A = {
@@ -293,6 +303,7 @@
 		9FD29C69224589FE00CC969A /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
+				9FA6238922D371F1007ED794 /* Semantic Annotation */,
 				9FD29C53223C3B6F00CC969A /* OCRHelper.swift */,
 				9FD29BCC2226BAD600CC969A /* SemanticHelper.swift */,
 				9FA6238722CEA7FE007ED794 /* MapHelper.swift */,
@@ -452,6 +463,7 @@
 			files = (
 				9FD9BD1422678D79007F4A2D /* NoteShareView.swift in Sources */,
 				9FD29C3F223861E100CC969A /* ExpandableButtonItem.swift in Sources */,
+				9FA6238B22D37213007ED794 /* BioPortalHelper.swift in Sources */,
 				9FD29C2D22370E1800CC969A /* ColorSliderExtensions.swift in Sources */,
 				9FD29C58223C3CF700CC969A /* UIImageExtensions.swift in Sources */,
 				9FD29C192236DCFC00CC969A /* SketchNoteViewController.swift in Sources */,
