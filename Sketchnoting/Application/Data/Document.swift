@@ -15,6 +15,7 @@ enum DocumentType: String, Codable {
     case Map
     case Babelfy
     case Spotlight
+    case BioOntology
     case Other
 }
 // This class contains the information for a document that is related to a note's text.
@@ -28,6 +29,8 @@ class Document: Codable {
     var URL: String
     var documentType: DocumentType
     var rankPercentage: Double
+    var previewImage: UIImage?
+    var mapImage: UIImage?
     
     enum CodingKeys: String, CodingKey {
         case title
@@ -36,6 +39,8 @@ class Document: Codable {
         case URL
         case documentType
         case rankPercentage
+        case previewImage
+        case mapImage
     }
     
     init?(title: String, description: String?, entityType: String?, URL: String, type: DocumentType, rank: Double){
@@ -58,6 +63,16 @@ class Document: Codable {
         try container.encode(URL, forKey: .URL)
         try container.encode(documentType, forKey: .documentType)
         try container.encode(rankPercentage, forKey: .rankPercentage)
+        if previewImage != nil {
+            let imageData: Data = previewImage!.pngData()!
+            let strBase64 = imageData.base64EncodedString(options: .lineLength64Characters)
+            try container.encode(strBase64, forKey: .previewImage)
+        }
+        if mapImage != nil {
+            let imageData: Data = mapImage!.pngData()!
+            let strBase64 = imageData.base64EncodedString(options: .lineLength64Characters)
+            try container.encode(strBase64, forKey: .mapImage)
+        }
     }
     
     required init(from decoder: Decoder) throws {
@@ -68,5 +83,18 @@ class Document: Codable {
         URL = try container.decode(String.self, forKey: .URL)
         documentType = DocumentType(rawValue: try container.decode(String.self, forKey: .documentType)) ?? .Other
         rankPercentage = try container.decode(Double.self, forKey: .rankPercentage)
+        
+        do {
+            let strBase64: String = try container.decode(String.self, forKey: .previewImage)
+            let dataDecoded: Data = Data(base64Encoded: strBase64, options: .ignoreUnknownCharacters)!
+            previewImage = UIImage(data: dataDecoded)
+        } catch {
+        }
+        do {
+            let strBase64: String = try container.decode(String.self, forKey: .mapImage)
+            let dataDecoded: Data = Data(base64Encoded: strBase64, options: .ignoreUnknownCharacters)!
+            mapImage = UIImage(data: dataDecoded)
+        } catch {
+        }
     }
 }

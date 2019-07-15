@@ -87,12 +87,12 @@ class BioPortalHelper {
                 
                 let json = JSON(value)
                 
-                if let label = json["prefLabel"].string {
+                if let label = json["prefLabel"].string, let definition = json["definition"][0].string {
                     print(label)
-                }
-                
-                if let definition = json["definition"][0].string {
-                    print(definition)
+                    let document = Document(title: label, description: definition, entityType: "Biology", URL: "https://bioportal.bioontology.org/search?utf8=%E2%9C%93&query=" + (label.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) ?? "https://bioportal.bioontology.org/"), type: .BioOntology, rank: Double(0))
+                    if document != nil {
+                        self.viewController.addDocument(document: document!)
+                    }
                 }
             case .failure(let error):
                 print(error.localizedDescription)

@@ -14,7 +14,7 @@ import GSMessages
 
 // This is the controller for the other page of the application, i.e. not the home page, for the page displayed when the user wants to edit a note.
 
-class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, SketchViewDelegate, UIPencilInteractionDelegate {
+class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, SketchViewDelegate, UIPencilInteractionDelegate, UICollectionViewDataSource, UICollectionViewDelegate {
 
     @IBOutlet weak var topContainer: UIView!
     @IBOutlet var sketchView: SketchView!
@@ -26,15 +26,10 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     @IBOutlet var undoButton: LGButton!
     @IBOutlet var helpLinesButton: LGButton!
     @IBOutlet var drawingsButton: LGButton!
-    @IBOutlet var dimView: UIView!
     
     @IBOutlet var bookshelf: UIView!
     @IBOutlet var bookshelfCloseButton: LGButton!
     @IBOutlet var bookshelfHighlightSwitch: UISwitch!
-    @IBOutlet var bookshelfScrollView: UIScrollView!
-    var bookshelfContentView = UIStackView()
-    
-    var documentViews = [DocumentView]()
     
     var colorSlider: ColorSlider!
     var toolsMenu: ExpandableButtonView!
@@ -50,24 +45,14 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     var drawingViews = [UIView]()
     var drawingViewsShown = false
     
+    var dbpediaHelper: DBpediaHelper!
+    
     // This function sets up the page and every element contained within it.
     override func viewDidLoad() {
         super.viewDidLoad()
         self.navigationController?.setNavigationBarHidden(false, animated: false)
         
-        bookshelfContentView.axis = .vertical
-        bookshelfContentView.distribution = .equalSpacing
-        bookshelfContentView.alignment = .fill
-        bookshelfContentView.spacing = 5
-        bookshelfScrollView.addSubview(bookshelfContentView)
-        bookshelfContentView.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            bookshelfContentView.topAnchor.constraint(equalTo: bookshelfScrollView.topAnchor),
-            bookshelfContentView.leadingAnchor.constraint(equalTo: bookshelfScrollView.leadingAnchor),
-            bookshelfContentView.trailingAnchor.constraint(equalTo: bookshelfScrollView.trailingAnchor),
-            bookshelfContentView.bottomAnchor.constraint(equalTo: bookshelfScrollView.bottomAnchor),
-            bookshelfContentView.widthAnchor.constraint(equalTo: bookshelfScrollView.widthAnchor)
-            ])
+        self.setupDocumentDetailScrollView()
 
         colorSlider = ColorSlider(orientation: .horizontal, previewSide: .bottom)
         colorSlider.color = .black
@@ -152,6 +137,8 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         let interaction = UIPencilInteraction()
         interaction.delegate = self
         view.addInteraction(interaction)
+        
+        dbpediaHelper = DBpediaHelper(viewController: self)!
     }
     
     func pencilInteractionDidTap(_ interaction: UIPencilInteraction) {
@@ -482,7 +469,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
             let resultText = OCRHelper.postprocess(text: result.text)
             self.sketchnote?.recognizedText = resultText
             print(resultText)
-            SemanticHelper.performSpotlightOnSketchnote(text: resultText, viewController: self)
+            self.dbpediaHelper.fetch(text: resultText)
         }
     }
     
@@ -490,29 +477,16 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     func displaySpotlightDocuments(documents: [Document]) {
         self.documentsButton.isLoading = false
         self.bookshelf.isHidden = false
-
-        for docView in documentViews {
-            docView.removeFromSuperview()
-        }
-        documentViews = [DocumentView]()
         
         for doc in documents.sorted(by: { $0.rankPercentage > $1.rankPercentage }) {
-            
-            let documentView = DocumentView(frame: CGRect(x: 0, y: 0, width: 400, height: 280))
-            documentView.titleLabel.text = doc.title
-            documentView.abstractLabel.text = doc.description
-            documentView.urlString = doc.URL
-            documentView.viewController = self
-           
-            bookshelfContentView.insertArrangedSubview(documentView, at: 0)
-            documentViews.append(documentView)
-            print("Adding document: " + doc.title)
             self.sketchnote!.addDocument(document: doc)
             
-            if doc.entityType != nil && doc.entityType!.lowercased().contains("place") || doc.entityType!.lowercased().contains("location") {
-                MapHelper.fetchMap(location: doc.title, documentView: documentView)
+            if doc.entityType != nil && doc.entityType!.lowercased().contains("place") || doc.entityType!.lowercased().contains("location") || doc.entityType!.lowercased().contains("event") {
+                MapHelper.fetchMap(location: doc.title, document: doc)
             }
         }
+        self.items = documents
+        documentsCollectionView.reloadData()
     }
     
     func displayNoDocumentsFound() {
@@ -652,6 +626,170 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         self.bookshelf.isHidden = true
     }
     @IBAction func bookshelfHighlightTapped(_ sender: UISwitch) {
+    }
+    
+    //MARK: Bookshelf resize
+    @IBOutlet var bookshelfRightConstraint: NSLayoutConstraint!
+    @IBOutlet var bookshelfTopConstraint: NSLayoutConstraint!
+    @IBOutlet var bookshelfLeftConstraint: NSLayoutConstraint!
+    @IBOutlet var bookshelfBottomConstraint: NSLayoutConstraint!
+    
+    struct ResizeRect{
+        var topTouch = false
+        var leftTouch = false
+        var rightTouch = false
+        var bottomTouch = false
+        var middelTouch = false
+    }
+    
+    var touchStart = CGPoint.zero
+    var proxyFactor = CGFloat(10)
+    var resizeRect = ResizeRect()
+    
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        if let touch = touches.first{
+            
+            let touchStart = touch.location(in: self.view)
+            print(touchStart)
+            
+            resizeRect.topTouch = false
+            resizeRect.leftTouch = false
+            resizeRect.rightTouch = false
+            resizeRect.bottomTouch = false
+            resizeRect.middelTouch = false
+            if touchStart.x > bookshelf.frame.minX - proxyFactor &&  touchStart.x < bookshelf.frame.minX + proxyFactor + 15 {
+                resizeRect.leftTouch = true
+            }
+        }
+    }
+    
+    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+        if let touch = touches.first{
+            let currentTouchPoint = touch.location(in: self.view)
+            let previousTouchPoint = touch.previousLocation(in: self.view)
+            
+            let deltaX = currentTouchPoint.x - previousTouchPoint.x
+            
+            if resizeRect.leftTouch {
+                bookshelfLeftConstraint.constant += deltaX
+            }
+            
+            UIView.animate(withDuration: 0.25, delay: 0, options: UIView.AnimationOptions.curveEaseIn, animations: {
+                self.view.layoutIfNeeded()
+            }, completion: { (ended) in
+            })
+        }
+    }
+    @IBOutlet var documentsCollectionView: UICollectionView!
+    
+    let reuseIdentifier = "cell" // also enter this string as the cell identifier in the storyboard
+    var items = [Document]()
+    
+    
+    // MARK: - UICollectionViewDataSource protocol
+    
+    // tell the collection view how many cells to make
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return self.items.count
+    }
+    
+    // make a cell for each cell index path
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        
+        // get a reference to our storyboard cell
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath as IndexPath) as! DocumentUICollectionViewCell
+        
+        // Use the outlet in our custom class to get a reference to the UILabel in the cell
+        cell.titleLabel.text = self.items[indexPath.item].title
+        cell.typeLabel.text = self.items[indexPath.item].documentType.rawValue
+        cell.backgroundColor = UIColor.cyan // make cell more visible in our example project
+        
+        return cell
+    }
+    
+    // MARK: - UICollectionViewDelegate protocol
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        // handle tap events
+        print("You selected cell #\(indexPath.item)!")
+        showDocumentDetail(document: self.items[indexPath.item])
+    }
+    
+    func addDocument(document: Document) {
+        self.items.append(document)
+        self.documentsCollectionView.reloadData()
+    }
+    
+    //MARK: Document Detail View
+    
+    @IBOutlet var documentDetailView: UIView!
+    @IBOutlet var documentTitleLabel: UILabel!
+    @IBOutlet var documentDetailScrollView: UIScrollView!
+    var documentDetailStackView = UIStackView()
+    
+    private func setupDocumentDetailScrollView() {
+        documentDetailStackView.axis = .vertical
+        documentDetailStackView.distribution = .equalSpacing
+        documentDetailStackView.alignment = .fill
+        documentDetailStackView.spacing = 5
+        documentDetailScrollView.addSubview(documentDetailStackView)
+        documentDetailStackView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            documentDetailStackView.topAnchor.constraint(equalTo: documentDetailScrollView.topAnchor),
+            documentDetailStackView.leadingAnchor.constraint(equalTo: documentDetailScrollView.leadingAnchor),
+            documentDetailStackView.trailingAnchor.constraint(equalTo: documentDetailScrollView.trailingAnchor),
+            documentDetailStackView.bottomAnchor.constraint(equalTo: documentDetailScrollView.bottomAnchor),
+            documentDetailStackView.widthAnchor.constraint(equalTo: documentDetailScrollView.widthAnchor)
+            ])
+    }
+    
+    private func showDocumentDetail(document: Document) {
+        documentTitleLabel.text = document.title
+        
+        for view in documentDetailStackView.subviews {
+            view.removeFromSuperview()
+        }
+        if let description = document.description {
+            let descriptionLabel = UILabel(frame: documentDetailStackView.frame)
+            descriptionLabel.text = description
+            descriptionLabel.numberOfLines = 50
+            documentDetailStackView.addArrangedSubview(descriptionLabel)
+        }
+        
+        if let mapImage = document.mapImage {
+            let mapImageView = UIImageView(image: mapImage)
+            documentDetailStackView.addArrangedSubview(mapImageView)
+            
+            let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(mapImageTapped(tapGestureRecognizer:)))
+            mapImageView.isUserInteractionEnabled = true
+            mapImageView.addGestureRecognizer(tapGestureRecognizer)
+        }
+        
+        documentDetailView.isHidden = false
+        documentsCollectionView.isHidden = true
+    }
+    @objc func mapImageTapped(tapGestureRecognizer: UITapGestureRecognizer)
+    {
+        let tappedImage = tapGestureRecognizer.view as! UIImageView
+        let newImageView = UIImageView(image: tappedImage.image)
+        newImageView.frame = UIScreen.main.bounds
+        newImageView.backgroundColor = .black
+        newImageView.contentMode = .scaleAspectFit
+        newImageView.isUserInteractionEnabled = true
+        let tap = UITapGestureRecognizer(target: self, action: #selector(dismissFullscreenMapImage))
+        newImageView.addGestureRecognizer(tap)
+        self.view.addSubview(newImageView)
+        self.navigationController?.isNavigationBarHidden = true
+        self.tabBarController?.tabBar.isHidden = true
+    }
+    @objc func dismissFullscreenMapImage(_ sender: UITapGestureRecognizer) {
+        self.navigationController?.isNavigationBarHidden = false
+        self.tabBarController?.tabBar.isHidden = false
+        sender.view?.removeFromSuperview()
+    }
+    @IBAction func documentDetailViewBrowseTapped(_ sender: UIButton) {
+        documentDetailView.isHidden = true
+        documentsCollectionView.isHidden = false
     }
     
     

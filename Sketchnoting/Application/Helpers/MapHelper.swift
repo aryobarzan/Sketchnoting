@@ -10,7 +10,7 @@ import UIKit
 import Alamofire
 
 class MapHelper {
-    static func fetchMap(location: String, documentView: DocumentView) {
+    static func fetchMap(location: String, document: Document) {
         let parameters: Parameters = ["q": location, "maxRows": 1, "username": "aryo"]
         let headers: HTTPHeaders = [
                 "Accept": "application/json"
@@ -32,7 +32,7 @@ class MapHelper {
                 for res in resources! {
                     let latitude = res["lat"] as! String
                     let longitude = res["lng"] as! String
-                    self.fetchMapImage(latitude: latitude, longitude: longitude, documentView: documentView)
+                    self.fetchMapImage(latitude: latitude, longitude: longitude, document: document)
                 }
             }
             else {
@@ -40,7 +40,7 @@ class MapHelper {
             }
         }
     }
-    private static func fetchMapImage(latitude: String, longitude: String, documentView: DocumentView) {
+    private static func fetchMapImage(latitude: String, longitude: String, document: Document) {
         let url = URL(string: "https://www.mapquestapi.com/staticmap/v5/map?key=bAELaFV3A8vNwICyhbziI7tNeSfYdUvr&center=" + latitude + "," + longitude + "&size=800,600")
         
         DispatchQueue.global().async {
@@ -49,7 +49,7 @@ class MapHelper {
                     print("got the image")
                     if let image = try? UIImage(data: data) {
                         print("Setting image")
-                        documentView.setMapImage(image: image)
+                        document.mapImage = image
                     }
                 }
             }
