@@ -15,8 +15,11 @@
 		9F5D0FC8229CBC4100BCA451 /* NotesManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5D0FC7229CBC4100BCA451 /* NotesManager.swift */; };
 		9FA6238822CEA7FE007ED794 /* MapHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA6238722CEA7FE007ED794 /* MapHelper.swift */; };
 		9FA6238B22D37213007ED794 /* BioPortalHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA6238A22D37213007ED794 /* BioPortalHelper.swift */; };
-		9FA6238D22D38AEE007ED794 /* DBpediaHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA6238C22D38AEE007ED794 /* DBpediaHelper.swift */; };
+		9FA6238D22D38AEE007ED794 /* SpotlightHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA6238C22D38AEE007ED794 /* SpotlightHelper.swift */; };
 		9FA6238F22DCD3AD007ED794 /* DocumentUICollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA6238E22DCD3AD007ED794 /* DocumentUICollectionViewCell.swift */; };
+		9FA6239322DE30AC007ED794 /* SpotlightDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA6239222DE30AC007ED794 /* SpotlightDocument.swift */; };
+		9FA6239522DE3741007ED794 /* BioPortalDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA6239422DE3741007ED794 /* BioPortalDocument.swift */; };
+		9FA6239722DE3806007ED794 /* CHEBIDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA6239622DE3806007ED794 /* CHEBIDocument.swift */; };
 		9FC788F2225CEC230074BD16 /* DrawingSearchView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9FC788F1225CEC230074BD16 /* DrawingSearchView.xib */; };
 		9FC788F4225CEC4C0074BD16 /* DrawingSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FC788F3225CEC4C0074BD16 /* DrawingSearchView.swift */; };
 		9FD29BA72220524D00CC969A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29BA62220524D00CC969A /* AppDelegate.swift */; };
@@ -72,8 +75,11 @@
 		9F5D8B2C228B9EF800F56FEC /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		9FA6238722CEA7FE007ED794 /* MapHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapHelper.swift; sourceTree = "<group>"; };
 		9FA6238A22D37213007ED794 /* BioPortalHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BioPortalHelper.swift; sourceTree = "<group>"; };
-		9FA6238C22D38AEE007ED794 /* DBpediaHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DBpediaHelper.swift; sourceTree = "<group>"; };
+		9FA6238C22D38AEE007ED794 /* SpotlightHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotlightHelper.swift; sourceTree = "<group>"; };
 		9FA6238E22DCD3AD007ED794 /* DocumentUICollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentUICollectionViewCell.swift; sourceTree = "<group>"; };
+		9FA6239222DE30AC007ED794 /* SpotlightDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotlightDocument.swift; sourceTree = "<group>"; };
+		9FA6239422DE3741007ED794 /* BioPortalDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BioPortalDocument.swift; sourceTree = "<group>"; };
+		9FA6239622DE3806007ED794 /* CHEBIDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CHEBIDocument.swift; sourceTree = "<group>"; };
 		9FC788F1225CEC230074BD16 /* DrawingSearchView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DrawingSearchView.xib; sourceTree = "<group>"; };
 		9FC788F3225CEC4C0074BD16 /* DrawingSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrawingSearchView.swift; sourceTree = "<group>"; };
 		9FD29BA32220524D00CC969A /* Sketchnoting.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Sketchnoting.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -163,10 +169,38 @@
 		9FA6238922D371F1007ED794 /* Semantic Annotation */ = {
 			isa = PBXGroup;
 			children = (
-				9FA6238A22D37213007ED794 /* BioPortalHelper.swift */,
-				9FA6238C22D38AEE007ED794 /* DBpediaHelper.swift */,
+				9FA6239922DE3ACD007ED794 /* BioPortal */,
+				9FA6239822DE3AC0007ED794 /* Spotlight */,
 			);
 			path = "Semantic Annotation";
+			sourceTree = "<group>";
+		};
+		9FA6239822DE3AC0007ED794 /* Spotlight */ = {
+			isa = PBXGroup;
+			children = (
+				9FA6238C22D38AEE007ED794 /* SpotlightHelper.swift */,
+				9FA6238722CEA7FE007ED794 /* MapHelper.swift */,
+			);
+			path = Spotlight;
+			sourceTree = "<group>";
+		};
+		9FA6239922DE3ACD007ED794 /* BioPortal */ = {
+			isa = PBXGroup;
+			children = (
+				9FA6238A22D37213007ED794 /* BioPortalHelper.swift */,
+			);
+			path = BioPortal;
+			sourceTree = "<group>";
+		};
+		9FA6239A22DE3ADB007ED794 /* Documents */ = {
+			isa = PBXGroup;
+			children = (
+				9FD29BC62224B58600CC969A /* Document.swift */,
+				9FA6239222DE30AC007ED794 /* SpotlightDocument.swift */,
+				9FA6239422DE3741007ED794 /* BioPortalDocument.swift */,
+				9FA6239622DE3806007ED794 /* CHEBIDocument.swift */,
+			);
+			path = Documents;
 			sourceTree = "<group>";
 		};
 		9FD29B9A2220524D00CC969A = {
@@ -289,10 +323,10 @@
 		9FD29C68224589DA00CC969A /* Data */ = {
 			isa = PBXGroup;
 			children = (
+				9FA6239A22DE3ADB007ED794 /* Documents */,
 				9F5D0FC6229CBC2A00BCA451 /* Models */,
 				9FD29BC422249D9500CC969A /* Note.swift */,
 				9FD29BCA2224B89800CC969A /* Sketchnote.swift */,
-				9FD29BC62224B58600CC969A /* Document.swift */,
 				9F5010CF224930E400425424 /* NoteCollection.swift */,
 			);
 			path = Data;
@@ -303,7 +337,6 @@
 			children = (
 				9FA6238922D371F1007ED794 /* Semantic Annotation */,
 				9FD29C53223C3B6F00CC969A /* OCRHelper.swift */,
-				9FA6238722CEA7FE007ED794 /* MapHelper.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -460,6 +493,7 @@
 				9FD9BD1422678D79007F4A2D /* NoteShareView.swift in Sources */,
 				9FD29C3F223861E100CC969A /* ExpandableButtonItem.swift in Sources */,
 				9FA6238B22D37213007ED794 /* BioPortalHelper.swift in Sources */,
+				9FA6239322DE30AC007ED794 /* SpotlightDocument.swift in Sources */,
 				9FD29C2D22370E1800CC969A /* ColorSliderExtensions.swift in Sources */,
 				9FD29C58223C3CF700CC969A /* UIImageExtensions.swift in Sources */,
 				9FD29C192236DCFC00CC969A /* SketchNoteViewController.swift in Sources */,
@@ -467,8 +501,10 @@
 				9FA6238822CEA7FE007ED794 /* MapHelper.swift in Sources */,
 				9FD29C202236EA2800CC969A /* UIImage+fill.swift in Sources */,
 				9FD29C40223861E100CC969A /* ExpandableButtonView.swift in Sources */,
+				9FA6239522DE3741007ED794 /* BioPortalDocument.swift in Sources */,
 				9FD29BA92220524D00CC969A /* ViewController.swift in Sources */,
 				9FD29C2922370DF000CC969A /* ColorSlider.swift in Sources */,
+				9FA6239722DE3806007ED794 /* CHEBIDocument.swift in Sources */,
 				9FD29BA72220524D00CC969A /* AppDelegate.swift in Sources */,
 				9FD29C6422431BFA00CC969A /* DrawnImageClassifier.mlmodel in Sources */,
 				9FD29C2822370DF000CC969A /* GradientView.swift in Sources */,
@@ -495,7 +531,7 @@
 				9FD29C1E2236EA2800CC969A /* SketchTool.swift in Sources */,
 				9FD29BC72224B58600CC969A /* Document.swift in Sources */,
 				9FD29BCB2224B89800CC969A /* Sketchnote.swift in Sources */,
-				9FA6238D22D38AEE007ED794 /* DBpediaHelper.swift in Sources */,
+				9FA6238D22D38AEE007ED794 /* SpotlightHelper.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -14,7 +14,7 @@ import GSMessages
 
 // This is the controller for the other page of the application, i.e. not the home page, for the page displayed when the user wants to edit a note.
 
-class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, SketchViewDelegate, UIPencilInteractionDelegate, UICollectionViewDataSource, UICollectionViewDelegate {
+class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, SketchViewDelegate, UIPencilInteractionDelegate, UICollectionViewDataSource, UICollectionViewDelegate, DocumentVisitor {
 
     @IBOutlet weak var topContainer: UIView!
     @IBOutlet var sketchView: SketchView!
@@ -28,8 +28,6 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     @IBOutlet var drawingsButton: LGButton!
     
     @IBOutlet var bookshelf: UIView!
-    @IBOutlet var bookshelfCloseButton: LGButton!
-    @IBOutlet var bookshelfHighlightSwitch: UISwitch!
     
     var colorSlider: ColorSlider!
     var toolsMenu: ExpandableButtonView!
@@ -45,7 +43,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     var drawingViews = [UIView]()
     var drawingViewsShown = false
     
-    var dbpediaHelper: DBpediaHelper!
+    var dbpediaHelper: SpotlightHelper!
     
     // This function sets up the page and every element contained within it.
     override func viewDidLoad() {
@@ -53,6 +51,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         self.navigationController?.setNavigationBarHidden(false, animated: false)
         
         self.setupDocumentDetailScrollView()
+        self.bookshelfLeftDragView.curveTopCorners(size: 5)
 
         colorSlider = ColorSlider(orientation: .horizontal, previewSide: .bottom)
         colorSlider.color = .black
@@ -104,6 +103,11 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
                         ])
                 }
             }
+            if let documents = sketchnote?.relatedDocuments {
+                for doc in documents {
+                    self.displayInBookshelf(document: doc)
+                }
+            }
             // This is the case where the user has created a new note and is not editing an existing one.
         } else {
             sketchnote = Sketchnote(image: sketchView.asImage(), relatedDocuments: nil, drawings: nil)
@@ -138,7 +142,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         interaction.delegate = self
         view.addInteraction(interaction)
         
-        dbpediaHelper = DBpediaHelper(viewController: self)!
+        dbpediaHelper = SpotlightHelper(viewController: self)!
     }
     
     func pencilInteractionDidTap(_ interaction: UIPencilInteraction) {
@@ -469,7 +473,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
             let resultText = OCRHelper.postprocess(text: result.text)
             self.sketchnote?.recognizedText = resultText
             print(resultText)
-            self.dbpediaHelper.fetch(text: resultText)
+            self.dbpediaHelper.fetch(text: "Melanoma is a malignant tumor of melanocytes found in the skin. H2O + CO2")
         }
     }
     
@@ -477,12 +481,22 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     func displaySpotlightDocuments(documents: [Document]) {
         self.documentsButton.isLoading = false
         self.bookshelf.isHidden = false
+        if self.isBookshelfDraggedOut {
+            bookshelfLeftConstraint.constant -= 300
+            UIView.animate(withDuration: 0.25, delay: 0, options: UIView.AnimationOptions.curveEaseIn, animations: {
+                self.view.layoutIfNeeded()
+            }, completion: { (ended) in
+            })
+            self.isBookshelfDraggedOut = false
+        }
         
-        for doc in documents.sorted(by: { $0.rankPercentage > $1.rankPercentage }) {
+        for doc in documents {
             self.sketchnote!.addDocument(document: doc)
             
             if doc.entityType != nil && doc.entityType!.lowercased().contains("place") || doc.entityType!.lowercased().contains("location") || doc.entityType!.lowercased().contains("event") {
-                MapHelper.fetchMap(location: doc.title, document: doc)
+                if let doc = doc as? SpotlightDocument {
+                    MapHelper.fetchMap(location: doc.title, document: doc)
+                }
             }
         }
         self.items = documents
@@ -634,6 +648,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     @IBOutlet var bookshelfLeftConstraint: NSLayoutConstraint!
     @IBOutlet var bookshelfBottomConstraint: NSLayoutConstraint!
     
+    @IBOutlet var closeBookshelfLabel: UILabel!
     struct ResizeRect{
         var topTouch = false
         var leftTouch = false
@@ -645,6 +660,9 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     var touchStart = CGPoint.zero
     var proxyFactor = CGFloat(10)
     var resizeRect = ResizeRect()
+    
+    var isBookshelfDraggedOut = false
+    @IBOutlet var bookshelfLeftDragView: UIView!
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         if let touch = touches.first{
@@ -672,7 +690,15 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
             
             if resizeRect.leftTouch {
                 bookshelfLeftConstraint.constant += deltaX
+                
+                if UIScreen.main.bounds.maxX - currentTouchPoint.x <= 100 {
+                    closeBookshelfLabel.isHidden = false
+                }
+                else {
+                    closeBookshelfLabel.isHidden = true
+                }
             }
+            
             
             UIView.animate(withDuration: 0.25, delay: 0, options: UIView.AnimationOptions.curveEaseIn, animations: {
                 self.view.layoutIfNeeded()
@@ -680,6 +706,24 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
             })
         }
     }
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        if let touch = touches.first{
+            let currentTouchPoint = touch.location(in: self.view)
+            
+            if resizeRect.leftTouch {
+                if UIScreen.main.bounds.maxX - currentTouchPoint.x <= 100 {
+                    bookshelfLeftConstraint.constant += 100
+                    self.isBookshelfDraggedOut = true
+                    UIView.animate(withDuration: 0.25, delay: 0, options: UIView.AnimationOptions.curveEaseIn, animations: {
+                        self.view.layoutIfNeeded()
+                    }, completion: { (ended) in
+                    })
+                    closeBookshelfLabel.isHidden = true
+                }
+            }
+        }
+    }
+    
     @IBOutlet var documentsCollectionView: UICollectionView!
     
     let reuseIdentifier = "cell" // also enter this string as the cell identifier in the storyboard
@@ -702,9 +746,24 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         // Use the outlet in our custom class to get a reference to the UILabel in the cell
         cell.titleLabel.text = self.items[indexPath.item].title
         cell.typeLabel.text = self.items[indexPath.item].documentType.rawValue
-        cell.backgroundColor = UIColor.cyan // make cell more visible in our example project
+        cell.previewImage.image = self.items[indexPath.item].previewImage
+        cell.backgroundColor = self.getDocumentTypeColor(type: self.items[indexPath.item].documentType)
         
         return cell
+    }
+    
+    //MARK: Bookshelf collection view cell color mapping to document type
+    private func getDocumentTypeColor(type: DocumentType) -> UIColor {
+        switch(type) {
+        case .Spotlight:
+            return .lightGray
+        case .BioOntology:
+            return .purple
+        case .Chemistry:
+            return .brown
+        case .Other:
+            return .white
+        }
     }
     
     // MARK: - UICollectionViewDelegate protocol
@@ -715,8 +774,20 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         showDocumentDetail(document: self.items[indexPath.item])
     }
     
-    func addDocument(document: Document) {
+    func displayInBookshelf(document: Document) {
         self.items.append(document)
+        self.documentsCollectionView.reloadData()
+    }
+    
+    func displayInBookshelf(documents: [Document]) {
+        for doc in documents {
+            self.items.append(doc)
+        }
+        
+        self.documentsCollectionView.reloadData()
+    }
+    
+    func updateBookshelf() {
         self.documentsCollectionView.reloadData()
     }
     
@@ -744,18 +815,27 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     }
     
     private func showDocumentDetail(document: Document) {
-        documentTitleLabel.text = document.title
-        
         for view in documentDetailStackView.subviews {
             view.removeFromSuperview()
         }
-        if let description = document.description {
-            let descriptionLabel = UILabel(frame: documentDetailStackView.frame)
-            descriptionLabel.text = description
-            descriptionLabel.numberOfLines = 50
-            documentDetailStackView.addArrangedSubview(descriptionLabel)
-        }
         
+        documentTitleLabel.text = document.title
+        document.accept(visitor: self)
+        
+        documentDetailView.isHidden = false
+        documentsCollectionView.isHidden = true
+    }
+    
+    func process(document: Document) {
+        if let description = document.description {
+            self.setDetailDescription(text: description)
+        }
+    }
+    
+    func process(document: SpotlightDocument) {
+        if let description = document.description {
+            self.setDetailDescription(text: description)
+        }
         if let mapImage = document.mapImage {
             let mapImageView = UIImageView(image: mapImage)
             documentDetailStackView.addArrangedSubview(mapImageView)
@@ -764,10 +844,42 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
             mapImageView.isUserInteractionEnabled = true
             mapImageView.addGestureRecognizer(tapGestureRecognizer)
         }
-        
-        documentDetailView.isHidden = false
-        documentsCollectionView.isHidden = true
     }
+    
+    func process(document: BioPortalDocument) {
+        if let definition = document.definition {
+            let descriptionLabel = UILabel(frame: documentDetailStackView.frame)
+            descriptionLabel.text = definition
+            descriptionLabel.numberOfLines = 50
+            documentDetailStackView.addArrangedSubview(descriptionLabel)
+        }
+    }
+    
+    func process(document: CHEBIDocument) {
+        if let definition = document.definition {
+            let descriptionLabel = UILabel(frame: documentDetailStackView.frame)
+            descriptionLabel.text = definition
+            descriptionLabel.numberOfLines = 50
+            documentDetailStackView.addArrangedSubview(descriptionLabel)
+        }
+        if let moleculeImage = document.moleculeImage {
+            let mapImageView = UIImageView(image: moleculeImage)
+            documentDetailStackView.addArrangedSubview(mapImageView)
+            
+            let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(mapImageTapped(tapGestureRecognizer:)))
+            mapImageView.isUserInteractionEnabled = true
+            mapImageView.addGestureRecognizer(tapGestureRecognizer)
+        }
+    }
+    
+    private func setDetailDescription(text: String) {
+        let descriptionLabel = UILabel(frame: documentDetailStackView.frame)
+        descriptionLabel.text = text
+        descriptionLabel.numberOfLines = 50
+        documentDetailStackView.addArrangedSubview(descriptionLabel)
+    }
+    
+    
     @objc func mapImageTapped(tapGestureRecognizer: UITapGestureRecognizer)
     {
         let tappedImage = tapGestureRecognizer.view as! UIImageView
@@ -791,8 +903,6 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         documentDetailView.isHidden = true
         documentsCollectionView.isHidden = false
     }
-    
-    
 }
 public class SimpleLine: UIView  {
     

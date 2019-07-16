@@ -9,7 +9,7 @@
 import UIKit
 import Alamofire
 
-class DBpediaHelper {
+class SpotlightHelper {
     var viewController: SketchNoteViewController!
     
     init?(viewController: SketchNoteViewController){
@@ -66,7 +66,7 @@ class DBpediaHelper {
                                     } catch {
                                     }
                                 }
-                                let document = Document(title: concept, description: description, entityType: entityType, URL: conceptURL, type: .Spotlight, rank: rankPercentage ?? Double(0))
+                                let document = SpotlightDocument(title: concept, description: description, entityType: entityType, URL: conceptURL, type: .Spotlight, rank: rankPercentage ?? Double(0))
                                 if document != nil {
                                     documents.append(document!)
                                 }
@@ -76,6 +76,7 @@ class DBpediaHelper {
                     self.viewController.displaySpotlightDocuments(documents: documents)
                     let bioportalHelper = BioPortalHelper(viewController: self.viewController)
                     bioportalHelper?.fetch(text: text)
+                    bioportalHelper?.fetchCHEBI(text: text)
                 }
                 else {
                     self.viewController.displayNoDocumentsFound()

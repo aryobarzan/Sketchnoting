@@ -8,42 +8,50 @@
 
 import UIKit
 
+protocol Visitable {
+    func accept(visitor: DocumentVisitor)
+}
+protocol DocumentVisitor {
+    func process(document: Document)
+    func process(document: SpotlightDocument)
+    func process(document: BioPortalDocument)
+    func process(document: CHEBIDocument)
+}
 // This enum is used to let the user know the type of a found document.
 // Currently only the case Spotlight is used, as that is the only source for retrieving related documents.
 enum DocumentType: String, Codable {
-    case Wikipedia
-    case Map
-    case Babelfy
     case Spotlight
     case BioOntology
+    case Chemistry
     case Other
 }
+
 // This class contains the information for a document that is related to a note's text.
 // All of its properties are required, except for 'description', which is the abstract text of the found document.
 // As this abstract text is manually fetched from the document's page source code via a regular expression, it may at times fail, hence why it is an optional property.
-class Document: Codable {
+class Document: Codable, Visitable {
     
     var title: String
     var description: String?
     var entityType: String?
     var URL: String
     var documentType: DocumentType
-    var rankPercentage: Double
+    //var rankPercentage: Double
     var previewImage: UIImage?
-    var mapImage: UIImage?
+    //var mapImage: UIImage?
     
-    enum CodingKeys: String, CodingKey {
+    private enum CodingKeys: String, CodingKey {
         case title
         case description
         case entityType
         case URL
         case documentType
-        case rankPercentage
+        //case rankPercentage
         case previewImage
-        case mapImage
+        //case mapImage
     }
     
-    init?(title: String, description: String?, entityType: String?, URL: String, type: DocumentType, rank: Double){
+    init?(title: String, description: String?, entityType: String?, URL: String, type: DocumentType){
         guard !title.isEmpty && !URL.isEmpty else {
             return nil
         }
@@ -51,7 +59,6 @@ class Document: Codable {
         self.description = description
         self.URL = URL
         self.documentType = type
-        self.rankPercentage = rank
         self.entityType = entityType
     }
     
@@ -62,16 +69,10 @@ class Document: Codable {
         try container.encode(entityType, forKey: .entityType)
         try container.encode(URL, forKey: .URL)
         try container.encode(documentType, forKey: .documentType)
-        try container.encode(rankPercentage, forKey: .rankPercentage)
         if previewImage != nil {
             let imageData: Data = previewImage!.pngData()!
             let strBase64 = imageData.base64EncodedString(options: .lineLength64Characters)
             try container.encode(strBase64, forKey: .previewImage)
-        }
-        if mapImage != nil {
-            let imageData: Data = mapImage!.pngData()!
-            let strBase64 = imageData.base64EncodedString(options: .lineLength64Characters)
-            try container.encode(strBase64, forKey: .mapImage)
         }
     }
     
@@ -82,7 +83,6 @@ class Document: Codable {
         description = try container.decode(String.self, forKey: .entityType)
         URL = try container.decode(String.self, forKey: .URL)
         documentType = DocumentType(rawValue: try container.decode(String.self, forKey: .documentType)) ?? .Other
-        rankPercentage = try container.decode(Double.self, forKey: .rankPercentage)
         
         do {
             let strBase64: String = try container.decode(String.self, forKey: .previewImage)
@@ -90,11 +90,10 @@ class Document: Codable {
             previewImage = UIImage(data: dataDecoded)
         } catch {
         }
-        do {
-            let strBase64: String = try container.decode(String.self, forKey: .mapImage)
-            let dataDecoded: Data = Data(base64Encoded: strBase64, options: .ignoreUnknownCharacters)!
-            mapImage = UIImage(data: dataDecoded)
-        } catch {
-        }
+    }
+    
+    //MARK: Visitable
+    func accept(visitor: DocumentVisitor) {
+        visitor.process(document: self)
     }
 }
