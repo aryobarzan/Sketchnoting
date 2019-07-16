@@ -473,7 +473,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
             let resultText = OCRHelper.postprocess(text: result.text)
             self.sketchnote?.recognizedText = resultText
             print(resultText)
-            self.dbpediaHelper.fetch(text: "Melanoma is a malignant tumor of melanocytes found in the skin. H2O + CO2")
+            self.dbpediaHelper.fetch(text: resultText)
         }
     }
     
