@@ -40,7 +40,7 @@ class MapHelper {
             }
         }
     }
-    private static func fetchMapImage(latitude: String, longitude: String, document: SpotlightDocument) {
+    static func fetchMapImage(latitude: String, longitude: String, document: SpotlightDocument) {
         let url = URL(string: "https://www.mapquestapi.com/staticmap/v5/map?key=bAELaFV3A8vNwICyhbziI7tNeSfYdUvr&center=" + latitude + "," + longitude + "&size=800,600")
         
         DispatchQueue.global().async {

@@ -8,6 +8,7 @@
 
 import UIKit
 import Alamofire
+import SwiftyJSON
 
 class SpotlightHelper {
     var viewController: SketchNoteViewController!
@@ -27,60 +28,126 @@ class SpotlightHelper {
             ]
             AF.request("http://api.dbpedia-spotlight.org/en/annotate", parameters: parameters, headers: headers).responseJSON { response in
                 let responseResult = response.result
-                var json = [String : Any]()
+                var json = JSON()
                 switch responseResult {
                 case .success(let res):
-                    json = res as! [String: Any]
+                    json = JSON(res)
                 case .failure(let error):
                     print(error.localizedDescription)
                 }
                 print("JSON: \(json)")
                 var results = [String: String]()
-                var documents = [Document]()
-                let result = json
-                let resources = result["Resources"] as? [[String: Any]]
-                if resources != nil {
-                    for res in resources! {
-                        let concept = res["@surfaceForm"] as! String
-                        let conceptURL = res["@URI"] as! String
-                        let rankPercentage = Double(res["@percentageOfSecondRank"] as! String)
-                        if results[concept] == nil && !concept.isEmpty {
-                            if !conceptURL.isEmpty {
-                                results[concept] = conceptURL
-                                
-                                var description = ""
-                                var entityType = ""
-                                let url = URL(string: conceptURL)
-                                if url != nil {
-                                    do {
-                                        let html = try NSString(contentsOf: url!, encoding: String.Encoding.utf8.rawValue)
-                                        let abstract = self.extractValueWithRegex(pageSource: html as String, pattern: "<li><span class=\"literal\"><span property=\"dbo:abstract\" xmlns:dbo=\"http://dbpedia.org/ontology/\" xml:lang=\"en\">(.*)</span>")
-                                        if abstract != nil {
-                                            description = abstract?.htmlAttributedString?.string ?? ""
-                                        }
-                                        
-                                        let dboType = self.extractValueWithRegex(pageSource: html as String, pattern: "An Entity of Type : <a href=.*>(.*)</a>,")
-                                        if dboType != nil {
-                                            entityType = dboType ?? ""
-                                        }
-                                    } catch {
-                                    }
-                                }
-                                let document = SpotlightDocument(title: concept, description: description, entityType: entityType, URL: conceptURL, type: .Spotlight, rank: rankPercentage ?? Double(0))
-                                if document != nil {
-                                    documents.append(document!)
+                
+                if let resources = json["Resources"].array {
+                    for res in resources {
+                        if let concept = res["@surfaceForm"].string, let conceptURI = res["@URI"].string, let secondRankPercentage = res["@percentageOfSecondRank"].string {
+                            if !concept.isEmpty && !conceptURI.isEmpty && results[concept] == nil {
+                                results[concept] = conceptURI
+                                if let resourceName = self.extractValueWithRegex(pageSource: conceptURI, pattern: "http://dbpedia.org/resource/(.*)"), let _ = URL(string: "http://dbpedia.org/data/" + resourceName + ".json") {
+                                    print(resourceName)
+                                    self.fetchJSONOfResource(concept: concept, conceptURI: conceptURI, secondRankPercentage: Double(secondRankPercentage) ?? 0, resourceJSONURL: "http://dbpedia.org/data/" + resourceName + ".json")
                                 }
                             }
                         }
                     }
-                    self.viewController.displaySpotlightDocuments(documents: documents)
-                    let bioportalHelper = BioPortalHelper(viewController: self.viewController)
-                    bioportalHelper?.fetch(text: text)
-                    bioportalHelper?.fetchCHEBI(text: text)
                 }
-                else {
-                    self.viewController.displayNoDocumentsFound()
+            }
+        }
+    }
+    
+    private func fetchJSONOfResource(concept: String, conceptURI: String, secondRankPercentage: Double, resourceJSONURL: String) {
+        let headers: HTTPHeaders = [
+            "Accept": "application/json"
+        ]
+        AF.request(resourceJSONURL, headers: headers).responseJSON { response in
+            let responseResult = response.result
+            var json = JSON()
+            switch responseResult {
+            case .success(let res):
+                json = JSON(res)
+            case .failure(let error):
+                print(error.localizedDescription)
+            }
+            if let content = json[conceptURI].dictionary {
+                var types = [String]()
+                var label : String?
+                var abstract : String?
+                var thumbnail : UIImage?
+                var wikiPageID : Double?
+                var latitude : Double?
+                var longitude : Double?
+                if let typeArray = content["http://www.w3.org/1999/02/22-rdf-syntax-ns#type"]?.array {
+                    for type in typeArray {
+                        if let value = type["value"].string {
+                            if value.contains("http://dbpedia.org/ontology/") {
+                                if let typeName = self.extractValueWithRegex(pageSource: value, pattern: "http://dbpedia.org/ontology/(.*)") {
+                                    types.append(typeName)
+                                }
+                            }
+                        }
+                    }
                 }
+                if let labelArray = content["http://www.w3.org/2000/01/rdf-schema#label"]?.array {
+                    for l in labelArray {
+                        if let value = l["value"].string, let lang = l["lang"].string {
+                            if lang.lowercased() == "en" {
+                                label = value
+                            }
+                        }
+                    }
+                }
+                if let abstractArray = content["http://dbpedia.org/ontology/abstract"]?.array {
+                    for abs in abstractArray {
+                        if let value = abs["value"].string, let lang = abs["lang"].string {
+                            if lang.lowercased() == "en" {
+                                abstract = value
+                            }
+                        }
+                    }
+                }
+                if let thumbnailArray = content["http://dbpedia.org/ontology/thumbnail"]?.array {
+                    if let value = thumbnailArray[0]["value"].string {
+                        let url = URL(string: value)
+                        if let url = url {
+                        if let data = try? Data(contentsOf: url) {
+                            if let image = UIImage(data: data) {
+                                thumbnail = image
+                            }
+                        }
+                        }
+                    }
+                }
+                if let wikiPageIDArray = content["http://dbpedia.org/ontology/wikiPageID"]?.array {
+                    if let value = wikiPageIDArray[0]["value"].double {
+                        wikiPageID = value
+                    }
+                }
+                if let latitudeArray = content["http://dbpedia.org/property/latd"]?.array {
+                    if let value = latitudeArray[0]["value"].double {
+                        latitude = value
+                    }
+                }
+                if let longitudeArray = content["http://dbpedia.org/property/longd"]?.array {
+                    if let value = longitudeArray[0]["value"].double {
+                        longitude = value
+                    }
+                }
+                
+                if let document = SpotlightDocument(title: concept, description: abstract, URL: conceptURI, type: .Spotlight, previewImage: thumbnail, rank: secondRankPercentage, label: label, types: types, wikiPageID: wikiPageID, latitude: latitude, longitude: longitude, mapImage: nil) {
+                    if let latitude = latitude, let longitude = longitude {
+                        MapHelper.fetchMapImage(latitude: String(latitude), longitude: String(longitude), document: document)
+                    }
+                    else {
+                        for type in types {
+                            if type.lowercased().contains("place") || type.lowercased().contains("location") || type.lowercased().contains("event") {
+                                MapHelper.fetchMap(location: concept, document: document)
+                                break
+                            }
+                        }
+                    }                        
+                    self.viewController.displayInBookshelf(document: document)
+                }
+                
             }
         }
     }
@@ -121,8 +188,8 @@ class SpotlightHelper {
         let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive)
         if let match = regex?.firstMatch(in: pageSource, options: [], range: NSRange(location: 0, length: pageSource.utf16.count)) {
             if let valueRange = Range(match.range(at: 1), in: pageSource) {
-                let value = pageSource[valueRange].lowercased()
-                return value
+                let value = pageSource[valueRange]
+                return String(value)
             }
             return nil
         }

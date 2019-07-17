@@ -20,6 +20,8 @@ class SketchnoteView : UIView {
     
     var sketchnote: Sketchnote?
     
+    var matchesSearch = true
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         commonInit()

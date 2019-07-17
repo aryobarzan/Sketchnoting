@@ -10,22 +10,43 @@ import UIKit
 
 class SpotlightDocument: Document {
     
-    var rankPercentage: Double?
+    var secondRankPercentage: Double?
+    var label: String?
+    var types: [String]?
+    var wikiPageID: Double?
+    var latitude: Double?
+    var longitude: Double?
     var mapImage: UIImage?
     
     private enum CodingKeys: String, CodingKey {
-        case rankPercentage
+        case secondRankPercentage
+        case label
+        case types = "types"
+        case wikiPageID
+        case latitude
+        case longitude
         case mapImage
     }
     
-    init?(title: String, description: String?, entityType: String?, URL: String, type: DocumentType, rank: Double) {
-        self.rankPercentage = rank
-        super.init(title: title, description: description, entityType: entityType, URL: URL, type: type)
+    init?(title: String, description: String?, URL: String, type: DocumentType, previewImage: UIImage?, rank: Double?, label: String?, types: [String]?, wikiPageID: Double?, latitude: Double?, longitude: Double?, mapImage: UIImage?) {
+        self.secondRankPercentage = rank
+        self.label = label
+        self.types = types
+        self.wikiPageID = wikiPageID
+        self.latitude = latitude
+        self.longitude = longitude
+        self.mapImage = mapImage
+        super.init(title: title, description: description, URL: URL, type: type, previewImage: previewImage)
     }
     
     override func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(rankPercentage, forKey: .rankPercentage)
+        try container.encode(secondRankPercentage, forKey: .secondRankPercentage)
+        try container.encode(label, forKey: .label)
+        try container.encode(types, forKey: .types)
+        try container.encode(wikiPageID, forKey: .wikiPageID)
+        try container.encode(latitude, forKey: .latitude)
+        try container.encode(longitude, forKey: .longitude)
         if mapImage != nil {
             let imageData: Data = mapImage!.pngData()!
             let strBase64 = imageData.base64EncodedString(options: .lineLength64Characters)
@@ -41,7 +62,12 @@ class SpotlightDocument: Document {
         let superdecoder = try container.superDecoder()
         try super.init(from: superdecoder)
         
-        rankPercentage = try container.decode(Double.self, forKey: .rankPercentage)
+        secondRankPercentage = try container.decode(Double.self, forKey: .secondRankPercentage)
+        label = try container.decode(String.self, forKey: .label)
+        types = try container.decode([String].self, forKey: .types)
+        wikiPageID = try container.decode(Double.self, forKey: .wikiPageID)
+        latitude = try container.decode(Double.self, forKey: .latitude)
+        longitude = try container.decode(Double.self, forKey: .longitude)
         do {
             let strBase64: String = try container.decode(String.self, forKey: .mapImage)
             let dataDecoded: Data = Data(base64Encoded: strBase64, options: .ignoreUnknownCharacters)!

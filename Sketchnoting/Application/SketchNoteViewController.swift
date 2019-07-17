@@ -43,7 +43,8 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     var drawingViews = [UIView]()
     var drawingViewsShown = false
     
-    var dbpediaHelper: SpotlightHelper!
+    var spotlightHelper: SpotlightHelper!
+    var bioportalHelper: BioPortalHelper!
     
     // This function sets up the page and every element contained within it.
     override func viewDidLoad() {
@@ -142,7 +143,8 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         interaction.delegate = self
         view.addInteraction(interaction)
         
-        dbpediaHelper = SpotlightHelper(viewController: self)!
+        spotlightHelper = SpotlightHelper(viewController: self)!
+        bioportalHelper = BioPortalHelper(viewController: self)!
     }
     
     func pencilInteractionDidTap(_ interaction: UIPencilInteraction) {
@@ -473,16 +475,19 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
             let resultText = OCRHelper.postprocess(text: result.text)
             self.sketchnote?.recognizedText = resultText
             print(resultText)
-            self.dbpediaHelper.fetch(text: resultText)
+            
+            self.processDocuments(text: resultText)
         }
     }
     
-    // This function displays related documents found for the note.
-    func displaySpotlightDocuments(documents: [Document]) {
+    func processDocuments(text: String) {
+        self.items = [Document]()
+        documentsCollectionView.reloadData()
+        
         self.documentsButton.isLoading = false
         self.bookshelf.isHidden = false
         if self.isBookshelfDraggedOut {
-            bookshelfLeftConstraint.constant -= 300
+            self.bookshelfLeftConstraint.constant -= 300
             UIView.animate(withDuration: 0.25, delay: 0, options: UIView.AnimationOptions.curveEaseIn, animations: {
                 self.view.layoutIfNeeded()
             }, completion: { (ended) in
@@ -490,17 +495,9 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
             self.isBookshelfDraggedOut = false
         }
         
-        for doc in documents {
-            self.sketchnote!.addDocument(document: doc)
-            
-            if doc.entityType != nil && doc.entityType!.lowercased().contains("place") || doc.entityType!.lowercased().contains("location") || doc.entityType!.lowercased().contains("event") {
-                if let doc = doc as? SpotlightDocument {
-                    MapHelper.fetchMap(location: doc.title, document: doc)
-                }
-            }
-        }
-        self.items = documents
-        documentsCollectionView.reloadData()
+        self.spotlightHelper.fetch(text: text)
+        self.bioportalHelper.fetch(text: text)
+        self.bioportalHelper.fetchCHEBI(text: text)
     }
     
     func displayNoDocumentsFound() {
@@ -756,7 +753,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     private func getDocumentTypeColor(type: DocumentType) -> UIColor {
         switch(type) {
         case .Spotlight:
-            return .lightGray
+            return .gray
         case .BioOntology:
             return .purple
         case .Chemistry:
@@ -777,14 +774,17 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     func displayInBookshelf(document: Document) {
         self.items.append(document)
         self.documentsCollectionView.reloadData()
+        
+        self.sketchnote?.relatedDocuments = items
     }
     
     func displayInBookshelf(documents: [Document]) {
         for doc in documents {
             self.items.append(doc)
         }
-        
         self.documentsCollectionView.reloadData()
+        
+        self.sketchnote?.relatedDocuments = items
     }
     
     func updateBookshelf() {
@@ -833,6 +833,9 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     }
     
     func process(document: SpotlightDocument) {
+        if let label = document.label {
+            documentTitleLabel.text = label
+        }
         if let description = document.description {
             self.setDetailDescription(text: description)
         }

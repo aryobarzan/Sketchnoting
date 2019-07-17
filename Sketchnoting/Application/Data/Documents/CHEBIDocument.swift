@@ -16,8 +16,9 @@ class CHEBIDocument: BioPortalDocument {
         case moleculeImage
     }
     
-    override init?(title: String, description: String?, entityType: String?, URL: String, type: DocumentType, prefLabel: String, definition: String) {
-        super.init(title: title, description: description, entityType: entityType, URL: URL, type: type, prefLabel: prefLabel, definition: definition)
+    init?(title: String, description: String?, URL: String, type: DocumentType, previewImage: UIImage?, prefLabel: String, definition: String, moleculeImage: UIImage?) {
+        self.moleculeImage = moleculeImage
+        super.init(title: title, description: description, URL: URL, type: type, previewImage: previewImage, prefLabel: prefLabel, definition: definition)
     }
     
     override func encode(to encoder: Encoder) throws {

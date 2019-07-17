@@ -33,25 +33,19 @@ class Document: Codable, Visitable {
     
     var title: String
     var description: String?
-    var entityType: String?
     var URL: String
     var documentType: DocumentType
-    //var rankPercentage: Double
     var previewImage: UIImage?
-    //var mapImage: UIImage?
     
     private enum CodingKeys: String, CodingKey {
         case title
         case description
-        case entityType
         case URL
         case documentType
-        //case rankPercentage
         case previewImage
-        //case mapImage
     }
     
-    init?(title: String, description: String?, entityType: String?, URL: String, type: DocumentType){
+    init?(title: String, description: String?, URL: String, type: DocumentType, previewImage: UIImage?){
         guard !title.isEmpty && !URL.isEmpty else {
             return nil
         }
@@ -59,14 +53,13 @@ class Document: Codable, Visitable {
         self.description = description
         self.URL = URL
         self.documentType = type
-        self.entityType = entityType
+        self.previewImage = previewImage
     }
     
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(title, forKey: .title)
         try container.encode(description, forKey: .description)
-        try container.encode(entityType, forKey: .entityType)
         try container.encode(URL, forKey: .URL)
         try container.encode(documentType, forKey: .documentType)
         if previewImage != nil {
@@ -80,7 +73,6 @@ class Document: Codable, Visitable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         title = try container.decode(String.self, forKey: .title)
         description = try container.decode(String.self, forKey: .description)
-        description = try container.decode(String.self, forKey: .entityType)
         URL = try container.decode(String.self, forKey: .URL)
         documentType = DocumentType(rawValue: try container.decode(String.self, forKey: .documentType)) ?? .Other
         
