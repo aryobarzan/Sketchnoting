@@ -7,43 +7,66 @@
 //
 
 import UIKit
-// A note collection contains sketchnotes and has a title property.
+
 class NoteCollection: Codable, Equatable {
     
+    var id: String
     var title: String
     var notes: [Sketchnote]
     
-    static let DocumentsDirectory = FileManager().urls(for: .documentDirectory, in: .userDomainMask).first!
-    static let ArchiveURL = DocumentsDirectory.appendingPathComponent("noteCollections")
-    
     enum CodingKeys: String, CodingKey {
+        case id
         case title
         case notes = "notes"
     }
     
     //MARK: Initialization
-    
     init?(title: String?, notes: [Sketchnote]?) {
+        self.id = UUID().uuidString
         self.title = title ?? "Untitled"
         self.notes = notes ?? [Sketchnote]()
     }
     
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(id, forKey: .id)
         try container.encode(title, forKey: .title)
-        try container.encode(notes, forKey: .notes)
+        var noteIDs = [String]()
+        for note in notes {
+            noteIDs.append(note.id)
+        }
+        try container.encode(noteIDs, forKey: .notes)
     }
     
     required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(String.self, forKey: .id)
         title = try container.decode(String.self, forKey: .title)
-        notes = try container.decode([Sketchnote].self, forKey: .notes)
+        let noteIDs = try container.decode([String].self, forKey: .notes)
+        notes = [Sketchnote]()
+        for id in noteIDs {
+            if let note = NoteLoader.loadSketchnote(id: id) {
+                notes.append(note)
+            }
+        }
+    }
+    
+    public func save() {
+        let encoder = JSONEncoder()
+        
+        if let encoded = try? encoder.encode(self) {
+            UserDefaults.collections.set(encoded, forKey: self.id)
+            print("Note Collection " + id + " saved.")
+        }
+        else {
+            print("Encoding failed for note collection " + id + ".")
+        }
     }
     
     func addSketchnote(note: Sketchnote) {
         var exists = false
         for n in notes {
-            if n.creationDate == note.creationDate {
+            if n.id == note.id {
                 exists = true
                 break
             }
@@ -56,7 +79,7 @@ class NoteCollection: Codable, Equatable {
     func removeSketchnote(note: Sketchnote) {
         var toDeleteIndex = -1
         for i in 0..<notes.count {
-            if notes[i].creationDate == note.creationDate {
+            if notes[i].id == note.id {
                 toDeleteIndex = i
                 break
             }
@@ -66,12 +89,8 @@ class NoteCollection: Codable, Equatable {
         }
     }
     
-    // The equality function is overriden to be able to properly compare 2 note collections with each other to check if they are equal or not.
-    // A unique identifier is not generated for a note collection. Instead, the title and all of the contained notes are used together as an identifier.
-    // This cannot lead to possible identifier conflicts, as a sketchnote is always added to a single note collection and cannot be part of multiple note collections.
-    // A sketchnote itself has a unique identifier generated, which is explained in the Sketchnote.swift file
     static func == (lhs: NoteCollection, rhs: NoteCollection) -> Bool {
-        if lhs.title == rhs.title && lhs.notes == rhs.notes {
+        if lhs.id == rhs.id {
             return true
         }
         return false

@@ -85,9 +85,10 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
                 sketchnote?.image = sketchView.asImage()
             }
             else {
-                if self.storedPathArray != nil && self.storedPathArray!.count > 0 {
+                //if self.storedPathArray != nil && self.storedPathArray!.count > 0 {
+                if sketchnote!.paths != nil && sketchnote!.paths!.count > 0 {
                     print("Debug: Reloading path array")
-                    self.sketchView.reloadPathArray(array: self.storedPathArray!)
+                    self.sketchView.reloadPathArray(array: sketchnote!.paths!)
                 }
                     // If the app does not manage to reload the user's drawn strokes (for any reason), the app simply loads a screenshot of the note's last state as a background for the note's canvas on the page.
                 else if sketchnote?.image != nil {
@@ -431,6 +432,9 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         self.processOCR(image: self.generateOCRImage())
     }
     
+    //MARK: Handwriting recognition process
+    let handwritingRecognizer = HandwritingRecognizer()
+    
     // This function generates the input image for the handwriting recognition model.
     private func generateOCRImage() -> UIImage {
         let canvas = UIView(frame: self.sketchView.frame)
@@ -460,27 +464,26 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         return canvas.asImage()
     }
     
-    // This function in turn calls the OCR engine (Google Firebase ML Kit) with the generated input image (previous function).
     private func processOCR(image: UIImage) {
-        let vision = Vision.vision()
-        let textRecognizer = vision.onDeviceTextRecognizer()
-        let image = VisionImage(image: image)
-        textRecognizer.process(image) { result, error in
-            
-            guard error == nil, let result = result else {
-                self.documentsButton.isLoading = false
-                self.showMessage("No documents could be found.", type: .error)
-                return
+        let (visionText, postprocessed) = self.handwritingRecognizer.recognize(image: image, postprocess: true)
+        if let visionText = visionText {
+            var textToUseForAnnotation: String?
+            if let postprocessed = postprocessed {
+                textToUseForAnnotation = postprocessed
             }
-            let resultText = OCRHelper.postprocess(text: result.text)
-            self.sketchnote?.recognizedText = resultText
-            print(resultText)
-            
-            self.processDocuments(text: resultText)
+            else {
+                textToUseForAnnotation = visionText.text
+            }
+            self.sketchnote?.recognizedText = textToUseForAnnotation
+            self.annotateText(text: textToUseForAnnotation!)
+        }
+        else {
+            self.documentsButton.isLoading = false
+            self.showMessage("No documents could be found!", type: .error)
         }
     }
     
-    func processDocuments(text: String) {
+    func annotateText(text: String) {
         self.items = [Document]()
         documentsCollectionView.reloadData()
         

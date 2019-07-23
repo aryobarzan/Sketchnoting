@@ -171,9 +171,9 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             guard let sketchnoteViewController = segue.destination as? SketchNoteViewController else {
                 fatalError("Unexpected destination")
             }
-            if let pathArray = NotesManager.shared.pathArrayDictionary[selectedSketchnote!.creationDate.timeIntervalSince1970] {
+            /*if let pathArray = NotesManager.shared.pathArrayDictionary[selectedSketchnote!.creationDate.timeIntervalSince1970] {
                 sketchnoteViewController.storedPathArray = pathArray
-            }
+            }*/
             sketchnoteViewController.new = false
             sketchnoteViewController.sketchnote = selectedSketchnote
             
@@ -215,11 +215,15 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
                     popMenu.addAction(copyTextAction)
                 }
                 let sendAction = PopMenuDefaultAction(title: "Send", color: .white, didSelect: { action in
-                    self.sketchnoteToShare = sketchnoteView.sketchnote!
-                    
-                    if let pathArray = NotesManager.shared.pathArrayDictionary[self.sketchnoteToShare!.creationDate.timeIntervalSince1970] {
-                        self.pathArrayToShare = pathArray
+                    if let note = sketchnoteView.sketchnote {
+                        self.sketchnoteToShare = note
+                        self.pathArrayToShare = note.paths
                     }
+                    //self.sketchnoteToShare = sketchnoteView.sketchnote!
+                    
+                    /*if let pathArray = NotesManager.shared.pathArrayDictionary[self.sketchnoteToShare!.creationDate.timeIntervalSince1970] {
+                        self.pathArrayToShare = pathArray
+                    }*/
                     DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                         self.joinSession()
                     }
@@ -277,7 +281,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             var alreadyExists = false
             for i in 0..<noteCollectionViews.count {
                 for j in 0..<noteCollectionViews[i].sketchnoteViews.count {
-                    if noteCollectionViews[i].sketchnoteViews[j].sketchnote?.creationDate == note.creationDate {
+                    if noteCollectionViews[i].sketchnoteViews[j].sketchnote == note {
                         noteCollectionViews[i].sketchnoteViews[j].setNote(note: note)
                         alreadyExists = true
                         break
@@ -606,10 +610,13 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             if pendingSharedNotes.count > 0 {
                 pendingSharedNotes.remove(at: 0)
             }
+            receivedSketchnote!.paths = receivedPathArray
             let noteCollection = NoteCollection(title: "Shared Note", notes: nil)!
             noteCollection.addSketchnote(note: receivedSketchnote!)
             NotesManager.shared.add(noteCollection: noteCollection)
-            NotesManager.shared.add(note: receivedSketchnote!, pathArray: receivedPathArray!)
+            receivedSketchnote?.save()
+            noteCollection.save()
+            //NotesManager.shared.add(note: receivedSketchnote!, pathArray: receivedPathArray!)
 
             displayNoteCollection(collection: noteCollection)
         }

@@ -80,6 +80,8 @@ class NoteCollectionView : UIView, UITextFieldDelegate, DocumentVisitor {
     @IBAction func newSketchnoteTapped(_ sender: LGButton) {
         let newNote = Sketchnote(image: nil, relatedDocuments: nil, drawings: nil)!
         noteCollection!.addSketchnote(note: newNote)
+        newNote.save()
+        noteCollection!.save()
         
         parentViewController.selectedSketchnote = newNote
         parentViewController.performSegue(withIdentifier: "NewSketchnote", sender: self)
