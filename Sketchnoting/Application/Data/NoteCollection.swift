@@ -66,7 +66,7 @@ class NoteCollection: Codable, Equatable {
     func addSketchnote(note: Sketchnote) {
         var exists = false
         for n in notes {
-            if n.id == note.id {
+            if n == note {
                 exists = true
                 break
             }
@@ -79,7 +79,7 @@ class NoteCollection: Codable, Equatable {
     func removeSketchnote(note: Sketchnote) {
         var toDeleteIndex = -1
         for i in 0..<notes.count {
-            if notes[i].id == note.id {
+            if notes[i] == note {
                 toDeleteIndex = i
                 break
             }

@@ -65,9 +65,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		2789948FCEC9A9800B2E515F /* Pods-Sketchnoting.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Sketchnoting.debug.xcconfig"; path = "Target Support Files/Pods-Sketchnoting/Pods-Sketchnoting.debug.xcconfig"; sourceTree = "<group>"; };
+		3866EAD96654DEBC2DCDFB3E /* Pods-Sketchnoting.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Sketchnoting.release.xcconfig"; path = "Target Support Files/Pods-Sketchnoting/Pods-Sketchnoting.release.xcconfig"; sourceTree = "<group>"; };
+		8703F8178351837A9DB23A40 /* Pods-Sketchnoting.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Sketchnoting.debug.xcconfig"; path = "Target Support Files/Pods-Sketchnoting/Pods-Sketchnoting.debug.xcconfig"; sourceTree = "<group>"; };
 		9DC8B7BD96FB5DF71C8C0CA0 /* Pods_Sketchnoting.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Sketchnoting.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		9E978D993668D59B2DBBC9F4 /* Pods-Sketchnoting.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Sketchnoting.release.xcconfig"; path = "Target Support Files/Pods-Sketchnoting/Pods-Sketchnoting.release.xcconfig"; sourceTree = "<group>"; };
 		9F5010CB22491FC000425424 /* SketchnoteView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SketchnoteView.xib; sourceTree = "<group>"; };
 		9F5010CD22491FD000425424 /* SketchnoteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SketchnoteView.swift; sourceTree = "<group>"; };
 		9F5010CF224930E400425424 /* NoteCollection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteCollection.swift; sourceTree = "<group>"; };
@@ -140,6 +140,16 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		04894B1DC0E872292CA59A2C /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				8703F8178351837A9DB23A40 /* Pods-Sketchnoting.debug.xcconfig */,
+				3866EAD96654DEBC2DCDFB3E /* Pods-Sketchnoting.release.xcconfig */,
+			);
+			name = Pods;
+			path = Pods;
+			sourceTree = "<group>";
+		};
 		124769D1803E7C4AE8A1F382 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -224,8 +234,8 @@
 			children = (
 				9FD29BA52220524D00CC969A /* Sketchnoting */,
 				9FD29BA42220524D00CC969A /* Products */,
-				A42EF4785A4BE0D5AC7720A5 /* Pods */,
 				124769D1803E7C4AE8A1F382 /* Frameworks */,
+				04894B1DC0E872292CA59A2C /* Pods */,
 			);
 			sourceTree = "<group>";
 		};
@@ -356,15 +366,6 @@
 				9FA6238922D371F1007ED794 /* Semantic Annotation */,
 			);
 			path = Helpers;
-			sourceTree = "<group>";
-		};
-		A42EF4785A4BE0D5AC7720A5 /* Pods */ = {
-			isa = PBXGroup;
-			children = (
-				2789948FCEC9A9800B2E515F /* Pods-Sketchnoting.debug.xcconfig */,
-				9E978D993668D59B2DBBC9F4 /* Pods-Sketchnoting.release.xcconfig */,
-			);
-			path = Pods;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -695,7 +696,7 @@
 		};
 		9FD29BB62220525000CC969A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 2789948FCEC9A9800B2E515F /* Pods-Sketchnoting.debug.xcconfig */;
+			baseConfigurationReference = 8703F8178351837A9DB23A40 /* Pods-Sketchnoting.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
@@ -722,7 +723,7 @@
 		};
 		9FD29BB72220525000CC969A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 9E978D993668D59B2DBBC9F4 /* Pods-Sketchnoting.release.xcconfig */;
+			baseConfigurationReference = 3866EAD96654DEBC2DCDFB3E /* Pods-Sketchnoting.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";

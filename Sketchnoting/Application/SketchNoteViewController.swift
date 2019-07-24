@@ -33,7 +33,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     var toolsMenu: ExpandableButtonView!
     var toolSizeMenu: ExpandableButtonView!
     
-    var sketchnote: Sketchnote?
+    var sketchnote: Sketchnote!
     var new = false
     var storedPathArray: NSMutableArray?
     
@@ -85,12 +85,11 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
                 sketchnote?.image = sketchView.asImage()
             }
             else {
-                //if self.storedPathArray != nil && self.storedPathArray!.count > 0 {
                 if sketchnote!.paths != nil && sketchnote!.paths!.count > 0 {
-                    print("Debug: Reloading path array")
+                    print("Reloading paths.")
                     self.sketchView.reloadPathArray(array: sketchnote!.paths!)
                 }
-                    // If the app does not manage to reload the user's drawn strokes (for any reason), the app simply loads a screenshot of the note's last state as a background for the note's canvas on the page.
+                    // If the app does not manage to reload the user's drawn strokes (for any reason), the app simply loads a screenshot of the note's last state as a background for the note's canvas on the page. The latter case should preferably never occur.
                 else if sketchnote?.image != nil {
                     let imageView = UIImageView(image: sketchnote!.image!)
                     sketchView.addSubview(imageView)
@@ -163,7 +162,6 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         default:
             print("Unknown Pen action")
         }
-        
     }
     
     private func toggleDrawTool() {
@@ -296,7 +294,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     private func setupHelpLines() {
         var height = CGFloat(40)
         while (CGFloat(height) < self.sketchView.frame.height) {
-            let line = SimpleLine(frame: CGRect(x: 0, y: height, width: self.view.frame.width, height: 2))
+            let line = SimpleLine(frame: CGRect(x: 0, y: height, width: self.view.frame.width, height: 1))
             line.isUserInteractionEnabled = false
             line.isHidden = true
             self.sketchView.addSubview(line)
@@ -429,7 +427,8 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     
     @IBAction func documentsTapped(_ sender: LGButton) {
         documentsButton.isLoading = true
-        self.processOCR(image: self.generateOCRImage())
+        //self.processOCR(image: self.generateOCRImage())
+        self.processHandwritingRecognition()
     }
     
     //MARK: Handwriting recognition process
@@ -464,22 +463,49 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         return canvas.asImage()
     }
     
-    private func processOCR(image: UIImage) {
-        let (visionText, postprocessed) = self.handwritingRecognizer.recognize(image: image, postprocess: true)
+    /*private func processOCR(image: UIImage) {
+        let visionText = self.handwritingRecognizer.recognize(image: image)
         if let visionText = visionText {
-            var textToUseForAnnotation: String?
-            if let postprocessed = postprocessed {
-                textToUseForAnnotation = postprocessed
-            }
-            else {
-                textToUseForAnnotation = visionText.text
-            }
-            self.sketchnote?.recognizedText = textToUseForAnnotation
-            self.annotateText(text: textToUseForAnnotation!)
+            self.sketchnote?.recognizedText = visionText.text
+            self.annotateText(text: visionText.text)
         }
         else {
             self.documentsButton.isLoading = false
             self.showMessage("No documents could be found!", type: .error)
+        }
+    }*/
+    
+    private func processHandwritingRecognition() {
+        var newPenTools = [PenTool]()
+        for pathObject in self.sketchView.pathArray {
+            if let penTool = pathObject as? PenTool {
+                let path = penTool.path
+                var isDrawing = false
+                for drawingView in self.drawingViews {
+                    if drawingView.frame.contains(path.boundingBox) {
+                        isDrawing = true
+                        break
+                    }
+                }
+                if !isDrawing {
+                    newPenTools.append(penTool)
+                }
+            }
+            else {
+            }
+        }
+        handwritingRecognizer.recognize(note: sketchnote, penTools: newPenTools, canvasFrame: self.sketchView.frame) { (success, textData) in
+            if success {
+                if let textData = textData {
+                    self.sketchnote.textDataArray.append(textData)
+                    self.annotateText(text: textData.spellchecked)
+                    print(textData.spellchecked)
+                }
+            }
+            else {
+                self.documentsButton.isLoading = false
+                self.showMessage("No documents could be found!", type: .error)
+            }
         }
     }
     

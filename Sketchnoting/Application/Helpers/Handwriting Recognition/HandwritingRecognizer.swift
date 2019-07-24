@@ -18,32 +18,45 @@ class HandwritingRecognizer {
         self.textRecognizer = vision.onDeviceTextRecognizer()
     }
     
-    public func recognize(image: UIImage, postprocess: Bool) -> (VisionText?, String?) {
-        if let visionText = recognizeText(image: image) {
-            let postprocessed = OCRHelper.postprocess(text: visionText.text)
-            return (visionText, postprocessed)
+    public func recognize(note: Sketchnote, penTools: [PenTool], canvasFrame: CGRect, handleFinish:@escaping ((_ success: Bool, _ param: TextData?)->())){
+        var newPenTools = [PenTool]()
+        
+        if let textDataArray = note.textDataArray {
+            for penTool in penTools {
+                var alreadyRecognized = false
+                for textData in textDataArray {
+                    if textData.paths.contains(penTool.path.boundingBox) {
+                        alreadyRecognized = true
+                        break
+                    }
+                }
+                if !alreadyRecognized {
+                    newPenTools.append(penTool)
+                }
+            }
         }
-        return (nil, nil)
-    }
-    
-    private func recognizeText(image: UIImage) -> VisionText? {
-        var visionText: VisionText?
-        let visionImage = VisionImage(image: image)
-        let dispatchGroup = DispatchGroup()
-        dispatchGroup.enter()
+        
+        let canvas = UIView(frame: canvasFrame)
+        canvas.backgroundColor = .black
+        var newPathsBoundingBoxes = [CGRect]()
+        for penTool in newPenTools {
+            newPathsBoundingBoxes.append(penTool.path.boundingBox)
+            let newPath = penTool.path.copy(strokingWithWidth: penTool.lineWidth, lineCap: .round, lineJoin: .round, miterLimit: 0)
+            let layer = CAShapeLayer()
+            layer.path = newPath
+            layer.strokeColor = UIColor.white.cgColor
+            layer.fillColor = UIColor.white.cgColor
+            canvas.layer.addSublayer(layer)
+        }
+        
+        let visionImage = VisionImage(image: canvas.asImage())
         textRecognizer.process(visionImage) { result, error in
-            
             guard error == nil, let result = result else {
-                dispatchGroup.leave()
+                handleFinish(false, nil)
                 return
             }
-            visionText = result
-            let resultText = OCRHelper.postprocess(text: result.text)
-            print(resultText)
-            
-            dispatchGroup.leave()
+            let textData = TextData(visionText: result, original: result.text, paths: newPathsBoundingBoxes)
+            handleFinish(true, textData)
         }
-        dispatchGroup.wait()
-        return visionText
     }
 }

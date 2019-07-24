@@ -20,6 +20,7 @@ class Sketchnote: Note, Equatable {
     var recognizedText: String?
     var drawingViewRects: [CGRect]?
     var paths: NSMutableArray?
+    var textDataArray: [TextData]!
     
     enum CodingKeys: String, CodingKey {
         case id
@@ -40,6 +41,7 @@ class Sketchnote: Note, Equatable {
         self.relatedDocuments = relatedDocuments ?? [Document]()
         self.drawings = drawings ?? [String]()
         self.image = image
+        self.textDataArray = [TextData]()
     }
     
     func encode(to encoder: Encoder) throws {
@@ -81,6 +83,7 @@ class Sketchnote: Note, Equatable {
         }
         
         self.loadPaths()
+        self.loadTextDataArray()
         print("Sketchnote decoded")
     }
     
@@ -94,6 +97,7 @@ class Sketchnote: Note, Equatable {
             if self.paths != nil {
                 self.savePaths()
             }
+            self.saveTextDataArray()
         }
         else {
             print("Encoding failed for note " + id + ".")
@@ -118,6 +122,26 @@ class Sketchnote: Note, Equatable {
             NSMutableArray) as NSMutableArray??) else { return }
         print("Paths for note " + id + " loaded.")
         self.paths = data
+    }
+    private func saveTextDataArray() {
+        let DocumentsDirectory = FileManager().urls(for: .documentDirectory, in: .userDomainMask).first!
+        let ArchiveURLPathArray = DocumentsDirectory.appendingPathComponent("NoteTextDataArray-" + self.id)
+        if let encoded = try? NSKeyedArchiver.archivedData(withRootObject: self.textDataArray, requiringSecureCoding: false) {
+            try! encoded.write(to: ArchiveURLPathArray)
+            print("Note " + id + " text data array saved.")
+        }
+        else {
+            print("Failed to encode text data array for note " + id + ".")
+        }
+    }
+    private func loadTextDataArray() {
+        let DocumentsDirectory = FileManager().urls(for: .documentDirectory, in: .userDomainMask).first!
+        let ArchiveURLPathArray = DocumentsDirectory.appendingPathComponent("NoteTextDataArray-" + self.id)
+        guard let codedData = try? Data(contentsOf: ArchiveURLPathArray) else { return }
+        guard let data = ((try? NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(codedData) as?
+            [TextData]) as [TextData]??) else { return }
+        print("Text data array for note " + id + " loaded.")
+        self.textDataArray = data
     }
     // A related document that has been found for this note is added to the note here.
     func addDocument(document: Document) {

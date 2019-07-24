@@ -10,9 +10,6 @@ import UIKit
 import Firebase
 
 class TextData: NSCoding {
-    
-    let noteID: String!
-    
     let visionText: VisionText!
     let paths: [CGRect]!
     
@@ -20,8 +17,7 @@ class TextData: NSCoding {
     let spellchecked: String!
     var corrected: String?
     
-    init(noteID: String, visionText: VisionText, original: String, paths: [CGRect]) {
-        self.noteID = noteID
+    init(visionText: VisionText, original: String, paths: [CGRect]) {
         self.visionText = visionText
         self.paths = paths
         self.original = original
@@ -30,7 +26,6 @@ class TextData: NSCoding {
     
     //MARK: Decode / Encode
     enum Keys: String {
-        case noteID = "NoteID"
         case visionText = "VisionText"
         case paths = "Paths"
         case original = "Original"
@@ -39,7 +34,6 @@ class TextData: NSCoding {
     }
 
     func encode(with aCoder: NSCoder) {
-        aCoder.encode(noteID, forKey: Keys.noteID.rawValue)
         aCoder.encode(visionText, forKey: Keys.visionText.rawValue)
         aCoder.encode(paths, forKey: Keys.paths.rawValue)
         aCoder.encode(original, forKey: Keys.original.rawValue)
@@ -48,7 +42,6 @@ class TextData: NSCoding {
     }
     
     required init?(coder aDecoder: NSCoder) {
-        noteID = aDecoder.decodeObject(forKey: Keys.noteID.rawValue) as! String
         visionText = aDecoder.decodeObject(forKey: Keys.visionText.rawValue) as! VisionText
         paths = aDecoder.decodeObject(forKey: Keys.paths.rawValue) as! [CGRect]
         original = aDecoder.decodeObject(forKey: Keys.original.rawValue) as! String

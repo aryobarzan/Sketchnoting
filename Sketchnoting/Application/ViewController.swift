@@ -171,9 +171,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             guard let sketchnoteViewController = segue.destination as? SketchNoteViewController else {
                 fatalError("Unexpected destination")
             }
-            /*if let pathArray = NotesManager.shared.pathArrayDictionary[selectedSketchnote!.creationDate.timeIntervalSince1970] {
-                sketchnoteViewController.storedPathArray = pathArray
-            }*/
             sketchnoteViewController.new = false
             sketchnoteViewController.sketchnote = selectedSketchnote
             
@@ -182,9 +179,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         }
     }
     
-    // This function sets up a SketchnoteView for a sketchnote, displays it on the home page and sets up interaction with it.
-    // When the view is tapped, the note is opened for editing.
-    // When the view is long pressed, a pop-up menu is displayed for other actions such as sharing, deleting, etc.
     func displaySketchnote(note: Sketchnote, collectionView: NoteCollectionView) {
         let sketchnoteView = SketchnoteView(frame: collectionView.stackView.frame)
         sketchnoteView.setNote(note: note)

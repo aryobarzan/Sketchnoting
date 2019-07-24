@@ -87,7 +87,9 @@ class BioPortalHelper {
                             }
                         }
                     }
-                    self.viewController.displayInBookshelf(documents: documents)
+                    for doc in documents {
+                        self.viewController.displayInBookshelf(document: doc)
+                    }
                 }
             case .failure(let error):
                 print(error.localizedDescription)
