@@ -63,6 +63,10 @@ class NoteCollection: Codable, Equatable {
         }
     }
     
+    public func delete() {
+        UserDefaults.collections.removeObject(forKey: id)
+    }
+    
     func addSketchnote(note: Sketchnote) {
         var exists = false
         for n in notes {

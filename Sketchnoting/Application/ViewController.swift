@@ -200,19 +200,17 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
                 
             })
             popMenu.addAction(action)
-            if sketchnoteView.sketchnote != nil {
-                if sketchnoteView.sketchnote!.recognizedText != nil && !sketchnoteView.sketchnote!.recognizedText!.isEmpty {
+            if let sketchnote = sketchnoteView.sketchnote {
+                if !sketchnote.getText().isEmpty {
                     let copyTextAction = PopMenuDefaultAction(title: "Copy Text", color: .white, didSelect: { action in
-                        UIPasteboard.general.string = sketchnoteView.sketchnote!.recognizedText!
+                        UIPasteboard.general.string = sketchnote.getText()
                         self.showMessage("Text copied to clipboard.", type: .success)
                     })
                     popMenu.addAction(copyTextAction)
                 }
                 let sendAction = PopMenuDefaultAction(title: "Send", color: .white, didSelect: { action in
-                    if let note = sketchnoteView.sketchnote {
-                        self.sketchnoteToShare = note
-                        self.pathArrayToShare = note.paths
-                    }
+                    self.sketchnoteToShare = sketchnote
+                    self.pathArrayToShare = sketchnote.paths
                     //self.sketchnoteToShare = sketchnoteView.sketchnote!
                     
                     /*if let pathArray = NotesManager.shared.pathArrayDictionary[self.sketchnoteToShare!.creationDate.timeIntervalSince1970] {
@@ -223,7 +221,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
                     }
                 })
                 popMenu.addAction(sendAction)
-                if sketchnoteView.sketchnote!.image != nil {
+                if sketchnote.image != nil {
                     let shareAction = PopMenuDefaultAction(title: "Share", color: .white, didSelect: { action in
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                             self.generatePDF(sketchnoteView: sketchnoteView)

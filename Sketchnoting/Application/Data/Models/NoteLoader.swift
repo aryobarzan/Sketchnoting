@@ -45,17 +45,4 @@ class NoteLoader {
         }
         return collections
     }
-    
-    public static func delete(note: Sketchnote) {
-        do {
-            let DocumentsDirectory = FileManager().urls(for: .documentDirectory, in: .userDomainMask).first!
-            let ArchiveURLPathArray = DocumentsDirectory.appendingPathComponent("NotePaths-" + note.id)
-            try FileManager().removeItem(atPath: ArchiveURLPathArray.absoluteString)
-        } catch {
-        }
-        UserDefaults.sketchnotes.removeObject(forKey: note.id)
-    }
-    public static func delete(collection: NoteCollection) {
-        UserDefaults.collections.removeObject(forKey: collection.id)
-    }
 }

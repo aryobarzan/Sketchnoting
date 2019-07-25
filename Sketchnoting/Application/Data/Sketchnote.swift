@@ -7,17 +7,15 @@
 //
 
 import UIKit
-// This class contains every information related to a single sketchnote, except for the strokes drawn on the note's canvas.
-// Where and how the strokes are stored&saved is explained in the ViewController.swift file
+
 class Sketchnote: Note, Equatable {
     
     var id: String!
     var creationDate: Date!
     var updateDate: Date?
     var image: UIImage?
-    var relatedDocuments: [Document]?
-    var drawings: [String]?
-    var recognizedText: String?
+    var documents: [Document]?
+    var drawings: [String]? // recognized drawings' labels
     var drawingViewRects: [CGRect]?
     var paths: NSMutableArray?
     var textDataArray: [TextData]!
@@ -29,7 +27,6 @@ class Sketchnote: Note, Equatable {
         case image
         case relatedDocuments = "relatedDocuments"
         case drawings = "drawings"
-        case recognizedText
         case drawingViewRects = "drawingViewRects"
     }
     
@@ -38,20 +35,20 @@ class Sketchnote: Note, Equatable {
     init?(image: UIImage?, relatedDocuments: [Document]?, drawings: [String]?) {
         self.id = UUID().uuidString
         self.creationDate = Date.init(timeIntervalSinceNow: 0)
-        self.relatedDocuments = relatedDocuments ?? [Document]()
+        self.documents = relatedDocuments ?? [Document]()
         self.drawings = drawings ?? [String]()
         self.image = image
         self.textDataArray = [TextData]()
     }
     
+    //MARK: Persistence
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(id, forKey: .id)
         try container.encode(creationDate.timeIntervalSince1970, forKey: .creationDate)
         try container.encode(updateDate?.timeIntervalSince1970, forKey: .updateDate)
-        try container.encode(relatedDocuments, forKey: .relatedDocuments)
+        try container.encode(documents, forKey: .relatedDocuments)
         try container.encode(drawings, forKey: .drawings)
-        try container.encode(recognizedText, forKey: .recognizedText)
         try container.encode(drawingViewRects, forKey: .drawingViewRects)
         if image != nil {
             let imageData: Data = image!.pngData()!
@@ -71,9 +68,8 @@ class Sketchnote: Note, Equatable {
             updateDate = Date(timeIntervalSince1970: try container.decode(TimeInterval.self, forKey: .updateDate))
         } catch {
         }
-        relatedDocuments = try? container.decode([Document].self, forKey: .relatedDocuments) 
+        documents = try? container.decode([Document].self, forKey: .relatedDocuments) 
         drawings = try? container.decode([String].self, forKey: .drawings)
-        recognizedText = try? container.decode(String.self, forKey: .recognizedText)
         drawingViewRects = try? container.decode([CGRect].self, forKey: .drawingViewRects)
         do {
             let strBase64: String = try container.decode(String.self, forKey: .image)
@@ -143,20 +139,54 @@ class Sketchnote: Note, Equatable {
         print("Text data array for note " + id + " loaded.")
         self.textDataArray = data
     }
-    // A related document that has been found for this note is added to the note here.
+    
+    public func delete() {
+        clearPaths()
+        clearTextData()
+        UserDefaults.sketchnotes.removeObject(forKey: id)
+    }
+    
+    public func clearPaths() {
+        do {
+            let DocumentsDirectory = FileManager().urls(for: .documentDirectory, in: .userDomainMask).first!
+            let ArchiveURLPathArray = DocumentsDirectory.appendingPathComponent("NotePaths-" + id)
+            try FileManager().removeItem(atPath: ArchiveURLPathArray.absoluteString)
+        } catch {
+        }
+        self.paths = nil
+    }
+    
+    public func clearTextData() {
+        do {
+            let DocumentsDirectory = FileManager().urls(for: .documentDirectory, in: .userDomainMask).first!
+            let ArchiveURLPathArray = DocumentsDirectory.appendingPathComponent("NoteTextDataArray-" + id)
+            try FileManager().removeItem(atPath: ArchiveURLPathArray.absoluteString)
+        } catch {
+        }
+        self.textDataArray = [TextData]()
+    }
+    
+    //MARK: updating data
+    public func clear() {
+        documents = [Document]()
+        drawings = [String]()
+        clearTextData()
+        clearPaths()
+    }
+    
     func addDocument(document: Document) {
         var exists = false
-        if relatedDocuments == nil {
-            relatedDocuments = [Document]()
+        if documents == nil {
+            documents = [Document]()
         }
-        for d in relatedDocuments! {
+        for d in documents! {
             if d.title == document.title {
                 exists = true
                 break
             }
         }
         if !exists {
-            relatedDocuments!.append(document)
+            documents!.append(document)
         }
     }
     // This function only stores a recognized drawing's label for a note. The drawing itself (i.e. an image) is not stored.
@@ -176,7 +206,7 @@ class Sketchnote: Note, Equatable {
             drawings!.append(drawing.lowercased())
         }
     }
-    // This function stores a drawing region's location and size for the note. This drawing region is manually inserted somewhere on the note's canvas by the user.
+    
     func addDrawingViewRect(rect: CGRect) {
         var exists = false
         if drawingViewRects == nil {
@@ -196,8 +226,16 @@ class Sketchnote: Note, Equatable {
     func setUpdateDate() {
         self.updateDate = Date.init(timeIntervalSinceNow: 0)
     }
-    // The == function is overriden to allow comparing two instances of a Sketchnote class with each other, to check if they are equal to each other
-    // The unique identifier of a sketchnote is its creation date.
+    
+    //MARK: recognized text
+    public func getText() -> String {
+        var text: String = ""
+        for textData in textDataArray {
+            text = text + " " + textData.spellchecked
+        }
+        return text
+    }
+
     static func == (lhs: Sketchnote, rhs: Sketchnote) -> Bool {
         if lhs.id == rhs.id {
             return true

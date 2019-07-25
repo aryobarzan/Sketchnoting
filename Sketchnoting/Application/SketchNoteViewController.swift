@@ -12,15 +12,14 @@ import Firebase
 import PopMenu
 import GSMessages
 
-// This is the controller for the other page of the application, i.e. not the home page, for the page displayed when the user wants to edit a note.
+// This is the controller for the other page of the application, i.e. not the home page, but for the page displayed when the user wants to edit a note.
 
 class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, SketchViewDelegate, UIPencilInteractionDelegate, UICollectionViewDataSource, UICollectionViewDelegate, DocumentVisitor {
 
     @IBOutlet weak var topContainer: UIView!
     @IBOutlet var sketchView: SketchView!
     @IBOutlet weak var toolsView: UIView!
-    @IBOutlet var documentsButton: LGButton!
-    @IBOutlet var clearButton: UIBarButtonItem!
+    @IBOutlet var editButton: UIBarButtonItem!
     @IBOutlet var closeButton: UIBarButtonItem!
     @IBOutlet var redoButton: LGButton!
     @IBOutlet var undoButton: LGButton!
@@ -28,6 +27,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     @IBOutlet var drawingsButton: LGButton!
     
     @IBOutlet var bookshelf: UIView!
+    @IBOutlet var activityIndicator: UIActivityIndicatorView!
     
     var colorSlider: ColorSlider!
     var toolsMenu: ExpandableButtonView!
@@ -104,10 +104,9 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
                         ])
                 }
             }
-            if let documents = sketchnote?.relatedDocuments {
-                for doc in documents {
-                    self.displayInBookshelf(document: doc)
-                }
+            if let documents = sketchnote?.documents {
+                self.items = documents
+                documentsCollectionView.reloadData()
             }
             // This is the case where the user has created a new note and is not editing an existing one.
         } else {
@@ -387,13 +386,33 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     }
     
     
-    @IBAction func clearTapped(_ sender: UIBarButtonItem) {
-        sketchView.clear()
-        sketchView.subviews.forEach { $0.removeFromSuperview() }
-        self.setupHelpLines()
-        sketchnote?.relatedDocuments = [Document]()
-        sketchnote?.drawings = [String]()
-        sketchnote?.recognizedText = ""
+    @IBAction func editTapped(_ sender: UIBarButtonItem) {
+        let alert = UIAlertController(title: "Edit Your Note", message: "", preferredStyle: .alert)
+        if bookshelf.isHidden {
+            alert.addAction(UIAlertAction(title: "View Documents", style: .default, handler: { action in
+                self.showBookshelf()
+            }))
+        }
+        alert.addAction(UIAlertAction(title: "Reset Documents", style: .default, handler: { action in
+            self.sketchnote.documents = [Document]()
+            self.items = [Document]()
+            self.annotateText(text: self.sketchnote.getText())
+        }))
+        alert.addAction(UIAlertAction(title: "Reset Text Recognition", style: .default, handler: { action in
+            self.sketchnote.clearTextData()
+            self.sketchnote.documents = [Document]()
+            self.items = [Document]()
+            self.processHandwritingRecognition()
+        }))
+        alert.addAction(UIAlertAction(title: "Clear Note", style: .destructive, handler: { action in
+            self.sketchView.clear()
+            self.sketchView.subviews.forEach { $0.removeFromSuperview() }
+            self.setupHelpLines()
+            self.sketchnote.clear()
+        }))
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        self.present(alert, animated: true)
+        
     }
     @IBAction func redoTapped(_ sender: LGButton) {
         sketchView.redo()
@@ -425,55 +444,8 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         }
     }
     
-    @IBAction func documentsTapped(_ sender: LGButton) {
-        documentsButton.isLoading = true
-        //self.processOCR(image: self.generateOCRImage())
-        self.processHandwritingRecognition()
-    }
-    
     //MARK: Handwriting recognition process
     let handwritingRecognizer = HandwritingRecognizer()
-    
-    // This function generates the input image for the handwriting recognition model.
-    private func generateOCRImage() -> UIImage {
-        let canvas = UIView(frame: self.sketchView.frame)
-        canvas.backgroundColor = .black
-        for pathObject in self.sketchView.pathArray {
-            if let penTool = pathObject as? PenTool {
-                let path = penTool.path
-                var isDrawing = false
-                for drawingView in self.drawingViews {
-                    if drawingView.frame.contains(path.boundingBox) {
-                        isDrawing = true
-                        break
-                    }
-                }
-                if !isDrawing {
-                    let newPath = path.copy(strokingWithWidth: penTool.lineWidth, lineCap: .round, lineJoin: .round, miterLimit: 0)
-                    let layer = CAShapeLayer()
-                    layer.path = newPath
-                    layer.strokeColor = UIColor.white.cgColor
-                    layer.fillColor = UIColor.white.cgColor
-                    canvas.layer.addSublayer(layer)
-                }
-            }
-            else {
-            }
-        }
-        return canvas.asImage()
-    }
-    
-    /*private func processOCR(image: UIImage) {
-        let visionText = self.handwritingRecognizer.recognize(image: image)
-        if let visionText = visionText {
-            self.sketchnote?.recognizedText = visionText.text
-            self.annotateText(text: visionText.text)
-        }
-        else {
-            self.documentsButton.isLoading = false
-            self.showMessage("No documents could be found!", type: .error)
-        }
-    }*/
     
     private func processHandwritingRecognition() {
         var newPenTools = [PenTool]()
@@ -499,21 +471,26 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
                 if let textData = textData {
                     self.sketchnote.textDataArray.append(textData)
                     self.annotateText(text: textData.spellchecked)
-                    print(textData.spellchecked)
+                    print(textData.spellchecked ?? "")
                 }
             }
             else {
-                self.documentsButton.isLoading = false
-                self.showMessage("No documents could be found!", type: .error)
+                self.activityIndicator.stopAnimating()
+                self.displayNoDocumentsFound()
             }
         }
     }
     
     func annotateText(text: String) {
-        self.items = [Document]()
-        documentsCollectionView.reloadData()
+        self.activityIndicator.stopAnimating()
+        self.showBookshelf()
         
-        self.documentsButton.isLoading = false
+        self.spotlightHelper.fetch(text: text)
+        self.bioportalHelper.fetch(text: text)
+        self.bioportalHelper.fetchCHEBI(text: text)
+    }
+    
+    private func showBookshelf() {
         self.bookshelf.isHidden = false
         if self.isBookshelfDraggedOut {
             self.bookshelfLeftConstraint.constant -= 300
@@ -523,17 +500,29 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
             })
             self.isBookshelfDraggedOut = false
         }
-        
-        self.spotlightHelper.fetch(text: text)
-        self.bioportalHelper.fetch(text: text)
-        self.bioportalHelper.fetchCHEBI(text: text)
     }
     
     func displayNoDocumentsFound() {
-        let alertController = UIAlertController(title: "No documents found.", message: "", preferredStyle: .alert)
-        let alertAction = UIAlertAction(title: "Close", style: .default)
-        alertController.addAction(alertAction)
-        self.present(alertController, animated: true)
+        self.showMessage("No documents could be found!", type: .info)
+    }
+    
+    var timer: Timer?
+    func drawView(_ view: SketchView, didEndDrawUsingTool tool: AnyObject) {
+        if timer != nil {
+            timer!.invalidate()
+            timer = nil
+            print("Recognition timer reset.")
+            
+        }
+        timer = Timer.scheduledTimer(timeInterval: 5.0, target: self, selector: #selector(onTimerFires), userInfo: nil, repeats: false)
+        self.activityIndicator.startAnimating()
+        print("Recognition timer started.")
+    }
+    @objc func onTimerFires()
+    {
+        timer?.invalidate()
+        timer = nil
+        self.processHandwritingRecognition()
     }
     
     // Drawing recognition
@@ -743,6 +732,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
                     UIView.animate(withDuration: 0.25, delay: 0, options: UIView.AnimationOptions.curveEaseIn, animations: {
                         self.view.layoutIfNeeded()
                     }, completion: { (ended) in
+                        self.bookshelf.isHidden = true
                     })
                     closeBookshelfLabel.isHidden = true
                 }
@@ -804,7 +794,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         self.items.append(document)
         self.documentsCollectionView.reloadData()
         
-        self.sketchnote?.relatedDocuments = items
+        self.sketchnote?.documents = items
     }
     
     func displayInBookshelf(documents: [Document]) {
@@ -813,7 +803,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         }
         self.documentsCollectionView.reloadData()
         
-        self.sketchnote?.relatedDocuments = items
+        self.sketchnote?.documents = items
     }
     
     func updateBookshelf() {

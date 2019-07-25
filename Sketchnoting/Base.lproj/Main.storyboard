@@ -628,53 +628,41 @@
                                 <segue destination="MVO-Dc-8Sy" kind="unwind" unwindAction="unwindToHomeWithSender:" id="ZoP-O4-bI4"/>
                             </connections>
                         </barButtonItem>
-                        <view key="titleView" contentMode="scaleToFill" id="zQH-8L-NbQ" customClass="LGButton" customModule="LGButton">
-                            <rect key="frame" x="316" y="8.5" width="136" height="33"/>
+                        <view key="titleView" contentMode="scaleToFill" id="4rQ-UM-wO0">
+                            <rect key="frame" x="384" y="25" width="0.0" height="0.0"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                            <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                            <userDefinedRuntimeAttributes>
-                                <userDefinedRuntimeAttribute type="string" keyPath="titleString" value="Documents"/>
-                                <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
-                                    <real key="value" value="17"/>
-                                </userDefinedRuntimeAttribute>
-                                <userDefinedRuntimeAttribute type="string" keyPath="leftIconString" value="description"/>
-                                <userDefinedRuntimeAttribute type="string" keyPath="leftIconFontName" value="ma"/>
-                                <userDefinedRuntimeAttribute type="color" keyPath="gradientStartColor">
-                                    <color key="value" red="0.37345819359999999" green="0.75741592639999999" blue="0.58015881339999997" alpha="0.84705882349999995" colorSpace="custom" customColorSpace="sRGB"/>
-                                </userDefinedRuntimeAttribute>
-                                <userDefinedRuntimeAttribute type="color" keyPath="gradientEndColor">
-                                    <color key="value" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                </userDefinedRuntimeAttribute>
-                                <userDefinedRuntimeAttribute type="string" keyPath="loadingString" value="Scanning"/>
-                            </userDefinedRuntimeAttributes>
-                            <connections>
-                                <action selector="documentsTapped:" destination="lDo-DG-9fX" eventType="touchUpInside" id="nQG-do-762"/>
-                            </connections>
+                            <subviews>
+                                <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" hidesWhenStopped="YES" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="SX7-51-XS7">
+                                    <rect key="frame" x="-10" y="-10" width="20" height="20"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                </activityIndicatorView>
+                            </subviews>
+                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         </view>
-                        <barButtonItem key="rightBarButtonItem" title="Clear" id="fGp-qI-8jR">
+                        <barButtonItem key="rightBarButtonItem" title="Edit" id="fGp-qI-8jR">
                             <connections>
-                                <action selector="clearTapped:" destination="lDo-DG-9fX" id="hVZ-Wj-uNe"/>
+                                <action selector="editTapped:" destination="lDo-DG-9fX" id="hVZ-Wj-uNe"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
                     <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" prompted="NO"/>
                     <simulatedTabBarMetrics key="simulatedBottomBarMetrics"/>
                     <connections>
+                        <outlet property="activityIndicator" destination="SX7-51-XS7" id="STD-3r-0KF"/>
                         <outlet property="bookshelf" destination="oqt-gq-XGG" id="T84-7q-c23"/>
                         <outlet property="bookshelfBottomConstraint" destination="xOZ-Oh-PM9" id="236-Bf-TSu"/>
                         <outlet property="bookshelfLeftConstraint" destination="iPF-V3-TgN" id="0z1-wt-vWZ"/>
                         <outlet property="bookshelfLeftDragView" destination="O1Y-Db-0EN" id="IYp-8e-St4"/>
                         <outlet property="bookshelfRightConstraint" destination="2E6-z5-ABj" id="k6z-gh-JJI"/>
                         <outlet property="bookshelfTopConstraint" destination="UVR-Cd-FKG" id="sjo-bu-MRS"/>
-                        <outlet property="clearButton" destination="fGp-qI-8jR" id="MrF-N0-ogz"/>
                         <outlet property="closeBookshelfLabel" destination="bsH-0S-hPe" id="9EC-12-ayR"/>
                         <outlet property="closeButton" destination="1KW-JE-ed3" id="F9k-S4-cl9"/>
                         <outlet property="documentDetailScrollView" destination="IYX-uw-rqR" id="JTR-53-Gkj"/>
                         <outlet property="documentDetailView" destination="sjN-VI-3Ol" id="PuL-eJ-XhI"/>
                         <outlet property="documentTitleLabel" destination="PlC-3A-rvo" id="6zE-5b-MOR"/>
-                        <outlet property="documentsButton" destination="zQH-8L-NbQ" id="1ST-fD-BW8"/>
                         <outlet property="documentsCollectionView" destination="Soc-lK-uIi" id="lwd-l0-KxX"/>
                         <outlet property="drawingsButton" destination="PbO-cQ-nbQ" id="Z5N-BA-2AB"/>
+                        <outlet property="editButton" destination="fGp-qI-8jR" id="MrF-N0-ogz"/>
                         <outlet property="helpLinesButton" destination="Nvo-Or-dri" id="cfe-Fr-zyn"/>
                         <outlet property="redoButton" destination="5ja-5Q-pIX" id="cj6-tm-Qxz"/>
                         <outlet property="sketchView" destination="Nvg-e1-5lr" id="UFp-1k-pn5"/>

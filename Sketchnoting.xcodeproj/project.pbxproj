@@ -23,6 +23,10 @@
 		9FA6239C22E64EA2007ED794 /* TextData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA6239B22E64EA2007ED794 /* TextData.swift */; };
 		9FA6239E22E66D73007ED794 /* HandwritingRecognizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA6239D22E66D73007ED794 /* HandwritingRecognizer.swift */; };
 		9FA623A122E73DDA007ED794 /* NoteLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA623A022E73DDA007ED794 /* NoteLoader.swift */; };
+		9FBF6AB422E9F391001FD730 /* VisionTextWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FBF6AB322E9F391001FD730 /* VisionTextWrapper.swift */; };
+		9FBF6AB622E9F3FE001FD730 /* VisionTextBlockWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FBF6AB522E9F3FE001FD730 /* VisionTextBlockWrapper.swift */; };
+		9FBF6AB822E9F428001FD730 /* VisionTextLineWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FBF6AB722E9F428001FD730 /* VisionTextLineWrapper.swift */; };
+		9FBF6ABA22E9F439001FD730 /* VisionTextElementWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FBF6AB922E9F439001FD730 /* VisionTextElementWrapper.swift */; };
 		9FC788F2225CEC230074BD16 /* DrawingSearchView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9FC788F1225CEC230074BD16 /* DrawingSearchView.xib */; };
 		9FC788F4225CEC4C0074BD16 /* DrawingSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FC788F3225CEC4C0074BD16 /* DrawingSearchView.swift */; };
 		9FD29BA72220524D00CC969A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29BA62220524D00CC969A /* AppDelegate.swift */; };
@@ -86,6 +90,10 @@
 		9FA6239B22E64EA2007ED794 /* TextData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextData.swift; sourceTree = "<group>"; };
 		9FA6239D22E66D73007ED794 /* HandwritingRecognizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandwritingRecognizer.swift; sourceTree = "<group>"; };
 		9FA623A022E73DDA007ED794 /* NoteLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteLoader.swift; sourceTree = "<group>"; };
+		9FBF6AB322E9F391001FD730 /* VisionTextWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisionTextWrapper.swift; sourceTree = "<group>"; };
+		9FBF6AB522E9F3FE001FD730 /* VisionTextBlockWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisionTextBlockWrapper.swift; sourceTree = "<group>"; };
+		9FBF6AB722E9F428001FD730 /* VisionTextLineWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisionTextLineWrapper.swift; sourceTree = "<group>"; };
+		9FBF6AB922E9F439001FD730 /* VisionTextElementWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisionTextElementWrapper.swift; sourceTree = "<group>"; };
 		9FC788F1225CEC230074BD16 /* DrawingSearchView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DrawingSearchView.xib; sourceTree = "<group>"; };
 		9FC788F3225CEC4C0074BD16 /* DrawingSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrawingSearchView.swift; sourceTree = "<group>"; };
 		9FD29BA32220524D00CC969A /* Sketchnoting.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Sketchnoting.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -146,7 +154,6 @@
 				8703F8178351837A9DB23A40 /* Pods-Sketchnoting.debug.xcconfig */,
 				3866EAD96654DEBC2DCDFB3E /* Pods-Sketchnoting.release.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
@@ -225,6 +232,18 @@
 			children = (
 				9FA6239D22E66D73007ED794 /* HandwritingRecognizer.swift */,
 				9FD29C53223C3B6F00CC969A /* OCRHelper.swift */,
+			);
+			path = "Handwriting Recognition";
+			sourceTree = "<group>";
+		};
+		9FBF6ABB22EA1D0D001FD730 /* Handwriting Recognition */ = {
+			isa = PBXGroup;
+			children = (
+				9FA6239B22E64EA2007ED794 /* TextData.swift */,
+				9FBF6AB322E9F391001FD730 /* VisionTextWrapper.swift */,
+				9FBF6AB522E9F3FE001FD730 /* VisionTextBlockWrapper.swift */,
+				9FBF6AB722E9F428001FD730 /* VisionTextLineWrapper.swift */,
+				9FBF6AB922E9F439001FD730 /* VisionTextElementWrapper.swift */,
 			);
 			path = "Handwriting Recognition";
 			sourceTree = "<group>";
@@ -349,12 +368,12 @@
 		9FD29C68224589DA00CC969A /* Data */ = {
 			isa = PBXGroup;
 			children = (
+				9FBF6ABB22EA1D0D001FD730 /* Handwriting Recognition */,
 				9FA6239A22DE3ADB007ED794 /* Documents */,
 				9F5D0FC6229CBC2A00BCA451 /* Models */,
 				9FD29BC422249D9500CC969A /* Note.swift */,
 				9FD29BCA2224B89800CC969A /* Sketchnote.swift */,
 				9F5010CF224930E400425424 /* NoteCollection.swift */,
-				9FA6239B22E64EA2007ED794 /* TextData.swift */,
 			);
 			path = Data;
 			sourceTree = "<group>";
@@ -536,6 +555,7 @@
 				9FD29C4E223998BC00CC969A /* UIViewControllerExtensions.swift in Sources */,
 				9FD29C2B22370DF000CC969A /* DefaultPreviewView.swift in Sources */,
 				9FD29C472239588E00CC969A /* UIViewExtensions.swift in Sources */,
+				9FBF6AB822E9F428001FD730 /* VisionTextLineWrapper.swift in Sources */,
 				9FD29C1F2236EA2800CC969A /* SketchView.swift in Sources */,
 				9F5010CE22491FD000425424 /* SketchnoteView.swift in Sources */,
 				9FD29C42223861E100CC969A /* ActionButton.swift in Sources */,
@@ -544,12 +564,15 @@
 				9FA6238F22DCD3AD007ED794 /* DocumentUICollectionViewCell.swift in Sources */,
 				9FC788F4225CEC4C0074BD16 /* DrawingSearchView.swift in Sources */,
 				9FD29C2A22370DF000CC969A /* PreviewView.swift in Sources */,
+				9FBF6AB422E9F391001FD730 /* VisionTextWrapper.swift in Sources */,
 				9FD29C54223C3B6F00CC969A /* OCRHelper.swift in Sources */,
 				9FD29BC522249D9500CC969A /* Note.swift in Sources */,
+				9FBF6ABA22E9F439001FD730 /* VisionTextElementWrapper.swift in Sources */,
 				9FD29C41223861E100CC969A /* ArrowButton.swift in Sources */,
 				9FD29C2F22370E1B00CC969A /* Gradient.swift in Sources */,
 				9FD29C1E2236EA2800CC969A /* SketchTool.swift in Sources */,
 				9FD29BC72224B58600CC969A /* Document.swift in Sources */,
+				9FBF6AB622E9F3FE001FD730 /* VisionTextBlockWrapper.swift in Sources */,
 				9FA6239E22E66D73007ED794 /* HandwritingRecognizer.swift in Sources */,
 				9FD29BCB2224B89800CC969A /* Sketchnote.swift in Sources */,
 				9FA6238D22D38AEE007ED794 /* SpotlightHelper.swift in Sources */,

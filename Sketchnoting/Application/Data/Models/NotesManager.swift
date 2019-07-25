@@ -43,13 +43,13 @@ class NotesManager {
             }
         }
         if index != -1 {
-            NoteLoader.delete(collection: noteCollections[index])
+            noteCollections[index].delete()
             self.noteCollections.remove(at: index)
         }
     }
     
     public func delete(noteCollection: NoteCollection, note: Sketchnote) {
-        NoteLoader.delete(note: note)
+        note.delete()
         noteCollection.removeSketchnote(note: note)
     }
     

@@ -101,13 +101,13 @@ class NoteCollectionView : UIView, UITextFieldDelegate, DocumentVisitor {
             currentSketchnoteViewForSearch = sketchnoteViews[j]
             
             for filter in filters {
-                if (sketchnoteViews[j].sketchnote?.recognizedText?.lowercased().contains(filter) ?? false) || (sketchnoteViews[j].sketchnote?.drawings?.contains(filter) ?? false) {
+                if (sketchnoteViews[j].sketchnote?.getText().lowercased().contains(filter) ?? false) || (sketchnoteViews[j].sketchnote?.drawings?.contains(filter) ?? false) {
                     sketchnoteViews[j].matchesSearch = true
                 }
                 else {
                     sketchnoteViews[j].matchesSearch = false
                     currentSearchFilter = filter
-                    if let documents = sketchnoteViews[j].sketchnote?.relatedDocuments {
+                    if let documents = sketchnoteViews[j].sketchnote?.documents {
                         for doc in documents {
                             doc.accept(visitor: self)
                             if sketchnoteViews[j].matchesSearch {
