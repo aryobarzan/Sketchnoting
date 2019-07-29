@@ -436,6 +436,12 @@
                                             <action selector="drawingsTapped:" destination="lDo-DG-9fX" eventType="touchUpInside" id="eEt-4z-arx"/>
                                         </connections>
                                     </view>
+                                    <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="rzy-K7-sud">
+                                        <rect key="frame" x="465" y="12" width="51" height="31"/>
+                                        <connections>
+                                            <action selector="conceptHighlightsSwitchTapped:" destination="lDo-DG-9fX" eventType="valueChanged" id="bKa-BO-ud5"/>
+                                        </connections>
+                                    </switch>
                                 </subviews>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
@@ -443,6 +449,7 @@
                                     <constraint firstItem="lp1-fn-Ljv" firstAttribute="top" secondItem="aMI-wG-bBD" secondAttribute="top" constant="7" id="4S4-6V-Edb"/>
                                     <constraint firstItem="Pv4-3o-khD" firstAttribute="top" secondItem="aMI-wG-bBD" secondAttribute="top" id="949-qA-pbX"/>
                                     <constraint firstItem="Nvo-Or-dri" firstAttribute="leading" secondItem="PbO-cQ-nbQ" secondAttribute="trailing" constant="8" id="Eun-7R-XY2"/>
+                                    <constraint firstItem="rzy-K7-sud" firstAttribute="top" secondItem="aMI-wG-bBD" secondAttribute="top" constant="12" id="HEl-gA-U6w"/>
                                     <constraint firstAttribute="trailing" secondItem="Pv4-3o-khD" secondAttribute="trailing" constant="333" id="Obe-vX-M0D"/>
                                     <constraint firstItem="5ja-5Q-pIX" firstAttribute="leading" secondItem="gk5-k0-mFo" secondAttribute="trailing" constant="8" id="Ub0-Zv-1b4"/>
                                     <constraint firstItem="gk5-k0-mFo" firstAttribute="top" secondItem="aMI-wG-bBD" secondAttribute="top" constant="10" id="Wxl-Ic-kRz"/>
@@ -453,6 +460,7 @@
                                     <constraint firstAttribute="height" constant="65" id="mjf-cP-ug5"/>
                                     <constraint firstItem="gk5-k0-mFo" firstAttribute="leading" secondItem="lp1-fn-Ljv" secondAttribute="trailing" constant="8" id="r8h-jq-2xX"/>
                                     <constraint firstAttribute="trailing" secondItem="5ja-5Q-pIX" secondAttribute="trailing" constant="12" id="vIs-12-ghv"/>
+                                    <constraint firstItem="PbO-cQ-nbQ" firstAttribute="leading" secondItem="rzy-K7-sud" secondAttribute="trailing" constant="8" id="ykk-aD-r9L"/>
                                 </constraints>
                             </view>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Nvg-e1-5lr" customClass="SketchView" customModule="Sketchnoting" customModuleProvider="target">
@@ -657,6 +665,7 @@
                         <outlet property="bookshelfTopConstraint" destination="UVR-Cd-FKG" id="sjo-bu-MRS"/>
                         <outlet property="closeBookshelfLabel" destination="bsH-0S-hPe" id="9EC-12-ayR"/>
                         <outlet property="closeButton" destination="1KW-JE-ed3" id="F9k-S4-cl9"/>
+                        <outlet property="conceptHighlightsSwitch" destination="rzy-K7-sud" id="WUc-4H-11o"/>
                         <outlet property="documentDetailScrollView" destination="IYX-uw-rqR" id="JTR-53-Gkj"/>
                         <outlet property="documentDetailView" destination="sjN-VI-3Ol" id="PuL-eJ-XhI"/>
                         <outlet property="documentTitleLabel" destination="PlC-3A-rvo" id="6zE-5b-MOR"/>

@@ -46,6 +46,8 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     var spotlightHelper: SpotlightHelper!
     var bioportalHelper: BioPortalHelper!
     
+    var conceptHighlights = [UIView : Document]()
+    
     // This function sets up the page and every element contained within it.
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -132,6 +134,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         
         // Help lines are horizontal lines displayed as a help to the user on the canvas, in order to let them write in straight lines.
         setupHelpLines()
+        setupConceptHighlights()
         
         // Setup long press on canvas for inserting drawing region
         let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(self.handleSketchViewLongPress(_:)))
@@ -220,12 +223,10 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         }
     }
     
-    // When the user closes the note, this function loops through each drawing region inserted on the note's canvas and generates an input image of the drawing within that drawing region for the drawing recognition model.
     private func processDrawingRecognition() {
         if self.helpLinesShown {
             self.toggleHelpLines()
         }
-        // Clear all already recognized drawings from the note, as the entire canvas is re-scanned from scratch
         self.sketchnote?.drawings = [String]()
         for drawingView in self.drawingViews {
             drawingView.layer.sublayers?.forEach { $0.removeFromSuperlayer() }
@@ -319,6 +320,83 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         }
     }
     
+    // MARK: Highlighting recognized concepts/topics on the canvas
+    
+    @IBOutlet var conceptHighlightsSwitch: UISwitch!
+    private func setupConceptHighlights() {
+        if let documents = sketchnote.documents {
+            for textData in sketchnote.textDataArray {
+                for document in documents {
+                    var found = false
+                    var body = textData.spellchecked!
+                    if textData.corrected != nil && !textData.corrected!.isEmpty {
+                        body = textData.corrected!
+                    }
+                    if body.lowercased().contains(document.title.lowercased()) {
+                        for block in textData.visionTextWrapper.blocks {
+                            for line in block.lines {
+                                for element in line.elements {
+                                    if element.text.lowercased() == document.title.lowercased() || element.text.lowercased().levenshtein(document.title.lowercased()) <= 2 {
+                                        let conceptHighlightView = UIView(frame: element.frame)
+                                        conceptHighlightView.layer.borderWidth = 2
+                                        conceptHighlightView.layer.borderColor = UIColor.red.cgColor
+                                        self.view.addSubview(conceptHighlightView)
+                                        conceptHighlightView.isHidden = false
+                                        conceptHighlightView.isUserInteractionEnabled = true
+                                        self.conceptHighlights[conceptHighlightView] = document
+                                        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(self.handleConceptHighlightTap(_:)))
+                                        conceptHighlightView.addGestureRecognizer(tapGesture)
+
+                                        found = true
+                                        break
+                                    }
+                                }
+                                if found {
+                                    break
+                                }
+                            }
+                            if found {
+                                break
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    @objc func handleConceptHighlightTap(_ sender: UITapGestureRecognizer) {
+        if let conceptHighlightView = sender.view {
+            if let document = self.conceptHighlights[conceptHighlightView] {
+                showDocumentDetail(document: document)
+                if bookshelf.isHidden {
+                    showBookshelf()
+                }
+            }
+        }
+    }
+    
+    private func toggleConceptHighlight(isHidden: Bool) {
+        for (view, _) in self.conceptHighlights {
+            view.isHidden = isHidden
+        }
+    }
+    @IBAction func conceptHighlightsSwitchTapped(_ sender: UISwitch) {
+        self.toggleConceptHighlight(isHidden: !sender.isOn)
+        if sender.isOn {
+            if conceptHighlights.isEmpty {
+                setupConceptHighlights()
+            }
+        }
+    }
+    
+    private func clearConceptHighlights() {
+        for (view, _) in conceptHighlights {
+            view.removeFromSuperview()
+        }
+        self.conceptHighlights = [UIView : Document]()
+        conceptHighlightsSwitch.isOn = false
+    }
+    
     // This function is called when the user closes the page, i.e. stops editing the note, and the app returns to the home page.
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         super.prepare(for: segue, sender: sender)
@@ -334,6 +412,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
             for helpLine in self.helpLines {
                 helpLine.removeFromSuperview()
             }
+            self.toggleConceptHighlight(isHidden: true)
             self.processDrawingRecognition()
             sketchnote?.image = sketchView.asImage()
             sketchnote?.setUpdateDate()
@@ -396,12 +475,14 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         alert.addAction(UIAlertAction(title: "Reset Documents", style: .default, handler: { action in
             self.sketchnote.documents = [Document]()
             self.items = [Document]()
+            self.clearConceptHighlights()
             self.annotateText(text: self.sketchnote.getText())
         }))
         alert.addAction(UIAlertAction(title: "Reset Text Recognition", style: .default, handler: { action in
             self.sketchnote.clearTextData()
             self.sketchnote.documents = [Document]()
             self.items = [Document]()
+            self.clearConceptHighlights()
             self.processHandwritingRecognition()
         }))
         alert.addAction(UIAlertAction(title: "Clear Note", style: .destructive, handler: { action in
@@ -409,13 +490,15 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
             self.sketchView.subviews.forEach { $0.removeFromSuperview() }
             self.setupHelpLines()
             self.sketchnote.clear()
+            self.clearConceptHighlights()
         }))
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
         self.present(alert, animated: true)
         
     }
     @IBAction func redoTapped(_ sender: LGButton) {
-        sketchView.redo()
+        //sketchView.redo()
+        setupConceptHighlights()
     }
     @IBAction func undoTapped(_ sender: LGButton) {
         sketchView.undo()
@@ -483,6 +566,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     
     func annotateText(text: String) {
         self.activityIndicator.stopAnimating()
+        self.clearConceptHighlights()
         self.showBookshelf()
         
         self.spotlightHelper.fetch(text: text)
