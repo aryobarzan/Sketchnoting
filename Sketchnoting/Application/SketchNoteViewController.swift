@@ -19,26 +19,33 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     @IBOutlet weak var topContainer: UIView!
     @IBOutlet var sketchView: SketchView!
     @IBOutlet weak var toolsView: UIView!
-    @IBOutlet var editButton: UIBarButtonItem!
-    @IBOutlet var closeButton: UIBarButtonItem!
     @IBOutlet var redoButton: LGButton!
     @IBOutlet var undoButton: LGButton!
-    @IBOutlet var helpLinesButton: LGButton!
     @IBOutlet var drawingsButton: LGButton!
+    @IBOutlet var closeButton: UIButton!
     
     @IBOutlet var bookshelf: UIView!
     @IBOutlet var activityIndicator: UIActivityIndicatorView!
     
     var colorSlider: ColorSlider!
-    var toolsMenu: ExpandableButtonView!
-    var toolSizeMenu: ExpandableButtonView!
+    @IBOutlet var pencilButton: LGButton!
+    @IBOutlet var eraserButton: LGButton!
+    var pencilSize : CGFloat = 2
+    var eraserSize : CGFloat = 2
     
     var sketchnote: Sketchnote!
     var new = false
     var storedPathArray: NSMutableArray?
     
-    var helpLines = [SimpleLine]()
-    var helpLinesShown = false
+    @IBOutlet var helpLinesButton: LGButton!
+    var helpLinesHorizontal = [HoritonzalHelpLine]()
+    var helpLinesVertical = [VerticalHelpLine]()
+    enum HelpLinesStatus {
+        case None
+        case Horizontal
+        case Grid
+    }
+    var helpLinesStatus : HelpLinesStatus = .None
     
     var drawingViews = [UIView]()
     var drawingViewsShown = false
@@ -51,19 +58,17 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     // This function sets up the page and every element contained within it.
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.navigationController?.setNavigationBarHidden(false, animated: false)
+        self.navigationController?.setNavigationBarHidden(true, animated: false)
         
         self.setupDocumentDetailScrollView()
         self.bookshelfLeftDragView.curveTopCorners(size: 5)
 
         colorSlider = ColorSlider(orientation: .horizontal, previewSide: .bottom)
         colorSlider.color = .black
-        colorSlider.frame = CGRect(x: 106, y: 2, width: 231, height: 50)
+        colorSlider.frame = CGRect(x: 0, y: 2, width: 230, height: 50)
         toolsView.addSubview(colorSlider)
+        toolsView.bringSubviewToFront(colorSlider)
         colorSlider.addTarget(self, action: #selector(changedColor(_:)), for: .valueChanged)
-        
-        setupToolsMenu()
-        setupToolSizeMenu()
         
         sketchView.sketchViewDelegate = self
         sketchView.lineColor = colorSlider.color
@@ -169,10 +174,127 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     private func toggleDrawTool() {
         if self.sketchView.drawTool == .eraser {
             self.sketchView.drawTool = .pen
-            self.toolSelected(image: #imageLiteral(resourceName: "Pencil"))
-        } else {
+            self.sketchView.lineWidth = pencilSize
+            pencilButton.bgColor = UIColor(red: 85.0/255.0, green: 117.0/255.0, blue: 193.0/255.0, alpha: 1)
+            eraserButton.bgColor = .lightGray
+        }
+        else {
             self.sketchView.drawTool = .eraser
-            self.toolSelected(image: #imageLiteral(resourceName: "Eraser"))
+            self.sketchView.lineWidth = eraserSize
+            eraserButton.bgColor = UIColor(red: 85.0/255.0, green: 117.0/255.0, blue: 193.0/255.0, alpha: 1)
+            pencilButton.bgColor = .lightGray
+        }
+    }
+    private func updateDrawToolSize() {
+        if self.sketchView.drawTool == .eraser {
+            self.sketchView.lineWidth = eraserSize
+        }
+        else {
+            self.sketchView.lineWidth = pencilSize
+        }
+    }
+    @IBAction func pencilButtonTapped(_ sender: LGButton) {
+        if self.sketchView.drawTool == .eraser {
+            toggleDrawTool()
+        }
+        else {
+            let popMenu = PopMenuViewController(sourceView: sender, actions: [PopMenuAction](), appearance: nil)
+            let closeAction = PopMenuDefaultAction(title: "Close")
+            let size2 = PopMenuDefaultAction(title: "2", didSelect: { action in
+                print("Changing Pencil Tool Size To 2")
+                self.pencilSize = CGFloat(2)
+                self.updateDrawToolSize()
+            })
+            let size4 = PopMenuDefaultAction(title: "4", didSelect: { action in
+                print("Changing Pencil Tool Size To 4")
+                self.pencilSize = CGFloat(4)
+                self.updateDrawToolSize()
+            })
+            let size6 = PopMenuDefaultAction(title: "6", didSelect: { action in
+                print("Changing Pencil Tool Size To 6")
+                self.pencilSize = CGFloat(6)
+                self.updateDrawToolSize()
+            })
+            let size8 = PopMenuDefaultAction(title: "8", didSelect: { action in
+                print("Changing Pencil Tool Size To 8")
+                self.pencilSize = CGFloat(8)
+                self.updateDrawToolSize()
+            })
+            switch pencilSize {
+            case 2:
+                size2.highlighted = true
+                break
+            case 4:
+                size4.highlighted = true
+                break
+            case 6:
+                size6.highlighted = true
+                break
+            case 8:
+                size8.highlighted = true
+                break
+            default:
+                size2.highlighted = true
+                break
+            }
+            popMenu.addAction(size2)
+            popMenu.addAction(size4)
+            popMenu.addAction(size6)
+            popMenu.addAction(size8)
+            popMenu.addAction(closeAction)
+            self.present(popMenu, animated: true, completion: nil)
+        }
+    }
+    @IBAction func eraserButtonTapped(_ sender: LGButton) {
+        if self.sketchView.drawTool == .pen {
+            toggleDrawTool()
+        }
+        else {
+            let popMenu = PopMenuViewController(sourceView: sender, actions: [PopMenuAction](), appearance: nil)
+            let closeAction = PopMenuDefaultAction(title: "Close")
+            let size2 = PopMenuDefaultAction(title: "2", didSelect: { action in
+                print("Changing Eraser Tool Size To 2")
+                self.eraserSize = CGFloat(2)
+                self.updateDrawToolSize()
+            })
+            let size4 = PopMenuDefaultAction(title: "4", didSelect: { action in
+                print("Changing Eraser Tool Size To 4")
+                self.eraserSize = CGFloat(4)
+                self.updateDrawToolSize()
+            })
+            let size6 = PopMenuDefaultAction(title: "6", didSelect: { action in
+                print("Changing Eraser Tool Size To 6")
+                self.eraserSize = CGFloat(6)
+                self.updateDrawToolSize()
+            })
+            let size8 = PopMenuDefaultAction(title: "8", didSelect: { action in
+                print("Changing Eraser Tool Size To 8")
+                self.eraserSize = CGFloat(8)
+                self.updateDrawToolSize()
+            })
+            switch eraserSize {
+            case 2:
+                size2.highlighted = true
+                break
+            case 4:
+                size4.highlighted = true
+                break
+            case 6:
+                size6.highlighted = true
+                break
+            case 8:
+                size8.highlighted = true
+                break
+            default:
+                size2.highlighted = true
+                break
+            }
+            popMenu.addAction(size2)
+            popMenu.addAction(size4)
+            popMenu.addAction(size6)
+            popMenu.addAction(size8)
+            popMenu.addAction(closeAction)
+            self.present(popMenu, animated: true, completion: nil)
         }
     }
     
@@ -224,9 +346,8 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     }
     
     private func processDrawingRecognition() {
-        if self.helpLinesShown {
-            self.toggleHelpLines()
-        }
+        hideAllHelpLines()
+        
         self.sketchnote?.drawings = [String]()
         for drawingView in self.drawingViews {
             drawingView.layer.sublayers?.forEach { $0.removeFromSuperlayer() }
@@ -293,30 +414,22 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     
     private func setupHelpLines() {
         var height = CGFloat(40)
-        while (CGFloat(height) < self.sketchView.frame.height) {
-            let line = SimpleLine(frame: CGRect(x: 0, y: height, width: self.view.frame.width, height: 1))
+        while (CGFloat(height) < self.sketchView.frame.height + 80) {
+            let line = HoritonzalHelpLine(frame: CGRect(x: 0, y: height, width: self.view.frame.width, height: 1))
             line.isUserInteractionEnabled = false
             line.isHidden = true
             self.sketchView.addSubview(line)
-            self.helpLines.append(line)
+            self.helpLinesHorizontal.append(line)
             height = height + 40
         }
-    }
-    private func toggleHelpLines() {
-        self.helpLinesShown = !self.helpLinesShown
-        
-        for helpLine in self.helpLines {
-            helpLine.isHidden = !self.helpLinesShown
-        }
-        
-        if self.helpLinesShown == true {
-            helpLinesButton.gradientStartColor = UIColor(red: 95.0/255.0, green: 193.0/255.0, blue: 148.0/255.0, alpha: 1)
-            helpLinesButton.gradientEndColor = UIColor(red: 0.0, green: 122.0/255.0, blue: 255.0/255.0, alpha: 1)
-        }
-        else {
-            helpLinesButton.gradientEndColor = nil
-            helpLinesButton.gradientStartColor = nil
-            helpLinesButton.gradientHorizontal = false
+        var width = CGFloat(40)
+        while (CGFloat(width) < self.sketchView.frame.width + 80) {
+            let line = VerticalHelpLine(frame: CGRect(x: width, y: 0, width: 1, height: self.view.frame.height))
+            line.isUserInteractionEnabled = false
+            line.isHidden = true
+            self.sketchView.addSubview(line)
+            self.helpLinesVertical.append(line)
+            width = width + 40
         }
     }
     
@@ -337,11 +450,12 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
                             for line in block.lines {
                                 for element in line.elements {
                                     if element.text.lowercased() == document.title.lowercased() || element.text.lowercased().levenshtein(document.title.lowercased()) <= 2 {
-                                        let conceptHighlightView = UIView(frame: element.frame)
+                                        let absoluteFrame = view.convert(element.frame, to: sketchView)
+                                        let conceptHighlightView = UIView(frame: absoluteFrame)
                                         conceptHighlightView.layer.borderWidth = 2
                                         conceptHighlightView.layer.borderColor = UIColor.red.cgColor
                                         self.view.addSubview(conceptHighlightView)
-                                        conceptHighlightView.isHidden = false
+                                        conceptHighlightView.isHidden = true
                                         conceptHighlightView.isUserInteractionEnabled = true
                                         self.conceptHighlights[conceptHighlightView] = document
                                         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(self.handleConceptHighlightTap(_:)))
@@ -398,55 +512,30 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     }
     
     // This function is called when the user closes the page, i.e. stops editing the note, and the app returns to the home page.
+    
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         super.prepare(for: segue, sender: sender)
         
         switch(segue.identifier ?? "") {
         case "Placeholder":
             print("Placeholder")
-        default:
-            guard let button = sender as? UIBarButtonItem, button === closeButton else {
-                print("Close button not pressed, cancelling")
-                return
+            break
+        case "CloseNote":
+            for helpLine in self.helpLinesHorizontal {
+                helpLine.removeFromSuperview()
             }
-            for helpLine in self.helpLines {
+            for helpLine in self.helpLinesVertical {
                 helpLine.removeFromSuperview()
             }
             self.toggleConceptHighlight(isHidden: true)
             self.processDrawingRecognition()
-            sketchnote?.image = sketchView.asImage()
-            sketchnote?.setUpdateDate()
+            sketchnote.image = sketchView.asImage()
+            sketchnote.setUpdateDate()
             self.storedPathArray = sketchView.pathArray
             print("Closing & Saving sketchnote")
+        default:
+            print("Default segue case triggered.")
         }
-    }
-    
-    
-    
-    func willOpen(expandableButtonView: ExpandableButtonView) {
-        if expandableButtonView == toolsMenu {
-            if toolSizeMenu.state == ExpandableButtonView.State.opened {
-                toolSizeMenu.close()
-            }
-            else {
-                toolSizeMenu.isHidden = true
-            }
-        }
-    }
-    
-    func didOpen(expandableButtonView: ExpandableButtonView) {
-        if expandableButtonView == toolsMenu {
-            toolSizeMenu.isHidden = true
-        }
-    }
-    
-    func willClose(expandableButtonView: ExpandableButtonView) {
-        if expandableButtonView == toolsMenu {
-            toolSizeMenu.isHidden = false
-        }
-    }
-    
-    func didClose(expandableButtonView: ExpandableButtonView) {
     }
     
     @objc func changedColor(_ slider: ColorSlider) {
@@ -454,18 +543,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         sketchView.lineColor = color
     }
     
-    private func toolSelected(image: UIImage) {
-        toolsMenu.openImage = image
-        toolsMenu.closeImage = image
-    }
-    
-    private func toolSizeSelected(image: UIImage) {
-        toolSizeMenu.openImage = image
-        toolSizeMenu.closeImage = image
-    }
-    
-    
-    @IBAction func editTapped(_ sender: UIBarButtonItem) {
+    @IBAction func moreTapped(_ sender: LGButton) {
         let alert = UIAlertController(title: "Edit Your Note", message: "", preferredStyle: .alert)
         if bookshelf.isHidden {
             alert.addAction(UIAlertAction(title: "View Documents", style: .default, handler: { action in
@@ -494,17 +572,13 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         }))
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
         self.present(alert, animated: true)
-        
     }
+    
     @IBAction func redoTapped(_ sender: LGButton) {
-        //sketchView.redo()
-        setupConceptHighlights()
+        sketchView.redo()
     }
     @IBAction func undoTapped(_ sender: LGButton) {
         sketchView.undo()
-    }
-    @IBAction func helpLinesTapped(_ sender: LGButton) {
-        self.toggleHelpLines()
     }
     @IBAction func drawingsTapped(_ sender: LGButton) {
         self.toggleDrawingViews()
@@ -517,13 +591,49 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         }
         
         if self.drawingViewsShown == true {
-            drawingsButton.gradientStartColor = UIColor(red: 95.0/255.0, green: 193.0/255.0, blue: 148.0/255.0, alpha: 1)
-            drawingsButton.gradientEndColor = UIColor(red: 0.0, green: 122.0/255.0, blue: 255.0/255.0, alpha: 1)
+            drawingsButton.bgColor = UIColor(red: 95.0/255.0, green: 193.0/255.0, blue: 148.0/255.0, alpha: 1)
         }
         else {
-            drawingsButton.gradientEndColor = nil
-            drawingsButton.gradientStartColor = nil
-            drawingsButton.gradientHorizontal = false
+            drawingsButton.bgColor = .lightGray
+        }
+    }
+    @IBAction func toggleHelpLinesTapped(_ sender: LGButton) {
+        switch self.helpLinesStatus {
+        case .None:
+            self.helpLinesStatus = .Horizontal
+            helpLinesButton.leftIconString = "dehaze"
+            helpLinesButton.bgColor = UIColor(red: 95.0/255.0, green: 193.0/255.0, blue: 148.0/255.0, alpha: 1)
+            for line in helpLinesHorizontal {
+                line.isHidden = false
+            }
+            for line in helpLinesVertical {
+                line.isHidden = true
+            }
+            break
+        case .Horizontal:
+            self.helpLinesStatus = .Grid
+            helpLinesButton.leftIconString = "grid_on"
+            for line in helpLinesHorizontal {
+                line.isHidden = false
+            }
+            for line in helpLinesVertical {
+                line.isHidden = false
+            }
+            break
+        case .Grid:
+            self.helpLinesStatus = .None
+            helpLinesButton.leftIconString = "grid_off"
+            helpLinesButton.bgColor = .lightGray
+            hideAllHelpLines()
+            break
+        }
+    }
+    private func hideAllHelpLines() {
+        for line in helpLinesHorizontal {
+            line.isHidden = true
+        }
+        for line in helpLinesVertical {
+            line.isHidden = true
         }
     }
     
@@ -553,7 +663,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
             if success {
                 if let textData = textData {
                     self.sketchnote.textDataArray.append(textData)
-                    self.annotateText(text: textData.spellchecked)
+                    self.annotateText(text: self.sketchnote.getText())
                     print(textData.spellchecked ?? "")
                 }
             }
@@ -567,6 +677,8 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     func annotateText(text: String) {
         self.activityIndicator.stopAnimating()
         self.clearConceptHighlights()
+        self.sketchnote.documents = [Document]()
+        self.items = [Document]()
         self.showBookshelf()
         
         self.spotlightHelper.fetch(text: text)
@@ -635,115 +747,39 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         }
     }
     
+    //MARK: Tools View drag
+    @IBOutlet var toolsViewRightConstraint: NSLayoutConstraint!
+    @IBOutlet var toolsViewTopConstraint: NSLayoutConstraint!
+    @IBOutlet var toolsViewLeftConstraint: NSLayoutConstraint!
     
-    // **************************
-    // MARK: View Setup Functions - The following functions are used to setup some views of the page.
-    private func setupToolsMenu() {
-        let insets = UIEdgeInsets(top: 16, left: 16, bottom: 16, right: 16)
-        
-        // Tools
-        let items = [
-            ExpandableButtonItem(
-                image: #imageLiteral(resourceName: "Pencil"),
-                highlightedImage: #imageLiteral(resourceName: "Pencil"),
-                imageEdgeInsets: insets,
-                action: {_ in
-                    self.sketchView.drawTool = .pen
-                    self.toolSelected(image: #imageLiteral(resourceName: "Pencil"))
+    var toolsViewTouchPreviousPoint = CGPoint()
+    @IBAction func toolsViewPanned(_ sender: UIPanGestureRecognizer) {
+        if !colorSlider.frame.contains(sender.location(in: self.toolsView)) {
+            if sender.state == .began {
+                toolsViewTouchPreviousPoint = sender.location(in: self.view)
             }
-            ),
-            ExpandableButtonItem(
-                image: #imageLiteral(resourceName: "Eraser"),
-                highlightedImage: #imageLiteral(resourceName: "Eraser"),
-                imageEdgeInsets: insets,
-                action: {_ in
-                    self.sketchView.drawTool = .eraser
-                    self.toolSelected(image: #imageLiteral(resourceName: "Eraser"))
+            else if sender.state != .cancelled {
+                let currentTouchPoint = sender.location(in: self.view)
+                let deltaX = currentTouchPoint.x - toolsViewTouchPreviousPoint.x
+                let deltaY = currentTouchPoint.y - toolsViewTouchPreviousPoint.y
+                if toolsViewLeftConstraint.constant + deltaX > 5 && toolsViewRightConstraint.constant - deltaX > 5 {
+                    toolsViewLeftConstraint.constant += deltaX
+                    toolsViewRightConstraint.constant -= deltaX
+                }
+                if toolsViewTopConstraint.constant + deltaY >= 20 && toolsViewTopConstraint.constant + deltaY < self.view.frame.maxY - 115 {
+                    toolsViewTopConstraint.constant += deltaY
+                }
+                
+                toolsViewTouchPreviousPoint = currentTouchPoint
             }
-            )
-        ]
-        // Tools
-        
-        toolsMenu = ExpandableButtonView(frame: CGRect(x: 2, y: 2, width: 50, height: 50), direction: .right, items: items)
-        toolsMenu.backgroundColor = UIColor.lightGray
-        toolsMenu.arrowWidth = 1
-        toolsMenu.separatorWidth = 2
-        toolsMenu.separatorInset = 6
-        toolsMenu.openImage = #imageLiteral(resourceName: "Pencil")
-        toolsMenu.closeImage = #imageLiteral(resourceName: "Pencil")
-        toolsMenu.closeOnAction = true
-        toolsMenu.layer.cornerRadius = 25
-        toolsView.addSubview(toolsMenu)
-        toolsMenu.delegate = self
-    }
-    
-    private func setupToolSizeMenu() {
-        let insets = UIEdgeInsets(top: 16, left: 16, bottom: 16, right: 16)
-        
-        // Tools
-        let items = [
-            ExpandableButtonItem(
-                image: #imageLiteral(resourceName: "ToolSize1"),
-                highlightedImage: #imageLiteral(resourceName: "ToolSize1"),
-                imageEdgeInsets: insets,
-                action: {_ in
-                    self.sketchView.lineWidth = 2
-                    self.toolSizeSelected(image: #imageLiteral(resourceName: "ToolSize1"))
+            else {
+                toolsViewTouchPreviousPoint = CGPoint()
             }
-            ),
-            ExpandableButtonItem(
-                image: #imageLiteral(resourceName: "ToolSize2"),
-                highlightedImage: #imageLiteral(resourceName: "ToolSize2"),
-                imageEdgeInsets: insets,
-                action: {_ in
-                    self.sketchView.lineWidth = 4
-                    self.toolSizeSelected(image: #imageLiteral(resourceName: "ToolSize2"))
-            }
-            ),
-            ExpandableButtonItem(
-                image: #imageLiteral(resourceName: "ToolSize3"),
-                highlightedImage: #imageLiteral(resourceName: "ToolSize3"),
-                imageEdgeInsets: insets,
-                action: {_ in
-                    self.sketchView.lineWidth = 6
-                    self.toolSizeSelected(image: #imageLiteral(resourceName: "ToolSize3"))
-            }
-            ),
-            ExpandableButtonItem(
-                image: #imageLiteral(resourceName: "ToolSize4"),
-                highlightedImage: #imageLiteral(resourceName: "ToolSize4"),
-                imageEdgeInsets: insets,
-                action: {_ in
-                    self.sketchView.lineWidth = 8
-                    self.toolSizeSelected(image: #imageLiteral(resourceName: "ToolSize4"))
-            }
-            )
-        ]
-        // Tools
-        
-        toolSizeMenu = ExpandableButtonView(frame: CGRect(x: 55, y: 2, width: 50, height: 50), direction: .right, items: items)
-        toolSizeMenu.backgroundColor = UIColor.lightGray
-        toolSizeMenu.arrowWidth = 1
-        toolSizeMenu.separatorWidth = 2
-        toolSizeMenu.separatorInset = 6
-        toolSizeMenu.openImage = #imageLiteral(resourceName: "ToolSize1")
-        toolSizeMenu.closeImage = #imageLiteral(resourceName: "ToolSize1")
-        toolSizeMenu.closeOnAction = true
-        toolSizeMenu.layer.cornerRadius = 25
-        toolsView.addSubview(toolSizeMenu)
-        toolSizeMenu.delegate = self
-    }
-    
-    //MARK: Bookshelf actions
-    @IBAction func bookshelfCloseTapped(_ sender: LGButton) {
-        self.bookshelf.isHidden = true
-    }
-    @IBAction func bookshelfHighlightTapped(_ sender: UISwitch) {
+        }
     }
     
     //MARK: Bookshelf resize
     @IBOutlet var bookshelfRightConstraint: NSLayoutConstraint!
-    @IBOutlet var bookshelfTopConstraint: NSLayoutConstraint!
     @IBOutlet var bookshelfLeftConstraint: NSLayoutConstraint!
     @IBOutlet var bookshelfBottomConstraint: NSLayoutConstraint!
     
@@ -824,13 +860,11 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         }
     }
     
+    // MARK: Documents Collection View
     @IBOutlet var documentsCollectionView: UICollectionView!
     
     let reuseIdentifier = "cell" // also enter this string as the cell identifier in the storyboard
     var items = [Document]()
-    
-    
-    // MARK: - UICollectionViewDataSource protocol
     
     // tell the collection view how many cells to make
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -1010,7 +1044,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         documentsCollectionView.isHidden = false
     }
 }
-public class SimpleLine: UIView  {
+public class HoritonzalHelpLine: UIView  {
     
     public init() {
         super.init(frame: CGRect(x: 0, y: 0, width: 320, height: 480))
@@ -1032,6 +1066,31 @@ public class SimpleLine: UIView  {
         context.setStrokeColor(UIColor.black.cgColor)
         context.move(to: CGPoint(x: 0, y: 0))
         context.addLine(to: CGPoint(x: self.frame.width, y: 0))
+        context.strokePath()
+    }
+}
+public class VerticalHelpLine: UIView  {
+    
+    public init() {
+        super.init(frame: CGRect(x: 0, y: 0, width: 320, height: 480))
+        backgroundColor = .clear
+    }
+    
+    public required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    public override init(frame: CGRect) {
+        super.init(frame: frame)
+        backgroundColor = .clear
+    }
+    
+    public override func draw(_ rect: CGRect) {
+        guard let context = UIGraphicsGetCurrentContext() else { return }
+        context.setLineWidth(2.0)
+        context.setStrokeColor(UIColor.black.cgColor)
+        context.move(to: CGPoint(x: 0, y: 0))
+        context.addLine(to: CGPoint(x: 0, y: self.frame.height))
         context.strokePath()
     }
 }
