@@ -17,6 +17,7 @@ import GSMessages
 class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, SketchViewDelegate, UIPencilInteractionDelegate, UICollectionViewDataSource, UICollectionViewDelegate, DocumentVisitor {
 
     @IBOutlet weak var topContainer: UIView!
+    @IBOutlet var topContainerLeftDragView: UIView!
     @IBOutlet var sketchView: SketchView!
     @IBOutlet weak var toolsView: UIView!
     @IBOutlet var redoButton: LGButton!
@@ -62,12 +63,19 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         
         self.setupDocumentDetailScrollView()
         self.bookshelfLeftDragView.curveTopCorners(size: 5)
+        self.topContainerLeftDragView.curveTopCorners(size: 5)
 
         colorSlider = ColorSlider(orientation: .horizontal, previewSide: .bottom)
         colorSlider.color = .black
-        colorSlider.frame = CGRect(x: 0, y: 2, width: 230, height: 50)
-        toolsView.addSubview(colorSlider)
-        toolsView.bringSubviewToFront(colorSlider)
+        colorSlider.frame = toolsView.frame
+        topContainer.addSubview(colorSlider)
+        colorSlider.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            colorSlider.topAnchor.constraint(equalTo: toolsView.topAnchor),
+            colorSlider.leadingAnchor.constraint(equalTo: toolsView.leadingAnchor),
+            colorSlider.trailingAnchor.constraint(equalTo: toolsView.trailingAnchor),
+            colorSlider.bottomAnchor.constraint(equalTo: toolsView.bottomAnchor),
+            ])
         colorSlider.addTarget(self, action: #selector(changedColor(_:)), for: .valueChanged)
         
         sketchView.sketchViewDelegate = self
@@ -454,7 +462,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
                                         let conceptHighlightView = UIView(frame: absoluteFrame)
                                         conceptHighlightView.layer.borderWidth = 2
                                         conceptHighlightView.layer.borderColor = UIColor.red.cgColor
-                                        self.view.addSubview(conceptHighlightView)
+                                        self.sketchView.addSubview(conceptHighlightView)
                                         conceptHighlightView.isHidden = true
                                         conceptHighlightView.isUserInteractionEnabled = true
                                         self.conceptHighlights[conceptHighlightView] = document
@@ -542,6 +550,15 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         let color = slider.color
         sketchView.lineColor = color
     }
+    @IBAction func viewToolsTapped(_ sender: LGButton) {
+        topContainer.isHidden = !topContainer.isHidden
+        if topContainer.isHidden {
+            sender.bgColor = .lightGray
+        }
+        else {
+            sender.bgColor = UIColor(red: 85.0/255.0, green: 117.0/255.0, blue: 193.0/255.0, alpha: 1)
+        }
+    }
     
     @IBAction func moreTapped(_ sender: LGButton) {
         let alert = UIAlertController(title: "Edit Your Note", message: "", preferredStyle: .alert)
@@ -591,7 +608,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         }
         
         if self.drawingViewsShown == true {
-            drawingsButton.bgColor = UIColor(red: 95.0/255.0, green: 193.0/255.0, blue: 148.0/255.0, alpha: 1)
+            drawingsButton.bgColor = UIColor(red: 85.0/255.0, green: 117.0/255.0, blue: 193.0/255.0, alpha: 1)
         }
         else {
             drawingsButton.bgColor = .lightGray
@@ -602,7 +619,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         case .None:
             self.helpLinesStatus = .Horizontal
             helpLinesButton.leftIconString = "dehaze"
-            helpLinesButton.bgColor = UIColor(red: 95.0/255.0, green: 193.0/255.0, blue: 148.0/255.0, alpha: 1)
+            helpLinesButton.bgColor = UIColor(red: 85.0/255.0, green: 117.0/255.0, blue: 193.0/255.0, alpha: 1)
             for line in helpLinesHorizontal {
                 line.isHidden = false
             }
@@ -748,9 +765,10 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     }
     
     //MARK: Tools View drag
-    @IBOutlet var toolsViewRightConstraint: NSLayoutConstraint!
-    @IBOutlet var toolsViewTopConstraint: NSLayoutConstraint!
     @IBOutlet var toolsViewLeftConstraint: NSLayoutConstraint!
+    @IBOutlet var toolsViewTopConstraint: NSLayoutConstraint!
+    @IBOutlet var toolsViewRightConstraint: NSLayoutConstraint!
+    
     
     var toolsViewTouchPreviousPoint = CGPoint()
     @IBAction func toolsViewPanned(_ sender: UIPanGestureRecognizer) {
