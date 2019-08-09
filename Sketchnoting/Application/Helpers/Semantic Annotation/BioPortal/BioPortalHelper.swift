@@ -76,7 +76,7 @@ class BioPortalHelper {
                                     }
                                 }
                                 else {
-                                    let document = BioPortalDocument(title: annotation, description: definition, URL: "https://bioportal.bioontology.org/search?utf8=%E2%9C%93&query=" + (prefLabel.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) ?? "https://bioportal.bioontology.org/"), type: .BioOntology, previewImage: nil, prefLabel: prefLabel, definition: definition)
+                                    let document = BioPortalDocument(title: annotation, description: definition, URL: "https://bioportal.bioontology.org/search?utf8=%E2%9C%93&query=" + (prefLabel.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) ?? "https://bioportal.bioontology.org/"), type: .BioPortal, previewImage: nil, prefLabel: prefLabel, definition: definition)
                                     if let document = document {
                                         documents.append(document)
                                     }

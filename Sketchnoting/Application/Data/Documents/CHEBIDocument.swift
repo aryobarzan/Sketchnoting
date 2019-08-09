@@ -34,10 +34,9 @@ class CHEBIDocument: BioPortalDocument {
     }
     
     required init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        let superdecoder = try container.superDecoder()
-        try super.init(from: superdecoder)
+        try super.init(from: decoder)
         
+        let container = try decoder.container(keyedBy: CodingKeys.self)
         do {
             let strBase64: String = try container.decode(String.self, forKey: .moleculeImage)
             let dataDecoded: Data = Data(base64Encoded: strBase64, options: .ignoreUnknownCharacters)!

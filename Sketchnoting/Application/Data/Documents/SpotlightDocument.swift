@@ -36,10 +36,11 @@ class SpotlightDocument: Document {
         self.latitude = latitude
         self.longitude = longitude
         self.mapImage = mapImage
-        super.init(title: title, description: description, URL: URL, type: type, previewImage: previewImage)
+        super.init(title: title, description: description, URL: URL, documentType: type, previewImage: previewImage, type: "Spotlight")
     }
     
     override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(secondRankPercentage, forKey: .secondRankPercentage)
         try container.encode(label, forKey: .label)
@@ -52,27 +53,39 @@ class SpotlightDocument: Document {
             let strBase64 = imageData.base64EncodedString(options: .lineLength64Characters)
             try container.encode(strBase64, forKey: .mapImage)
         }
+        if let mapImage = mapImage {
+            if let pngData = mapImage.pngData() {
+                let strBase64 = pngData.base64EncodedString(options: .lineLength64Characters)
+                try container.encode(strBase64, forKey: .mapImage)
+            }
+            else  {
+                if let jpgData = mapImage.jpegData(compressionQuality: 1) {
+                    let strBase64 = jpgData.base64EncodedString(options: .lineLength64Characters)
+                    try container.encode(strBase64, forKey: .mapImage)
+                }
+            }
+        }
         
-        let superencoder = container.superEncoder()
-        try super.encode(to: superencoder)
+        //let superencoder = container.superEncoder()
+        //try super.encode(to: superencoder)
     }
     
     required init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        let superdecoder = try container.superDecoder()
-        try super.init(from: superdecoder)
+        try super.init(from: decoder)
         
-        secondRankPercentage = try container.decode(Double.self, forKey: .secondRankPercentage)
-        label = try container.decode(String.self, forKey: .label)
-        types = try container.decode([String].self, forKey: .types)
-        wikiPageID = try container.decode(Double.self, forKey: .wikiPageID)
-        latitude = try container.decode(Double.self, forKey: .latitude)
-        longitude = try container.decode(Double.self, forKey: .longitude)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        secondRankPercentage = try? container.decode(Double.self, forKey: .secondRankPercentage)
+        label = try? container.decode(String.self, forKey: .label)
+        types = try? container.decode([String].self, forKey: .types)
+        wikiPageID = try? container.decode(Double.self, forKey: .wikiPageID)
+        latitude = try? container.decode(Double.self, forKey: .latitude)
+        longitude = try? container.decode(Double.self, forKey: .longitude)
         do {
             let strBase64: String = try container.decode(String.self, forKey: .mapImage)
             let dataDecoded: Data = Data(base64Encoded: strBase64, options: .ignoreUnknownCharacters)!
             mapImage = UIImage(data: dataDecoded)
         } catch {
+            print(error)
         }
     }
     

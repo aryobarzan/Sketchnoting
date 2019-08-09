@@ -34,6 +34,8 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     var pencilSize : CGFloat = 2
     var eraserSize : CGFloat = 2
     
+    
+    
     var sketchnote: Sketchnote!
     var new = false
     var storedPathArray: NSMutableArray?
@@ -119,7 +121,8 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
                         ])
                 }
             }
-            if let documents = sketchnote?.documents {
+            if let documents = sketchnote.documents {
+                print("Reloading documents.")
                 self.items = documents
                 documentsCollectionView.reloadData()
             }
@@ -458,11 +461,11 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
                             for line in block.lines {
                                 for element in line.elements {
                                     if element.text.lowercased() == document.title.lowercased() || element.text.lowercased().levenshtein(document.title.lowercased()) <= 2 {
-                                        let absoluteFrame = view.convert(element.frame, to: sketchView)
-                                        let conceptHighlightView = UIView(frame: absoluteFrame)
+                                        let scaledFrame = createScaledFrame(featureFrame: element.frame, imageSize: textData.imageSize)
+                                        let conceptHighlightView = UIView(frame: scaledFrame)
                                         conceptHighlightView.layer.borderWidth = 2
                                         conceptHighlightView.layer.borderColor = UIColor.red.cgColor
-                                        self.sketchView.addSubview(conceptHighlightView)
+                                        self.view.addSubview(conceptHighlightView)
                                         conceptHighlightView.isHidden = true
                                         conceptHighlightView.isUserInteractionEnabled = true
                                         self.conceptHighlights[conceptHighlightView] = document
@@ -485,6 +488,41 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
                 }
             }
         }
+    }
+    private func createScaledFrame(featureFrame: CGRect, imageSize: CGSize) -> CGRect {
+            let viewSize = sketchView.frame.size
+            
+            // 2
+            let resolutionView = viewSize.width / viewSize.height
+            let resolutionImage = imageSize.width / imageSize.height
+            
+            // 3
+            var scale: CGFloat
+            if resolutionView > resolutionImage {
+                scale = viewSize.height / imageSize.height
+            } else {
+                scale = viewSize.width / imageSize.width
+            }
+            
+            // 4
+            let featureWidthScaled = featureFrame.size.width * scale
+            let featureHeightScaled = featureFrame.size.height * scale
+            
+            // 5
+            let imageWidthScaled = imageSize.width * scale
+            let imageHeightScaled = imageSize.height * scale
+            let imagePointXScaled = (viewSize.width - imageWidthScaled) / 2
+            let imagePointYScaled = (viewSize.height - imageHeightScaled) / 2
+            
+            // 6
+            let featurePointXScaled = imagePointXScaled + featureFrame.origin.x * scale
+            let featurePointYScaled = imagePointYScaled + featureFrame.origin.y * scale
+            
+            // 7
+            return CGRect(x: featurePointXScaled,
+                          y: featurePointYScaled,
+                          width: featureWidthScaled,
+                          height: featureHeightScaled)
     }
     @objc func handleConceptHighlightTap(_ sender: UITapGestureRecognizer) {
         if let conceptHighlightView = sender.view {
@@ -909,7 +947,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         switch(type) {
         case .Spotlight:
             return .gray
-        case .BioOntology:
+        case .BioPortal:
             return .purple
         case .Chemistry:
             return .brown
@@ -927,10 +965,9 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     }
     
     func displayInBookshelf(document: Document) {
-        self.items.append(document)
+        self.sketchnote.addDocument(document: document)
+        self.items = self.sketchnote.documents ?? [Document]()
         self.documentsCollectionView.reloadData()
-        
-        self.sketchnote?.documents = items
     }
     
     func displayInBookshelf(documents: [Document]) {

@@ -17,43 +17,49 @@ protocol DocumentVisitor {
     func process(document: BioPortalDocument)
     func process(document: CHEBIDocument)
 }
-// This enum is used to let the user know the type of a found document.
-// Currently only the case Spotlight is used, as that is the only source for retrieving related documents.
+
 enum DocumentType: String, Codable {
     case Spotlight
-    case BioOntology
+    case BioPortal
     case Chemistry
     case Other
 }
 
-// This class contains the information for a document that is related to a note's text.
-// All of its properties are required, except for 'description', which is the abstract text of the found document.
-// As this abstract text is manually fetched from the document's page source code via a regular expression, it may at times fail, hence why it is an optional property.
-class Document: Codable, Visitable {
+class Document: Codable, Visitable, Equatable {
+    static func == (lhs: Document, rhs: Document) -> Bool {
+        if lhs.title == rhs.title {
+            return true
+        }
+        return false
+    }
+    
     
     var title: String
     var description: String?
     var URL: String
     var documentType: DocumentType
     var previewImage: UIImage?
+    var type: String
     
     private enum CodingKeys: String, CodingKey {
-        case title
-        case description
-        case URL
-        case documentType
-        case previewImage
+        case title = "Title"
+        case description = "Description"
+        case URL = "URL"
+        case documentType = "DocumentType"
+        case type = "Type"
+        case previewImage = "PreviewImage"
     }
     
-    init?(title: String, description: String?, URL: String, type: DocumentType, previewImage: UIImage?){
+    init?(title: String, description: String?, URL: String, documentType: DocumentType, previewImage: UIImage?, type: String?){
         guard !title.isEmpty && !URL.isEmpty else {
             return nil
         }
         self.title = title
         self.description = description
         self.URL = URL
-        self.documentType = type
+        self.documentType = documentType
         self.previewImage = previewImage
+        self.type = type ?? "SpotlightDocument"
     }
     
     func encode(to encoder: Encoder) throws {
@@ -62,25 +68,48 @@ class Document: Codable, Visitable {
         try container.encode(description, forKey: .description)
         try container.encode(URL, forKey: .URL)
         try container.encode(documentType, forKey: .documentType)
-        if previewImage != nil {
-            let imageData: Data = previewImage!.pngData()!
-            let strBase64 = imageData.base64EncodedString(options: .lineLength64Characters)
-            try container.encode(strBase64, forKey: .previewImage)
+        try container.encode(type, forKey: .type)
+        print("Encoding image")
+        if let previewImage = previewImage {
+            if let pngData = previewImage.pngData() {
+                let strBase64 = pngData.base64EncodedString(options: .lineLength64Characters)
+                try container.encode(strBase64, forKey: .previewImage)
+            }
+            else  {
+                if let jpgData = previewImage.jpegData(compressionQuality: 1) {
+                    let strBase64 = jpgData.base64EncodedString(options: .lineLength64Characters)
+                    try container.encode(strBase64, forKey: .previewImage)
+                }
+            }
         }
     }
     
     required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        title = try container.decode(String.self, forKey: .title)
-        description = try container.decode(String.self, forKey: .description)
+        do {
+            title = try container.decode(String.self, forKey: CodingKeys.title)
+        } catch {
+            print(error)
+            title = ""
+        }
+        do {
+            description = try container.decode(String.self, forKey: .description)
+        } catch {
+            print(error)
+            print("Note description decoding failed.")
+            description = ""
+        }
+        
         URL = try container.decode(String.self, forKey: .URL)
         documentType = DocumentType(rawValue: try container.decode(String.self, forKey: .documentType)) ?? .Other
-        
+        type = try container.decode(String.self, forKey: .type)
         do {
             let strBase64: String = try container.decode(String.self, forKey: .previewImage)
             let dataDecoded: Data = Data(base64Encoded: strBase64, options: .ignoreUnknownCharacters)!
             previewImage = UIImage(data: dataDecoded)
+            print("Document preview image decoded.")
         } catch {
+            print("Document preview image decoding failed.")
         }
     }
     

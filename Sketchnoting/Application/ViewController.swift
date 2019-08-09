@@ -12,8 +12,6 @@ import PopMenu
 import MultipeerConnectivity
 import PDFGenerator
 import GSMessages
-import RAMPaperSwitch
-import BadgeHub
 
 // This is the controller for the app's home page view.
 // It contains the search bar and all the buttons related to it.
@@ -31,11 +29,11 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     @IBOutlet var searchFiltersScrollView: UIScrollView!
     @IBOutlet var searchSeparator: UIView!
     var searchFiltersStackView = UIStackView()
-    @IBOutlet var noteSharingSwitch: UISwitch!
-    @IBOutlet var sharedNotesButton: LGButton!
-    @IBOutlet var noteSharingLabel: UILabel!
     
-    var sharedNotesBadge: BadgeHub!
+    @IBOutlet var searchPanel: UIView!
+    @IBOutlet var searchPanelHeightConstraint: NSLayoutConstraint!
+    @IBOutlet var searchPanelButton: LGButton!
+    var searchPanelOpen = false
     
     // This property holds the user's note collection views displayed on this home page.
     var noteCollectionViews = [NoteCollectionView]()
@@ -69,8 +67,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     var receivedSketchnote: Sketchnote?
     // The strokes linked to that received note are stored here.
     var receivedPathArray: NSMutableArray?
-    // This view is displayed to a shared note's recipient, which allows the user to accept or reject the shared note.
-    var noteShareView: NoteShareView!
     
     
     // This function initializes the home page view.
@@ -82,21 +78,11 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         peerID = MCPeerID(displayName: UIDevice.current.name)
         mcSession = MCSession(peer: peerID, securityIdentity: nil, encryptionPreference: .required)
         mcSession.delegate = self
-        noteShareView = NoteShareView(frame: CGRect(x: 0, y: 0, width: 326, height: 435))
-        noteShareView.center = self.view.center
-        noteShareView.alpha = 1
-        noteShareView.transform = CGAffineTransform(scaleX: 0.8, y: 1.2)
-        noteShareView.setAcceptAction {
-            self.acceptSharedNote()
-        }
-        noteShareView.setRejectAction {
-            self.rejectSharedNote()
-        }
-        noteShareView.setCloseAction {
-            self.hideNoteShareView()
-        }
-        sharedNotesBadge = BadgeHub(view: sharedNotesButton)
-        sharedNotesBadge.moveCircleBy(x: -120, y: 0)
+        setSharedNotesPanelStatus(notesAreShared: false)
+        noteSharingPanel.layer.borderWidth = 1
+        noteSharingPanel.layer.borderColor = UIColor.black.cgColor
+        sharedNoteImageView.layer.borderWidth = 1
+        sharedNoteImageView.layer.borderColor = UIColor.black.cgColor
         
         // The search views are setup, including the search field and the pop-up view for searching by drawing
         self.searchField.delegate = self
@@ -154,6 +140,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
                 print("error loading labels: \(error)")
             }
         }
+        searchPanelHeightConstraint.constant = 0
     }
     
     // This function handles the cases where the user either creates a new note or wants to edit an existing note.
@@ -178,6 +165,31 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             print("Not creating or editing sketchnote.")
         }
     }
+    
+    //MARK: Search panel
+    @IBAction func searchPanelButtonTapped(_ sender: LGButton) {
+        if searchPanelOpen {
+            searchPanelButton.bgColor = UIColor(red: 155.0/255.0, green: 83.0/255.0, blue: 229.0/255.0, alpha: 1)
+            self.searchPanelHeightConstraint.constant = 0
+            self.view.setNeedsUpdateConstraints()
+            self.searchPanel.isHidden = true
+        }
+        else {
+            searchPanelButton.bgColor = .lightGray
+            self.searchPanelHeightConstraint.constant = 125
+            self.view.setNeedsUpdateConstraints()
+            UIView.animate(withDuration: 0.5, delay: 0, options: UIView.AnimationOptions.curveEaseIn, animations: {
+                self.view.layoutIfNeeded()
+            }, completion: { (finished: Bool) in
+                self.searchPanel.isHidden = false
+            })
+        }
+        
+        searchPanelOpen = !searchPanelOpen
+    }
+    
+    
+    //MARK: Display notes
     
     func displaySketchnote(note: Sketchnote, collectionView: NoteCollectionView) {
         let sketchnoteView = SketchnoteView(frame: collectionView.stackView.frame)
@@ -446,22 +458,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     }
     
     // Multipeer Connectivity - The following functions are related to the note-sharing feature.
-    @IBAction func noteSharingTapped(_ sender: UISwitch) {
-        // The user's device is made visible to nearby devices for sharing
-        if sender.isOn {
-            startHosting()
-            sharedNotesButton.isHidden = false
-            noteSharingLabel.textColor = .white
-        }
-        else {
-            // The user's device is no longer visible to other nearby devices
-            if mcAdvertiserAssistant != nil {
-                mcAdvertiserAssistant.stop()
-            }
-            sharedNotesButton.isHidden = true
-            noteSharingLabel.textColor = .black
-        }
-    }
+
     func session(_ session: MCSession, didReceive stream: InputStream, withName streamName: String, fromPeer peerID: MCPeerID) {
     }
     
@@ -541,6 +538,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             print("wrong data")
             return
         }
+        received.sharedByDevice = peerID.displayName
         self.receivedSketchnote = received
         guard let receivedPath = ((try? NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(receivedData![1]) as?
             NSMutableArray) as NSMutableArray??) else { return }
@@ -548,23 +546,12 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         if self.receivedSketchnote != nil && self.receivedPathArray != nil {
             DispatchQueue.main.async {
                 self.pendingSharedNotes.append((received, receivedPath!))
-                self.view.showMessage("New note shared with you. Tap Shared Notes to preview it!", type: .info)
-                self.sharedNotesBadge.increment()
-                self.sharedNotesButton.isEnabled = true
+                self.setSharedNotesPanelStatus(notesAreShared: true)
+                self.view.showMessage("Device \(peerID.displayName) shared a note with you!", type: .info)
             }
         }
     }
     var pendingSharedNotes = [(Sketchnote, NSMutableArray)]()
-    @IBAction func sharedNotesButtonTapped(_ sender: LGButton) {
-        if pendingSharedNotes.count > 0 {
-            self.receivedSketchnote = pendingSharedNotes[0].0
-            self.receivedPathArray = pendingSharedNotes[0].1
-            self.displayNoteShareView()
-        }
-        else {
-            self.view.showMessage("There are no shared notes to preview.", type: .info)
-        }
-    }
     
     func startHosting() {
         mcAdvertiserAssistant = MCAdvertiserAssistant(serviceType: "hws-kb", discoveryInfo: nil, session: mcSession)
@@ -577,56 +564,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         mcBrowser.delegate = self
         present(mcBrowser, animated: true)
         print("Joining sessions...")
-    }
-    
-    private func displayNoteShareView() {
-        noteShareView.sketchnoteView.setNote(note: self.receivedSketchnote!)
-        self.view.addSubview(self.noteShareView)
-        self.dimView.isHidden = false
-        self.noteShareView.transform = .identity
-    }
-    
-    private func hideNoteShareView() {
-        self.receivedSketchnote = nil
-        self.receivedPathArray = nil
-        self.dimView.isHidden = true
-        self.noteShareView.removeFromSuperview()
-        if pendingSharedNotes.count == 0 {
-            sharedNotesButton.isEnabled = false
-        }
-    }
-    
-    private func acceptSharedNote() {
-        print("Accepted shared note")
-        if receivedSketchnote != nil && receivedPathArray != nil {
-            if pendingSharedNotes.count > 0 {
-                pendingSharedNotes.remove(at: 0)
-            }
-            receivedSketchnote!.paths = receivedPathArray
-            let noteCollection = NoteCollection(title: "Shared Note", notes: nil)!
-            noteCollection.addSketchnote(note: receivedSketchnote!)
-            NotesManager.shared.add(noteCollection: noteCollection)
-            receivedSketchnote?.save()
-            noteCollection.save()
-            //NotesManager.shared.add(note: receivedSketchnote!, pathArray: receivedPathArray!)
-
-            displayNoteCollection(collection: noteCollection)
-        }
-        hideNoteShareView()
-        self.view.showMessage("Shared note accepted and stored to your device.", type: .success)
-        sharedNotesBadge.decrement()
-    }
-    
-    private func rejectSharedNote() {
-        print("Rejected shared note")
-        if receivedSketchnote != nil && receivedPathArray != nil {
-            if pendingSharedNotes.count > 0 {
-                pendingSharedNotes.remove(at: 0)
-            }
-        }
-        hideNoteShareView()
-        self.view.showMessage("Shared note rejected.", type: .error)
-        sharedNotesBadge.decrement()
     }
     
     // PDF Generation - The following functions are used for generating a pdf from either a single sketchnote or a note collection.
@@ -668,4 +605,190 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             }
         }
     }
+    
+    //MARK: Sharing Panel
+    @IBOutlet var noteSharingPanelButton: LGButton!
+    @IBOutlet var noteSharingPanel: UIView!
+    @IBOutlet var sharedNotesIndexLabel: UILabel!
+    @IBOutlet var sharedByLabel: UILabel!
+    @IBOutlet var sharedNoteImageView: UIImageView!
+    
+    @IBAction func noteSharingPanelButtonTapped(_ sender: LGButton) {
+        showNoteSharingPanel()
+    }
+    private func showNoteSharingPanel() {
+        UIView.animate(withDuration: 0.0, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 0, options: [], animations: {
+            self.dimView.alpha = 0.8
+            self.dimView.isHidden = false
+            self.noteSharingPanel.isHidden = false
+        }) { (success) in
+        }
+    }
+    private func hideNoteSharingPanel() {
+        UIView.animate(withDuration: 0.0, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 0, options: [], animations: {
+            self.dimView.alpha = 0
+            self.dimView.isHidden = true
+            self.noteSharingPanel.isHidden = true
+        }) { (success) in
+        }
+    }
+    
+    private var currentSharedNoteIndex = 0
+    @IBAction func noteSharingPanelCloseTapped(_ sender: UIButton) {
+        hideNoteSharingPanel()
+    }
+    @IBAction func noteSharingSwitchChanged(_ sender: UISwitch) {
+        if sender.isOn {
+            startHosting()
+            noteSharingPanelButton.bgColor = UIColor(red: 85.0/255.0, green: 117.0/255.0, blue: 193.0/255.0, alpha: 1)
+        }
+        else {
+            // The user's device is no longer visible to other nearby devices
+            if mcAdvertiserAssistant != nil {
+                mcAdvertiserAssistant.stop()
+            }
+            noteSharingPanelButton.bgColor = UIColor(red: 201.0/255.0, green: 181.0/255.0, blue: 171.0/255.0, alpha: 1)
+        }
+    }
+    @IBOutlet var previousSharedNoteButton: LGButton!
+    @IBOutlet var nextSharedNoteButton: LGButton!
+    @IBAction func previousSharedNoteTapped(_ sender: LGButton) {
+        if pendingSharedNotes.count > 0 && currentSharedNoteIndex > 0 {
+            currentSharedNoteIndex -= 1
+            updateCurrentSharedNote()
+        }
+        updatePreviousSharedNoteButtonStatus()
+        updateNextSharedNoteButtonStatus()
+    }
+    @IBAction func nextSharedNoteTapped(_ sender: LGButton) {
+        if pendingSharedNotes.count > 0 && currentSharedNoteIndex < pendingSharedNotes.count - 1 {
+            currentSharedNoteIndex += 1
+            updateCurrentSharedNote()
+        }
+        updateNextSharedNoteButtonStatus()
+        updatePreviousSharedNoteButtonStatus()
+    }
+    @IBOutlet var declineSharedNoteButton: LGButton!
+    @IBOutlet var acceptSharedNoteButton: LGButton!
+    @IBAction func declineSharedNoteTapped(_ sender: LGButton) {
+        print("Rejected shared note")
+        if receivedSketchnote != nil && receivedPathArray != nil {
+            if pendingSharedNotes.count > 0 {
+                pendingSharedNotes.remove(at: currentSharedNoteIndex)
+            }
+        }
+        self.view.showMessage("Shared note rejected.", type: .error)
+        
+        DispatchQueue.main.async {
+            if self.currentSharedNoteIndex > 0 {
+                self.currentSharedNoteIndex -= 1
+            }
+            self.updatePreviousSharedNoteButtonStatus()
+            self.updateNextSharedNoteButtonStatus()
+            self.updateCurrentSharedNote()
+            if self.pendingSharedNotes.count == 0 {
+                self.setSharedNotesPanelStatus(notesAreShared: false)
+            }
+        }
+    }
+    @IBAction func acceptSharedNoteTapped(_ sender: LGButton) {
+        print("Accepted shared note")
+        if receivedSketchnote != nil && receivedPathArray != nil {
+            if pendingSharedNotes.count > 0 {
+                pendingSharedNotes.remove(at: currentSharedNoteIndex)
+            }
+            receivedSketchnote!.paths = receivedPathArray
+            let noteCollection = NoteCollection(title: "Shared Note", notes: nil)!
+            noteCollection.addSketchnote(note: receivedSketchnote!)
+            NotesManager.shared.add(noteCollection: noteCollection)
+            receivedSketchnote?.save()
+            noteCollection.save()
+            displayNoteCollection(collection: noteCollection)
+        }
+        self.view.showMessage("Shared note accepted and stored to your device.", type: .success)
+        
+        DispatchQueue.main.async {
+            if self.currentSharedNoteIndex > 0 {
+                self.currentSharedNoteIndex -= 1
+            }
+            self.updatePreviousSharedNoteButtonStatus()
+            self.updateNextSharedNoteButtonStatus()
+            self.updateCurrentSharedNote()
+            if self.pendingSharedNotes.count == 0 {
+                self.setSharedNotesPanelStatus(notesAreShared: false)
+            }
+        }
+    }
+    
+    private func setSharedNotesPanelStatus(notesAreShared: Bool) {
+        if !notesAreShared {
+            sharedNoteImageView.isHidden = true
+            sharedNotesIndexLabel.text = "No shared notes to view."
+            sharedByLabel.text = "..."
+            previousSharedNoteButton.isUserInteractionEnabled = false
+            previousSharedNoteButton.bgColor = .lightGray
+            nextSharedNoteButton.isUserInteractionEnabled = false
+            nextSharedNoteButton.bgColor = .lightGray
+            declineSharedNoteButton.isUserInteractionEnabled = false
+            declineSharedNoteButton.bgColor = .lightGray
+            acceptSharedNoteButton.isUserInteractionEnabled = false
+            acceptSharedNoteButton.bgColor = .lightGray
+            
+            receivedSketchnote = nil
+            receivedPathArray = nil
+        }
+        else {
+            sharedNoteImageView.isHidden = false
+            sharedNotesIndexLabel.text = "\(currentSharedNoteIndex + 1)/\(pendingSharedNotes.count)"
+            updatePreviousSharedNoteButtonStatus()
+            updateNextSharedNoteButtonStatus()
+            updateCurrentSharedNote()
+            declineSharedNoteButton.isUserInteractionEnabled = true
+            declineSharedNoteButton.bgColor = UIColor(red: 187.0/255.0, green: 34.0/255.0, blue: 40.0/255.0, alpha: 1)
+            acceptSharedNoteButton.isUserInteractionEnabled = true
+            acceptSharedNoteButton.bgColor = UIColor(red: 85.0/255.0, green: 117.0/255.0, blue: 193.0/255.0, alpha: 1)
+        }
+    }
+    private func updatePreviousSharedNoteButtonStatus() {
+        var enabled = false
+        if pendingSharedNotes.count > 0 {
+            if currentSharedNoteIndex > 0 {
+                enabled = true
+                previousSharedNoteButton.isUserInteractionEnabled = true
+                previousSharedNoteButton.bgColor = UIColor(red: 85.0/255.0, green: 117.0/255.0, blue: 193.0/255.0, alpha: 1)
+            }
+        }
+        if !enabled {
+            previousSharedNoteButton.isUserInteractionEnabled = false
+            previousSharedNoteButton.bgColor = .lightGray
+        }
+    }
+    private func updateNextSharedNoteButtonStatus() {
+        var enabled = false
+        if pendingSharedNotes.count > 0 {
+            if currentSharedNoteIndex < pendingSharedNotes.count - 1 {
+                enabled = true
+                nextSharedNoteButton.isUserInteractionEnabled = true
+                nextSharedNoteButton.bgColor = UIColor(red: 85.0/255.0, green: 117.0/255.0, blue: 193.0/255.0, alpha: 1)
+            }
+        }
+        if !enabled {
+            nextSharedNoteButton.isUserInteractionEnabled = true
+            nextSharedNoteButton.bgColor = .lightGray
+        }
+    }
+    private func updateCurrentSharedNote() {
+        if pendingSharedNotes.count > 0 && currentSharedNoteIndex < pendingSharedNotes.count {
+            DispatchQueue.main.async {
+                let note = Array(self.pendingSharedNotes)[self.currentSharedNoteIndex].0
+                let pathArray = Array(self.pendingSharedNotes)[self.currentSharedNoteIndex].1
+                self.sharedNotesIndexLabel.text = "\(self.currentSharedNoteIndex + 1)/\(self.pendingSharedNotes.count)"
+                self.sharedNoteImageView.image = note.image
+                self.sharedByLabel.text = "Shared by: \(note.sharedByDevice ?? "Unknown")"
+                self.receivedSketchnote = note
+                self.receivedPathArray = pathArray
+            }
+        }
+    }
+    
 }

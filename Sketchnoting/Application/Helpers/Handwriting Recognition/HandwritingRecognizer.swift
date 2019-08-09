@@ -48,14 +48,14 @@ class HandwritingRecognizer {
             layer.fillColor = UIColor.white.cgColor
             canvas.layer.addSublayer(layer)
         }
-        
-        let visionImage = VisionImage(image: canvas.asImage())
+        let image = canvas.asImage()
+        let visionImage = VisionImage(image: image)
         textRecognizer.process(visionImage) { result, error in
             guard error == nil, let result = result else {
                 handleFinish(false, nil)
                 return
             }
-            let textData = TextData(visionText: result, original: result.text, paths: newPathsBoundingBoxes)
+            let textData = TextData(visionText: result, original: result.text, paths: newPathsBoundingBoxes, imageSize: canvas.frame.size)
             handleFinish(true, textData)
         }
     }

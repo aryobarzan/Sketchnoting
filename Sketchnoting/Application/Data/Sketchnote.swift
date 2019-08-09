@@ -20,6 +20,8 @@ class Sketchnote: Note, Equatable {
     var paths: NSMutableArray?
     var textDataArray: [TextData]!
     
+    var sharedByDevice: String?
+    
     enum CodingKeys: String, CodingKey {
         case id
         case creationDate
@@ -47,7 +49,15 @@ class Sketchnote: Note, Equatable {
         try container.encode(id, forKey: .id)
         try container.encode(creationDate.timeIntervalSince1970, forKey: .creationDate)
         try container.encode(updateDate?.timeIntervalSince1970, forKey: .updateDate)
-        try container.encode(documents, forKey: .relatedDocuments)
+        print("Encoding documents.")
+        do {
+            try container.encode(documents, forKey: .relatedDocuments)
+            print("Documents encoded.")
+        } catch {
+            print("Document encoding failed.")
+        }
+        
+        
         try container.encode(drawings, forKey: .drawings)
         try container.encode(drawingViewRects, forKey: .drawingViewRects)
         if image != nil {
@@ -58,7 +68,7 @@ class Sketchnote: Note, Equatable {
     }
     
     required init(from decoder: Decoder) throws {
-        print("Decoding sketchnote")
+        print("Decoding sketchnote.")
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         id = try? container.decode(String.self, forKey: .id)
@@ -68,7 +78,28 @@ class Sketchnote: Note, Equatable {
             updateDate = Date(timeIntervalSince1970: try container.decode(TimeInterval.self, forKey: .updateDate))
         } catch {
         }
-        documents = try? container.decode([Document].self, forKey: .relatedDocuments) 
+
+        var docsArrayForType = try container.nestedUnkeyedContainer(forKey: .relatedDocuments)
+        var docs = [Document]()
+        var docsArray = docsArrayForType
+        do {
+        while(!docsArrayForType.isAtEnd) {
+            let doc = try docsArrayForType.nestedContainer(keyedBy: DocumentTypeKey.self)
+            let t = try doc.decode(DocumentTypes.self, forKey: DocumentTypeKey.type)
+            switch t {
+            case .spotlight:
+                docs.append(try docsArray.decode(SpotlightDocument.self))
+            case .bioportal:
+                docs.append(try docsArray.decode(BioPortalDocument.self))
+            case .chebi:
+                docs.append(try docsArray.decode(CHEBIDocument.self))
+            }
+        }
+        } catch {
+            print(error)
+        }
+        self.documents = docs
+        
         drawings = try? container.decode([String].self, forKey: .drawings)
         drawingViewRects = try? container.decode([CGRect].self, forKey: .drawingViewRects)
         do {
@@ -81,6 +112,16 @@ class Sketchnote: Note, Equatable {
         self.loadPaths()
         self.loadTextDataArray()
         print("Sketchnote decoded")
+        print("Sketchnote has \(documents?.count ?? -1) documents.")
+    }
+    
+    private enum DocumentTypeKey : String, CodingKey {
+        case type = "Type"
+    }
+    private enum DocumentTypes : String, Decodable {
+        case spotlight = "Spotlight"
+        case bioportal = "BioPortal"
+        case chebi = "CHEBI"
     }
     
     public func save() {
@@ -89,7 +130,6 @@ class Sketchnote: Note, Equatable {
         if let encoded = try? encoder.encode(self) {
             UserDefaults.sketchnotes.set(encoded, forKey: self.id)
             print("Note " + id + " saved.")
-            
             if self.paths != nil {
                 self.savePaths()
             }
@@ -175,17 +215,10 @@ class Sketchnote: Note, Equatable {
     }
     
     func addDocument(document: Document) {
-        var exists = false
         if documents == nil {
             documents = [Document]()
         }
-        for d in documents! {
-            if d.title == document.title {
-                exists = true
-                break
-            }
-        }
-        if !exists {
+        if !documents!.contains(document) {
             documents!.append(document)
         }
     }
