@@ -61,7 +61,7 @@
                                     </view>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="B0J-a8-BRi" customClass="LGButton" customModule="LGButton">
                                         <rect key="frame" x="533" y="0.0" width="65" height="50"/>
-                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="65" id="lFt-hL-NWK"/>
                                             <constraint firstAttribute="height" constant="50" id="peM-uC-ajf"/>
@@ -76,7 +76,7 @@
                                                 <real key="value" value="20"/>
                                             </userDefinedRuntimeAttribute>
                                             <userDefinedRuntimeAttribute type="color" keyPath="bgColor">
-                                                <color key="value" red="0.60671163423860741" green="0.32727300898591355" blue="0.8980392157" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                <color key="value" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                             </userDefinedRuntimeAttribute>
                                         </userDefinedRuntimeAttributes>
                                         <connections>
@@ -111,7 +111,7 @@
                                         </connections>
                                     </view>
                                 </subviews>
-                                <color key="backgroundColor" white="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <color key="backgroundColor" red="0.77104940789999998" green="0.85011527760000005" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
                                     <constraint firstItem="aQl-UP-8lm" firstAttribute="top" secondItem="CoV-ID-6VL" secondAttribute="top" id="79s-y5-3Ak"/>
                                     <constraint firstAttribute="bottom" secondItem="2wc-S9-gDw" secondAttribute="bottom" id="8M2-vG-4ob"/>
@@ -250,7 +250,7 @@
                                         <textInputTraits key="textInputTraits"/>
                                     </textField>
                                 </subviews>
-                                <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <color key="backgroundColor" red="0.61960784313725492" green="0.80000000000000004" blue="0.89803921568627454" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
                                     <constraint firstItem="x1S-iw-JgW" firstAttribute="leading" secondItem="uWo-fO-shM" secondAttribute="trailing" constant="8" id="2KQ-r9-eds"/>
                                     <constraint firstItem="x1S-iw-JgW" firstAttribute="top" secondItem="jfx-Y6-PqO" secondAttribute="top" constant="82" id="2sD-br-swe"/>
@@ -615,7 +615,7 @@
                                     </activityIndicatorView>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="cR9-7M-Ydo" customClass="LGButton" customModule="LGButton">
                                         <rect key="frame" x="710" y="5" width="50" height="30"/>
-                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="50" id="QG8-Mx-64w"/>
                                             <constraint firstAttribute="height" constant="30" id="QpQ-hp-TUk"/>
@@ -659,11 +659,11 @@
                                         </connections>
                                     </view>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="3Vz-PC-NBp" customClass="LGButton" customModule="LGButton">
-                                        <rect key="frame" x="486" y="5" width="100" height="30"/>
+                                        <rect key="frame" x="536" y="5" width="50" height="30"/>
                                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="30" id="3ng-1O-hCi"/>
-                                            <constraint firstAttribute="width" constant="100" id="7or-Ck-Te1"/>
+                                            <constraint firstAttribute="width" constant="50" id="7or-Ck-Te1"/>
                                         </constraints>
                                         <userDefinedRuntimeAttributes>
                                             <userDefinedRuntimeAttribute type="string" keyPath="leftIconString" value="pencil"/>
@@ -671,7 +671,6 @@
                                             <userDefinedRuntimeAttribute type="color" keyPath="bgColor">
                                                 <color key="value" red="0.33255316369999999" green="0.45757836530000001" blue="0.75741592639999999" alpha="0.84705882349999995" colorSpace="custom" customColorSpace="sRGB"/>
                                             </userDefinedRuntimeAttribute>
-                                            <userDefinedRuntimeAttribute type="string" keyPath="titleString" value="Tools"/>
                                             <userDefinedRuntimeAttribute type="number" keyPath="leftIconFontSize">
                                                 <real key="value" value="17"/>
                                             </userDefinedRuntimeAttribute>
@@ -680,8 +679,22 @@
                                             <action selector="viewToolsTapped:" destination="lDo-DG-9fX" eventType="touchUpInside" id="d2b-jh-8Ac"/>
                                         </connections>
                                     </view>
+                                    <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="0Bw-fn-oMs">
+                                        <rect key="frame" x="288" y="6" width="192" height="29"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="192" id="5sp-4o-xcN"/>
+                                            <constraint firstAttribute="height" constant="28" id="hnd-Xc-hSX"/>
+                                        </constraints>
+                                        <segments>
+                                            <segment title="Text Mode"/>
+                                            <segment title="Drawing Mode"/>
+                                        </segments>
+                                        <connections>
+                                            <action selector="textDrawingSegmentValueChanged:" destination="lDo-DG-9fX" eventType="valueChanged" id="x7x-3U-Zhi"/>
+                                        </connections>
+                                    </segmentedControl>
                                 </subviews>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <color key="backgroundColor" red="0.77104940792909837" green="0.85011527759294747" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
                                     <constraint firstItem="3Vz-PC-NBp" firstAttribute="top" secondItem="gne-qG-Zx4" secondAttribute="top" constant="5" id="0MJ-u4-nx1"/>
                                     <constraint firstItem="cR9-7M-Ydo" firstAttribute="top" secondItem="gne-qG-Zx4" secondAttribute="top" constant="5" id="0Yb-WD-GJ7"/>
@@ -689,6 +702,7 @@
                                     <constraint firstItem="Dl1-P3-BKm" firstAttribute="top" secondItem="gne-qG-Zx4" secondAttribute="top" constant="10" id="2WG-5D-yNn"/>
                                     <constraint firstAttribute="bottom" secondItem="oHb-df-76H" secondAttribute="bottom" constant="5" id="3xc-UJ-bUB"/>
                                     <constraint firstAttribute="bottom" secondItem="PbO-cQ-nbQ" secondAttribute="bottom" constant="5" id="6M1-Rc-b5s"/>
+                                    <constraint firstItem="0Bw-fn-oMs" firstAttribute="top" secondItem="gne-qG-Zx4" secondAttribute="top" constant="6" id="7hx-xs-VmS"/>
                                     <constraint firstAttribute="trailing" secondItem="cR9-7M-Ydo" secondAttribute="trailing" constant="8" id="9FP-Xl-XKi"/>
                                     <constraint firstItem="rzy-K7-sud" firstAttribute="top" secondItem="gne-qG-Zx4" secondAttribute="top" constant="4" id="AuN-NA-GcB"/>
                                     <constraint firstAttribute="bottom" secondItem="rzy-K7-sud" secondAttribute="bottom" constant="5" id="BME-a7-tIU"/>
@@ -702,6 +716,7 @@
                                     <constraint firstItem="SiY-ox-qPY" firstAttribute="leading" secondItem="YQI-WO-Gvp" secondAttribute="trailing" constant="8" id="QRi-KA-kF6"/>
                                     <constraint firstItem="rzy-K7-sud" firstAttribute="leading" secondItem="SiY-ox-qPY" secondAttribute="trailing" constant="8" id="Ygk-R4-hJR"/>
                                     <constraint firstItem="SX7-51-XS7" firstAttribute="top" secondItem="gne-qG-Zx4" secondAttribute="top" constant="10" id="bgl-n6-FhA"/>
+                                    <constraint firstItem="0Bw-fn-oMs" firstAttribute="leading" secondItem="SX7-51-XS7" secondAttribute="trailing" constant="11" id="cHa-Qz-eyb"/>
                                     <constraint firstItem="YQI-WO-Gvp" firstAttribute="leading" secondItem="gne-qG-Zx4" secondAttribute="leading" constant="8" id="cU4-Jv-M4b"/>
                                     <constraint firstAttribute="bottom" secondItem="SX7-51-XS7" secondAttribute="bottom" constant="10" id="cbe-od-zua"/>
                                     <constraint firstAttribute="bottom" secondItem="3Vz-PC-NBp" secondAttribute="bottom" constant="5" id="d19-DE-raE"/>
@@ -716,6 +731,14 @@
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Nvg-e1-5lr" customClass="SketchView" customModule="Sketchnoting" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="60" width="768" height="964"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            </view>
+                            <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="P5Z-5P-6jH">
+                                <rect key="frame" x="0.0" y="60" width="768" height="964"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <gestureRecognizers/>
+                                <connections>
+                                    <outletCollection property="gestureRecognizers" destination="j3l-UM-ZMZ" appends="YES" id="JSD-nz-769"/>
+                                </connections>
                             </view>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="aMI-wG-bBD">
                                 <rect key="frame" x="143" y="80" width="482" height="50"/>
@@ -1012,16 +1035,22 @@
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="oqt-gq-XGG" firstAttribute="trailing" secondItem="aqH-yZ-g7K" secondAttribute="trailing" id="2E6-z5-ABj"/>
+                            <constraint firstItem="P5Z-5P-6jH" firstAttribute="width" secondItem="Nvg-e1-5lr" secondAttribute="width" id="4oQ-A6-X93"/>
                             <constraint firstItem="Nvg-e1-5lr" firstAttribute="leading" secondItem="aqH-yZ-g7K" secondAttribute="leading" id="BRc-iK-NFw"/>
+                            <constraint firstItem="P5Z-5P-6jH" firstAttribute="trailing" secondItem="aqH-yZ-g7K" secondAttribute="trailing" id="Buy-wa-Gna"/>
                             <constraint firstItem="gne-qG-Zx4" firstAttribute="trailing" secondItem="aqH-yZ-g7K" secondAttribute="trailing" id="GBj-Dk-dhg"/>
                             <constraint firstAttribute="bottom" secondItem="Nvg-e1-5lr" secondAttribute="bottom" id="IM4-Zx-quF"/>
+                            <constraint firstItem="P5Z-5P-6jH" firstAttribute="top" secondItem="gne-qG-Zx4" secondAttribute="bottom" id="OTl-iK-XPR"/>
                             <constraint firstItem="Nvg-e1-5lr" firstAttribute="top" secondItem="gne-qG-Zx4" secondAttribute="bottom" id="RZG-u6-JPk"/>
                             <constraint firstItem="aqH-yZ-g7K" firstAttribute="trailing" secondItem="aMI-wG-bBD" secondAttribute="trailing" constant="143" id="Tm9-7z-a8c"/>
                             <constraint firstItem="Nvg-e1-5lr" firstAttribute="trailing" secondItem="aqH-yZ-g7K" secondAttribute="trailing" id="d96-oa-5n9"/>
                             <constraint firstItem="oqt-gq-XGG" firstAttribute="top" secondItem="gne-qG-Zx4" secondAttribute="bottom" id="e30-Iq-jZB"/>
                             <constraint firstItem="aMI-wG-bBD" firstAttribute="leading" secondItem="aqH-yZ-g7K" secondAttribute="leading" constant="143" id="eST-mb-ngU"/>
+                            <constraint firstItem="P5Z-5P-6jH" firstAttribute="height" secondItem="Nvg-e1-5lr" secondAttribute="height" id="fye-Ij-yd3"/>
+                            <constraint firstItem="P5Z-5P-6jH" firstAttribute="leading" secondItem="aqH-yZ-g7K" secondAttribute="leading" id="iC6-jP-MvF"/>
                             <constraint firstItem="oqt-gq-XGG" firstAttribute="leading" secondItem="aqH-yZ-g7K" secondAttribute="leading" constant="400" id="iPF-V3-TgN"/>
                             <constraint firstItem="gne-qG-Zx4" firstAttribute="top" secondItem="aqH-yZ-g7K" secondAttribute="top" id="n7V-9g-ItK"/>
+                            <constraint firstItem="P5Z-5P-6jH" firstAttribute="bottom" secondItem="aqH-yZ-g7K" secondAttribute="bottom" id="vRf-IU-YCB"/>
                             <constraint firstItem="oqt-gq-XGG" firstAttribute="bottom" secondItem="aqH-yZ-g7K" secondAttribute="bottom" id="xOZ-Oh-PM9"/>
                             <constraint firstItem="gne-qG-Zx4" firstAttribute="leading" secondItem="aqH-yZ-g7K" secondAttribute="leading" id="zds-ME-PfP"/>
                             <constraint firstItem="aMI-wG-bBD" firstAttribute="top" secondItem="gne-qG-Zx4" secondAttribute="bottom" constant="20" id="zsl-GP-Q1o"/>
@@ -1052,6 +1081,7 @@
                         <outlet property="documentDetailView" destination="sjN-VI-3Ol" id="PuL-eJ-XhI"/>
                         <outlet property="documentTitleLabel" destination="PlC-3A-rvo" id="6zE-5b-MOR"/>
                         <outlet property="documentsCollectionView" destination="Soc-lK-uIi" id="lwd-l0-KxX"/>
+                        <outlet property="drawingInsertionCanvas" destination="P5Z-5P-6jH" id="XXi-nc-F0V"/>
                         <outlet property="drawingsButton" destination="PbO-cQ-nbQ" id="Z5N-BA-2AB"/>
                         <outlet property="eraserButton" destination="Cez-JB-1nT" id="gc5-ps-Juz"/>
                         <outlet property="helpLinesButton" destination="oHb-df-76H" id="8xU-ns-LDZ"/>
@@ -1072,6 +1102,11 @@
                 <panGestureRecognizer minimumNumberOfTouches="1" id="BLd-LR-b6l">
                     <connections>
                         <action selector="toolsViewPanned:" destination="lDo-DG-9fX" id="daM-4g-EcM"/>
+                    </connections>
+                </panGestureRecognizer>
+                <panGestureRecognizer minimumNumberOfTouches="1" id="j3l-UM-ZMZ">
+                    <connections>
+                        <action selector="drawingRegionPanGesture:" destination="lDo-DG-9fX" id="DdQ-ct-JJd"/>
                     </connections>
                 </panGestureRecognizer>
             </objects>

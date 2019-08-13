@@ -169,20 +169,16 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     //MARK: Search panel
     @IBAction func searchPanelButtonTapped(_ sender: LGButton) {
         if searchPanelOpen {
-            searchPanelButton.bgColor = UIColor(red: 155.0/255.0, green: 83.0/255.0, blue: 229.0/255.0, alpha: 1)
+            searchPanelButton.bgColor = .clear
             self.searchPanelHeightConstraint.constant = 0
             self.view.setNeedsUpdateConstraints()
             self.searchPanel.isHidden = true
         }
         else {
-            searchPanelButton.bgColor = .lightGray
+            searchPanelButton.bgColor = UIColor(red: 158.0/255.0, green: 204.0/255.0, blue: 229.0/255.0, alpha: 1)
             self.searchPanelHeightConstraint.constant = 125
             self.view.setNeedsUpdateConstraints()
-            UIView.animate(withDuration: 0.5, delay: 0, options: UIView.AnimationOptions.curveEaseIn, animations: {
-                self.view.layoutIfNeeded()
-            }, completion: { (finished: Bool) in
-                self.searchPanel.isHidden = false
-            })
+            self.searchPanel.isHidden = false
         }
         
         searchPanelOpen = !searchPanelOpen

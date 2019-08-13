@@ -256,6 +256,14 @@ class Sketchnote: Note, Equatable {
         }
     }
     
+    func removeDrawingViewRect(rect: CGRect) {
+        if drawingViewRects != nil {
+            if drawingViewRects!.contains(rect) {
+                drawingViewRects!.removeAll{$0 == rect}
+            }
+        }
+    }
+    
     func setUpdateDate() {
         self.updateDate = Date.init(timeIntervalSinceNow: 0)
     }

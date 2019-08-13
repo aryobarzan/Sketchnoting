@@ -131,31 +131,9 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
             sketchnote = Sketchnote(image: sketchView.asImage(), relatedDocuments: nil, drawings: nil)
         }
         
-        // The inserted drawing regions for the existing note are reloaded on the canvas.
-        if sketchnote != nil && sketchnote!.drawingViewRects != nil {
-            for rect in sketchnote!.drawingViewRects! {
-                let drawingView = UIView(frame: rect)
-                drawingView.layer.borderWidth = 1
-                drawingView.layer.borderColor = UIColor.black.cgColor
-                self.sketchView.addSubview(drawingView)
-                drawingView.isHidden = true
-                drawingView.isUserInteractionEnabled = false
-                self.drawingViews.append(drawingView)
-                
-            }
-            if sketchnote!.drawingViewRects!.count > 0 && !self.drawingViewsShown {
-                self.toggleDrawingViews()
-            }
-        }
-        
-        // Help lines are horizontal lines displayed as a help to the user on the canvas, in order to let them write in straight lines.
         setupHelpLines()
         setupConceptHighlights()
-        
-        // Setup long press on canvas for inserting drawing region
-        let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(self.handleSketchViewLongPress(_:)))
-        longPressGesture.minimumPressDuration = 1.5
-        self.sketchView.addGestureRecognizer(longPressGesture)
+        setupDrawingRegions()
         
         let interaction = UIPencilInteraction()
         interaction.delegate = self
@@ -309,53 +287,6 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         }
     }
     
-    // This function handles the insertion of a drawing region on the note's canvas.
-    @objc func handleSketchViewLongPress(_ sender: UILongPressGestureRecognizer) {
-        if (sender.state == UIGestureRecognizer.State.began)
-        {
-            let tapLocation = sender.location(in: sketchView)
-            let popMenu = PopMenuViewController(sourceView: sender, actions: [PopMenuAction](), appearance: nil)
-            let closeAction = PopMenuDefaultAction(title: "Close")
-            let action = PopMenuDefaultAction(title: "Insert Drawing", didSelect: { action in
-                print("Inserting Drawing")
-                var x = tapLocation.x
-                var y = tapLocation.y
-                if (x + 75) > self.sketchView.frame.width {
-                    x = self.sketchView.frame.width - 150
-                }
-                else if (x - 75) < 0 {
-                    x = 0
-                }
-                else {
-                    x = x - 75
-                }
-                if (y + 75) > self.sketchView.frame.height {
-                    x = self.sketchView.frame.height - 150
-                }
-                else if (y - 75) < 0 {
-                    y = 0
-                }
-                else {
-                    y = y - 75
-                }
-                let drawingView = UIView(frame: CGRect(x: x, y: y, width: 150, height: 150))
-                drawingView.layer.borderWidth = 1
-                drawingView.layer.borderColor = UIColor.black.cgColor
-                self.sketchView.addSubview(drawingView)
-                drawingView.isHidden = true
-                drawingView.isUserInteractionEnabled = false
-                self.drawingViews.append(drawingView)
-                if !self.drawingViewsShown {
-                    self.toggleDrawingViews()
-                }
-                self.sketchnote!.addDrawingViewRect(rect: drawingView.frame)
-            })
-            popMenu.addAction(action)
-            popMenu.addAction(closeAction)
-            self.present(popMenu, animated: true, completion: nil)
-        }
-    }
-    
     private func processDrawingRecognition() {
         hideAllHelpLines()
         
@@ -371,7 +302,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
                 for drawingView in self.drawingViews {
                     if drawingView.frame.contains(path.boundingBox) {
                         let absoluteFrame = sketchView.convert(sketchView.bounds, to: drawingView)
-                        let newPath = path.copy(strokingWithWidth: 150 * 0.04, lineCap: .round, lineJoin: .round, miterLimit: 0)
+                        let newPath = path.copy(strokingWithWidth: drawingView.frame.width * 0.04, lineCap: .round, lineJoin: .round, miterLimit: 0)
                         let layer = CAShapeLayer()
                         layer.frame = absoluteFrame
                         layer.path = newPath
@@ -388,7 +319,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
                 for drawingView in self.drawingViews {
                     if drawingView.frame.contains(path.boundingBox) {
                         let absoluteFrame = sketchView.convert(sketchView.bounds, to: drawingView)
-                        let newPath = path.copy(strokingWithWidth: 150 * 0.04, lineCap: .round, lineJoin: .round, miterLimit: 0)
+                        let newPath = path.copy(strokingWithWidth: drawingView.frame.width * 0.04, lineCap: .round, lineJoin: .round, miterLimit: 0)
                         let layer = CAShapeLayer()
                         layer.frame = absoluteFrame
                         layer.path = newPath
@@ -1097,6 +1028,92 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     @IBAction func documentDetailViewBrowseTapped(_ sender: UIButton) {
         documentDetailView.isHidden = true
         documentsCollectionView.isHidden = false
+    }
+    
+    //MARK: Drawing insertion mode
+    private func setupDrawingRegions() {
+        if let drawingRegionRects = sketchnote.drawingViewRects {
+            for rect in drawingRegionRects {
+                let region = UIView(frame: rect)
+                region.layer.borderColor = UIColor.black.cgColor
+                region.layer.borderWidth = 1
+                drawingInsertionCanvas.addSubview(region)
+                let tapGesture = UITapGestureRecognizer(target: self, action: #selector(self.handleDrawingRegionTap(_:)))
+                region.addGestureRecognizer(tapGesture)
+                region.isUserInteractionEnabled = true
+            }
+        }
+    }
+    @IBOutlet weak var drawingInsertionCanvas: UIView!
+    @IBAction func textDrawingSegmentValueChanged(_ sender: UISegmentedControl) {
+        if sender.selectedSegmentIndex == 0 {
+            drawingInsertionCanvas.isHidden = true
+            sketchView.isUserInteractionEnabled = true
+        }
+        else {
+            drawingInsertionCanvas.isHidden = false
+            sketchView.isUserInteractionEnabled = false
+            if conceptHighlightsSwitch.isOn {
+                conceptHighlightsSwitch.isOn = false
+                conceptHighlightsSwitch.setOn(false, animated: true)
+            }
+        }
+    }
+    var currentDrawingRegion: UIView?
+    var startPoint: CGPoint?
+    var endPoint: CGPoint?
+    @IBAction func drawingRegionPanGesture(_ sender: UIPanGestureRecognizer) {
+        let tapPoint = sender.location(in: drawingInsertionCanvas)
+        switch sender.state {
+        case .began:
+            startPoint = tapPoint
+            currentDrawingRegion = UIView(frame: CGRect(x: tapPoint.x, y: tapPoint.y, width: 1, height: 1))
+            currentDrawingRegion?.layer.borderColor = UIColor.black.cgColor
+            currentDrawingRegion?.layer.borderWidth = 1
+            drawingInsertionCanvas.addSubview(currentDrawingRegion!)
+            break
+        case .changed:
+            endPoint = tapPoint
+            if let currentDrawingRegion = currentDrawingRegion {
+                currentDrawingRegion.frame = CGRect(x: min(startPoint!.x, endPoint!.x), y: min(startPoint!.y, endPoint!.y), width: abs(startPoint!.x - endPoint!.x), height: abs(startPoint!.y - endPoint!.y))
+            }
+        case .ended:
+            endPoint = tapPoint
+            if let currentDrawingRegion = currentDrawingRegion {
+                if currentDrawingRegion.frame.width >= 150 {
+                    self.sketchnote.addDrawingViewRect(rect: currentDrawingRegion.frame)
+                    self.drawingViews.append(currentDrawingRegion)
+                    
+                    let tapGesture = UITapGestureRecognizer(target: self, action: #selector(self.handleDrawingRegionTap(_:)))
+                    currentDrawingRegion.addGestureRecognizer(tapGesture)
+                    currentDrawingRegion.isUserInteractionEnabled = true
+                }
+                else {
+                    currentDrawingRegion.removeFromSuperview()
+                }
+            }
+        case .cancelled:
+            if let currentDrawingRegion = currentDrawingRegion {
+                    currentDrawingRegion.removeFromSuperview()
+            }
+        default:
+            break
+        }
+    }
+    @objc func handleDrawingRegionTap(_ sender: UITapGestureRecognizer) {
+        if sender.view != nil {
+            let popMenu = PopMenuViewController(sourceView: sender.view, actions: [PopMenuAction](), appearance: nil)
+            let closeAction = PopMenuDefaultAction(title: "Close")
+            let action = PopMenuDefaultAction(title: "Delete Drawing Region", didSelect: { action in
+                if let drawingRegion = sender.view {
+                    drawingRegion.removeFromSuperview()
+                    self.sketchnote.removeDrawingViewRect(rect: drawingRegion.frame)
+                }
+            })
+            popMenu.addAction(action)
+            popMenu.addAction(closeAction)
+            self.present(popMenu, animated: true, completion: nil)
+        }
     }
 }
 public class HoritonzalHelpLine: UIView  {
