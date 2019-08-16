@@ -41,13 +41,6 @@
 		9FD29C1E2236EA2800CC969A /* SketchTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29C1B2236EA2800CC969A /* SketchTool.swift */; };
 		9FD29C1F2236EA2800CC969A /* SketchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29C1C2236EA2800CC969A /* SketchView.swift */; };
 		9FD29C202236EA2800CC969A /* UIImage+fill.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29C1D2236EA2800CC969A /* UIImage+fill.swift */; };
-		9FD29C2822370DF000CC969A /* GradientView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29C2322370DF000CC969A /* GradientView.swift */; };
-		9FD29C2922370DF000CC969A /* ColorSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29C2422370DF000CC969A /* ColorSlider.swift */; };
-		9FD29C2A22370DF000CC969A /* PreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29C2522370DF000CC969A /* PreviewView.swift */; };
-		9FD29C2B22370DF000CC969A /* DefaultPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29C2622370DF000CC969A /* DefaultPreviewView.swift */; };
-		9FD29C2D22370E1800CC969A /* ColorSliderExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29C2C22370E1800CC969A /* ColorSliderExtensions.swift */; };
-		9FD29C2F22370E1B00CC969A /* Gradient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29C2E22370E1A00CC969A /* Gradient.swift */; };
-		9FD29C3122370E2000CC969A /* HSBColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29C3022370E2000CC969A /* HSBColor.swift */; };
 		9FD29C342237FD2B00CC969A /* GMStepper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29C332237FD2B00CC969A /* GMStepper.swift */; };
 		9FD29C362238539200CC969A /* PhotoRequestManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29C352238539200CC969A /* PhotoRequestManager.swift */; };
 		9FD29C38223853C300CC969A /* PhotoAuthorization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29C37223853C300CC969A /* PhotoAuthorization.swift */; };
@@ -110,13 +103,6 @@
 		9FD29C1B2236EA2800CC969A /* SketchTool.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SketchTool.swift; sourceTree = "<group>"; };
 		9FD29C1C2236EA2800CC969A /* SketchView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SketchView.swift; sourceTree = "<group>"; };
 		9FD29C1D2236EA2800CC969A /* UIImage+fill.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIImage+fill.swift"; sourceTree = "<group>"; };
-		9FD29C2322370DF000CC969A /* GradientView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GradientView.swift; sourceTree = "<group>"; };
-		9FD29C2422370DF000CC969A /* ColorSlider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ColorSlider.swift; sourceTree = "<group>"; };
-		9FD29C2522370DF000CC969A /* PreviewView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PreviewView.swift; sourceTree = "<group>"; };
-		9FD29C2622370DF000CC969A /* DefaultPreviewView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DefaultPreviewView.swift; sourceTree = "<group>"; };
-		9FD29C2C22370E1800CC969A /* ColorSliderExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorSliderExtensions.swift; sourceTree = "<group>"; };
-		9FD29C2E22370E1A00CC969A /* Gradient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Gradient.swift; sourceTree = "<group>"; };
-		9FD29C3022370E2000CC969A /* HSBColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HSBColor.swift; sourceTree = "<group>"; };
 		9FD29C332237FD2B00CC969A /* GMStepper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GMStepper.swift; sourceTree = "<group>"; };
 		9FD29C352238539200CC969A /* PhotoRequestManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoRequestManager.swift; sourceTree = "<group>"; };
 		9FD29C37223853C300CC969A /* PhotoAuthorization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoAuthorization.swift; sourceTree = "<group>"; };
@@ -280,7 +266,6 @@
 				9FD29C452239587D00CC969A /* Extensions */,
 				9FD29C3A223861D200CC969A /* ExpandableButton */,
 				9FD29C322237FD1600CC969A /* GMStepper */,
-				9FD29C2122370DE300CC969A /* ColorSlider */,
 				9FD29C1A2236EA1700CC969A /* Sketch */,
 				9F5D8B2B228B9D7000F56FEC /* CREDITS.md */,
 				9F5D8B2C228B9EF800F56FEC /* README.md */,
@@ -298,20 +283,6 @@
 				9FD29C37223853C300CC969A /* PhotoAuthorization.swift */,
 			);
 			path = Sketch;
-			sourceTree = "<group>";
-		};
-		9FD29C2122370DE300CC969A /* ColorSlider */ = {
-			isa = PBXGroup;
-			children = (
-				9FD29C2422370DF000CC969A /* ColorSlider.swift */,
-				9FD29C2622370DF000CC969A /* DefaultPreviewView.swift */,
-				9FD29C2322370DF000CC969A /* GradientView.swift */,
-				9FD29C2C22370E1800CC969A /* ColorSliderExtensions.swift */,
-				9FD29C2E22370E1A00CC969A /* Gradient.swift */,
-				9FD29C3022370E2000CC969A /* HSBColor.swift */,
-				9FD29C2522370DF000CC969A /* PreviewView.swift */,
-			);
-			path = ColorSlider;
 			sourceTree = "<group>";
 		};
 		9FD29C322237FD1600CC969A /* GMStepper */ = {
@@ -531,7 +502,6 @@
 				9FD29C3F223861E100CC969A /* ExpandableButtonItem.swift in Sources */,
 				9FA6238B22D37213007ED794 /* BioPortalHelper.swift in Sources */,
 				9FA6239322DE30AC007ED794 /* SpotlightDocument.swift in Sources */,
-				9FD29C2D22370E1800CC969A /* ColorSliderExtensions.swift in Sources */,
 				9FD29C58223C3CF700CC969A /* UIImageExtensions.swift in Sources */,
 				9FD29C192236DCFC00CC969A /* SketchNoteViewController.swift in Sources */,
 				9F5010D42249326D00425424 /* NoteCollectionView.swift in Sources */,
@@ -540,20 +510,16 @@
 				9FD29C40223861E100CC969A /* ExpandableButtonView.swift in Sources */,
 				9FA6239522DE3741007ED794 /* BioPortalDocument.swift in Sources */,
 				9FD29BA92220524D00CC969A /* ViewController.swift in Sources */,
-				9FD29C2922370DF000CC969A /* ColorSlider.swift in Sources */,
 				9FA6239722DE3806007ED794 /* CHEBIDocument.swift in Sources */,
 				9FA623A122E73DDA007ED794 /* NoteLoader.swift in Sources */,
 				9FD29BA72220524D00CC969A /* AppDelegate.swift in Sources */,
 				9FD29C6422431BFA00CC969A /* DrawnImageClassifier.mlmodel in Sources */,
-				9FD29C2822370DF000CC969A /* GradientView.swift in Sources */,
-				9FD29C3122370E2000CC969A /* HSBColor.swift in Sources */,
 				9FA6239C22E64EA2007ED794 /* TextData.swift in Sources */,
 				9FD29C362238539200CC969A /* PhotoRequestManager.swift in Sources */,
 				9FD29C342237FD2B00CC969A /* GMStepper.swift in Sources */,
 				9F5010D0224930E400425424 /* NoteCollection.swift in Sources */,
 				9FD29C56223C3C3900CC969A /* StringExtensions.swift in Sources */,
 				9FD29C4E223998BC00CC969A /* UIViewControllerExtensions.swift in Sources */,
-				9FD29C2B22370DF000CC969A /* DefaultPreviewView.swift in Sources */,
 				9FD29C472239588E00CC969A /* UIViewExtensions.swift in Sources */,
 				9FBF6AB822E9F428001FD730 /* VisionTextLineWrapper.swift in Sources */,
 				9FD29C1F2236EA2800CC969A /* SketchView.swift in Sources */,
@@ -563,13 +529,11 @@
 				9F5D0FC8229CBC4100BCA451 /* NotesManager.swift in Sources */,
 				9FA6238F22DCD3AD007ED794 /* DocumentUICollectionViewCell.swift in Sources */,
 				9FC788F4225CEC4C0074BD16 /* DrawingSearchView.swift in Sources */,
-				9FD29C2A22370DF000CC969A /* PreviewView.swift in Sources */,
 				9FBF6AB422E9F391001FD730 /* VisionTextWrapper.swift in Sources */,
 				9FD29C54223C3B6F00CC969A /* OCRHelper.swift in Sources */,
 				9FD29BC522249D9500CC969A /* Note.swift in Sources */,
 				9FBF6ABA22E9F439001FD730 /* VisionTextElementWrapper.swift in Sources */,
 				9FD29C41223861E100CC969A /* ArrowButton.swift in Sources */,
-				9FD29C2F22370E1B00CC969A /* Gradient.swift in Sources */,
 				9FD29C1E2236EA2800CC969A /* SketchTool.swift in Sources */,
 				9FD29BC72224B58600CC969A /* Document.swift in Sources */,
 				9FBF6AB622E9F3FE001FD730 /* VisionTextBlockWrapper.swift in Sources */,

@@ -11,15 +11,15 @@ import LGButton
 import Firebase
 import PopMenu
 import GSMessages
+import IGColorPicker
 
 // This is the controller for the other page of the application, i.e. not the home page, but for the page displayed when the user wants to edit a note.
 
-class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, SketchViewDelegate, UIPencilInteractionDelegate, UICollectionViewDataSource, UICollectionViewDelegate, DocumentVisitor {
+class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, SketchViewDelegate, UIPencilInteractionDelegate, UICollectionViewDataSource, UICollectionViewDelegate, DocumentVisitor, ColorPickerViewDelegate, ColorPickerViewDelegateFlowLayout {
 
     @IBOutlet weak var topContainer: UIView!
     @IBOutlet var topContainerLeftDragView: UIView!
     @IBOutlet var sketchView: SketchView!
-    @IBOutlet weak var toolsView: UIView!
     @IBOutlet var redoButton: LGButton!
     @IBOutlet var undoButton: LGButton!
     @IBOutlet var drawingsButton: LGButton!
@@ -28,13 +28,10 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     @IBOutlet var bookshelf: UIView!
     @IBOutlet var activityIndicator: UIActivityIndicatorView!
     
-    var colorSlider: ColorSlider!
     @IBOutlet var pencilButton: LGButton!
     @IBOutlet var eraserButton: LGButton!
     var pencilSize : CGFloat = 2
     var eraserSize : CGFloat = 2
-    
-    
     
     var sketchnote: Sketchnote!
     var new = false
@@ -63,25 +60,21 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         super.viewDidLoad()
         self.navigationController?.setNavigationBarHidden(true, animated: false)
         
+        colorPicker.delegate = self
+        colorPicker.layoutDelegate = self
+        
+        colorPicker.isSelectedColorTappable = false
+        colorPicker.colors = [#colorLiteral(red: 0, green: 0, blue: 0, alpha: 1), #colorLiteral(red: 0.1215686277, green: 0.01176470611, blue: 0.4235294163, alpha: 1), #colorLiteral(red: 0.2196078449, green: 0.007843137719, blue: 0.8549019694, alpha: 1), #colorLiteral(red: 0.5568627715, green: 0.3529411852, blue: 0.9686274529, alpha: 1), #colorLiteral(red: 0.2392156869, green: 0.6745098233, blue: 0.9686274529, alpha: 1), #colorLiteral(red: 0.1411764771, green: 0.3960784376, blue: 0.5647059083, alpha: 1), #colorLiteral(red: 0.1294117719, green: 0.2156862766, blue: 0.06666667014, alpha: 1), #colorLiteral(red: 0.3411764801, green: 0.6235294342, blue: 0.1686274558, alpha: 1), #colorLiteral(red: 0.721568644, green: 0.8862745166, blue: 0.5921568871, alpha: 1), #colorLiteral(red: 0.9764705896, green: 0.850980401, blue: 0.5490196347, alpha: 1), #colorLiteral(red: 0.9529411793, green: 0.6862745285, blue: 0.1333333403, alpha: 1), #colorLiteral(red: 0.3098039329, green: 0.2039215714, blue: 0.03921568766, alpha: 1), #colorLiteral(red: 0.3176470697, green: 0.07450980693, blue: 0.02745098062, alpha: 1), #colorLiteral(red: 0.7450980544, green: 0.1568627506, blue: 0.07450980693, alpha: 1), #colorLiteral(red: 0.9372549057, green: 0.3490196168, blue: 0.1921568662, alpha: 1), #colorLiteral(red: 0.9568627477, green: 0.6588235497, blue: 0.5450980663, alpha: 1), #colorLiteral(red: 0.8549019694, green: 0.250980407, blue: 0.4784313738, alpha: 1), #colorLiteral(red: 0.5725490451, green: 0, blue: 0.2313725501, alpha: 1), #colorLiteral(red: 0.1921568662, green: 0.007843137719, blue: 0.09019608051, alpha: 1)]
+        colorPicker.preselectedIndex = 0
+        topContainer.layer.borderColor = UIColor.black.cgColor
+        topContainer.layer.borderWidth = 1
+        
         self.setupDocumentDetailScrollView()
         self.bookshelfLeftDragView.curveTopCorners(size: 5)
         self.topContainerLeftDragView.curveTopCorners(size: 5)
-
-        colorSlider = ColorSlider(orientation: .horizontal, previewSide: .bottom)
-        colorSlider.color = .black
-        colorSlider.frame = toolsView.frame
-        topContainer.addSubview(colorSlider)
-        colorSlider.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            colorSlider.topAnchor.constraint(equalTo: toolsView.topAnchor),
-            colorSlider.leadingAnchor.constraint(equalTo: toolsView.leadingAnchor),
-            colorSlider.trailingAnchor.constraint(equalTo: toolsView.trailingAnchor),
-            colorSlider.bottomAnchor.constraint(equalTo: toolsView.bottomAnchor),
-            ])
-        colorSlider.addTarget(self, action: #selector(changedColor(_:)), for: .valueChanged)
         
         sketchView.sketchViewDelegate = self
-        sketchView.lineColor = colorSlider.color
+        sketchView.lineColor = .black
         sketchView.drawTool = .pen
         sketchView.lineWidth = 2
         //Drawing Recognition - This loads the labels for the drawing recognition's CoreML model.
@@ -515,10 +508,6 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         }
     }
     
-    @objc func changedColor(_ slider: ColorSlider) {
-        let color = slider.color
-        sketchView.lineColor = color
-    }
     @IBAction func viewToolsTapped(_ sender: LGButton) {
         topContainer.isHidden = !topContainer.isHidden
         if topContainer.isHidden {
@@ -567,19 +556,13 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         sketchView.undo()
     }
     @IBAction func drawingsTapped(_ sender: LGButton) {
-        self.toggleDrawingViews()
-    }
-    private func toggleDrawingViews() {
-        self.drawingViewsShown = !self.drawingViewsShown
-        
-        for drawingView in self.drawingViews {
-            drawingView.isHidden = !self.drawingViewsShown
-        }
-        
-        if self.drawingViewsShown == true {
+        drawingViewsShown = !drawingViewsShown
+        if drawingViewsShown {
+            toggleDrawingRegions(isHidden: false, canInteract: false)
             drawingsButton.bgColor = UIColor(red: 85.0/255.0, green: 117.0/255.0, blue: 193.0/255.0, alpha: 1)
         }
         else {
+            toggleDrawingRegions(isHidden: true, canInteract: false)
             drawingsButton.bgColor = .lightGray
         }
     }
@@ -741,27 +724,25 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     
     var toolsViewTouchPreviousPoint = CGPoint()
     @IBAction func toolsViewPanned(_ sender: UIPanGestureRecognizer) {
-        if !colorSlider.frame.contains(sender.location(in: self.toolsView)) {
-            if sender.state == .began {
-                toolsViewTouchPreviousPoint = sender.location(in: self.view)
+        if sender.state == .began {
+            toolsViewTouchPreviousPoint = sender.location(in: self.view)
+        }
+        else if sender.state != .cancelled {
+            let currentTouchPoint = sender.location(in: self.view)
+            let deltaX = currentTouchPoint.x - toolsViewTouchPreviousPoint.x
+            let deltaY = currentTouchPoint.y - toolsViewTouchPreviousPoint.y
+            if toolsViewLeftConstraint.constant + deltaX > 5 && toolsViewRightConstraint.constant - deltaX > 5 {
+                toolsViewLeftConstraint.constant += deltaX
+                toolsViewRightConstraint.constant -= deltaX
             }
-            else if sender.state != .cancelled {
-                let currentTouchPoint = sender.location(in: self.view)
-                let deltaX = currentTouchPoint.x - toolsViewTouchPreviousPoint.x
-                let deltaY = currentTouchPoint.y - toolsViewTouchPreviousPoint.y
-                if toolsViewLeftConstraint.constant + deltaX > 5 && toolsViewRightConstraint.constant - deltaX > 5 {
-                    toolsViewLeftConstraint.constant += deltaX
-                    toolsViewRightConstraint.constant -= deltaX
-                }
-                if toolsViewTopConstraint.constant + deltaY >= 20 && toolsViewTopConstraint.constant + deltaY < self.view.frame.maxY - 115 {
-                    toolsViewTopConstraint.constant += deltaY
-                }
+            if toolsViewTopConstraint.constant + deltaY >= 20 && toolsViewTopConstraint.constant + deltaY < self.view.frame.maxY - 115 {
+                toolsViewTopConstraint.constant += deltaY
+            }
                 
-                toolsViewTouchPreviousPoint = currentTouchPoint
-            }
-            else {
-                toolsViewTouchPreviousPoint = CGPoint()
-            }
+            toolsViewTouchPreviousPoint = currentTouchPoint
+        }
+        else {
+            toolsViewTouchPreviousPoint = CGPoint()
         }
     }
     
@@ -1044,21 +1025,44 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
             }
         }
     }
-    @IBOutlet weak var drawingInsertionCanvas: UIView!
-    @IBAction func textDrawingSegmentValueChanged(_ sender: UISegmentedControl) {
-        if sender.selectedSegmentIndex == 0 {
-            drawingInsertionCanvas.isHidden = true
-            sketchView.isUserInteractionEnabled = true
+    private func toggleDrawingRegions(isHidden: Bool, canInteract: Bool) {
+        for drawingView in drawingViews {
+            drawingView.isUserInteractionEnabled = canInteract
         }
-        else {
-            drawingInsertionCanvas.isHidden = false
+        drawingInsertionCanvas.isHidden = isHidden
+        drawingInsertionCanvas.isUserInteractionEnabled = canInteract
+    }
+    @IBOutlet weak var drawingInsertionCanvas: UIView!
+    
+    @IBOutlet weak var manageDrawingsButton: LGButton!
+    var isManageDrawings = false
+    @IBAction func manageDrawingsTapped(_ sender: LGButton) {
+        isManageDrawings = !isManageDrawings
+        if isManageDrawings {
+            drawingsButton.isEnabled = false
+            conceptHighlightsSwitch.isEnabled = false
+            toggleDrawingRegions(isHidden: false, canInteract: true)
             sketchView.isUserInteractionEnabled = false
             if conceptHighlightsSwitch.isOn {
                 conceptHighlightsSwitch.isOn = false
                 conceptHighlightsSwitch.setOn(false, animated: true)
             }
+            manageDrawingsButton.bgColor = UIColor(red: 85.0/255.0, green: 117.0/255.0, blue: 193.0/255.0, alpha: 1)
+        }
+        else {
+            drawingsButton.isEnabled = true
+            conceptHighlightsSwitch.isEnabled = true
+            if drawingViewsShown {
+                toggleDrawingRegions(isHidden: false, canInteract: false)
+            }
+            else {
+                toggleDrawingRegions(isHidden: true, canInteract: false)
+            }
+            sketchView.isUserInteractionEnabled = true
+            manageDrawingsButton.bgColor = .lightGray
         }
     }
+
     var currentDrawingRegion: UIView?
     var startPoint: CGPoint?
     var endPoint: CGPoint?
@@ -1114,6 +1118,23 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
             popMenu.addAction(closeAction)
             self.present(popMenu, animated: true, completion: nil)
         }
+    }
+    
+    @IBOutlet weak var colorPicker: ColorPickerView!
+    func colorPickerView(_ colorPickerView: ColorPickerView, didSelectItemAt indexPath: IndexPath) {
+        sketchView.lineColor = colorPickerView.colors[colorPickerView.indexOfSelectedColor ?? 0]
+    }
+    
+    // This is an optional method
+    func colorPickerView(_ colorPickerView: ColorPickerView, didDeselectItemAt indexPath: IndexPath) {
+        // A color has been deselected
+    }
+    
+    func colorPickerView(_ colorPickerView: ColorPickerView, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        return CGSize(width: 25, height: 25)
+    }
+    func colorPickerView(_ colorPickerView: ColorPickerView, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
+        return CGFloat(3)
     }
 }
 public class HoritonzalHelpLine: UIView  {

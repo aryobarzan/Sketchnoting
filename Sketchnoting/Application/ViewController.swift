@@ -21,7 +21,6 @@ import GSMessages
 class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextFieldDelegate, MCSessionDelegate, MCBrowserViewControllerDelegate {
 
     @IBOutlet var searchField: UITextField!
-    @IBOutlet var searchButton: LGButton!
     @IBOutlet var scrollView: UIScrollView!
     var notesStackView = UIStackView()
     @IBOutlet var dimView: UIView!
@@ -31,9 +30,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     var searchFiltersStackView = UIStackView()
     
     @IBOutlet var searchPanel: UIView!
-    @IBOutlet var searchPanelHeightConstraint: NSLayoutConstraint!
-    @IBOutlet var searchPanelButton: LGButton!
-    var searchPanelOpen = false
     
     // This property holds the user's note collection views displayed on this home page.
     var noteCollectionViews = [NoteCollectionView]()
@@ -140,7 +136,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
                 print("error loading labels: \(error)")
             }
         }
-        searchPanelHeightConstraint.constant = 0
     }
     
     // This function handles the cases where the user either creates a new note or wants to edit an existing note.
@@ -165,25 +160,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             print("Not creating or editing sketchnote.")
         }
     }
-    
-    //MARK: Search panel
-    @IBAction func searchPanelButtonTapped(_ sender: LGButton) {
-        if searchPanelOpen {
-            searchPanelButton.bgColor = .clear
-            self.searchPanelHeightConstraint.constant = 0
-            self.view.setNeedsUpdateConstraints()
-            self.searchPanel.isHidden = true
-        }
-        else {
-            searchPanelButton.bgColor = UIColor(red: 158.0/255.0, green: 204.0/255.0, blue: 229.0/255.0, alpha: 1)
-            self.searchPanelHeightConstraint.constant = 125
-            self.view.setNeedsUpdateConstraints()
-            self.searchPanel.isHidden = false
-        }
-        
-        searchPanelOpen = !searchPanelOpen
-    }
-    
     
     //MARK: Display notes
     
@@ -315,10 +291,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         let noteCollection = NoteCollection(title: "Untitled", notes: nil)!
         NotesManager.shared.add(noteCollection: noteCollection)
         displayNoteCollection(collection: noteCollection)
-    }
-    
-    @IBAction func searchButtonTapped(_ sender: LGButton) {
-        self.performSearch()
     }
     
     // This function loops through each search term and checks each sketchnote on the homepage.

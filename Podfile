@@ -15,4 +15,5 @@ target 'Sketchnoting' do
   pod 'RAMPaperSwitch'
   pod 'BadgeHub'
   pod 'SwiftyJSON'
+  pod 'IGColorPicker'
 end
