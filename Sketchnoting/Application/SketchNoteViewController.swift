@@ -30,8 +30,9 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     
     @IBOutlet var pencilButton: LGButton!
     @IBOutlet var eraserButton: LGButton!
-    var pencilSize : CGFloat = 2
-    var eraserSize : CGFloat = 2
+    var pencilSize : CGFloat = 3
+    var eraserSize : CGFloat = 3
+    @IBOutlet weak var sizeSlider: SizeSlider!
     
     var sketchnote: Sketchnote!
     var new = false
@@ -62,12 +63,12 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         
         colorPicker.delegate = self
         colorPicker.layoutDelegate = self
-        
         colorPicker.isSelectedColorTappable = false
         colorPicker.colors = [#colorLiteral(red: 0, green: 0, blue: 0, alpha: 1), #colorLiteral(red: 0.1215686277, green: 0.01176470611, blue: 0.4235294163, alpha: 1), #colorLiteral(red: 0.2196078449, green: 0.007843137719, blue: 0.8549019694, alpha: 1), #colorLiteral(red: 0.5568627715, green: 0.3529411852, blue: 0.9686274529, alpha: 1), #colorLiteral(red: 0.2392156869, green: 0.6745098233, blue: 0.9686274529, alpha: 1), #colorLiteral(red: 0.1411764771, green: 0.3960784376, blue: 0.5647059083, alpha: 1), #colorLiteral(red: 0.1294117719, green: 0.2156862766, blue: 0.06666667014, alpha: 1), #colorLiteral(red: 0.3411764801, green: 0.6235294342, blue: 0.1686274558, alpha: 1), #colorLiteral(red: 0.721568644, green: 0.8862745166, blue: 0.5921568871, alpha: 1), #colorLiteral(red: 0.9764705896, green: 0.850980401, blue: 0.5490196347, alpha: 1), #colorLiteral(red: 0.9529411793, green: 0.6862745285, blue: 0.1333333403, alpha: 1), #colorLiteral(red: 0.3098039329, green: 0.2039215714, blue: 0.03921568766, alpha: 1), #colorLiteral(red: 0.3176470697, green: 0.07450980693, blue: 0.02745098062, alpha: 1), #colorLiteral(red: 0.7450980544, green: 0.1568627506, blue: 0.07450980693, alpha: 1), #colorLiteral(red: 0.9372549057, green: 0.3490196168, blue: 0.1921568662, alpha: 1), #colorLiteral(red: 0.9568627477, green: 0.6588235497, blue: 0.5450980663, alpha: 1), #colorLiteral(red: 0.8549019694, green: 0.250980407, blue: 0.4784313738, alpha: 1), #colorLiteral(red: 0.5725490451, green: 0, blue: 0.2313725501, alpha: 1), #colorLiteral(red: 0.1921568662, green: 0.007843137719, blue: 0.09019608051, alpha: 1)]
         colorPicker.preselectedIndex = 0
         topContainer.layer.borderColor = UIColor.black.cgColor
         topContainer.layer.borderWidth = 1
+        
         
         self.setupDocumentDetailScrollView()
         self.bookshelfLeftDragView.curveTopCorners(size: 5)
@@ -134,6 +135,8 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         
         spotlightHelper = SpotlightHelper(viewController: self)!
         bioportalHelper = BioPortalHelper(viewController: self)!
+        
+        
     }
     
     func pencilInteractionDidTap(_ interaction: UIPencilInteraction) {
@@ -143,141 +146,49 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         case .showColorPalette:
             print("Color Palette Apple Pencil interaction. This has no effect in this app")
         case .switchEraser:
-            self.toggleDrawTool()
+            self.setEraserTool()
             break
         case .switchPrevious:
-            self.toggleDrawTool()
+            self.setPenctilTool()
             break
         default:
             print("Unknown Pen action")
         }
     }
     
-    private func toggleDrawTool() {
-        if self.sketchView.drawTool == .eraser {
-            self.sketchView.drawTool = .pen
-            self.sketchView.lineWidth = pencilSize
-            pencilButton.bgColor = UIColor(red: 85.0/255.0, green: 117.0/255.0, blue: 193.0/255.0, alpha: 1)
-            eraserButton.bgColor = .lightGray
-        }
-        else {
-            self.sketchView.drawTool = .eraser
-            self.sketchView.lineWidth = eraserSize
-            eraserButton.bgColor = UIColor(red: 85.0/255.0, green: 117.0/255.0, blue: 193.0/255.0, alpha: 1)
-            pencilButton.bgColor = .lightGray
-        }
+    private func setPenctilTool() {
+        self.sketchView.drawTool = .pen
+        self.sketchView.lineWidth = pencilSize
+        pencilButton.bgColor = UIColor(red: 85.0/255.0, green: 117.0/255.0, blue: 193.0/255.0, alpha: 1)
+        eraserButton.bgColor = .lightGray
+        sizeSlider.value = Float(pencilSize)
     }
-    private func updateDrawToolSize() {
-        if self.sketchView.drawTool == .eraser {
-            self.sketchView.lineWidth = eraserSize
-        }
-        else {
-            self.sketchView.lineWidth = pencilSize
-        }
+    private func setEraserTool() {
+        self.sketchView.drawTool = .eraser
+        self.sketchView.lineWidth = eraserSize
+        eraserButton.bgColor = UIColor(red: 85.0/255.0, green: 117.0/255.0, blue: 193.0/255.0, alpha: 1)
+        pencilButton.bgColor = .lightGray
+        sizeSlider.value = Float(eraserSize)
     }
     @IBAction func pencilButtonTapped(_ sender: LGButton) {
-        if self.sketchView.drawTool == .eraser {
-            toggleDrawTool()
-        }
-        else {
-            let popMenu = PopMenuViewController(sourceView: sender, actions: [PopMenuAction](), appearance: nil)
-            let closeAction = PopMenuDefaultAction(title: "Close")
-            let size2 = PopMenuDefaultAction(title: "2", didSelect: { action in
-                print("Changing Pencil Tool Size To 2")
-                self.pencilSize = CGFloat(2)
-                self.updateDrawToolSize()
-            })
-            let size4 = PopMenuDefaultAction(title: "4", didSelect: { action in
-                print("Changing Pencil Tool Size To 4")
-                self.pencilSize = CGFloat(4)
-                self.updateDrawToolSize()
-            })
-            let size6 = PopMenuDefaultAction(title: "6", didSelect: { action in
-                print("Changing Pencil Tool Size To 6")
-                self.pencilSize = CGFloat(6)
-                self.updateDrawToolSize()
-            })
-            let size8 = PopMenuDefaultAction(title: "8", didSelect: { action in
-                print("Changing Pencil Tool Size To 8")
-                self.pencilSize = CGFloat(8)
-                self.updateDrawToolSize()
-            })
-            switch pencilSize {
-            case 2:
-                size2.highlighted = true
-                break
-            case 4:
-                size4.highlighted = true
-                break
-            case 6:
-                size6.highlighted = true
-                break
-            case 8:
-                size8.highlighted = true
-                break
-            default:
-                size2.highlighted = true
-                break
-            }
-            popMenu.addAction(size2)
-            popMenu.addAction(size4)
-            popMenu.addAction(size6)
-            popMenu.addAction(size8)
-            popMenu.addAction(closeAction)
-            self.present(popMenu, animated: true, completion: nil)
-        }
+        self.setPenctilTool()
     }
     @IBAction func eraserButtonTapped(_ sender: LGButton) {
-        if self.sketchView.drawTool == .pen {
-            toggleDrawTool()
+        self.setEraserTool()
+    }
+    @IBAction func sizeSliderValueChanged(_ sender: SizeSlider) {
+        sender.value = sender.value.rounded()
+        switch sketchView.drawTool {
+        case .pen:
+            pencilSize = CGFloat(sender.value)
+            break
+        case .eraser:
+            eraserSize = CGFloat(sender.value)
+            break
+        default:
+            pencilSize = CGFloat(sender.value)
         }
-        else {
-            let popMenu = PopMenuViewController(sourceView: sender, actions: [PopMenuAction](), appearance: nil)
-            let closeAction = PopMenuDefaultAction(title: "Close")
-            let size2 = PopMenuDefaultAction(title: "2", didSelect: { action in
-                print("Changing Eraser Tool Size To 2")
-                self.eraserSize = CGFloat(2)
-                self.updateDrawToolSize()
-            })
-            let size4 = PopMenuDefaultAction(title: "4", didSelect: { action in
-                print("Changing Eraser Tool Size To 4")
-                self.eraserSize = CGFloat(4)
-                self.updateDrawToolSize()
-            })
-            let size6 = PopMenuDefaultAction(title: "6", didSelect: { action in
-                print("Changing Eraser Tool Size To 6")
-                self.eraserSize = CGFloat(6)
-                self.updateDrawToolSize()
-            })
-            let size8 = PopMenuDefaultAction(title: "8", didSelect: { action in
-                print("Changing Eraser Tool Size To 8")
-                self.eraserSize = CGFloat(8)
-                self.updateDrawToolSize()
-            })
-            switch eraserSize {
-            case 2:
-                size2.highlighted = true
-                break
-            case 4:
-                size4.highlighted = true
-                break
-            case 6:
-                size6.highlighted = true
-                break
-            case 8:
-                size8.highlighted = true
-                break
-            default:
-                size2.highlighted = true
-                break
-            }
-            popMenu.addAction(size2)
-            popMenu.addAction(size4)
-            popMenu.addAction(size6)
-            popMenu.addAction(size8)
-            popMenu.addAction(closeAction)
-            self.present(popMenu, animated: true, completion: nil)
-        }
+        self.sketchView.lineWidth = CGFloat(sender.value)
     }
     
     private func processDrawingRecognition() {
@@ -390,12 +301,13 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
                                         conceptHighlightView.layer.borderWidth = 2
                                         conceptHighlightView.layer.borderColor = UIColor.red.cgColor
                                         self.view.addSubview(conceptHighlightView)
+                                        print(conceptHighlightView.frame)
                                         conceptHighlightView.isHidden = true
                                         conceptHighlightView.isUserInteractionEnabled = true
                                         self.conceptHighlights[conceptHighlightView] = document
                                         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(self.handleConceptHighlightTap(_:)))
                                         conceptHighlightView.addGestureRecognizer(tapGesture)
-
+ 
                                         found = true
                                         break
                                     }
@@ -443,11 +355,12 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
             let featurePointYScaled = imagePointYScaled + featureFrame.origin.y * scale
             
             // 7
-            return CGRect(x: featurePointXScaled,
-                          y: featurePointYScaled,
+            return CGRect(x: featurePointXScaled - 15,
+                          y: featurePointYScaled - 30,
                           width: featureWidthScaled,
                           height: featureHeightScaled)
     }
+    
     @objc func handleConceptHighlightTap(_ sender: UITapGestureRecognizer) {
         if let conceptHighlightView = sender.view {
             if let document = self.conceptHighlights[conceptHighlightView] {
@@ -628,7 +541,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
             else {
             }
         }
-        handwritingRecognizer.recognize(note: sketchnote, penTools: newPenTools, canvasFrame: self.sketchView.frame) { (success, textData) in
+        handwritingRecognizer.recognize(note: sketchnote, view: sketchView, penTools: newPenTools, canvasFrame: self.sketchView.bounds) { (success, textData) in
             if success {
                 if let textData = textData {
                     self.sketchnote.textDataArray.append(textData)
@@ -638,7 +551,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
             }
             else {
                 self.activityIndicator.stopAnimating()
-                self.displayNoDocumentsFound()
+                print("Handwriting recognition returned no result.")
             }
         }
     }
@@ -665,10 +578,6 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
             })
             self.isBookshelfDraggedOut = false
         }
-    }
-    
-    func displayNoDocumentsFound() {
-        self.showMessage("No documents could be found!", type: .info)
     }
     
     var timer: Timer?
@@ -1123,6 +1032,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     @IBOutlet weak var colorPicker: ColorPickerView!
     func colorPickerView(_ colorPickerView: ColorPickerView, didSelectItemAt indexPath: IndexPath) {
         sketchView.lineColor = colorPickerView.colors[colorPickerView.indexOfSelectedColor ?? 0]
+        sizeSlider.minimumTrackTintColor = colorPickerView.colors[colorPickerView.indexOfSelectedColor ?? 0]
     }
     
     // This is an optional method
@@ -1131,10 +1041,13 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     }
     
     func colorPickerView(_ colorPickerView: ColorPickerView, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: 25, height: 25)
+        return CGSize(width: 30, height: 30)
     }
     func colorPickerView(_ colorPickerView: ColorPickerView, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
         return CGFloat(3)
+    }
+    func colorPickerView(_ colorPickerView: ColorPickerView, insetForSectionAt section: Int) -> UIEdgeInsets {
+        return UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
     }
 }
 public class HoritonzalHelpLine: UIView  {

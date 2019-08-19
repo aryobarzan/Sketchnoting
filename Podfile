@@ -12,8 +12,8 @@ target 'Sketchnoting' do
   pod 'NewPopMenu'
   pod 'PDFGenerator'
   pod 'GSMessages'
-  pod 'RAMPaperSwitch'
   pod 'BadgeHub'
   pod 'SwiftyJSON'
   pod 'IGColorPicker'
+  pod 'SideMenu'
 end

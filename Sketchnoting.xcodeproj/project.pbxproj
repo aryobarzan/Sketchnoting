@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		9F08F3F0230AEE0E00A0587C /* SizeSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F08F3EF230AEE0E00A0587C /* SizeSlider.swift */; };
 		9F5010CC22491FC000425424 /* SketchnoteView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9F5010CB22491FC000425424 /* SketchnoteView.xib */; };
 		9F5010CE22491FD000425424 /* SketchnoteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5010CD22491FD000425424 /* SketchnoteView.swift */; };
 		9F5010D0224930E400425424 /* NoteCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5010CF224930E400425424 /* NoteCollection.swift */; };
@@ -65,6 +66,7 @@
 		3866EAD96654DEBC2DCDFB3E /* Pods-Sketchnoting.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Sketchnoting.release.xcconfig"; path = "Target Support Files/Pods-Sketchnoting/Pods-Sketchnoting.release.xcconfig"; sourceTree = "<group>"; };
 		8703F8178351837A9DB23A40 /* Pods-Sketchnoting.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Sketchnoting.debug.xcconfig"; path = "Target Support Files/Pods-Sketchnoting/Pods-Sketchnoting.debug.xcconfig"; sourceTree = "<group>"; };
 		9DC8B7BD96FB5DF71C8C0CA0 /* Pods_Sketchnoting.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Sketchnoting.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		9F08F3EF230AEE0E00A0587C /* SizeSlider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SizeSlider.swift; sourceTree = "<group>"; };
 		9F5010CB22491FC000425424 /* SketchnoteView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SketchnoteView.xib; sourceTree = "<group>"; };
 		9F5010CD22491FD000425424 /* SketchnoteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SketchnoteView.swift; sourceTree = "<group>"; };
 		9F5010CF224930E400425424 /* NoteCollection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteCollection.swift; sourceTree = "<group>"; };
@@ -163,6 +165,7 @@
 				9FD9BD0F22678D41007F4A2D /* NoteShareView.xib */,
 				9FD9BD1322678D79007F4A2D /* NoteShareView.swift */,
 				9FA6238E22DCD3AD007ED794 /* DocumentUICollectionViewCell.swift */,
+				9F08F3EF230AEE0E00A0587C /* SizeSlider.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -531,6 +534,7 @@
 				9FC788F4225CEC4C0074BD16 /* DrawingSearchView.swift in Sources */,
 				9FBF6AB422E9F391001FD730 /* VisionTextWrapper.swift in Sources */,
 				9FD29C54223C3B6F00CC969A /* OCRHelper.swift in Sources */,
+				9F08F3F0230AEE0E00A0587C /* SizeSlider.swift in Sources */,
 				9FD29BC522249D9500CC969A /* Note.swift in Sources */,
 				9FBF6ABA22E9F439001FD730 /* VisionTextElementWrapper.swift in Sources */,
 				9FD29C41223861E100CC969A /* ArrowButton.swift in Sources */,
@@ -704,7 +708,7 @@
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 2;
 			};
 			name = Debug;
 		};
@@ -731,7 +735,7 @@
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 2;
 			};
 			name = Release;
 		};

@@ -18,7 +18,7 @@ class HandwritingRecognizer {
         self.textRecognizer = vision.onDeviceTextRecognizer()
     }
     
-    public func recognize(note: Sketchnote, penTools: [PenTool], canvasFrame: CGRect, handleFinish:@escaping ((_ success: Bool, _ param: TextData?)->())){
+    public func recognize(note: Sketchnote, view: UIView, penTools: [PenTool], canvasFrame: CGRect, handleFinish:@escaping ((_ success: Bool, _ param: TextData?)->())){
         var newPenTools = [PenTool]()
         
         if let textDataArray = note.textDataArray {
@@ -48,9 +48,11 @@ class HandwritingRecognizer {
             layer.fillColor = UIColor.white.cgColor
             canvas.layer.addSublayer(layer)
         }
+        //view.addSubview(canvas)
         let image = canvas.asImage()
         let visionImage = VisionImage(image: image)
         textRecognizer.process(visionImage) { result, error in
+            //canvas.removeFromSuperview()
             guard error == nil, let result = result else {
                 handleFinish(false, nil)
                 return

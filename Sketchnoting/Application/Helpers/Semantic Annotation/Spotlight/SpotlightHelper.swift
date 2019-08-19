@@ -106,6 +106,21 @@ class SpotlightHelper {
                     }
                 }
                 
+                if let thumbnailArray = content["http://dbpedia.org/ontology/thumbnail"]?.array {
+                    if let value = thumbnailArray[0]["value"].string {
+                        let url = URL(string: value)
+                        if let url = url {
+                            do {
+                                let data = try Data(contentsOf: url)
+                                let image = UIImage(data: data)
+                                thumbnail = image
+                            } catch {
+                                print(error.localizedDescription)
+                            }
+                        }
+                    }
+                }
+                
                 if let wikiPageIDArray = content["http://dbpedia.org/ontology/wikiPageID"]?.array {
                     if let value = wikiPageIDArray[0]["value"].double {
                         wikiPageID = value
@@ -122,7 +137,7 @@ class SpotlightHelper {
                     }
                 }
                 
-                if let document = SpotlightDocument(title: concept, description: abstract, URL: conceptURI, type: .Spotlight, previewImage: nil, rank: secondRankPercentage, label: label, types: types, wikiPageID: wikiPageID, latitude: latitude, longitude: longitude, mapImage: nil) {
+                if let document = SpotlightDocument(title: concept, description: abstract, URL: conceptURI, type: .Spotlight, previewImage: thumbnail, rank: secondRankPercentage, label: label, types: types, wikiPageID: wikiPageID, latitude: latitude, longitude: longitude, mapImage: nil) {
                     if let latitude = latitude, let longitude = longitude {
                         MapHelper.fetchMapImage(latitude: String(latitude), longitude: String(longitude), document: document)
                     }
@@ -135,25 +150,7 @@ class SpotlightHelper {
                         }
                     }                        
                     self.viewController.displayInBookshelf(document: document)
-                    if let thumbnailArray = content["http://dbpedia.org/ontology/thumbnail"]?.array {
-                        if let value = thumbnailArray[0]["value"].string {
-                            let url = URL(string: value)
-                            if let url = url {
-                                DispatchQueue.global(qos: .background).async {
-                                    do {
-                                        let data = try Data(contentsOf: url)
-                                        let image = UIImage(data: data)
-                                        document.previewImage = image
-                                        
-                                    } catch {
-                                        print(error.localizedDescription)
-                                    }
-                                }
-                            }
-                        }
-                    }
                 }
-                
             }
         }
     }
