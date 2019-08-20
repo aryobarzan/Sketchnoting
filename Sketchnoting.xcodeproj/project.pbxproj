@@ -11,9 +11,10 @@
 		9F5010CC22491FC000425424 /* SketchnoteView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9F5010CB22491FC000425424 /* SketchnoteView.xib */; };
 		9F5010CE22491FD000425424 /* SketchnoteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5010CD22491FD000425424 /* SketchnoteView.swift */; };
 		9F5010D0224930E400425424 /* NoteCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5010CF224930E400425424 /* NoteCollection.swift */; };
-		9F5010D22249325300425424 /* NoteCollectionView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9F5010D12249325300425424 /* NoteCollectionView.xib */; };
-		9F5010D42249326D00425424 /* NoteCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5010D32249326D00425424 /* NoteCollectionView.swift */; };
 		9F5D0FC8229CBC4100BCA451 /* NotesManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5D0FC7229CBC4100BCA451 /* NotesManager.swift */; };
+		9F75E448230C368F00488BBD /* NoteSharingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F75E447230C368F00488BBD /* NoteSharingViewController.swift */; };
+		9F75E44C230C583200488BBD /* NoteCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F75E44A230C583200488BBD /* NoteCollectionViewCell.swift */; };
+		9F75E44D230C583200488BBD /* NoteCollectionViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9F75E44B230C583200488BBD /* NoteCollectionViewCell.xib */; };
 		9FA6238822CEA7FE007ED794 /* MapHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA6238722CEA7FE007ED794 /* MapHelper.swift */; };
 		9FA6238B22D37213007ED794 /* BioPortalHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA6238A22D37213007ED794 /* BioPortalHelper.swift */; };
 		9FA6238D22D38AEE007ED794 /* SpotlightHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA6238C22D38AEE007ED794 /* SpotlightHelper.swift */; };
@@ -70,11 +71,12 @@
 		9F5010CB22491FC000425424 /* SketchnoteView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SketchnoteView.xib; sourceTree = "<group>"; };
 		9F5010CD22491FD000425424 /* SketchnoteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SketchnoteView.swift; sourceTree = "<group>"; };
 		9F5010CF224930E400425424 /* NoteCollection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteCollection.swift; sourceTree = "<group>"; };
-		9F5010D12249325300425424 /* NoteCollectionView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NoteCollectionView.xib; sourceTree = "<group>"; };
-		9F5010D32249326D00425424 /* NoteCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteCollectionView.swift; sourceTree = "<group>"; };
 		9F5D0FC7229CBC4100BCA451 /* NotesManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotesManager.swift; sourceTree = "<group>"; };
 		9F5D8B2B228B9D7000F56FEC /* CREDITS.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CREDITS.md; sourceTree = "<group>"; };
 		9F5D8B2C228B9EF800F56FEC /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		9F75E447230C368F00488BBD /* NoteSharingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteSharingViewController.swift; sourceTree = "<group>"; };
+		9F75E44A230C583200488BBD /* NoteCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteCollectionViewCell.swift; sourceTree = "<group>"; };
+		9F75E44B230C583200488BBD /* NoteCollectionViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NoteCollectionViewCell.xib; sourceTree = "<group>"; };
 		9FA6238722CEA7FE007ED794 /* MapHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapHelper.swift; sourceTree = "<group>"; };
 		9FA6238A22D37213007ED794 /* BioPortalHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BioPortalHelper.swift; sourceTree = "<group>"; };
 		9FA6238C22D38AEE007ED794 /* SpotlightHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotlightHelper.swift; sourceTree = "<group>"; };
@@ -156,10 +158,9 @@
 		9F5010CA22491F8900425424 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				9F75E449230C580300488BBD /* Note Collection View */,
 				9F5010CB22491FC000425424 /* SketchnoteView.xib */,
 				9F5010CD22491FD000425424 /* SketchnoteView.swift */,
-				9F5010D12249325300425424 /* NoteCollectionView.xib */,
-				9F5010D32249326D00425424 /* NoteCollectionView.swift */,
 				9FC788F1225CEC230074BD16 /* DrawingSearchView.xib */,
 				9FC788F3225CEC4C0074BD16 /* DrawingSearchView.swift */,
 				9FD9BD0F22678D41007F4A2D /* NoteShareView.xib */,
@@ -177,6 +178,15 @@
 				9FA623A022E73DDA007ED794 /* NoteLoader.swift */,
 			);
 			path = Models;
+			sourceTree = "<group>";
+		};
+		9F75E449230C580300488BBD /* Note Collection View */ = {
+			isa = PBXGroup;
+			children = (
+				9F75E44A230C583200488BBD /* NoteCollectionViewCell.swift */,
+				9F75E44B230C583200488BBD /* NoteCollectionViewCell.xib */,
+			);
+			path = "Note Collection View";
 			sourceTree = "<group>";
 		};
 		9FA6238922D371F1007ED794 /* Semantic Annotation */ = {
@@ -335,6 +345,7 @@
 				9FD29C68224589DA00CC969A /* Data */,
 				9FD29BA82220524D00CC969A /* ViewController.swift */,
 				9FD29C182236DCFC00CC969A /* SketchNoteViewController.swift */,
+				9F75E447230C368F00488BBD /* NoteSharingViewController.swift */,
 			);
 			path = Application;
 			sourceTree = "<group>";
@@ -423,7 +434,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9F5010D22249325300425424 /* NoteCollectionView.xib in Resources */,
 				9FD29C442239525A00CC969A /* GoogleService-Info.plist in Resources */,
 				9FD9BD1022678D41007F4A2D /* NoteShareView.xib in Resources */,
 				9FD29BB12220525000CC969A /* LaunchScreen.storyboard in Resources */,
@@ -431,6 +441,7 @@
 				9FD29BAC2220524D00CC969A /* Main.storyboard in Resources */,
 				9FD29C6622431C0000CC969A /* labels.txt in Resources */,
 				9F5010CC22491FC000425424 /* SketchnoteView.xib in Resources */,
+				9F75E44D230C583200488BBD /* NoteCollectionViewCell.xib in Resources */,
 				9FC788F2225CEC230074BD16 /* DrawingSearchView.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -507,7 +518,6 @@
 				9FA6239322DE30AC007ED794 /* SpotlightDocument.swift in Sources */,
 				9FD29C58223C3CF700CC969A /* UIImageExtensions.swift in Sources */,
 				9FD29C192236DCFC00CC969A /* SketchNoteViewController.swift in Sources */,
-				9F5010D42249326D00425424 /* NoteCollectionView.swift in Sources */,
 				9FA6238822CEA7FE007ED794 /* MapHelper.swift in Sources */,
 				9FD29C202236EA2800CC969A /* UIImage+fill.swift in Sources */,
 				9FD29C40223861E100CC969A /* ExpandableButtonView.swift in Sources */,
@@ -528,10 +538,12 @@
 				9FD29C1F2236EA2800CC969A /* SketchView.swift in Sources */,
 				9F5010CE22491FD000425424 /* SketchnoteView.swift in Sources */,
 				9FD29C42223861E100CC969A /* ActionButton.swift in Sources */,
+				9F75E44C230C583200488BBD /* NoteCollectionViewCell.swift in Sources */,
 				9FD29C38223853C300CC969A /* PhotoAuthorization.swift in Sources */,
 				9F5D0FC8229CBC4100BCA451 /* NotesManager.swift in Sources */,
 				9FA6238F22DCD3AD007ED794 /* DocumentUICollectionViewCell.swift in Sources */,
 				9FC788F4225CEC4C0074BD16 /* DrawingSearchView.swift in Sources */,
+				9F75E448230C368F00488BBD /* NoteSharingViewController.swift in Sources */,
 				9FBF6AB422E9F391001FD730 /* VisionTextWrapper.swift in Sources */,
 				9FD29C54223C3B6F00CC969A /* OCRHelper.swift in Sources */,
 				9F08F3F0230AEE0E00A0587C /* SizeSlider.swift in Sources */,

@@ -18,21 +18,15 @@ import GSMessages
 // It also contains note collection views, which in turn contain sketchnote views.
 
 //This controller handles all interactions of the user on the home page, including creating new note collections and new notes, searching, sharing notes, and generating pdfs from notes.
-class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextFieldDelegate, MCSessionDelegate, MCBrowserViewControllerDelegate {
-
+class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextFieldDelegate, MCSessionDelegate, MCBrowserViewControllerDelegate, UICollectionViewDelegate, UICollectionViewDataSource, NoteCollectionViewCellDelegate {
+    
     @IBOutlet var searchField: UITextField!
-    @IBOutlet var scrollView: UIScrollView!
-    var notesStackView = UIStackView()
-    @IBOutlet var dimView: UIView!
     @IBOutlet var clearSearchButton: LGButton!
     @IBOutlet var searchFiltersScrollView: UIScrollView!
     @IBOutlet var searchSeparator: UIView!
     var searchFiltersStackView = UIStackView()
     
     @IBOutlet var searchPanel: UIView!
-    
-    // This property holds the user's note collection views displayed on this home page.
-    var noteCollectionViews = [NoteCollectionView]()
     
     // When the user taps a sketchnote to open it for editing, the app stores it in this property to remember which note is currently being edited.
     var selectedSketchnote: Sketchnote?
@@ -64,7 +58,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     // The strokes linked to that received note are stored here.
     var receivedPathArray: NSMutableArray?
     
-    
     // This function initializes the home page view.
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -74,11 +67,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         peerID = MCPeerID(displayName: UIDevice.current.name)
         mcSession = MCSession(peer: peerID, securityIdentity: nil, encryptionPreference: .required)
         mcSession.delegate = self
-        setSharedNotesPanelStatus(notesAreShared: false)
-        noteSharingPanel.layer.borderWidth = 1
-        noteSharingPanel.layer.borderColor = UIColor.black.cgColor
-        sharedNoteImageView.layer.borderWidth = 1
-        sharedNoteImageView.layer.borderColor = UIColor.black.cgColor
         
         // The search views are setup, including the search field and the pop-up view for searching by drawing
         self.searchField.delegate = self
@@ -108,22 +96,10 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             self.searchByDrawing()
         }
  
-        notesStackView.axis = .vertical
-        notesStackView.distribution = .equalSpacing
-        notesStackView.alignment = .fill
-        notesStackView.spacing = 15
-        scrollView.addSubview(notesStackView)
-        notesStackView.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            notesStackView.topAnchor.constraint(equalTo: scrollView.topAnchor),
-            notesStackView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
-            notesStackView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
-            notesStackView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
-            notesStackView.widthAnchor.constraint(equalTo: scrollView.widthAnchor)
-            ])
-
-        for collection in NotesManager.shared.noteCollections {
-            displayNoteCollection(collection: collection)
+        noteCollectionView.register(UINib(nibName: "NoteCollectionViewCell", bundle: nil), forCellWithReuseIdentifier: "NoteCollectionViewCell")
+        if let notes = NoteLoader.loadSketchnotes() {
+            items = notes
+            noteCollectionView.reloadData()
         }
         
         //Drawing Recognition - This loads the labels for the drawing recognition's CoreML model.
@@ -149,124 +125,29 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             }
             sketchnoteViewController.new = true
             sketchnoteViewController.sketchnote = selectedSketchnote
+            break
         case "EditSketchnote":
             guard let sketchnoteViewController = segue.destination as? SketchNoteViewController else {
                 fatalError("Unexpected destination")
             }
             sketchnoteViewController.new = false
             sketchnoteViewController.sketchnote = selectedSketchnote
-            
+            break
+        case "NoteSharing":
+            self.navigationController?.setNavigationBarHidden(false, animated: false)
+            break
         default:
             print("Not creating or editing sketchnote.")
-        }
-    }
-    
-    //MARK: Display notes
-    
-    func displaySketchnote(note: Sketchnote, collectionView: NoteCollectionView) {
-        let sketchnoteView = SketchnoteView(frame: collectionView.stackView.frame)
-        sketchnoteView.setNote(note: note)
-        collectionView.sketchnoteViews.append(sketchnoteView)
-        collectionView.stackView.insertArrangedSubview(sketchnoteView, at: 0)
-        
-        let tap = UITapGestureRecognizer(target: self, action: #selector(self.handleSketchnoteTap(_:)))
-        sketchnoteView.isUserInteractionEnabled = true
-        sketchnoteView.addGestureRecognizer(tap)
-        sketchnoteView.setDeleteAction {
-            let popMenu = PopMenuViewController(sourceView: sketchnoteView, actions: [PopMenuAction](), appearance: nil)
-            popMenu.appearance.popMenuBackgroundStyle = .blurred(.dark)
-            let closeAction = PopMenuDefaultAction(title: "Cancel")
-            let action = PopMenuDefaultAction(title: "Delete", color: .red, didSelect: { action in
-                if collectionView.noteCollection != nil {
-                    NotesManager.shared.delete(noteCollection: collectionView.noteCollection!, note: note)
-                    sketchnoteView.removeFromSuperview()
-                }
-                
-            })
-            popMenu.addAction(action)
-            if let sketchnote = sketchnoteView.sketchnote {
-                if !sketchnote.getText().isEmpty {
-                    let copyTextAction = PopMenuDefaultAction(title: "Copy Text", color: .white, didSelect: { action in
-                        UIPasteboard.general.string = sketchnote.getText()
-                        self.showMessage("Text copied to clipboard.", type: .success)
-                    })
-                    popMenu.addAction(copyTextAction)
-                }
-                let sendAction = PopMenuDefaultAction(title: "Send", color: .white, didSelect: { action in
-                    self.sketchnoteToShare = sketchnote
-                    self.pathArrayToShare = sketchnote.paths
-                    //self.sketchnoteToShare = sketchnoteView.sketchnote!
-                    
-                    /*if let pathArray = NotesManager.shared.pathArrayDictionary[self.sketchnoteToShare!.creationDate.timeIntervalSince1970] {
-                        self.pathArrayToShare = pathArray
-                    }*/
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                        self.joinSession()
-                    }
-                })
-                popMenu.addAction(sendAction)
-                if sketchnote.image != nil {
-                    let shareAction = PopMenuDefaultAction(title: "Share", color: .white, didSelect: { action in
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                            self.generatePDF(sketchnoteView: sketchnoteView)
-                        }
-                    })
-                    popMenu.addAction(shareAction)
-                }
-            }
-            popMenu.addAction(closeAction)
-            self.present(popMenu, animated: true, completion: nil)
-        }
-    }
-    
-    // This function sets up a NoteCollectionView for a given note collection and displays it on the homepage.
-    // Interactions with the view's buttons are also set up, such as creating a new sketchnote in that note collection.
-    private func displayNoteCollection(collection: NoteCollection) {
-        let noteCollectionView = NoteCollectionView(frame: notesStackView.frame)
-        noteCollectionView.parentViewController = self
-        noteCollectionView.setNoteCollection(collection: collection)
-        self.noteCollectionViews.append(noteCollectionView)
-        self.notesStackView.insertArrangedSubview(noteCollectionView, at: 0)
-        
-        noteCollectionView.setShareAction {
-            let alert = UIAlertController(title: "Note Collection", message: "", preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: "Share", style: .default, handler: { action in
-                if noteCollectionView.noteCollection != nil && noteCollectionView.noteCollection!.notes.count > 0 {
-                    self.generatePDF(noteCollectionView: noteCollectionView)
-                }
-            }))
-            alert.addAction(UIAlertAction(title: "Delete", style: .destructive, handler: { action in
-                NotesManager.shared.delete(noteCollection: collection)
-                noteCollectionView.removeFromSuperview()
-            }))
-            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
-            self.present(alert, animated: true)
-        }
-        
-        for n in collection.notes {
-            displaySketchnote(note: n, collectionView: noteCollectionView)
         }
     }
     
     // This function is called when the user closes a note they were editing and the user returns to the homepage.
     // Upon return, the edited note is saved to disk.
     @IBAction func unwindToHome(sender: UIStoryboardSegue) {
+        self.navigationController?.setNavigationBarHidden(true, animated: false)
         if let sourceViewController = sender.source as? SketchNoteViewController, let note = sourceViewController.sketchnote {
-            
             NotesManager.shared.update(note: note, pathArray: sourceViewController.storedPathArray)
-            var alreadyExists = false
-            for i in 0..<noteCollectionViews.count {
-                for j in 0..<noteCollectionViews[i].sketchnoteViews.count {
-                    if noteCollectionViews[i].sketchnoteViews[j].sketchnote == note {
-                        noteCollectionViews[i].sketchnoteViews[j].setNote(note: note)
-                        alreadyExists = true
-                        break
-                    }
-                }
-                if alreadyExists {
-                    break
-                }
-            }
+            noteCollectionView.reloadData()
         }
     }
     
@@ -277,20 +158,14 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         performSearch()
         return true
     }
-    
-    // This function is called when the user taps a sketchnote's preview image to open it for editing.
-    @objc func handleSketchnoteTap(_ sender: UITapGestureRecognizer) {
-        let noteView = sender.view as! SketchnoteView
-        self.selectedSketchnote = noteView.sketchnote
-        self.performSegue(withIdentifier: "EditSketchnote", sender: self)
-    }
-    
 
-    // This function is called when the user presses the "New Sketchnote" button in a NoteCollectionView.
-    @IBAction func newNoteCollectionTapped(_ sender: LGButton) {
-        let noteCollection = NoteCollection(title: "Untitled", notes: nil)!
-        NotesManager.shared.add(noteCollection: noteCollection)
-        displayNoteCollection(collection: noteCollection)
+    @IBAction func newNoteTapped(_ sender: LGButton) {
+        let newNote = Sketchnote(image: nil, relatedDocuments: nil, drawings: nil)!
+        newNote.save()
+        self.items.append(newNote)
+        
+        selectedSketchnote = newNote
+        performSegue(withIdentifier: "NewSketchnote", sender: self)
     }
     
     // This function loops through each search term and checks each sketchnote on the homepage.
@@ -315,11 +190,18 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             searchSeparator.isHidden = false
             searchField.text = ""
         }
-        for noteCollectionView in noteCollectionViews {
-            noteCollectionView.applySearchFilters(filters: self.searchFilters)
-        }
-        if noteCollectionViews.count == 0 {
+        if items.count == 0 {
             self.clearSearch()
+        }
+        else {
+            var filteredNotes = [Sketchnote]()
+            for note in items {
+                if note.applySearchFilters(filters: searchFilters) {
+                    filteredNotes.append(note)
+                }
+            }
+            self.items = filteredNotes
+            noteCollectionView.reloadData()
         }
     }
     
@@ -341,8 +223,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     @IBAction func searchByDrawingTapped(_ sender: LGButton) {
         self.view.addSubview(self.drawingSearchView)
         UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 0, options: [],  animations: {
-            self.dimView.isHidden = false
-            self.dimView.alpha = 0.8
             self.drawingSearchView.transform = .identity
         })
     }
@@ -350,9 +230,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         clearSearch()
     }
     private func clearSearch() {
-        for noteCollectionView in noteCollectionViews {
-            noteCollectionView.showSketchnotes()
-        }
         searchFilters = [String]()
         for searchFilterButton in searchFilterButtons {
             searchFilterButton.removeFromSuperview()
@@ -361,6 +238,12 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         clearSearchButton.isHidden = true
         searchField.text = ""
         searchSeparator.isHidden = true
+        
+        self.items = [Sketchnote]()
+        if let notes = NoteLoader.loadSketchnotes() {
+            self.items = notes
+        }
+        noteCollectionView.reloadData()
     }
     
     // Drawing recognition
@@ -416,8 +299,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     }
     private func hideDrawingSearchView() {
         UIView.animate(withDuration: 0.0, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 0, options: [], animations: {
-            self.dimView.alpha = 0
-            self.dimView.isHidden = true
             self.drawingSearchView.transform = CGAffineTransform(scaleX: 0.2, y: 0.2)
             
         }) { (success) in
@@ -499,32 +380,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     // When the user's device receives a shared note, this function is called to let the device know and to handle it.
     // In turn, a NoteShareView is displayed for the user to let them know.
     func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
-        guard let receivedData = ((try? NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(data) as?
-            [Data]) as [Data]??) else { return }
-        let decoder = JSONDecoder()
-        guard let received = try? decoder.decode(Sketchnote.self, from: receivedData![0]) else {
-            print("wrong data")
-            return
-        }
-        received.sharedByDevice = peerID.displayName
-        self.receivedSketchnote = received
-        guard let receivedPath = ((try? NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(receivedData![1]) as?
-            NSMutableArray) as NSMutableArray??) else { return }
-        self.receivedPathArray = receivedPath
-        if self.receivedSketchnote != nil && self.receivedPathArray != nil {
-            DispatchQueue.main.async {
-                self.pendingSharedNotes.append((received, receivedPath!))
-                self.setSharedNotesPanelStatus(notesAreShared: true)
-                self.view.showMessage("Device \(peerID.displayName) shared a note with you!", type: .info)
-            }
-        }
-    }
-    var pendingSharedNotes = [(Sketchnote, NSMutableArray)]()
-    
-    func startHosting() {
-        mcAdvertiserAssistant = MCAdvertiserAssistant(serviceType: "hws-kb", discoveryInfo: nil, session: mcSession)
-        mcAdvertiserAssistant.start()
-        print("Started hosting session")
     }
     
     func joinSession() {
@@ -537,21 +392,21 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     // PDF Generation - The following functions are used for generating a pdf from either a single sketchnote or a note collection.
     // This generated pdf can then be saved to the device's disk.
     
-    func generatePDF(sketchnoteView: SketchnoteView) {
-        if sketchnoteView.sketchnote != nil && sketchnoteView.sketchnote!.image != nil {
+    func generatePDF(noteViewCell: NoteCollectionViewCell) {
+        if noteViewCell.sketchnote.image != nil {
             do {
-                let data = try PDFGenerator.generated(by: [sketchnoteView.sketchnote!.image!])
+                let data = try PDFGenerator.generated(by: [noteViewCell.sketchnote.image!])
                 let activityController = UIActivityViewController(activityItems: [data], applicationActivities: nil)
                 self.present(activityController, animated: true, completion: nil)
                 if let popOver = activityController.popoverPresentationController {
-                    popOver.sourceView = sketchnoteView
+                    popOver.sourceView = noteViewCell
                 }
             } catch (let error) {
                 print(error)
             }
         }
     }
-    func generatePDF(noteCollectionView: NoteCollectionView) {
+    /*func generatePDF(noteCollectionView: NoteCollectionView) {
         if noteCollectionView.noteCollection != nil && noteCollectionView.noteCollection!.notes.count > 0 {
             do {
                 var pages = [UIImage]()
@@ -572,191 +427,63 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
                 print(error)
             }
         }
+    }*/
+    
+    // MARK: Note Collection View
+    @IBOutlet weak var noteCollectionView: UICollectionView!
+    let reuseIdentifier = "NoteCollectionViewCell" // also enter this string as the cell identifier in the storyboard
+    var items = [Sketchnote]()
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return items.count
     }
     
-    //MARK: Sharing Panel
-    @IBOutlet var noteSharingPanelButton: LGButton!
-    @IBOutlet var noteSharingPanel: UIView!
-    @IBOutlet var sharedNotesIndexLabel: UILabel!
-    @IBOutlet var sharedByLabel: UILabel!
-    @IBOutlet var sharedNoteImageView: UIImageView!
-    
-    @IBAction func noteSharingPanelButtonTapped(_ sender: LGButton) {
-        showNoteSharingPanel()
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath as IndexPath) as! NoteCollectionViewCell
+        cell.setNote(note: self.items[indexPath.item])
+        cell.delegate = self
+        return cell
     }
-    private func showNoteSharingPanel() {
-        UIView.animate(withDuration: 0.0, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 0, options: [], animations: {
-            self.dimView.alpha = 0.8
-            self.dimView.isHidden = false
-            self.noteSharingPanel.isHidden = false
-        }) { (success) in
-        }
-    }
-    private func hideNoteSharingPanel() {
-        UIView.animate(withDuration: 0.0, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 0, options: [], animations: {
-            self.dimView.alpha = 0
-            self.dimView.isHidden = true
-            self.noteSharingPanel.isHidden = true
-        }) { (success) in
-        }
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        self.selectedSketchnote = self.items[indexPath.item]
+        self.performSegue(withIdentifier: "EditSketchnote", sender: self)
+        print("You selected note view cell #\(indexPath.item)!")
     }
     
-    private var currentSharedNoteIndex = 0
-    @IBAction func noteSharingPanelCloseTapped(_ sender: UIButton) {
-        hideNoteSharingPanel()
-    }
-    @IBAction func noteSharingSwitchChanged(_ sender: UISwitch) {
-        if sender.isOn {
-            startHosting()
-            noteSharingPanelButton.bgColor = UIColor(red: 85.0/255.0, green: 117.0/255.0, blue: 193.0/255.0, alpha: 1)
-        }
-        else {
-            // The user's device is no longer visible to other nearby devices
-            if mcAdvertiserAssistant != nil {
-                mcAdvertiserAssistant.stop()
-            }
-            noteSharingPanelButton.bgColor = UIColor(red: 201.0/255.0, green: 181.0/255.0, blue: 171.0/255.0, alpha: 1)
-        }
-    }
-    @IBOutlet var previousSharedNoteButton: LGButton!
-    @IBOutlet var nextSharedNoteButton: LGButton!
-    @IBAction func previousSharedNoteTapped(_ sender: LGButton) {
-        if pendingSharedNotes.count > 0 && currentSharedNoteIndex > 0 {
-            currentSharedNoteIndex -= 1
-            updateCurrentSharedNote()
-        }
-        updatePreviousSharedNoteButtonStatus()
-        updateNextSharedNoteButtonStatus()
-    }
-    @IBAction func nextSharedNoteTapped(_ sender: LGButton) {
-        if pendingSharedNotes.count > 0 && currentSharedNoteIndex < pendingSharedNotes.count - 1 {
-            currentSharedNoteIndex += 1
-            updateCurrentSharedNote()
-        }
-        updateNextSharedNoteButtonStatus()
-        updatePreviousSharedNoteButtonStatus()
-    }
-    @IBOutlet var declineSharedNoteButton: LGButton!
-    @IBOutlet var acceptSharedNoteButton: LGButton!
-    @IBAction func declineSharedNoteTapped(_ sender: LGButton) {
-        print("Rejected shared note")
-        if receivedSketchnote != nil && receivedPathArray != nil {
-            if pendingSharedNotes.count > 0 {
-                pendingSharedNotes.remove(at: currentSharedNoteIndex)
-            }
-        }
-        self.view.showMessage("Shared note rejected.", type: .error)
-        
-        DispatchQueue.main.async {
-            if self.currentSharedNoteIndex > 0 {
-                self.currentSharedNoteIndex -= 1
-            }
-            self.updatePreviousSharedNoteButtonStatus()
-            self.updateNextSharedNoteButtonStatus()
-            self.updateCurrentSharedNote()
-            if self.pendingSharedNotes.count == 0 {
-                self.setSharedNotesPanelStatus(notesAreShared: false)
-            }
-        }
-    }
-    @IBAction func acceptSharedNoteTapped(_ sender: LGButton) {
-        print("Accepted shared note")
-        if receivedSketchnote != nil && receivedPathArray != nil {
-            if pendingSharedNotes.count > 0 {
-                pendingSharedNotes.remove(at: currentSharedNoteIndex)
-            }
-            receivedSketchnote!.paths = receivedPathArray
-            let noteCollection = NoteCollection(title: "Shared Note", notes: nil)!
-            noteCollection.addSketchnote(note: receivedSketchnote!)
-            NotesManager.shared.add(noteCollection: noteCollection)
-            receivedSketchnote?.save()
-            noteCollection.save()
-            displayNoteCollection(collection: noteCollection)
-        }
-        self.view.showMessage("Shared note accepted and stored to your device.", type: .success)
-        
-        DispatchQueue.main.async {
-            if self.currentSharedNoteIndex > 0 {
-                self.currentSharedNoteIndex -= 1
-            }
-            self.updatePreviousSharedNoteButtonStatus()
-            self.updateNextSharedNoteButtonStatus()
-            self.updateCurrentSharedNote()
-            if self.pendingSharedNotes.count == 0 {
-                self.setSharedNotesPanelStatus(notesAreShared: false)
-            }
-        }
-    }
-    
-    private func setSharedNotesPanelStatus(notesAreShared: Bool) {
-        if !notesAreShared {
-            sharedNoteImageView.isHidden = true
-            sharedNotesIndexLabel.text = "No shared notes to view."
-            sharedByLabel.text = "..."
-            previousSharedNoteButton.isUserInteractionEnabled = false
-            previousSharedNoteButton.bgColor = .lightGray
-            nextSharedNoteButton.isUserInteractionEnabled = false
-            nextSharedNoteButton.bgColor = .lightGray
-            declineSharedNoteButton.isUserInteractionEnabled = false
-            declineSharedNoteButton.bgColor = .lightGray
-            acceptSharedNoteButton.isUserInteractionEnabled = false
-            acceptSharedNoteButton.bgColor = .lightGray
+    func noteCollectionViewCellMoreTapped(sketchnote: Sketchnote, sender: NoteCollectionViewCell) {
+        print("More button of note view cell tapped.")
+        let popMenu = PopMenuViewController(sourceView: sender, actions: [PopMenuAction](), appearance: nil)
+        popMenu.appearance.popMenuBackgroundStyle = .blurred(.dark)
+        let closeAction = PopMenuDefaultAction(title: "Cancel")
+        let action = PopMenuDefaultAction(title: "Delete", color: .red, didSelect: { action in
+            self.items.removeAll{$0 == sketchnote}
+            sketchnote.delete()
+            self.noteCollectionView.reloadData()
             
-            receivedSketchnote = nil
-            receivedPathArray = nil
-        }
-        else {
-            sharedNoteImageView.isHidden = false
-            sharedNotesIndexLabel.text = "\(currentSharedNoteIndex + 1)/\(pendingSharedNotes.count)"
-            updatePreviousSharedNoteButtonStatus()
-            updateNextSharedNoteButtonStatus()
-            updateCurrentSharedNote()
-            declineSharedNoteButton.isUserInteractionEnabled = true
-            declineSharedNoteButton.bgColor = UIColor(red: 187.0/255.0, green: 34.0/255.0, blue: 40.0/255.0, alpha: 1)
-            acceptSharedNoteButton.isUserInteractionEnabled = true
-            acceptSharedNoteButton.bgColor = UIColor(red: 85.0/255.0, green: 117.0/255.0, blue: 193.0/255.0, alpha: 1)
-        }
-    }
-    private func updatePreviousSharedNoteButtonStatus() {
-        var enabled = false
-        if pendingSharedNotes.count > 0 {
-            if currentSharedNoteIndex > 0 {
-                enabled = true
-                previousSharedNoteButton.isUserInteractionEnabled = true
-                previousSharedNoteButton.bgColor = UIColor(red: 85.0/255.0, green: 117.0/255.0, blue: 193.0/255.0, alpha: 1)
+        })
+        popMenu.addAction(action)
+        // Bug: Currently empty string
+        let copyTextAction = PopMenuDefaultAction(title: "Copy Text", color: .white, didSelect: { action in
+            UIPasteboard.general.string = sketchnote.getText()
+            self.showMessage("Text copied to clipboard.", type: .success)
+        })
+        popMenu.addAction(copyTextAction)
+        let sendAction = PopMenuDefaultAction(title: "Send", color: .white, didSelect: { action in
+            self.sketchnoteToShare = sketchnote
+            self.pathArrayToShare = sketchnote.paths
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                self.joinSession()
             }
+        })
+        popMenu.addAction(sendAction)
+        if sketchnote.image != nil {
+            let shareAction = PopMenuDefaultAction(title: "Share", color: .white, didSelect: { action in
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    self.generatePDF(noteViewCell: sender)
+                }
+            })
+            popMenu.addAction(shareAction)
         }
-        if !enabled {
-            previousSharedNoteButton.isUserInteractionEnabled = false
-            previousSharedNoteButton.bgColor = .lightGray
-        }
+        popMenu.addAction(closeAction)
+        self.present(popMenu, animated: true, completion: nil)
     }
-    private func updateNextSharedNoteButtonStatus() {
-        var enabled = false
-        if pendingSharedNotes.count > 0 {
-            if currentSharedNoteIndex < pendingSharedNotes.count - 1 {
-                enabled = true
-                nextSharedNoteButton.isUserInteractionEnabled = true
-                nextSharedNoteButton.bgColor = UIColor(red: 85.0/255.0, green: 117.0/255.0, blue: 193.0/255.0, alpha: 1)
-            }
-        }
-        if !enabled {
-            nextSharedNoteButton.isUserInteractionEnabled = true
-            nextSharedNoteButton.bgColor = .lightGray
-        }
-    }
-    private func updateCurrentSharedNote() {
-        if pendingSharedNotes.count > 0 && currentSharedNoteIndex < pendingSharedNotes.count {
-            DispatchQueue.main.async {
-                let note = Array(self.pendingSharedNotes)[self.currentSharedNoteIndex].0
-                let pathArray = Array(self.pendingSharedNotes)[self.currentSharedNoteIndex].1
-                self.sharedNotesIndexLabel.text = "\(self.currentSharedNoteIndex + 1)/\(self.pendingSharedNotes.count)"
-                self.sharedNoteImageView.image = note.image
-                self.sharedByLabel.text = "Shared by: \(note.sharedByDevice ?? "Unknown")"
-                self.receivedSketchnote = note
-                self.receivedPathArray = pathArray
-            }
-        }
-    }
-    
 }

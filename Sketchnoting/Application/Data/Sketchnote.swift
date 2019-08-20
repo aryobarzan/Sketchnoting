@@ -8,7 +8,7 @@
 
 import UIKit
 
-class Sketchnote: Note, Equatable {
+class Sketchnote: Note, Equatable, DocumentVisitor {
     
     var id: String!
     var creationDate: Date!
@@ -271,10 +271,79 @@ class Sketchnote: Note, Equatable {
     //MARK: recognized text
     public func getText() -> String {
         var text: String = ""
-        for textData in textDataArray {
-            text = text + " " + textData.spellchecked
+        if textDataArray != nil {
+            for textData in textDataArray {
+                text = text + " " + textData.spellchecked
+            }
         }
         return text
+    }
+    
+    // MARK: Search
+    var matchesSearch = false
+    var currentSearchFilter : String?
+    public func applySearchFilters(filters: [String]) -> Bool {
+        matchesSearch = false
+        for filter in filters {
+            if (self.getText().lowercased().contains(filter)) || (self.drawings?.contains(filter) ?? false) {
+                return true
+            }
+            else {
+                currentSearchFilter = filter
+                if let documents = self.documents {
+                    for doc in documents {
+                        doc.accept(visitor: self)
+                        if matchesSearch {
+                            return true
+                        }
+                    }
+                }
+            }
+        }
+        return false
+    }
+    func process(document: Document) {
+        let _ = self.processBaseDocumentSearch(document: document)
+    }
+    
+    func process(document: SpotlightDocument) {
+        if !processBaseDocumentSearch(document: document) {
+            if let label = document.label {
+                if label.lowercased().contains(currentSearchFilter!) {
+                    matchesSearch = true
+                }
+            }
+            if let types = document.types {
+                for type in types {
+                    if type.lowercased().contains(currentSearchFilter!) {
+                        matchesSearch = true
+                        break
+                    }
+                }
+            }
+        }
+    }
+    
+    func process(document: BioPortalDocument) {
+        let _ = processBaseDocumentSearch(document: document)
+    }
+    
+    func process(document: CHEBIDocument) {
+        let _ = processBaseDocumentSearch(document: document)
+    }
+    
+    private func processBaseDocumentSearch(document: Document) -> Bool {
+        if document.title.lowercased().contains(currentSearchFilter!) {
+            matchesSearch = true
+            return true
+        }
+        else if let description = document.description {
+            if description.lowercased().contains(currentSearchFilter!) {
+                matchesSearch = true
+                return true
+            }
+        }
+        return false
     }
 
     static func == (lhs: Sketchnote, rhs: Sketchnote) -> Bool {
