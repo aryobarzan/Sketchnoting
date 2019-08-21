@@ -12,6 +12,7 @@ import PopMenu
 import MultipeerConnectivity
 import PDFGenerator
 import GSMessages
+import SideMenu
 
 // This is the controller for the app's home page view.
 // It contains the search bar and all the buttons related to it.
@@ -27,6 +28,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     var searchFiltersStackView = UIStackView()
     
     @IBOutlet var searchPanel: UIView!
+    @IBOutlet weak var noteSortingButton: UIButton!
     
     // When the user taps a sketchnote to open it for editing, the app stores it in this property to remember which note is currently being edited.
     var selectedSketchnote: Sketchnote?
@@ -102,6 +104,13 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             noteCollectionView.reloadData()
         }
         
+        if SettingsManager.noteSortingByNewest() {
+            self.noteSortingButton.titleLabel?.text = "Newest First"
+        }
+        
+        
+
+        
         //Drawing Recognition - This loads the labels for the drawing recognition's CoreML model.
         if let path = Bundle.main.path(forResource: "labels", ofType: "txt") {
             do {
@@ -136,6 +145,15 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         case "NoteSharing":
             self.navigationController?.setNavigationBarHidden(false, animated: false)
             break
+        case "SideMenu":
+            print("Side menu opened.")
+            guard let sideMenuNavigationController = segue.destination as? UISideMenuNavigationController else {
+                print("Could not retrieve side menu navigation controller.")
+                return
+            }
+            SideMenuManager.default.leftMenuNavigationController = sideMenuNavigationController
+            SideMenuManager.default.addScreenEdgePanGesturesToPresent(toView: self.navigationController!.view, forMenu: .left)
+            break
         default:
             print("Not creating or editing sketchnote.")
         }
@@ -166,6 +184,28 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         
         selectedSketchnote = newNote
         performSegue(withIdentifier: "NewSketchnote", sender: self)
+    }
+    @IBAction func noteSortingTapped(_ sender: UIButton) {
+        let popMenu = PopMenuViewController(sourceView: sender, actions: [PopMenuAction](), appearance: nil)
+        popMenu.appearance.popMenuBackgroundStyle = .blurred(.dark)
+        let newestFirstAction = PopMenuDefaultAction(title: "Newest First", didSelect: { action in
+            self.noteSortingButton.titleLabel?.text = "Newest First"
+            UserDefaults.settings.set(true, forKey: SettingsKeys.NoteSortingByNewest.rawValue)
+            self.items = self.items.sorted(by: { (note0: Sketchnote, note1: Sketchnote) -> Bool in
+                return note0 > note1
+            })
+            self.noteCollectionView.reloadData()
+            
+        })
+        popMenu.addAction(newestFirstAction)
+        let oldestFirstAction = PopMenuDefaultAction(title: "Oldest First", didSelect: { action in
+            self.noteSortingButton.titleLabel?.text = "Oldest First"
+            UserDefaults.settings.set(false, forKey: SettingsKeys.NoteSortingByNewest.rawValue)
+            self.items = self.items.sorted()
+            self.noteCollectionView.reloadData()
+        })
+        popMenu.addAction(oldestFirstAction)
+        self.present(popMenu, animated: true, completion: nil)
     }
     
     // This function loops through each search term and checks each sketchnote on the homepage.

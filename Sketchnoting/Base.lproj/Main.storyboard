@@ -13,8 +13,8 @@
         <!--Table View Controller-->
         <scene sceneID="pVz-Li-pwz">
             <objects>
-                <tableViewController id="tJa-l6-rO9" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="nqv-BK-xoT">
+                <tableViewController storyboardIdentifier="SideMenu" id="tJa-l6-rO9" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="plain" separatorStyle="none" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="nqv-BK-xoT">
                         <rect key="frame" x="0.0" y="0.0" width="768" height="1024"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -25,7 +25,7 @@
                                         <rect key="frame" x="0.0" y="28" width="768" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="Urg-gi-D3P" id="UTY-PV-b49">
-                                            <rect key="frame" x="0.0" y="0.0" width="730" height="43.5"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="730" height="44"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Note Sharing" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="JwC-mH-Cy4">
@@ -45,7 +45,7 @@
                                         <rect key="frame" x="0.0" y="72" width="768" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="ztX-zO-VNS" id="rzO-lJ-a0E">
-                                            <rect key="frame" x="0.0" y="0.0" width="730" height="43.5"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="730" height="44"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Settings" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="f0t-bm-Plb">
@@ -57,6 +57,9 @@
                                                 </label>
                                             </subviews>
                                         </tableViewCellContentView>
+                                        <connections>
+                                            <segue destination="9zg-b6-ctU" kind="show" identifier="Settings" id="nj5-20-BPI"/>
+                                        </connections>
                                     </tableViewCell>
                                 </cells>
                             </tableViewSection>
@@ -72,6 +75,103 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="2hG-iN-mOw" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="1838.28125" y="-557.2265625"/>
+        </scene>
+        <!--Settings-->
+        <scene sceneID="Vkf-KL-WO9">
+            <objects>
+                <tableViewController title="Settings" id="9zg-b6-ctU" customClass="SettingsViewController" customModule="Sketchnoting" customModuleProvider="target" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="fWV-nU-jIa">
+                        <rect key="frame" x="0.0" y="0.0" width="768" height="1024"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <sections>
+                            <tableViewSection headerTitle="Sketching" id="cMo-pY-Ab9">
+                                <cells>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" id="vlo-Uf-A8v">
+                                        <rect key="frame" x="0.0" y="28" width="768" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="vlo-Uf-A8v" id="l9H-GZ-Ak0">
+                                            <rect key="frame" x="0.0" y="0.0" width="768" height="43.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Ignore Touch Input (Pencil-only)" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Vhu-Os-h1I">
+                                                    <rect key="frame" x="20" y="11" width="245" height="21"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="Csy-l9-mh1">
+                                                    <rect key="frame" x="697" y="6" width="51" height="31"/>
+                                                    <connections>
+                                                        <action selector="ignoreTouchSwitchChanged:" destination="9zg-b6-ctU" eventType="valueChanged" id="j08-Er-AvQ"/>
+                                                    </connections>
+                                                </switch>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="Vhu-Os-h1I" firstAttribute="top" secondItem="l9H-GZ-Ak0" secondAttribute="topMargin" id="EdN-Ts-Ixp"/>
+                                                <constraint firstItem="Vhu-Os-h1I" firstAttribute="leading" secondItem="l9H-GZ-Ak0" secondAttribute="leadingMargin" id="Slr-tD-ArC"/>
+                                                <constraint firstItem="Csy-l9-mh1" firstAttribute="top" secondItem="l9H-GZ-Ak0" secondAttribute="top" constant="6" id="p4x-Yu-Zh8"/>
+                                                <constraint firstAttribute="trailing" secondItem="Csy-l9-mh1" secondAttribute="trailing" constant="22" id="tdy-HW-aeQ"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                </cells>
+                            </tableViewSection>
+                            <tableViewSection headerTitle="Apple Pencil (2nd Gen.)" id="dwn-np-DMw">
+                                <cells>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" rowHeight="100" id="99Z-mE-RB5">
+                                        <rect key="frame" x="0.0" y="100" width="768" height="100"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="99Z-mE-RB5" id="gl0-jM-dr8">
+                                            <rect key="frame" x="0.0" y="0.0" width="768" height="99.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Side Button Double-Tap" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="C8w-mE-3y9">
+                                                    <rect key="frame" x="20" y="11" width="182" height="21"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="8Sn-sq-rPx">
+                                                    <rect key="frame" x="37" y="40" width="694" height="29"/>
+                                                    <segments>
+                                                        <segment title="Manage Drawings"/>
+                                                        <segment title="Toggle Eraser/Pencil"/>
+                                                        <segment title="Show/Hide Tools"/>
+                                                        <segment title="Undo"/>
+                                                        <segment title="Redo"/>
+                                                    </segments>
+                                                    <connections>
+                                                        <action selector="pencilSideButtonSegmentedControlChanged:" destination="9zg-b6-ctU" eventType="valueChanged" id="l1m-a3-eaG"/>
+                                                    </connections>
+                                                </segmentedControl>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="8Sn-sq-rPx" firstAttribute="top" secondItem="C8w-mE-3y9" secondAttribute="bottom" constant="8" id="WQd-fc-baa"/>
+                                                <constraint firstItem="8Sn-sq-rPx" firstAttribute="centerX" secondItem="gl0-jM-dr8" secondAttribute="centerX" id="f84-eH-Htd"/>
+                                                <constraint firstItem="C8w-mE-3y9" firstAttribute="top" secondItem="gl0-jM-dr8" secondAttribute="topMargin" id="pc6-lk-geJ"/>
+                                                <constraint firstItem="C8w-mE-3y9" firstAttribute="leading" secondItem="gl0-jM-dr8" secondAttribute="leadingMargin" id="rld-s1-Tnu"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                </cells>
+                            </tableViewSection>
+                        </sections>
+                        <connections>
+                            <outlet property="dataSource" destination="9zg-b6-ctU" id="vVd-rG-Jwt"/>
+                            <outlet property="delegate" destination="9zg-b6-ctU" id="Heh-wq-R4w"/>
+                        </connections>
+                    </tableView>
+                    <navigationItem key="navigationItem" title="Settings" id="pot-t7-3nv"/>
+                    <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" prompted="NO"/>
+                    <connections>
+                        <outlet property="ignoreTouchSwitch" destination="Csy-l9-mh1" id="G3N-cT-oxo"/>
+                        <outlet property="pencilSideButtonSegmentedControl" destination="8Sn-sq-rPx" id="Dev-LW-PNh"/>
+                    </connections>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Wrb-WC-ypC" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="4257.03125" y="-850.1953125"/>
         </scene>
         <!--Note Sharing-->
         <scene sceneID="BKP-Yz-JbA">
@@ -388,20 +488,14 @@
                                     <userDefinedRuntimeAttribute type="string" keyPath="titleString" value="Sketchnote"/>
                                     <userDefinedRuntimeAttribute type="string" keyPath="leftIconString" value="add"/>
                                     <userDefinedRuntimeAttribute type="string" keyPath="leftIconFontName" value="ma"/>
-                                    <userDefinedRuntimeAttribute type="color" keyPath="gradientStartColor">
-                                        <color key="value" red="0.33255316370671639" green="0.45757836525055373" blue="0.75741592639999999" alpha="0.84705882349999995" colorSpace="custom" customColorSpace="sRGB"/>
-                                    </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="color" keyPath="gradientEndColor">
-                                        <color key="value" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                    </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
-                                        <real key="value" value="0.0"/>
+                                        <real key="value" value="25"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="number" keyPath="leftIconFontSize">
                                         <real key="value" value="20"/>
                                     </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="number" keyPath="gradientRotation">
-                                        <real key="value" value="90"/>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="bgColor">
+                                        <color key="value" red="0.33333333329999998" green="0.45882352939999999" blue="0.75686274509999996" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                                 <connections>
@@ -414,11 +508,19 @@
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="leading" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="IRa-tg-YTc">
+                                <rect key="frame" x="117" y="182" width="101" height="30"/>
+                                <state key="normal" title="Newest First"/>
+                                <connections>
+                                    <action selector="noteSortingTapped:" destination="BYZ-38-t0r" eventType="touchUpInside" id="WgW-HJ-mc2"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="jfx-Y6-PqO" secondAttribute="trailing" id="1tb-Ni-gxg"/>
                             <constraint firstItem="CoV-ID-6VL" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="2Cm-yr-FvP"/>
+                            <constraint firstItem="khA-pa-wBN" firstAttribute="top" secondItem="IRa-tg-YTc" secondAttribute="bottom" constant="18" id="5Co-Yb-Bg9"/>
                             <constraint firstItem="CoV-ID-6VL" firstAttribute="trailing" secondItem="6Tk-OE-BBY" secondAttribute="trailing" id="ByF-jS-BtU"/>
                             <constraint firstItem="khA-pa-wBN" firstAttribute="top" secondItem="Vi1-RF-h8p" secondAttribute="bottom" constant="21" id="COg-pm-9yM"/>
                             <constraint firstItem="jfx-Y6-PqO" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="CYZ-9M-bmQ"/>
@@ -430,8 +532,10 @@
                             <constraint firstItem="khA-pa-wBN" firstAttribute="bottom" secondItem="6Tk-OE-BBY" secondAttribute="bottom" id="g7W-s7-gLB"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="2wc-S9-gDw" secondAttribute="trailing" constant="8" id="gzF-0j-6ue"/>
                             <constraint firstItem="khA-pa-wBN" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="t1W-lb-yyj"/>
+                            <constraint firstItem="IRa-tg-YTc" firstAttribute="leading" secondItem="Vi1-RF-h8p" secondAttribute="trailing" constant="8" id="tll-nn-qav"/>
                             <constraint firstItem="CoV-ID-6VL" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="vEV-4R-RKQ"/>
                             <constraint firstItem="2wc-S9-gDw" firstAttribute="top" secondItem="jfx-Y6-PqO" secondAttribute="bottom" constant="7" id="vee-2m-rGX"/>
+                            <constraint firstItem="IRa-tg-YTc" firstAttribute="top" secondItem="jfx-Y6-PqO" secondAttribute="bottom" constant="17" id="wSb-ij-pTI"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
@@ -440,6 +544,7 @@
                     <connections>
                         <outlet property="clearSearchButton" destination="jH0-gW-c2y" id="MIz-6q-yBI"/>
                         <outlet property="noteCollectionView" destination="khA-pa-wBN" id="jLd-Rn-697"/>
+                        <outlet property="noteSortingButton" destination="IRa-tg-YTc" id="AT7-Iy-uvD"/>
                         <outlet property="searchField" destination="kB5-c2-JaK" id="bJo-4g-hfF"/>
                         <outlet property="searchFiltersScrollView" destination="uWo-fO-shM" id="WAw-JH-1fy"/>
                         <outlet property="searchPanel" destination="jfx-Y6-PqO" id="HhG-x4-33y"/>
@@ -1057,6 +1162,7 @@
                         <outlet property="topContainer" destination="aMI-wG-bBD" id="CM9-nY-ikm"/>
                         <outlet property="topContainerLeftDragView" destination="Y6m-H5-k8N" id="kcF-Ux-4Se"/>
                         <outlet property="undoButton" destination="gk5-k0-mFo" id="lhC-cW-Jyx"/>
+                        <outlet property="viewToolsButton" destination="3Vz-PC-NBp" id="fWB-mb-f8D"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="HI4-3w-NN7" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -1110,7 +1216,7 @@
         <!--Side Menu Navigation Controller-->
         <scene sceneID="nr3-T0-Nbn">
             <objects>
-                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="u3T-ew-HAP" customClass="UISideMenuNavigationController" customModule="SideMenu" sceneMemberID="viewController">
+                <navigationController storyboardIdentifier="SideMenuNavigationController" automaticallyAdjustsScrollViewInsets="NO" id="u3T-ew-HAP" customClass="UISideMenuNavigationController" customModule="SideMenu" sceneMemberID="viewController">
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="DNI-oI-35A">
                         <rect key="frame" x="0.0" y="20" width="768" height="50"/>
@@ -1147,9 +1253,28 @@
             </objects>
             <point key="canvasLocation" x="2563.28125" y="145.8984375"/>
         </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="ONC-Xu-xeT">
+            <objects>
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="Bls-f0-zSx" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="QTv-8i-NKf">
+                        <rect key="frame" x="0.0" y="20" width="768" height="50"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="9zg-b6-ctU" kind="relationship" relationship="rootViewController" id="VVw-kx-ckz"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="j10-G4-0gk" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="3491.40625" y="-850.1953125"/>
+        </scene>
     </scenes>
     <inferredMetricsTieBreakers>
         <segue reference="ct4-u7-KZY"/>
         <segue reference="tTR-lm-Te9"/>
+        <segue reference="nj5-20-BPI"/>
     </inferredMetricsTieBreakers>
 </document>

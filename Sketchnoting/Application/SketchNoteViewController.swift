@@ -24,6 +24,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     @IBOutlet var undoButton: LGButton!
     @IBOutlet var drawingsButton: LGButton!
     @IBOutlet var closeButton: UIButton!
+    @IBOutlet weak var viewToolsButton: LGButton!
     
     @IBOutlet var bookshelf: UIView!
     @IBOutlet var activityIndicator: UIActivityIndicatorView!
@@ -140,23 +141,31 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     }
     
     func pencilInteractionDidTap(_ interaction: UIPencilInteraction) {
-        switch UIPencilInteraction.preferredTapAction {
-        case .ignore:
+        switch SettingsManager.pencilSideButton() {
+        case .ManageDrawings:
+            toggleManageDrawings()
             break
-        case .showColorPalette:
-            print("Color Palette Apple Pencil interaction. This has no effect in this app")
-        case .switchEraser:
-            self.setEraserTool()
+        case .ToggleEraserPencil:
+            if sketchView.drawTool == .pen {
+                setEraserTool()
+            }
+            else {
+                setPencilTool()
+            }
             break
-        case .switchPrevious:
-            self.setPenctilTool()
+        case .ShowHideTools:
+            toggleToolsView()
             break
-        default:
-            print("Unknown Pen action")
+        case .Undo:
+            sketchView.undo()
+            break
+        case .Redo:
+            sketchView.redo()
+            break
         }
     }
     
-    private func setPenctilTool() {
+    private func setPencilTool() {
         self.sketchView.drawTool = .pen
         self.sketchView.lineWidth = pencilSize
         pencilButton.bgColor = UIColor(red: 85.0/255.0, green: 117.0/255.0, blue: 193.0/255.0, alpha: 1)
@@ -171,7 +180,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         sizeSlider.value = Float(eraserSize)
     }
     @IBAction func pencilButtonTapped(_ sender: LGButton) {
-        self.setPenctilTool()
+        self.setPencilTool()
     }
     @IBAction func eraserButtonTapped(_ sender: LGButton) {
         self.setEraserTool()
@@ -420,15 +429,17 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
             print("Default segue case triggered.")
         }
     }
-    
-    @IBAction func viewToolsTapped(_ sender: LGButton) {
+    private func toggleToolsView() {
         topContainer.isHidden = !topContainer.isHidden
         if topContainer.isHidden {
-            sender.bgColor = .lightGray
+            viewToolsButton.bgColor = .lightGray
         }
         else {
-            sender.bgColor = UIColor(red: 85.0/255.0, green: 117.0/255.0, blue: 193.0/255.0, alpha: 1)
+            viewToolsButton.bgColor = UIColor(red: 85.0/255.0, green: 117.0/255.0, blue: 193.0/255.0, alpha: 1)
         }
+    }
+    @IBAction func viewToolsTapped(_ sender: LGButton) {
+        toggleToolsView()
     }
     
     @IBAction func moreTapped(_ sender: LGButton) {
@@ -946,6 +957,9 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     @IBOutlet weak var manageDrawingsButton: LGButton!
     var isManageDrawings = false
     @IBAction func manageDrawingsTapped(_ sender: LGButton) {
+        toggleManageDrawings()
+    }
+    private func toggleManageDrawings() {
         isManageDrawings = !isManageDrawings
         if isManageDrawings {
             drawingsButton.isEnabled = false

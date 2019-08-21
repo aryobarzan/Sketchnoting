@@ -164,6 +164,10 @@ public class SketchView: UIView {
                 currentTool?.lineWidth = lineWidth * touch.force * 0.25
             }
         }
+        if SettingsManager.ignoreTouchInput() && touch.type == .direct {
+            print("Direct touch input is user-disabled.")
+            return
+        }
         
         switch currentTool! {
         case is PenTool:
@@ -185,7 +189,9 @@ public class SketchView: UIView {
 
     public override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let touch = touches.first else { return }
-
+        if SettingsManager.ignoreTouchInput() && touch.type == .direct {
+            return
+        }
         previousPoint2 = previousPoint1
         previousPoint1 = touch.previousLocation(in: self)
         currentPoint = touch.location(in: self)
@@ -201,6 +207,10 @@ public class SketchView: UIView {
     }
 
     public override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        guard let touch = touches.first else { return }
+        if SettingsManager.ignoreTouchInput() && touch.type == .direct {
+            return
+        }
         touchesMoved(touches, with: event)
         finishDrawing()
     }

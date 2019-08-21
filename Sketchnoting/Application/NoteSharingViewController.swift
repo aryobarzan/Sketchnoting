@@ -62,11 +62,7 @@ class NoteSharingViewController: UIViewController, MCSessionDelegate {
                 pendingSharedNotes.remove(at: currentIndex)
             }
             selectedSketchnote!.paths = selectedPathArray
-            let noteCollection = NoteCollection(title: "Shared Note", notes: nil)!
-            noteCollection.addSketchnote(note: selectedSketchnote!)
-            NotesManager.shared.add(noteCollection: noteCollection)
             selectedSketchnote!.save()
-            noteCollection.save()
         }
         self.view.showMessage("Shared note accepted and stored to your device.", type: .success)
         

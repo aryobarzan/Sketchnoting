@@ -20,7 +20,15 @@ class NoteLoader {
                 sketchnotes.append(loadedSketchnote)
             }
         }
-        return sketchnotes
+        if SettingsManager.noteSortingByNewest() {
+            print("Sorting notes by newest.")
+            return sketchnotes.sorted(by: { (note0: Sketchnote, note1: Sketchnote) -> Bool in
+                return note0 > note1
+            })
+        }
+        else {
+            return sketchnotes.sorted()
+        }
     }
     public static func loadSketchnote(id: String) -> Sketchnote? {
         let decoder = JSONDecoder()
@@ -31,18 +39,5 @@ class NoteLoader {
             print("Note " + id + " loaded.")
         }
         return sketchnote
-    }
-    public static func loadCollections() -> [NoteCollection]? {
-        let decoder = JSONDecoder()
-        
-        var collections = [NoteCollection]()
-        for (key, _) in UserDefaults.collections.dictionaryRepresentation() {
-            if let data = UserDefaults.collections.data(forKey: key),
-                let loadedCollection = try? decoder.decode(NoteCollection.self, from: data) {
-                print("Note Collection " + key + " loaded.")
-                collections.append(loadedCollection)
-            }
-        }
-        return collections
     }
 }

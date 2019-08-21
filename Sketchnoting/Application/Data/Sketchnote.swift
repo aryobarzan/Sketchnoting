@@ -8,7 +8,7 @@
 
 import UIKit
 
-class Sketchnote: Note, Equatable, DocumentVisitor {
+class Sketchnote: Note, Equatable, DocumentVisitor, Comparable {
     
     var id: String!
     var creationDate: Date!
@@ -352,6 +352,10 @@ class Sketchnote: Note, Equatable, DocumentVisitor {
         }
         return false
     }
+    
+    static func < (lhs: Sketchnote, rhs: Sketchnote) -> Bool {
+        return lhs.creationDate < rhs.creationDate
+    }
 }
 
 extension UserDefaults {
@@ -360,5 +364,8 @@ extension UserDefaults {
     }
     static var collections: UserDefaults {
         return UserDefaults(suiteName: "lu.uni.coast.sketchnoting.collections")!
+    }
+    static var settings: UserDefaults {
+        return UserDefaults(suiteName: "lu.uni.coast.sketchnoting.settings")!
     }
 }
