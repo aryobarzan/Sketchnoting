@@ -56,3 +56,15 @@ class DrawingSearchView: UIView {
         sketchView.clear()
     }
 }
+
+class ClosureSleeve {
+    let closure: ()->()
+    
+    init (_ closure: @escaping ()->()) {
+        self.closure = closure
+    }
+    
+    @objc func invoke () {
+        closure()
+    }
+}
