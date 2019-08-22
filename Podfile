@@ -15,5 +15,5 @@ target 'Sketchnoting' do
   pod 'BadgeHub'
   pod 'SwiftyJSON'
   pod 'IGColorPicker'
-  pod 'SideMenu'
+  pod 'SideMenu', '~> 6.1.5'
 end

@@ -137,7 +137,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         spotlightHelper = SpotlightHelper(viewController: self)!
         bioportalHelper = BioPortalHelper(viewController: self)!
         
-        
+        self.recognizedTextLogView.text = self.sketchnote.getText(raw: true)
     }
     
     func pencilInteractionDidTap(_ interaction: UIPencilInteraction) {
@@ -552,12 +552,14 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
             else {
             }
         }
-        handwritingRecognizer.recognize(note: sketchnote, view: sketchView, penTools: newPenTools, canvasFrame: self.sketchView.bounds) { (success, textData) in
+        handwritingRecognizer.recognize(spellcheck: false, note: sketchnote, view: sketchView, penTools: newPenTools, canvasFrame: self.sketchView.bounds) { (success, textData) in
             if success {
                 if let textData = textData {
                     self.sketchnote.textDataArray.append(textData)
                     self.annotateText(text: self.sketchnote.getText())
                     print(textData.spellchecked ?? "")
+                    
+                    self.recognizedTextLogView.text = self.sketchnote.getText(raw: true)
                 }
             }
             else {
@@ -1063,6 +1065,17 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     func colorPickerView(_ colorPickerView: ColorPickerView, insetForSectionAt section: Int) -> UIEdgeInsets {
         return UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
     }
+    
+    // MARK: Log view for text recognition
+    @IBOutlet weak var logView: UIView!
+    @IBOutlet weak var recognizedTextLogView: UITextView!
+    @IBAction func openLogView(_ sender: UIButton) {
+        logView.isHidden = false
+    }
+    @IBAction func closeLogView(_ sender: UIButton) {
+        logView.isHidden = true
+    }
+    
 }
 public class HoritonzalHelpLine: UIView  {
     

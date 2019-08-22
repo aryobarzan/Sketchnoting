@@ -12,13 +12,17 @@ import Firebase
 class HandwritingRecognizer {
     private let vision: Vision!
     private let textRecognizer: VisionTextRecognizer!
-    
+    private var textRecognizerCloud: VisionTextRecognizer!
     init() {
         self.vision = Vision.vision()
         self.textRecognizer = vision.onDeviceTextRecognizer()
+        
+        let options = VisionCloudTextRecognizerOptions()
+        options.modelType = .dense
+        self.textRecognizerCloud = vision.cloudTextRecognizer(options: options)
     }
     
-    public func recognize(note: Sketchnote, view: UIView, penTools: [PenTool], canvasFrame: CGRect, handleFinish:@escaping ((_ success: Bool, _ param: TextData?)->())){
+    public func recognize(spellcheck: Bool = true, note: Sketchnote, view: UIView, penTools: [PenTool], canvasFrame: CGRect, handleFinish:@escaping ((_ success: Bool, _ param: TextData?)->())){
         var newPenTools = [PenTool]()
         
         if let textDataArray = note.textDataArray {
@@ -51,15 +55,47 @@ class HandwritingRecognizer {
         view.addSubview(canvas)
         let image = canvas.asImage()
         let visionImage = VisionImage(image: image)
-        textRecognizer.process(visionImage) { result, error in
-            guard error == nil, let result = result else {
+        
+        switch SettingsManager.textRecognitionSetting() {
+        case .OnDevice:
+            textRecognizer.process(visionImage) { result, error in
+                guard error == nil, let result = result else {
+                    canvas.removeFromSuperview()
+                    handleFinish(false, nil)
+                    return
+                }
+                let textData = TextData(visionText: result, original: result.text, paths: newPathsBoundingBoxes, imageSize: canvas.frame.size, spellcheck: spellcheck)
                 canvas.removeFromSuperview()
-                handleFinish(false, nil)
-                return
+                handleFinish(true, textData)
             }
-            let textData = TextData(visionText: result, original: result.text, paths: newPathsBoundingBoxes, imageSize: canvas.frame.size)
-            canvas.removeFromSuperview()
-            handleFinish(true, textData)
+        case .CloudSparse:
+            self.textRecognizerCloud = vision.cloudTextRecognizer()
+            textRecognizerCloud.process(visionImage) { result, error in
+                guard error == nil, let result = result else {
+                    canvas.removeFromSuperview()
+                    print(error)
+                    handleFinish(false, nil)
+                    return
+                }
+                let textData = TextData(visionText: result, original: result.text, paths: newPathsBoundingBoxes, imageSize: canvas.frame.size, spellcheck: spellcheck)
+                canvas.removeFromSuperview()
+                handleFinish(true, textData)
+            }
+        case .CloudDense:
+            let options = VisionCloudTextRecognizerOptions()
+            options.modelType = .dense
+            self.textRecognizerCloud = vision.cloudTextRecognizer(options: options)
+            textRecognizerCloud.process(visionImage) { result, error in
+                guard error == nil, let result = result else {
+                    canvas.removeFromSuperview()
+                    print(error)
+                    handleFinish(false, nil)
+                    return
+                }
+                let textData = TextData(visionText: result, original: result.text, paths: newPathsBoundingBoxes, imageSize: canvas.frame.size, spellcheck: spellcheck)
+                canvas.removeFromSuperview()
+                handleFinish(true, textData)
+            }
         }
     }
 }

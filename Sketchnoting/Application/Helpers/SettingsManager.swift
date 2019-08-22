@@ -35,6 +35,19 @@ class SettingsManager {
     public static func noteSortingByNewest() -> Bool {
         return UserDefaults.settings.bool(forKey: SettingsKeys.NoteSortingByNewest.rawValue)
     }
+    public static func textRecognitionSetting() -> TextRecognitionSetting {
+        if !UserDefaults.settings.bool(forKey: SettingsKeys.TextRecognitionCloud.rawValue) {
+            return TextRecognitionSetting.OnDevice
+        }
+        else {
+            if !UserDefaults.settings.bool(forKey: SettingsKeys.TextRecognitionCloudOption.rawValue) {
+                return TextRecognitionSetting.CloudSparse
+            }
+            else {
+                return TextRecognitionSetting.CloudDense
+            }
+        }
+    }
 }
 
 
@@ -42,6 +55,8 @@ public enum SettingsKeys : String, Any {
     case IgnoreTouchInput
     case PencilSideButton
     case NoteSortingByNewest
+    case TextRecognitionCloud
+    case TextRecognitionCloudOption
 }
 public enum PencilSideButtonKeys : String {
     case ManageDrawings
@@ -49,4 +64,10 @@ public enum PencilSideButtonKeys : String {
     case ShowHideTools
     case Undo
     case Redo
+}
+
+public enum TextRecognitionSetting : String {
+    case OnDevice
+    case CloudSparse
+    case CloudDense
 }

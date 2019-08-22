@@ -269,11 +269,18 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable {
     }
     
     //MARK: recognized text
-    public func getText() -> String {
+    public func getText(raw: Bool = false) -> String {
         var text: String = ""
         if textDataArray != nil {
-            for textData in textDataArray {
-                text = text + " " + textData.spellchecked
+            if !raw {
+                for textData in textDataArray {
+                    text = text + " " + textData.spellchecked
+                }
+            }
+            else {
+                for textData in textDataArray {
+                    text = text + " " + textData.original
+                }
             }
         }
         return text

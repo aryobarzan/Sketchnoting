@@ -19,10 +19,15 @@ class TextData: NSObject, NSCoding {
     
     let imageSize : CGSize!
     
-    init(visionText: VisionText, original: String, paths: [CGRect], imageSize: CGSize) {
+    init(visionText: VisionText, original: String, paths: [CGRect], imageSize: CGSize, spellcheck: Bool) {
         self.paths = paths
         self.original = original
-        self.spellchecked = OCRHelper.postprocess(text: original)
+        if spellcheck {
+            self.spellchecked = OCRHelper.postprocess(text: original)
+        }
+        else {
+            self.spellchecked = original
+        }
         self.imageSize = imageSize
         self.visionTextWrapper = TextData.createVisionTextWrapper(visionText: visionText)
     }
