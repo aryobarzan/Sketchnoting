@@ -14,6 +14,12 @@
 		9F75E44D230C583200488BBD /* NoteCollectionViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9F75E44B230C583200488BBD /* NoteCollectionViewCell.xib */; };
 		9F75E44F230D848200488BBD /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F75E44E230D848200488BBD /* SettingsViewController.swift */; };
 		9F75E451230D8AE100488BBD /* SettingsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F75E450230D8AE100488BBD /* SettingsManager.swift */; };
+		9F75E475231183B700488BBD /* DefaultValues.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F75E474231183B700488BBD /* DefaultValues.swift */; };
+		9F75E478231183DD00488BBD /* ColorPickerCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F75E476231183DD00488BBD /* ColorPickerCell.swift */; };
+		9F75E479231183DD00488BBD /* ColorPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F75E477231183DD00488BBD /* ColorPickerView.swift */; };
+		9F75E47C231183E500488BBD /* ColorPickerViewDelegateFlowLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F75E47A231183E500488BBD /* ColorPickerViewDelegateFlowLayout.swift */; };
+		9F75E47D231183E500488BBD /* ColorPickerViewDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F75E47B231183E500488BBD /* ColorPickerViewDelegate.swift */; };
+		9F75E47F231183EC00488BBD /* UIColor+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F75E47E231183EC00488BBD /* UIColor+Extension.swift */; };
 		9FA6238822CEA7FE007ED794 /* MapHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA6238722CEA7FE007ED794 /* MapHelper.swift */; };
 		9FA6238B22D37213007ED794 /* BioPortalHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA6238A22D37213007ED794 /* BioPortalHelper.swift */; };
 		9FA6238D22D38AEE007ED794 /* SpotlightHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA6238C22D38AEE007ED794 /* SpotlightHelper.swift */; };
@@ -73,6 +79,12 @@
 		9F75E44B230C583200488BBD /* NoteCollectionViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NoteCollectionViewCell.xib; sourceTree = "<group>"; };
 		9F75E44E230D848200488BBD /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
 		9F75E450230D8AE100488BBD /* SettingsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsManager.swift; sourceTree = "<group>"; };
+		9F75E474231183B700488BBD /* DefaultValues.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DefaultValues.swift; sourceTree = "<group>"; };
+		9F75E476231183DD00488BBD /* ColorPickerCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ColorPickerCell.swift; sourceTree = "<group>"; };
+		9F75E477231183DD00488BBD /* ColorPickerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ColorPickerView.swift; sourceTree = "<group>"; };
+		9F75E47A231183E500488BBD /* ColorPickerViewDelegateFlowLayout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ColorPickerViewDelegateFlowLayout.swift; sourceTree = "<group>"; };
+		9F75E47B231183E500488BBD /* ColorPickerViewDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ColorPickerViewDelegate.swift; sourceTree = "<group>"; };
+		9F75E47E231183EC00488BBD /* UIColor+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIColor+Extension.swift"; sourceTree = "<group>"; };
 		9FA6238722CEA7FE007ED794 /* MapHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapHelper.swift; sourceTree = "<group>"; };
 		9FA6238A22D37213007ED794 /* BioPortalHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BioPortalHelper.swift; sourceTree = "<group>"; };
 		9FA6238C22D38AEE007ED794 /* SpotlightHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotlightHelper.swift; sourceTree = "<group>"; };
@@ -179,6 +191,43 @@
 			path = "Note Collection View";
 			sourceTree = "<group>";
 		};
+		9F75E4642311830500488BBD /* IGColorPicker */ = {
+			isa = PBXGroup;
+			children = (
+				9F75E474231183B700488BBD /* DefaultValues.swift */,
+				9F75E4672311831A00488BBD /* Extension */,
+				9F75E4662311831400488BBD /* Protocol */,
+				9F75E4652311831000488BBD /* View */,
+			);
+			path = IGColorPicker;
+			sourceTree = "<group>";
+		};
+		9F75E4652311831000488BBD /* View */ = {
+			isa = PBXGroup;
+			children = (
+				9F75E476231183DD00488BBD /* ColorPickerCell.swift */,
+				9F75E477231183DD00488BBD /* ColorPickerView.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		9F75E4662311831400488BBD /* Protocol */ = {
+			isa = PBXGroup;
+			children = (
+				9F75E47B231183E500488BBD /* ColorPickerViewDelegate.swift */,
+				9F75E47A231183E500488BBD /* ColorPickerViewDelegateFlowLayout.swift */,
+			);
+			path = Protocol;
+			sourceTree = "<group>";
+		};
+		9F75E4672311831A00488BBD /* Extension */ = {
+			isa = PBXGroup;
+			children = (
+				9F75E47E231183EC00488BBD /* UIColor+Extension.swift */,
+			);
+			path = Extension;
+			sourceTree = "<group>";
+		};
 		9FA6238922D371F1007ED794 /* Semantic Annotation */ = {
 			isa = PBXGroup;
 			children = (
@@ -270,6 +319,7 @@
 				9FD29C3A223861D200CC969A /* ExpandableButton */,
 				9FD29C322237FD1600CC969A /* GMStepper */,
 				9FD29C1A2236EA1700CC969A /* Sketch */,
+				9F75E4642311830500488BBD /* IGColorPicker */,
 				9F5D8B2B228B9D7000F56FEC /* CREDITS.md */,
 				9F5D8B2C228B9EF800F56FEC /* README.md */,
 			);
@@ -501,6 +551,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9F75E47F231183EC00488BBD /* UIColor+Extension.swift in Sources */,
 				9F75E451230D8AE100488BBD /* SettingsManager.swift in Sources */,
 				9FD29C3F223861E100CC969A /* ExpandableButtonItem.swift in Sources */,
 				9FA6238B22D37213007ED794 /* BioPortalHelper.swift in Sources */,
@@ -512,6 +563,7 @@
 				9FD29C40223861E100CC969A /* ExpandableButtonView.swift in Sources */,
 				9FA6239522DE3741007ED794 /* BioPortalDocument.swift in Sources */,
 				9FD29BA92220524D00CC969A /* ViewController.swift in Sources */,
+				9F75E47D231183E500488BBD /* ColorPickerViewDelegate.swift in Sources */,
 				9FA6239722DE3806007ED794 /* CHEBIDocument.swift in Sources */,
 				9FA623A122E73DDA007ED794 /* NoteLoader.swift in Sources */,
 				9FD29BA72220524D00CC969A /* AppDelegate.swift in Sources */,
@@ -521,6 +573,7 @@
 				9FD29C342237FD2B00CC969A /* GMStepper.swift in Sources */,
 				9FD29C56223C3C3900CC969A /* StringExtensions.swift in Sources */,
 				9FD29C4E223998BC00CC969A /* UIViewControllerExtensions.swift in Sources */,
+				9F75E478231183DD00488BBD /* ColorPickerCell.swift in Sources */,
 				9FD29C472239588E00CC969A /* UIViewExtensions.swift in Sources */,
 				9FBF6AB822E9F428001FD730 /* VisionTextLineWrapper.swift in Sources */,
 				9FD29C1F2236EA2800CC969A /* SketchView.swift in Sources */,
@@ -536,11 +589,14 @@
 				9FD29C54223C3B6F00CC969A /* OCRHelper.swift in Sources */,
 				9F08F3F0230AEE0E00A0587C /* SizeSlider.swift in Sources */,
 				9FD29BC522249D9500CC969A /* Note.swift in Sources */,
+				9F75E479231183DD00488BBD /* ColorPickerView.swift in Sources */,
 				9FBF6ABA22E9F439001FD730 /* VisionTextElementWrapper.swift in Sources */,
+				9F75E47C231183E500488BBD /* ColorPickerViewDelegateFlowLayout.swift in Sources */,
 				9FD29C41223861E100CC969A /* ArrowButton.swift in Sources */,
 				9FD29C1E2236EA2800CC969A /* SketchTool.swift in Sources */,
 				9FD29BC72224B58600CC969A /* Document.swift in Sources */,
 				9FBF6AB622E9F3FE001FD730 /* VisionTextBlockWrapper.swift in Sources */,
+				9F75E475231183B700488BBD /* DefaultValues.swift in Sources */,
 				9FA6239E22E66D73007ED794 /* HandwritingRecognizer.swift in Sources */,
 				9FD29BCB2224B89800CC969A /* Sketchnote.swift in Sources */,
 				9FA6238D22D38AEE007ED794 /* SpotlightHelper.swift in Sources */,

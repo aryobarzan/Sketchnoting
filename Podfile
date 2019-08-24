@@ -14,6 +14,6 @@ target 'Sketchnoting' do
   pod 'GSMessages'
   pod 'BadgeHub'
   pod 'SwiftyJSON'
-  pod 'IGColorPicker'
+  pod 'M13Checkbox', '~> 3.4.0'
   pod 'SideMenu', '~> 6.1.5'
 end

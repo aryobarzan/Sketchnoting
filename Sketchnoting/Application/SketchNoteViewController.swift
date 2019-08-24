@@ -11,7 +11,6 @@ import LGButton
 import Firebase
 import PopMenu
 import GSMessages
-import IGColorPicker
 
 // This is the controller for the other page of the application, i.e. not the home page, but for the page displayed when the user wants to edit a note.
 

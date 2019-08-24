@@ -895,7 +895,7 @@
                                             <action selector="eraserButtonTapped:" destination="lDo-DG-9fX" eventType="touchUpInside" id="ZHM-5m-cQ5"/>
                                         </connections>
                                     </view>
-                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="FQa-yu-RwE" customClass="ColorPickerView" customModule="IGColorPicker">
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="FQa-yu-RwE" customClass="ColorPickerView" customModule="Sketchnoting" customModuleProvider="target">
                                         <rect key="frame" x="135" y="0.0" width="230" height="40"/>
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <constraints>
