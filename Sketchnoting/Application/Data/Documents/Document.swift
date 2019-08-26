@@ -16,10 +16,12 @@ protocol DocumentVisitor {
     func process(document: SpotlightDocument)
     func process(document: BioPortalDocument)
     func process(document: CHEBIDocument)
+    func process(document: TAGMEDocument)
 }
 
 enum DocumentType: String, Codable {
     case Spotlight
+    case TAGME
     case BioPortal
     case Chemistry
     case Other

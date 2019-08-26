@@ -20,6 +20,8 @@
 		9F75E47C231183E500488BBD /* ColorPickerViewDelegateFlowLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F75E47A231183E500488BBD /* ColorPickerViewDelegateFlowLayout.swift */; };
 		9F75E47D231183E500488BBD /* ColorPickerViewDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F75E47B231183E500488BBD /* ColorPickerViewDelegate.swift */; };
 		9F75E47F231183EC00488BBD /* UIColor+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F75E47E231183EC00488BBD /* UIColor+Extension.swift */; };
+		9F75E482231410A100488BBD /* TAGMEHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F75E481231410A100488BBD /* TAGMEHelper.swift */; };
+		9F75E484231419FA00488BBD /* TAGMEDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F75E483231419FA00488BBD /* TAGMEDocument.swift */; };
 		9FA6238822CEA7FE007ED794 /* MapHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA6238722CEA7FE007ED794 /* MapHelper.swift */; };
 		9FA6238B22D37213007ED794 /* BioPortalHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA6238A22D37213007ED794 /* BioPortalHelper.swift */; };
 		9FA6238D22D38AEE007ED794 /* SpotlightHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA6238C22D38AEE007ED794 /* SpotlightHelper.swift */; };
@@ -85,6 +87,8 @@
 		9F75E47A231183E500488BBD /* ColorPickerViewDelegateFlowLayout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ColorPickerViewDelegateFlowLayout.swift; sourceTree = "<group>"; };
 		9F75E47B231183E500488BBD /* ColorPickerViewDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ColorPickerViewDelegate.swift; sourceTree = "<group>"; };
 		9F75E47E231183EC00488BBD /* UIColor+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIColor+Extension.swift"; sourceTree = "<group>"; };
+		9F75E481231410A100488BBD /* TAGMEHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TAGMEHelper.swift; sourceTree = "<group>"; };
+		9F75E483231419FA00488BBD /* TAGMEDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TAGMEDocument.swift; sourceTree = "<group>"; };
 		9FA6238722CEA7FE007ED794 /* MapHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapHelper.swift; sourceTree = "<group>"; };
 		9FA6238A22D37213007ED794 /* BioPortalHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BioPortalHelper.swift; sourceTree = "<group>"; };
 		9FA6238C22D38AEE007ED794 /* SpotlightHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotlightHelper.swift; sourceTree = "<group>"; };
@@ -228,9 +232,18 @@
 			path = Extension;
 			sourceTree = "<group>";
 		};
+		9F75E4802314108500488BBD /* TAGME */ = {
+			isa = PBXGroup;
+			children = (
+				9F75E481231410A100488BBD /* TAGMEHelper.swift */,
+			);
+			path = TAGME;
+			sourceTree = "<group>";
+		};
 		9FA6238922D371F1007ED794 /* Semantic Annotation */ = {
 			isa = PBXGroup;
 			children = (
+				9F75E4802314108500488BBD /* TAGME */,
 				9FA6239922DE3ACD007ED794 /* BioPortal */,
 				9FA6239822DE3AC0007ED794 /* Spotlight */,
 			);
@@ -261,6 +274,7 @@
 				9FA6239222DE30AC007ED794 /* SpotlightDocument.swift */,
 				9FA6239422DE3741007ED794 /* BioPortalDocument.swift */,
 				9FA6239622DE3806007ED794 /* CHEBIDocument.swift */,
+				9F75E483231419FA00488BBD /* TAGMEDocument.swift */,
 			);
 			path = Documents;
 			sourceTree = "<group>";
@@ -553,6 +567,7 @@
 			files = (
 				9F75E47F231183EC00488BBD /* UIColor+Extension.swift in Sources */,
 				9F75E451230D8AE100488BBD /* SettingsManager.swift in Sources */,
+				9F75E482231410A100488BBD /* TAGMEHelper.swift in Sources */,
 				9FD29C3F223861E100CC969A /* ExpandableButtonItem.swift in Sources */,
 				9FA6238B22D37213007ED794 /* BioPortalHelper.swift in Sources */,
 				9FA6239322DE30AC007ED794 /* SpotlightDocument.swift in Sources */,
@@ -579,6 +594,7 @@
 				9FD29C1F2236EA2800CC969A /* SketchView.swift in Sources */,
 				9FD29C42223861E100CC969A /* ActionButton.swift in Sources */,
 				9F75E44F230D848200488BBD /* SettingsViewController.swift in Sources */,
+				9F75E484231419FA00488BBD /* TAGMEDocument.swift in Sources */,
 				9F75E44C230C583200488BBD /* NoteCollectionViewCell.swift in Sources */,
 				9FD29C38223853C300CC969A /* PhotoAuthorization.swift in Sources */,
 				9F5D0FC8229CBC4100BCA451 /* NotesManager.swift in Sources */,

@@ -53,6 +53,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     
     var spotlightHelper: SpotlightHelper!
     var bioportalHelper: BioPortalHelper!
+    var tagmeHelper: TAGMEHelper!
     
     var conceptHighlights = [UIView : Document]()
     
@@ -120,6 +121,10 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
                 self.items = documents
                 documentsCollectionView.reloadData()
             }
+            else {
+                sketchnote.documents = [Document]()
+                self.items = [Document]()
+            }
             // This is the case where the user has created a new note and is not editing an existing one.
         } else {
             sketchnote = Sketchnote(image: sketchView.asImage(), relatedDocuments: nil, drawings: nil)
@@ -135,6 +140,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         
         spotlightHelper = SpotlightHelper(viewController: self)!
         bioportalHelper = BioPortalHelper(viewController: self)!
+        tagmeHelper = TAGMEHelper(viewController: self)!
         
         self.recognizedTextLogView.text = self.sketchnote.getText(raw: true)
     }
@@ -578,6 +584,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         self.spotlightHelper.fetch(text: text)
         self.bioportalHelper.fetch(text: text)
         self.bioportalHelper.fetchCHEBI(text: text)
+        self.tagmeHelper.fetch(text: text)
     }
     
     private func showBookshelf() {
@@ -754,6 +761,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     
     let reuseIdentifier = "cell" // also enter this string as the cell identifier in the storyboard
     var items = [Document]()
+    var filteredItems = [Document]()
     
     // tell the collection view how many cells to make
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -786,6 +794,8 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
             return .brown
         case .Other:
             return .white
+        case .TAGME:
+            return .blue
         }
     }
     
@@ -874,6 +884,13 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         }
     }
     
+    func process(document: TAGMEDocument) {
+        documentTitleLabel.text = document.title
+        if let description = document.description {
+            self.setDetailDescription(text: description)
+        }
+    }
+    
     func process(document: BioPortalDocument) {
         if let definition = document.definition {
             let descriptionLabel = UILabel(frame: documentDetailStackView.frame)
@@ -930,6 +947,46 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     @IBAction func documentDetailViewBrowseTapped(_ sender: UIButton) {
         documentDetailView.isHidden = true
         documentsCollectionView.isHidden = false
+    }
+    
+    // MARK: Collection view document filtering
+    @IBOutlet weak var filterDocumentsButton: UIButton!
+    @IBAction func filterDocumentsButtonTapped(_ sender: UIButton) {
+        let popMenu = PopMenuViewController(sourceView: sender, actions: [PopMenuAction](), appearance: nil)
+        popMenu.appearance.popMenuBackgroundStyle = .blurred(.dark)
+        let allAction = PopMenuDefaultAction(title: "All", didSelect: { action in
+            self.filterDocumentsButton.titleLabel?.text = "All"
+            self.items = self.sketchnote.documents ?? [Document]()
+            
+            self.documentsCollectionView.reloadData()
+            
+        })
+        popMenu.addAction(allAction)
+        let spotlightAction = PopMenuDefaultAction(title: "Spotlight", didSelect: { action in
+            self.filterDocumentsButton.titleLabel?.text = "Spotlight"
+            self.items = self.sketchnote.documents?.filter{ $0.documentType == .Spotlight } ?? [Document]()
+            self.documentsCollectionView.reloadData()
+        })
+        popMenu.addAction(spotlightAction)
+        let bioportalAction = PopMenuDefaultAction(title: "BioPortal", didSelect: { action in
+            self.filterDocumentsButton.titleLabel?.text = "BioPortal"
+            self.items = self.sketchnote.documents?.filter{ $0.documentType == .BioPortal } ?? [Document]()
+            self.documentsCollectionView.reloadData()
+        })
+        popMenu.addAction(bioportalAction)
+        let chebiAction = PopMenuDefaultAction(title: "CHEBI", didSelect: { action in
+            self.filterDocumentsButton.titleLabel?.text = "CHEBI"
+            self.items = self.sketchnote.documents?.filter{ $0.documentType == .Chemistry } ?? [Document]()
+            self.documentsCollectionView.reloadData()
+        })
+        popMenu.addAction(chebiAction)
+        let tagmeAction = PopMenuDefaultAction(title: "TAGME", didSelect: { action in
+            self.filterDocumentsButton.titleLabel?.text = "TAGME"
+            self.items = self.sketchnote.documents?.filter{ $0.documentType == .TAGME } ?? [Document]()
+            self.documentsCollectionView.reloadData()
+        })
+        popMenu.addAction(tagmeAction)
+        self.present(popMenu, animated: true, completion: nil)
     }
     
     //MARK: Drawing insertion mode

@@ -89,10 +89,16 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable {
             switch t {
             case .spotlight:
                 docs.append(try docsArray.decode(SpotlightDocument.self))
+                break
             case .bioportal:
                 docs.append(try docsArray.decode(BioPortalDocument.self))
+                break
             case .chebi:
                 docs.append(try docsArray.decode(CHEBIDocument.self))
+                break
+            case .tagme:
+                docs.append(try docsArray.decode(CHEBIDocument.self))
+                break
             }
         }
         } catch {
@@ -122,6 +128,7 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable {
         case spotlight = "Spotlight"
         case bioportal = "BioPortal"
         case chebi = "CHEBI"
+        case tagme = "TAGME"
     }
     
     public func save() {
@@ -323,6 +330,23 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable {
             if let types = document.types {
                 for type in types {
                     if type.lowercased().contains(currentSearchFilter!) {
+                        matchesSearch = true
+                        break
+                    }
+                }
+            }
+        }
+    }
+    func process(document: TAGMEDocument) {
+        if !processBaseDocumentSearch(document: document) {
+            if let spot = document.spot {
+                if spot.lowercased().contains(currentSearchFilter!) {
+                    matchesSearch = true
+                }
+            }
+            if let categories = document.categories {
+                for category in categories {
+                    if category.lowercased().contains(currentSearchFilter!) {
                         matchesSearch = true
                         break
                     }

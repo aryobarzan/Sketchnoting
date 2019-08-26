@@ -85,7 +85,7 @@ class SpotlightDocument: Document {
             let dataDecoded: Data = Data(base64Encoded: strBase64, options: .ignoreUnknownCharacters)!
             mapImage = UIImage(data: dataDecoded)
         } catch {
-            print(error)
+            print("No map image for this document.")
         }
     }
     
