@@ -28,7 +28,7 @@
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             </imageView>
                             <view userInteractionEnabled="NO" contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="IaP-fE-srS">
-                                <rect key="frame" x="8" y="278" width="125" height="36"/>
+                                <rect key="frame" x="8" y="225" width="125" height="36"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Creation Date" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="LaG-YG-vZi">
@@ -45,12 +45,41 @@
                                 <color key="backgroundColor" red="0.37254901959999998" green="0.75686274509999996" blue="0.58039215690000001" alpha="0.84999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
                             </view>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="detailDisclosure" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="OiA-hP-dn8">
-                                <rect key="frame" x="190" y="6" width="22" height="22"/>
+                                <rect key="frame" x="190" y="13" width="22" height="22"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <connections>
                                     <action selector="moreButtonTapped:" destination="gTV-IL-0wX" eventType="touchUpInside" id="6mc-Il-LfO"/>
                                 </connections>
                             </button>
+                            <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="lwh-05-4wr">
+                                <rect key="frame" x="8" y="269" width="160" height="36"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Untitled" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="afa-LH-hYC">
+                                        <rect key="frame" x="8" y="6" width="144" height="25"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <nil key="highlightedColor"/>
+                                        <size key="shadowOffset" width="1" height="-1"/>
+                                    </label>
+                                </subviews>
+                                <color key="backgroundColor" red="0.26875244107853929" green="0.49985405115384529" blue="0.82210710104265361" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            </view>
+                            <view hidden="YES" contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Lxl-P4-LYA">
+                                <rect key="frame" x="8" y="181" width="98" height="36"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="0 Docs" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="kWT-e7-gPu">
+                                        <rect key="frame" x="4" y="8" width="90" height="21"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                </subviews>
+                                <color key="backgroundColor" red="0.54203005510271263" green="0.2967699547939936" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            </view>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     </view>
@@ -61,8 +90,12 @@
             <connections>
                 <outlet property="creationDateBackgroundView" destination="IaP-fE-srS" id="TEe-Jf-FKQ"/>
                 <outlet property="creationDateLabel" destination="LaG-YG-vZi" id="FI1-Ef-CPg"/>
+                <outlet property="documentsBackgroundView" destination="Lxl-P4-LYA" id="NZi-1A-jcj"/>
+                <outlet property="documentsLabel" destination="kWT-e7-gPu" id="IdC-Zx-obv"/>
                 <outlet property="imageView" destination="V13-sv-1Ta" id="Gn7-Pi-pdf"/>
                 <outlet property="moreButton" destination="OiA-hP-dn8" id="a1f-R1-KGX"/>
+                <outlet property="titleBackgroundView" destination="lwh-05-4wr" id="d9V-Ps-H1c"/>
+                <outlet property="titleLabel" destination="afa-LH-hYC" id="o9d-Ae-bBp"/>
             </connections>
             <point key="canvasLocation" x="-126.08695652173914" y="180.13392857142856"/>
         </collectionViewCell>

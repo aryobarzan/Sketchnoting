@@ -21,16 +21,17 @@ class BioPortalDocument: Document {
     init?(title: String, description: String?, URL: String, type: DocumentType, previewImage: UIImage?, prefLabel: String, definition: String) {
         self.prefLabel = prefLabel
         self.definition = definition
-        super.init(title: title, description: description, URL: URL, documentType: type, previewImage: previewImage, type: "BioPortal")
+        super.init(title: title, description: description, URL: URL, documentType: type, previewImage: previewImage)
     }
     
     override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(prefLabel, forKey: .prefLabel)
         try container.encode(definition, forKey: .definition)
         
-        let superencoder = container.superEncoder()
-        try super.encode(to: superencoder)
+        //let superencoder = container.superEncoder()
+        //try super.encode(to: superencoder)
     }
     
     required init(from decoder: Decoder) throws {

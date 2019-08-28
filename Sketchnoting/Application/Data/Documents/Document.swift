@@ -35,24 +35,21 @@ class Document: Codable, Visitable, Equatable {
         return false
     }
     
-    
     var title: String
     var description: String?
     var URL: String
     var documentType: DocumentType
     var previewImage: UIImage?
-    var type: String
     
     private enum CodingKeys: String, CodingKey {
         case title = "Title"
         case description = "Description"
         case URL = "URL"
         case documentType = "DocumentType"
-        case type = "Type"
         case previewImage = "PreviewImage"
     }
     
-    init?(title: String, description: String?, URL: String, documentType: DocumentType, previewImage: UIImage?, type: String?){
+    init?(title: String, description: String?, URL: String, documentType: DocumentType, previewImage: UIImage?){
         guard !title.isEmpty && !URL.isEmpty else {
             return nil
         }
@@ -61,7 +58,6 @@ class Document: Codable, Visitable, Equatable {
         self.URL = URL
         self.documentType = documentType
         self.previewImage = previewImage
-        self.type = type ?? "SpotlightDocument"
     }
     
     func encode(to encoder: Encoder) throws {
@@ -70,9 +66,8 @@ class Document: Codable, Visitable, Equatable {
         try container.encode(description, forKey: .description)
         try container.encode(URL, forKey: .URL)
         try container.encode(documentType, forKey: .documentType)
-        try container.encode(type, forKey: .type)
-        print("Encoding image")
         if let previewImage = previewImage {
+            print("Encoding image")
             if let pngData = previewImage.pngData() {
                 let strBase64 = pngData.base64EncodedString(options: .lineLength64Characters)
                 try container.encode(strBase64, forKey: .previewImage)
@@ -104,7 +99,6 @@ class Document: Codable, Visitable, Equatable {
         
         URL = try container.decode(String.self, forKey: .URL)
         documentType = DocumentType(rawValue: try container.decode(String.self, forKey: .documentType)) ?? .Other
-        type = try container.decode(String.self, forKey: .type)
         do {
             let strBase64: String = try container.decode(String.self, forKey: .previewImage)
             let dataDecoded: Data = Data(base64Encoded: strBase64, options: .ignoreUnknownCharacters)!

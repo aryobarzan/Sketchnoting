@@ -24,7 +24,7 @@ class TAGMEDocument: Document {
         self.spot = spot
         self.categories = categories
         self.wikiPageID = wikiPageID
-        super.init(title: title, description: description, URL: URL, documentType: type, previewImage: previewImage, type: "TAGME")
+        super.init(title: title, description: description, URL: URL, documentType: type, previewImage: previewImage)
     }
     
     override func encode(to encoder: Encoder) throws {

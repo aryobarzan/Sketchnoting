@@ -36,7 +36,7 @@ class SpotlightDocument: Document {
         self.latitude = latitude
         self.longitude = longitude
         self.mapImage = mapImage
-        super.init(title: title, description: description, URL: URL, documentType: type, previewImage: previewImage, type: "Spotlight")
+        super.init(title: title, description: description, URL: URL, documentType: type, previewImage: previewImage)
     }
     
     override func encode(to encoder: Encoder) throws {

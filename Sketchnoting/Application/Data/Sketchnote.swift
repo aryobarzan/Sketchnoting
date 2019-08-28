@@ -11,6 +11,7 @@ import UIKit
 class Sketchnote: Note, Equatable, DocumentVisitor, Comparable {
     
     var id: String!
+    private var title: String!
     var creationDate: Date!
     var updateDate: Date?
     var image: UIImage?
@@ -24,6 +25,7 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable {
     
     enum CodingKeys: String, CodingKey {
         case id
+        case title
         case creationDate
         case updateDate
         case image
@@ -36,6 +38,7 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable {
     
     init?(image: UIImage?, relatedDocuments: [Document]?, drawings: [String]?) {
         self.id = UUID().uuidString
+        self.title = "Untitled"
         self.creationDate = Date.init(timeIntervalSinceNow: 0)
         self.documents = relatedDocuments ?? [Document]()
         self.drawings = drawings ?? [String]()
@@ -47,6 +50,7 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable {
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(id, forKey: .id)
+        try container.encode(title, forKey: .title)
         try container.encode(creationDate.timeIntervalSince1970, forKey: .creationDate)
         try container.encode(updateDate?.timeIntervalSince1970, forKey: .updateDate)
         print("Encoding documents.")
@@ -72,6 +76,10 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         id = try? container.decode(String.self, forKey: .id)
+        title = try? container.decode(String.self, forKey: .title)
+        if title == nil || title.isEmpty {
+            title = "Untitled"
+        }
         creationDate = Date(timeIntervalSince1970: try container.decode(TimeInterval.self, forKey: .creationDate))
         do {
             _ = try container.decode(TimeInterval.self, forKey: .updateDate)
@@ -85,21 +93,25 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable {
         do {
         while(!docsArrayForType.isAtEnd) {
             let doc = try docsArrayForType.nestedContainer(keyedBy: DocumentTypeKey.self)
-            let t = try doc.decode(DocumentTypes.self, forKey: DocumentTypeKey.type)
+            let t = try doc.decode(DocumentType.self, forKey: DocumentTypeKey.type)
             switch t {
-            case .spotlight:
+            case .Spotlight:
                 docs.append(try docsArray.decode(SpotlightDocument.self))
                 break
-            case .bioportal:
+            case .BioPortal:
                 docs.append(try docsArray.decode(BioPortalDocument.self))
                 break
-            case .chebi:
+            case .Chemistry:
                 docs.append(try docsArray.decode(CHEBIDocument.self))
                 break
-            case .tagme:
-                docs.append(try docsArray.decode(CHEBIDocument.self))
+            case .TAGME:
+                docs.append(try docsArray.decode(TAGMEDocument.self))
+                break
+            case .Other:
+                docs.append(try docsArray.decode(Document.self))
                 break
             }
+            print(docs.count)
         }
         } catch {
             print(error)
@@ -122,7 +134,7 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable {
     }
     
     private enum DocumentTypeKey : String, CodingKey {
-        case type = "Type"
+        case type = "DocumentType"
     }
     private enum DocumentTypes : String, Decodable {
         case spotlight = "Spotlight"
@@ -275,6 +287,18 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable {
         self.updateDate = Date.init(timeIntervalSinceNow: 0)
     }
     
+    func setTitle(title: String) {
+        if title.isEmpty || title.count < 1 {
+            self.title = "Untitled"
+        }
+        else {
+            self.title = title
+        }
+    }
+    func getTitle() -> String {
+        return self.title
+    }
+    
     //MARK: recognized text
     public func getText(raw: Bool = false) -> String {
         var text: String = ""
@@ -299,7 +323,7 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable {
     public func applySearchFilters(filters: [String]) -> Bool {
         matchesSearch = false
         for filter in filters {
-            if (self.getText().lowercased().contains(filter)) || (self.drawings?.contains(filter) ?? false) {
+            if (self.title.lowercased().contains(filter) || self.getText().lowercased().contains(filter)) || (self.drawings?.contains(filter) ?? false) {
                 return true
             }
             else {

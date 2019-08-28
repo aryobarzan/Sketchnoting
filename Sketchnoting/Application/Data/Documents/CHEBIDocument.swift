@@ -22,6 +22,7 @@ class CHEBIDocument: BioPortalDocument {
     }
     
     override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
         var container = encoder.container(keyedBy: CodingKeys.self)
         if let moleculeImage = moleculeImage {
             let imageData: Data = moleculeImage.pngData()!
@@ -29,8 +30,8 @@ class CHEBIDocument: BioPortalDocument {
             try container.encode(strBase64, forKey: .moleculeImage)
         }
         
-        let superencoder = container.superEncoder()
-        try super.encode(to: superencoder)
+        //let superencoder = container.superEncoder()
+        //try super.encode(to: superencoder)
     }
     
     required init(from decoder: Decoder) throws {

@@ -108,9 +108,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             self.noteSortingButton.titleLabel?.text = "Newest First"
         }
         
-        
-
-        
         //Drawing Recognition - This loads the labels for the drawing recognition's CoreML model.
         if let path = Bundle.main.path(forResource: "labels", ofType: "txt") {
             do {
@@ -159,13 +156,26 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         }
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        self.navigationController?.setNavigationBarHidden(true, animated: true)
+    }
+    
     // This function is called when the user closes a note they were editing and the user returns to the homepage.
     // Upon return, the edited note is saved to disk.
     @IBAction func unwindToHome(sender: UIStoryboardSegue) {
-        self.navigationController?.setNavigationBarHidden(true, animated: false)
         if let sourceViewController = sender.source as? SketchNoteViewController, let note = sourceViewController.sketchnote {
             NotesManager.shared.update(note: note, pathArray: sourceViewController.storedPathArray)
-            noteCollectionView.reloadData()
+            
+            if SettingsManager.noteSortingByNewest() {
+                self.items = self.items.sorted(by: { (note0: Sketchnote, note1: Sketchnote) -> Bool in
+                    return note0 > note1
+                })
+                self.noteCollectionView.reloadData()
+            }
+            else {
+                self.items = self.items.sorted()
+                self.noteCollectionView.reloadData()
+            }
         }
     }
     
@@ -493,18 +503,32 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         print("More button of note view cell tapped.")
         let popMenu = PopMenuViewController(sourceView: sender, actions: [PopMenuAction](), appearance: nil)
         popMenu.appearance.popMenuBackgroundStyle = .blurred(.dark)
-        let closeAction = PopMenuDefaultAction(title: "Cancel")
-        let action = PopMenuDefaultAction(title: "Delete", color: .red, didSelect: { action in
-            self.items.removeAll{$0 == sketchnote}
-            sketchnote.delete()
-            self.noteCollectionView.reloadData()
+        let setTitleAction = PopMenuDefaultAction(title: "Set Title", color: .white, didSelect: { action in
+            let alertController = UIAlertController(title: "Title for this note", message: nil, preferredStyle: .alert)
             
+            let confirmAction = UIAlertAction(title: "Set", style: .default) { (_) in
+                
+                let title = alertController.textFields?[0].text
+                
+                sketchnote.setTitle(title: title ?? "Untitled")
+                sketchnote.save()
+                sender.titleLabel.text = sketchnote.getTitle()
+            }
+            let cancelAction = UIAlertAction(title: "Cancel", style: .cancel) { (_) in }
+            
+            alertController.addTextField { (textField) in
+                textField.placeholder = "Enter Note Title"
+            }
+            
+            alertController.addAction(confirmAction)
+            alertController.addAction(cancelAction)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                self.present(alertController, animated: true, completion: nil)
+            }
         })
-        popMenu.addAction(action)
-        // Bug: Currently empty string
+        popMenu.addAction(setTitleAction)
         let copyTextAction = PopMenuDefaultAction(title: "Copy Text", color: .white, didSelect: { action in
             UIPasteboard.general.string = sketchnote.getText()
-            self.showMessage("Text copied to clipboard.", type: .success)
         })
         popMenu.addAction(copyTextAction)
         let sendAction = PopMenuDefaultAction(title: "Send", color: .white, didSelect: { action in
@@ -523,7 +547,13 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             })
             popMenu.addAction(shareAction)
         }
-        popMenu.addAction(closeAction)
+        let action = PopMenuDefaultAction(title: "Delete", color: .red, didSelect: { action in
+            self.items.removeAll{$0 == sketchnote}
+            sketchnote.delete()
+            self.noteCollectionView.reloadData()
+            
+        })
+        popMenu.addAction(action)
         self.present(popMenu, animated: true, completion: nil)
     }
 }

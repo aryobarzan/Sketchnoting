@@ -449,6 +449,32 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     
     @IBAction func moreTapped(_ sender: LGButton) {
         let alert = UIAlertController(title: "Edit Your Note", message: "", preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Set Title", style: .default, handler: { action in
+            let alertController = UIAlertController(title: "Title for this note", message: nil, preferredStyle: .alert)
+            
+            let confirmAction = UIAlertAction(title: "Set", style: .default) { (_) in
+                
+                let title = alertController.textFields?[0].text
+                
+                self.sketchnote.setTitle(title: title ?? "Untitled")
+                
+            }
+            let cancelAction = UIAlertAction(title: "Cancel", style: .cancel) { (_) in }
+            
+            alertController.addTextField { (textField) in
+                textField.placeholder = "Enter Note Title"
+            }
+            
+            alertController.addAction(confirmAction)
+            alertController.addAction(cancelAction)
+            
+            self.present(alertController, animated: true, completion: nil)
+        }))
+        if !sketchnote.getText().isEmpty {
+            alert.addAction(UIAlertAction(title: "Copy Text", style: .default, handler: { action in
+                UIPasteboard.general.string = self.sketchnote.getText()
+            }))
+        }
         if bookshelf.isHidden {
             alert.addAction(UIAlertAction(title: "View Documents", style: .default, handler: { action in
                 self.showBookshelf()
@@ -579,6 +605,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         self.clearConceptHighlights()
         self.sketchnote.documents = [Document]()
         self.items = [Document]()
+        self.documentsCollectionView.reloadData()
         self.showBookshelf()
         
         self.spotlightHelper.fetch(text: text)
@@ -679,7 +706,6 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     @IBOutlet var bookshelfLeftConstraint: NSLayoutConstraint!
     @IBOutlet var bookshelfBottomConstraint: NSLayoutConstraint!
     
-    @IBOutlet var closeBookshelfLabel: UILabel!
     struct ResizeRect{
         var topTouch = false
         var leftTouch = false
@@ -723,10 +749,10 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
                 bookshelfLeftConstraint.constant += deltaX
                 
                 if UIScreen.main.bounds.maxX - currentTouchPoint.x <= 100 {
-                    closeBookshelfLabel.isHidden = false
+                    bookshelf.alpha = 0.4
                 }
                 else {
-                    closeBookshelfLabel.isHidden = true
+                    bookshelf.alpha = 1.0
                 }
             }
             
@@ -750,7 +776,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
                     }, completion: { (ended) in
                         self.bookshelf.isHidden = true
                     })
-                    closeBookshelfLabel.isHidden = true
+                    bookshelf.alpha = 1.0
                 }
             }
         }
@@ -761,7 +787,6 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     
     let reuseIdentifier = "cell" // also enter this string as the cell identifier in the storyboard
     var items = [Document]()
-    var filteredItems = [Document]()
     
     // tell the collection view how many cells to make
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -778,25 +803,9 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         cell.titleLabel.text = self.items[indexPath.item].title
         cell.typeLabel.text = self.items[indexPath.item].documentType.rawValue
         cell.previewImage.image = self.items[indexPath.item].previewImage
-        cell.backgroundColor = self.getDocumentTypeColor(type: self.items[indexPath.item].documentType)
+        cell.backgroundColor = .gray
         
         return cell
-    }
-    
-    //MARK: Bookshelf collection view cell color mapping to document type
-    private func getDocumentTypeColor(type: DocumentType) -> UIColor {
-        switch(type) {
-        case .Spotlight:
-            return .gray
-        case .BioPortal:
-            return .purple
-        case .Chemistry:
-            return .brown
-        case .Other:
-            return .white
-        case .TAGME:
-            return .blue
-        }
     }
     
     // MARK: - UICollectionViewDelegate protocol
@@ -963,25 +972,25 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         })
         popMenu.addAction(allAction)
         let spotlightAction = PopMenuDefaultAction(title: "Spotlight", didSelect: { action in
-            self.filterDocumentsButton.titleLabel?.text = "Spotlight"
+            self.filterDocumentsButton.setTitle("Spotlight", for: .normal)
             self.items = self.sketchnote.documents?.filter{ $0.documentType == .Spotlight } ?? [Document]()
             self.documentsCollectionView.reloadData()
         })
         popMenu.addAction(spotlightAction)
         let bioportalAction = PopMenuDefaultAction(title: "BioPortal", didSelect: { action in
-            self.filterDocumentsButton.titleLabel?.text = "BioPortal"
+            self.filterDocumentsButton.setTitle("BioPortal", for: .normal)
             self.items = self.sketchnote.documents?.filter{ $0.documentType == .BioPortal } ?? [Document]()
             self.documentsCollectionView.reloadData()
         })
         popMenu.addAction(bioportalAction)
         let chebiAction = PopMenuDefaultAction(title: "CHEBI", didSelect: { action in
-            self.filterDocumentsButton.titleLabel?.text = "CHEBI"
+            self.filterDocumentsButton.setTitle("CHEBI", for: .normal)
             self.items = self.sketchnote.documents?.filter{ $0.documentType == .Chemistry } ?? [Document]()
             self.documentsCollectionView.reloadData()
         })
         popMenu.addAction(chebiAction)
         let tagmeAction = PopMenuDefaultAction(title: "TAGME", didSelect: { action in
-            self.filterDocumentsButton.titleLabel?.text = "TAGME"
+            self.filterDocumentsButton.setTitle("TAGME", for: .normal)
             self.items = self.sketchnote.documents?.filter{ $0.documentType == .TAGME } ?? [Document]()
             self.documentsCollectionView.reloadData()
         })

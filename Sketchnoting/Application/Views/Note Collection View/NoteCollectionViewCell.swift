@@ -13,6 +13,10 @@ class NoteCollectionViewCell: UICollectionViewCell {
     @IBOutlet weak var moreButton: UIButton!
     @IBOutlet weak var creationDateLabel: UILabel!
     @IBOutlet weak var creationDateBackgroundView: UIView!
+    @IBOutlet weak var documentsBackgroundView: UIView!
+    @IBOutlet weak var documentsLabel: UILabel!
+    @IBOutlet weak var titleBackgroundView: UIView!
+    @IBOutlet weak var titleLabel: UILabel!
     
     var delegate : NoteCollectionViewCellDelegate!
     
@@ -30,6 +34,8 @@ class NoteCollectionViewCell: UICollectionViewCell {
         self.layer.borderWidth = 1
         self.layer.borderColor = UIColor.black.cgColor
         creationDateBackgroundView.layer.cornerRadius = 18
+        documentsBackgroundView.layer.cornerRadius = 18
+        titleBackgroundView.layer.cornerRadius = 18
         
         sketchnote = note
         imageView.image = sketchnote.image
@@ -41,6 +47,23 @@ class NoteCollectionViewCell: UICollectionViewCell {
         formatter.dateFormat = "dd MMM yyyy"
         let formattedDateAsString = formatter.string(from: date!)
         self.creationDateLabel.text = formattedDateAsString
+        
+        if let docs = note.documents {
+            if docs.count > 0 {
+                documentsBackgroundView.isHidden = false
+                if docs.count < 100 {
+                    documentsLabel.text = "\(docs.count) Docs"
+                }
+                else {
+                    documentsLabel.text = "99+ Docs"
+                }
+            }
+            else {
+                documentsBackgroundView.isHidden = true
+            }
+        }
+        
+        titleLabel.text = note.getTitle()
     }
     
     
