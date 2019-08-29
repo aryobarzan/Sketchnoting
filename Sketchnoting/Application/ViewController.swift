@@ -222,7 +222,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     // If a sketchnote matches EVERY search term, the sketchnote remains visible. Otherwise it is hidden and not considered a matchin result.
     private func performSearch() {
         if !searchField.text!.isEmpty {
-            let searchString = searchField.text!.lowercased()
+            let searchString = searchField.text!.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
             if !searchFilters.contains(searchString) {
                 let filterButton = UIButton(frame: CGRect(x: 0, y: 0, width: 75, height: 30))
                 filterButton.backgroundColor = .gray

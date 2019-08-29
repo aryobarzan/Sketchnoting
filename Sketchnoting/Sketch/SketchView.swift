@@ -284,16 +284,17 @@ public class SketchView: UIView {
             guard let tool = obj as? SketchTool else { return }
             resetTool()
             if let eraserTool = tool as? EraserTool {
+                print("Eraser tool")
                 eraserTool.lineAlpha = 0
                 pathArray.add(eraserTool)
             }
             else if let penTool = tool as? PenTool {
                 pathArray.add(penTool)
+                print(penTool.path.boundingBox)
             }
             else {
                 pathArray.add(tool)
             }
-            
             updateCacheImage(true)
             setNeedsDisplay()
         }

@@ -17,9 +17,7 @@ class TextData: NSObject, NSCoding {
     let spellchecked: String!
     var corrected: String?
     
-    let imageSize : CGSize!
-    
-    init(visionText: VisionText, original: String, paths: [CGRect], imageSize: CGSize, spellcheck: Bool) {
+    init(visionText: VisionText, original: String, paths: [CGRect], spellcheck: Bool) {
         self.paths = paths
         self.original = original
         if spellcheck {
@@ -28,7 +26,6 @@ class TextData: NSObject, NSCoding {
         else {
             self.spellchecked = original
         }
-        self.imageSize = imageSize
         self.visionTextWrapper = TextData.createVisionTextWrapper(visionText: visionText)
     }
     
@@ -55,7 +52,6 @@ class TextData: NSObject, NSCoding {
         case original = "Original"
         case spellchecked = "Spellchecked"
         case corrected = "Corrected"
-        case imageSize = "ImageSize"
     }
 
     func encode(with aCoder: NSCoder) {
@@ -64,7 +60,6 @@ class TextData: NSObject, NSCoding {
         aCoder.encode(spellchecked, forKey: Keys.spellchecked.rawValue)
         aCoder.encode(corrected, forKey: Keys.corrected.rawValue)
         aCoder.encode(visionTextWrapper, forKey: Keys.visionTextWrapper.rawValue)
-        aCoder.encode(imageSize, forKey: Keys.imageSize.rawValue)
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -73,6 +68,5 @@ class TextData: NSObject, NSCoding {
         spellchecked = aDecoder.decodeObject(forKey: Keys.spellchecked.rawValue) as? String
         corrected = aDecoder.decodeObject(forKey: Keys.corrected.rawValue) as? String
         visionTextWrapper = aDecoder.decodeObject(forKey: Keys.visionTextWrapper.rawValue) as? VisionTextWrapper
-        imageSize = aDecoder.decodeObject(forKey: Keys.imageSize.rawValue) as? CGSize
     }
 }

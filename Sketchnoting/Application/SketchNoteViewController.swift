@@ -97,9 +97,12 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
                 sketchnote?.image = sketchView.asImage()
             }
             else {
-                if sketchnote!.paths != nil && sketchnote!.paths!.count > 0 {
+                if sketchnote.paths != nil && sketchnote.paths!.count > 0 {
                     print("Reloading paths.")
-                    self.sketchView.reloadPathArray(array: sketchnote!.paths!)
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        self.sketchView.reloadPathArray(array: self.sketchnote.paths!)
+                    }
+                    
                 }
                     // If the app does not manage to reload the user's drawn strokes (for any reason), the app simply loads a screenshot of the note's last state as a background for the note's canvas on the page. The latter case should preferably never occur.
                 else if sketchnote?.image != nil {
@@ -294,44 +297,32 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     }
     
     // MARK: Highlighting recognized concepts/topics on the canvas
-    
     @IBOutlet var conceptHighlightsSwitch: UISwitch!
     private func setupConceptHighlights() {
         if let documents = sketchnote.documents {
             for textData in sketchnote.textDataArray {
                 for document in documents {
-                    var found = false
-                    var body = textData.spellchecked!
-                    if textData.corrected != nil && !textData.corrected!.isEmpty {
-                        body = textData.corrected!
-                    }
-                    if body.lowercased().contains(document.title.lowercased()) {
+                    if textData.original.lowercased().contains(document.title.lowercased()) {
                         for block in textData.visionTextWrapper.blocks {
                             for line in block.lines {
                                 for element in line.elements {
-                                    if element.text.lowercased() == document.title.lowercased() || element.text.lowercased().levenshtein(document.title.lowercased()) <= 2 {
-                                        let scaledFrame = createScaledFrame(featureFrame: element.frame, imageSize: textData.imageSize)
+                                    var levenshteinThreshold = 2
+                                    if document.title.count > 5 {
+                                        levenshteinThreshold = 5
+                                    }
+                                    if element.text.lowercased() == document.title.lowercased() || element.text.lowercased().levenshtein(document.title.lowercased()) <= levenshteinThreshold {
+                                        let scaledFrame = createScaledFrame(featureFrame: element.frame, imageSize: sketchView.frame.size)
                                         let conceptHighlightView = UIView(frame: scaledFrame)
                                         conceptHighlightView.layer.borderWidth = 2
-                                        conceptHighlightView.layer.borderColor = UIColor.red.cgColor
-                                        self.view.addSubview(conceptHighlightView)
-                                        print(conceptHighlightView.frame)
+                                        conceptHighlightView.layer.borderColor = UIColor.green.cgColor
+                                        self.sketchView.addSubview(conceptHighlightView)
                                         conceptHighlightView.isHidden = true
                                         conceptHighlightView.isUserInteractionEnabled = true
                                         self.conceptHighlights[conceptHighlightView] = document
                                         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(self.handleConceptHighlightTap(_:)))
                                         conceptHighlightView.addGestureRecognizer(tapGesture)
- 
-                                        found = true
-                                        break
                                     }
                                 }
-                                if found {
-                                    break
-                                }
-                            }
-                            if found {
-                                break
                             }
                         }
                     }
@@ -369,8 +360,8 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
             let featurePointYScaled = imagePointYScaled + featureFrame.origin.y * scale
             
             // 7
-            return CGRect(x: featurePointXScaled - 15,
-                          y: featurePointYScaled - 30,
+            return CGRect(x: featurePointXScaled,
+                          y: featurePointYScaled,
                           width: featureWidthScaled,
                           height: featureHeightScaled)
     }
@@ -583,7 +574,8 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
             else {
             }
         }
-        handwritingRecognizer.recognize(spellcheck: false, note: sketchnote, view: sketchView, penTools: newPenTools, canvasFrame: self.sketchView.bounds) { (success, textData) in
+        let (image, pathBoundingBoxes) = self.generateHandwritingRecognitionImage(note: sketchnote, penTools: newPenTools)
+        handwritingRecognizer.recognize(spellcheck: false, image: image, pathBoundingBoxes: pathBoundingBoxes) { (success, textData) in
             if success {
                 if let textData = textData {
                     self.sketchnote.textDataArray.append(textData)
@@ -598,6 +590,38 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
                 print("Handwriting recognition returned no result.")
             }
         }
+    }
+    private func generateHandwritingRecognitionImage(note: Sketchnote, penTools: [PenTool]) -> (UIImage, [CGRect]) {
+        var newPenTools = [PenTool]()
+        
+        if let textDataArray = note.textDataArray {
+            for penTool in penTools {
+                var alreadyRecognized = false
+                for textData in textDataArray {
+                    if textData.paths.contains(penTool.path.boundingBox) {
+                        alreadyRecognized = true
+                        break
+                    }
+                }
+                if !alreadyRecognized {
+                    newPenTools.append(penTool)
+                }
+            }
+        }
+        
+        let canvas = UIView(frame: sketchView.frame)
+        canvas.backgroundColor = .black
+        var newPathsBoundingBoxes = [CGRect]()
+        for penTool in newPenTools {
+            newPathsBoundingBoxes.append(penTool.path.boundingBox)
+            let newPath = penTool.path.copy(strokingWithWidth: penTool.lineWidth, lineCap: .round, lineJoin: .round, miterLimit: 0)
+            let layer = CAShapeLayer()
+            layer.path = newPath
+            layer.strokeColor = UIColor.white.cgColor
+            layer.fillColor = UIColor.white.cgColor
+            canvas.layer.addSublayer(layer)
+        }
+        return (canvas.asImage(), newPathsBoundingBoxes)
     }
     
     func annotateText(text: String) {
@@ -672,10 +696,10 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     }
     
     //MARK: Tools View drag
-    @IBOutlet var toolsViewLeftConstraint: NSLayoutConstraint!
-    @IBOutlet var toolsViewTopConstraint: NSLayoutConstraint!
-    @IBOutlet var toolsViewRightConstraint: NSLayoutConstraint!
     
+    @IBOutlet weak var toolsViewTopConstraint: NSLayoutConstraint!
+    @IBOutlet weak var toolsViewLeftConstraint: NSLayoutConstraint!
+    @IBOutlet weak var toolsViewRightConstraint: NSLayoutConstraint!
     
     var toolsViewTouchPreviousPoint = CGPoint()
     @IBAction func toolsViewPanned(_ sender: UIPanGestureRecognizer) {
@@ -690,7 +714,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
                 toolsViewLeftConstraint.constant += deltaX
                 toolsViewRightConstraint.constant -= deltaX
             }
-            if toolsViewTopConstraint.constant + deltaY >= 20 && toolsViewTopConstraint.constant + deltaY < self.view.frame.maxY - 115 {
+            if toolsViewTopConstraint.constant + deltaY >= 20 && toolsViewTopConstraint.constant + deltaY < self.view.frame.maxY - 110 {
                 toolsViewTopConstraint.constant += deltaY
             }
                 
@@ -702,9 +726,10 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     }
     
     //MARK: Bookshelf resize
-    @IBOutlet var bookshelfRightConstraint: NSLayoutConstraint!
-    @IBOutlet var bookshelfLeftConstraint: NSLayoutConstraint!
-    @IBOutlet var bookshelfBottomConstraint: NSLayoutConstraint!
+    @IBOutlet weak var bookshelfLeftConstraint: NSLayoutConstraint!
+    @IBOutlet weak var bookshelfRightConstraint: NSLayoutConstraint!
+    @IBOutlet weak var bookshelfBottomConstraint: NSLayoutConstraint!
+    
     
     struct ResizeRect{
         var topTouch = false

@@ -22,63 +22,28 @@ class HandwritingRecognizer {
         self.textRecognizerCloud = vision.cloudTextRecognizer(options: options)
     }
     
-    public func recognize(spellcheck: Bool = true, note: Sketchnote, view: UIView, penTools: [PenTool], canvasFrame: CGRect, handleFinish:@escaping ((_ success: Bool, _ param: TextData?)->())){
-        var newPenTools = [PenTool]()
-        
-        if let textDataArray = note.textDataArray {
-            for penTool in penTools {
-                var alreadyRecognized = false
-                for textData in textDataArray {
-                    if textData.paths.contains(penTool.path.boundingBox) {
-                        alreadyRecognized = true
-                        break
-                    }
-                }
-                if !alreadyRecognized {
-                    newPenTools.append(penTool)
-                }
-            }
-        }
-        
-        let canvas = UIView(frame: canvasFrame)
-        canvas.backgroundColor = .black
-        var newPathsBoundingBoxes = [CGRect]()
-        for penTool in newPenTools {
-            newPathsBoundingBoxes.append(penTool.path.boundingBox)
-            let newPath = penTool.path.copy(strokingWithWidth: penTool.lineWidth, lineCap: .round, lineJoin: .round, miterLimit: 0)
-            let layer = CAShapeLayer()
-            layer.path = newPath
-            layer.strokeColor = UIColor.white.cgColor
-            layer.fillColor = UIColor.white.cgColor
-            canvas.layer.addSublayer(layer)
-        }
-        view.addSubview(canvas)
-        let image = canvas.asImage()
+    public func recognize(spellcheck: Bool = true, image: UIImage, pathBoundingBoxes: [CGRect], handleFinish:@escaping ((_ success: Bool, _ param: TextData?)->())){
         let visionImage = VisionImage(image: image)
         
         switch SettingsManager.textRecognitionSetting() {
         case .OnDevice:
             textRecognizer.process(visionImage) { result, error in
                 guard error == nil, let result = result else {
-                    canvas.removeFromSuperview()
                     handleFinish(false, nil)
                     return
                 }
-                let textData = TextData(visionText: result, original: result.text, paths: newPathsBoundingBoxes, imageSize: canvas.frame.size, spellcheck: spellcheck)
-                canvas.removeFromSuperview()
+                let textData = TextData(visionText: result, original: result.text, paths: pathBoundingBoxes, spellcheck: spellcheck)
                 handleFinish(true, textData)
             }
         case .CloudSparse:
             self.textRecognizerCloud = vision.cloudTextRecognizer()
             textRecognizerCloud.process(visionImage) { result, error in
                 guard error == nil, let result = result else {
-                    canvas.removeFromSuperview()
                     print(error)
                     handleFinish(false, nil)
                     return
                 }
-                let textData = TextData(visionText: result, original: result.text, paths: newPathsBoundingBoxes, imageSize: canvas.frame.size, spellcheck: spellcheck)
-                canvas.removeFromSuperview()
+                let textData = TextData(visionText: result, original: result.text, paths: pathBoundingBoxes, spellcheck: spellcheck)
                 handleFinish(true, textData)
             }
         case .CloudDense:
@@ -87,13 +52,11 @@ class HandwritingRecognizer {
             self.textRecognizerCloud = vision.cloudTextRecognizer(options: options)
             textRecognizerCloud.process(visionImage) { result, error in
                 guard error == nil, let result = result else {
-                    canvas.removeFromSuperview()
                     print(error)
                     handleFinish(false, nil)
                     return
                 }
-                let textData = TextData(visionText: result, original: result.text, paths: newPathsBoundingBoxes, imageSize: canvas.frame.size, spellcheck: spellcheck)
-                canvas.removeFromSuperview()
+                let textData = TextData(visionText: result, original: result.text, paths: pathBoundingBoxes, spellcheck: spellcheck)
                 handleFinish(true, textData)
             }
         }
