@@ -11,13 +11,8 @@ import Alamofire
 import SwiftyJSON
 
 class TAGMEHelper {
-    var viewController: SketchNoteViewController!
     
-    init?(viewController: SketchNoteViewController){
-        self.viewController = viewController
-    }
-    
-    func fetch(text: String) {
+    func fetch(text: String, note: Sketchnote) {
         let chunks = text.split(by: 6000)
         
         for chunk in chunks {
@@ -51,7 +46,7 @@ class TAGMEHelper {
                                     }
                                 }
                                 if let document = TAGMEDocument(title: title, description: abstract, URL: "tagme.d4science.org/tagme", type: .TAGME, previewImage: nil, spot: spot, categories: categories, wikiPageID: id) {
-                                    self.viewController.displayInBookshelf(document: document)
+                                    note.addDocument(document: document)
                                 }
                             }
                         }

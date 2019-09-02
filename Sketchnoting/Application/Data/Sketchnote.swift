@@ -8,14 +8,21 @@
 
 import UIKit
 
+protocol SketchnoteDelegate {
+    func sketchnoteHasNewDocument(sketchnote: Sketchnote, document: Document)
+    func sketchnoteHasChanged(sketchnote: Sketchnote)
+}
+
 class Sketchnote: Note, Equatable, DocumentVisitor, Comparable {
+    
+    var delegate: SketchnoteDelegate?
     
     var id: String!
     private var title: String!
     var creationDate: Date!
     var updateDate: Date?
     var image: UIImage?
-    var documents: [Document]?
+    var documents: [Document]!
     var drawings: [String]? // recognized drawings' labels
     var drawingViewRects: [CGRect]?
     var paths: NSMutableArray?
@@ -60,7 +67,6 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable {
         } catch {
             print("Document encoding failed.")
         }
-        
         
         try container.encode(drawings, forKey: .drawings)
         try container.encode(drawingViewRects, forKey: .drawingViewRects)
@@ -239,6 +245,7 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable {
         }
         if !documents!.contains(document) {
             documents!.append(document)
+            self.delegate?.sketchnoteHasNewDocument(sketchnote: self, document: document)
         }
     }
     // This function only stores a recognized drawing's label for a note. The drawing itself (i.e. an image) is not stored.

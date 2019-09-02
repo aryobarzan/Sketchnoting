@@ -51,8 +51,6 @@
 		9FD29C1F2236EA2800CC969A /* SketchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29C1C2236EA2800CC969A /* SketchView.swift */; };
 		9FD29C202236EA2800CC969A /* UIImage+fill.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29C1D2236EA2800CC969A /* UIImage+fill.swift */; };
 		9FD29C342237FD2B00CC969A /* GMStepper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29C332237FD2B00CC969A /* GMStepper.swift */; };
-		9FD29C362238539200CC969A /* PhotoRequestManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29C352238539200CC969A /* PhotoRequestManager.swift */; };
-		9FD29C38223853C300CC969A /* PhotoAuthorization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29C37223853C300CC969A /* PhotoAuthorization.swift */; };
 		9FD29C392238571700CC969A /* Pods_Sketchnoting.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9DC8B7BD96FB5DF71C8C0CA0 /* Pods_Sketchnoting.framework */; };
 		9FD29C3F223861E100CC969A /* ExpandableButtonItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29C3B223861E000CC969A /* ExpandableButtonItem.swift */; };
 		9FD29C40223861E100CC969A /* ExpandableButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29C3C223861E000CC969A /* ExpandableButtonView.swift */; };
@@ -120,8 +118,6 @@
 		9FD29C1C2236EA2800CC969A /* SketchView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SketchView.swift; sourceTree = "<group>"; };
 		9FD29C1D2236EA2800CC969A /* UIImage+fill.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIImage+fill.swift"; sourceTree = "<group>"; };
 		9FD29C332237FD2B00CC969A /* GMStepper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GMStepper.swift; sourceTree = "<group>"; };
-		9FD29C352238539200CC969A /* PhotoRequestManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoRequestManager.swift; sourceTree = "<group>"; };
-		9FD29C37223853C300CC969A /* PhotoAuthorization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoAuthorization.swift; sourceTree = "<group>"; };
 		9FD29C3B223861E000CC969A /* ExpandableButtonItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExpandableButtonItem.swift; sourceTree = "<group>"; };
 		9FD29C3C223861E000CC969A /* ExpandableButtonView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExpandableButtonView.swift; sourceTree = "<group>"; };
 		9FD29C3D223861E000CC969A /* ArrowButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ArrowButton.swift; sourceTree = "<group>"; };
@@ -346,8 +342,6 @@
 				9FD29C1B2236EA2800CC969A /* SketchTool.swift */,
 				9FD29C1C2236EA2800CC969A /* SketchView.swift */,
 				9FD29C1D2236EA2800CC969A /* UIImage+fill.swift */,
-				9FD29C352238539200CC969A /* PhotoRequestManager.swift */,
-				9FD29C37223853C300CC969A /* PhotoAuthorization.swift */,
 			);
 			path = Sketch;
 			sourceTree = "<group>";
@@ -584,7 +578,6 @@
 				9FD29BA72220524D00CC969A /* AppDelegate.swift in Sources */,
 				9FD29C6422431BFA00CC969A /* DrawnImageClassifier.mlmodel in Sources */,
 				9FA6239C22E64EA2007ED794 /* TextData.swift in Sources */,
-				9FD29C362238539200CC969A /* PhotoRequestManager.swift in Sources */,
 				9FD29C342237FD2B00CC969A /* GMStepper.swift in Sources */,
 				9FD29C56223C3C3900CC969A /* StringExtensions.swift in Sources */,
 				9FD29C4E223998BC00CC969A /* UIViewControllerExtensions.swift in Sources */,
@@ -596,7 +589,6 @@
 				9F75E44F230D848200488BBD /* SettingsViewController.swift in Sources */,
 				9F75E484231419FA00488BBD /* TAGMEDocument.swift in Sources */,
 				9F75E44C230C583200488BBD /* NoteCollectionViewCell.swift in Sources */,
-				9FD29C38223853C300CC969A /* PhotoAuthorization.swift in Sources */,
 				9F5D0FC8229CBC4100BCA451 /* NotesManager.swift in Sources */,
 				9FA6238F22DCD3AD007ED794 /* DocumentUICollectionViewCell.swift in Sources */,
 				9FC788F4225CEC4C0074BD16 /* DrawingSearchView.swift in Sources */,

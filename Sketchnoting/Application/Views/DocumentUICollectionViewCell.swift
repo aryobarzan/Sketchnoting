@@ -13,5 +13,7 @@ class DocumentUICollectionViewCell: UICollectionViewCell {
     @IBOutlet var titleLabel: UILabel!
     @IBOutlet var typeLabel: UILabel!
     @IBOutlet var previewImage: UIImageView!
-    @IBOutlet var bottomView: UIView!
+    @IBOutlet var topView: UIView!
+    @IBOutlet var abstractTextView: UITextView!
+    @IBOutlet var typeLabelView: UIView!
 }

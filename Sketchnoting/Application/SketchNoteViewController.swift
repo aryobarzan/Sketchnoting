@@ -11,11 +11,12 @@ import LGButton
 import Firebase
 import PopMenu
 import GSMessages
+import BadgeHub
 
 // This is the controller for the other page of the application, i.e. not the home page, but for the page displayed when the user wants to edit a note.
 
-class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, SketchViewDelegate, UIPencilInteractionDelegate, UICollectionViewDataSource, UICollectionViewDelegate, DocumentVisitor, ColorPickerViewDelegate, ColorPickerViewDelegateFlowLayout {
-
+class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, SketchViewDelegate, UIPencilInteractionDelegate, UICollectionViewDataSource, UICollectionViewDelegate, DocumentVisitor, ColorPickerViewDelegate, ColorPickerViewDelegateFlowLayout, SketchnoteDelegate {
+    
     @IBOutlet weak var topContainer: UIView!
     @IBOutlet var topContainerLeftDragView: UIView!
     @IBOutlet var sketchView: SketchView!
@@ -24,6 +25,8 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     @IBOutlet var drawingsButton: LGButton!
     @IBOutlet var closeButton: UIButton!
     @IBOutlet weak var viewToolsButton: LGButton!
+    @IBOutlet weak var topicsLabel: UILabel!
+    var topicsBadgeHub: BadgeHub!
     
     @IBOutlet var bookshelf: UIView!
     @IBOutlet var activityIndicator: UIActivityIndicatorView!
@@ -61,6 +64,8 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     override func viewDidLoad() {
         super.viewDidLoad()
         self.navigationController?.setNavigationBarHidden(true, animated: false)
+        
+        self.sketchnote.delegate = self
         
         colorPicker.delegate = self
         colorPicker.layoutDelegate = self
@@ -136,14 +141,20 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         setupHelpLines()
         setupConceptHighlights()
         setupDrawingRegions()
+        self.rightScreenSidePanGesture.edges = [.right]
+        self.topicsBadgeHub = BadgeHub(view: topicsLabel)
+        self.topicsBadgeHub.scaleCircleSize(by: 0.55)
+        self.topicsBadgeHub.moveCircleBy(x: 4, y: -6)
+        self.topicsBadgeHub.setCount(self.sketchnote.documents.count)
+        
         
         let interaction = UIPencilInteraction()
         interaction.delegate = self
         view.addInteraction(interaction)
         
-        spotlightHelper = SpotlightHelper(viewController: self)!
-        bioportalHelper = BioPortalHelper(viewController: self)!
-        tagmeHelper = TAGMEHelper(viewController: self)!
+        spotlightHelper = SpotlightHelper()
+        bioportalHelper = BioPortalHelper()
+        tagmeHelper = TAGMEHelper()
         
         self.recognizedTextLogView.text = self.sketchnote.getText(raw: true)
     }
@@ -165,10 +176,10 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
             toggleToolsView()
             break
         case .Undo:
-            sketchView.undo()
+            self.undo()
             break
         case .Redo:
-            sketchView.redo()
+            self.redo()
             break
         }
     }
@@ -276,9 +287,12 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     }
     
     private func setupHelpLines() {
+        self.helpLinesHorizontal = [HoritonzalHelpLine]()
+        self.helpLinesVertical = [VerticalHelpLine]()
         var height = CGFloat(40)
-        while (CGFloat(height) < self.sketchView.frame.height + 80) {
-            let line = HoritonzalHelpLine(frame: CGRect(x: 0, y: height, width: self.view.frame.width, height: 1))
+        while (CGFloat(height) < UIScreen.main.bounds.height + 80) {
+            let line = HoritonzalHelpLine(frame: CGRect(x: 0, y: height, width: UIScreen.main.bounds.width, height: 1))
+            
             line.isUserInteractionEnabled = false
             line.isHidden = true
             self.sketchView.addSubview(line)
@@ -286,13 +300,52 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
             height = height + 40
         }
         var width = CGFloat(40)
-        while (CGFloat(width) < self.sketchView.frame.width + 80) {
-            let line = VerticalHelpLine(frame: CGRect(x: width, y: 0, width: 1, height: self.view.frame.height))
+        while (CGFloat(width) < UIScreen.main.bounds.width + 80) {
+            let line = VerticalHelpLine(frame: CGRect(x: width, y: 0, width: 1, height: UIScreen.main.bounds.height))
+            
             line.isUserInteractionEnabled = false
             line.isHidden = true
             self.sketchView.addSubview(line)
             self.helpLinesVertical.append(line)
             width = width + 40
+        }
+    }
+    
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) { // Handle screen orientation change
+        super.viewWillTransition(to: size, with: coordinator)
+        print("test")
+        for helpLine in self.helpLinesHorizontal {
+            helpLine.removeFromSuperview()
+        }
+        for helpLine in self.helpLinesVertical {
+            helpLine.removeFromSuperview()
+        }
+        self.setupHelpLines()
+        switch self.helpLinesStatus {
+        case .None:
+            for helpLine in self.helpLinesHorizontal {
+                helpLine.isHidden = true
+            }
+            for helpLine in self.helpLinesVertical {
+                helpLine.isHidden = true
+            }
+            break
+        case .Horizontal:
+            for helpLine in self.helpLinesHorizontal {
+                helpLine.isHidden = false
+            }
+            for helpLine in self.helpLinesVertical {
+                helpLine.isHidden = true
+            }
+            break
+        case .Grid:
+            for helpLine in self.helpLinesHorizontal {
+                helpLine.isHidden = false
+            }
+            for helpLine in self.helpLinesVertical {
+                helpLine.isHidden = false
+            }
+            break
         }
     }
     
@@ -302,25 +355,53 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         if let documents = sketchnote.documents {
             for textData in sketchnote.textDataArray {
                 for document in documents {
-                    if textData.original.lowercased().contains(document.title.lowercased()) {
+                    let documentTitle = document.title.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+                    var levenshteinThreshold = 2
+                    if documentTitle.count > 5 {
+                        levenshteinThreshold = 5
+                    }
+                    if textData.original.trimmingCharacters(in: .whitespacesAndNewlines).lowercased().contains(documentTitle) {
                         for block in textData.visionTextWrapper.blocks {
                             for line in block.lines {
                                 for element in line.elements {
-                                    var levenshteinThreshold = 2
-                                    if document.title.count > 5 {
-                                        levenshteinThreshold = 5
-                                    }
-                                    if element.text.lowercased() == document.title.lowercased() || element.text.lowercased().levenshtein(document.title.lowercased()) <= levenshteinThreshold {
+                                    
+                                    
+                                    let elementText = element.text.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+                                    if elementText == documentTitle || elementText.levenshtein(documentTitle) <= levenshteinThreshold {
                                         let scaledFrame = createScaledFrame(featureFrame: element.frame, imageSize: sketchView.frame.size)
                                         let conceptHighlightView = UIView(frame: scaledFrame)
                                         conceptHighlightView.layer.borderWidth = 2
-                                        conceptHighlightView.layer.borderColor = UIColor.green.cgColor
+                                        conceptHighlightView.layer.borderColor = #colorLiteral(red: 0.3333333333, green: 0.4588235294, blue: 0.7568627451, alpha: 1).cgColor
                                         self.sketchView.addSubview(conceptHighlightView)
                                         conceptHighlightView.isHidden = true
                                         conceptHighlightView.isUserInteractionEnabled = true
                                         self.conceptHighlights[conceptHighlightView] = document
                                         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(self.handleConceptHighlightTap(_:)))
                                         conceptHighlightView.addGestureRecognizer(tapGesture)
+                                    }
+                                }
+                                for index in 0..<line.elements.count {
+                                    var elementText = line.elements[index].text.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+                                    var width = line.elements[index].frame.width
+                                    if index < line.elements.count-1 {
+                                        for j in index+1..<line.elements.count {
+                                            elementText = elementText + " " + line.elements[j].text.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+                                            width = width + line.elements[j].frame.width
+                                            if elementText == documentTitle {
+                                                print(elementText)
+                                                let scaledFrame = createScaledFrame(featureFrame: CGRect(x: line.elements[index].frame.minX, y: line.elements[index].frame.minY, width: width, height: line.elements[index].frame.maxY), imageSize: sketchView.frame.size)
+                                                let conceptHighlightView = UIView(frame: scaledFrame)
+                                                conceptHighlightView.layer.borderWidth = 2
+                                                conceptHighlightView.layer.borderColor = #colorLiteral(red: 0.3333333333, green: 0.4588235294, blue: 0.7568627451, alpha: 1).cgColor
+                                                self.sketchView.addSubview(conceptHighlightView)
+                                                conceptHighlightView.isHidden = true
+                                                conceptHighlightView.isUserInteractionEnabled = true
+                                                self.conceptHighlights[conceptHighlightView] = document
+                                                let tapGesture = UITapGestureRecognizer(target: self, action: #selector(self.handleConceptHighlightTap(_:)))
+                                                conceptHighlightView.addGestureRecognizer(tapGesture)
+                                                break
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -496,11 +577,24 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     }
     
     @IBAction func redoTapped(_ sender: LGButton) {
-        sketchView.redo()
+        self.redo()
     }
+    
     @IBAction func undoTapped(_ sender: LGButton) {
+        self.undo()
+    }
+    
+    private func undo() {
+        self.startRecognitionTimer()
+        self.resetHandwritingRecognition = true
         sketchView.undo()
     }
+    private func redo() {
+        self.startRecognitionTimer()
+        self.resetHandwritingRecognition = true
+        sketchView.redo()
+    }
+    
     @IBAction func drawingsTapped(_ sender: LGButton) {
         drawingViewsShown = !drawingViewsShown
         if drawingViewsShown {
@@ -593,20 +687,26 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     }
     private func generateHandwritingRecognitionImage(note: Sketchnote, penTools: [PenTool]) -> (UIImage, [CGRect]) {
         var newPenTools = [PenTool]()
-        
-        if let textDataArray = note.textDataArray {
-            for penTool in penTools {
-                var alreadyRecognized = false
-                for textData in textDataArray {
-                    if textData.paths.contains(penTool.path.boundingBox) {
-                        alreadyRecognized = true
-                        break
+        if !self.resetHandwritingRecognition {
+            self.resetHandwritingRecognition = false
+            if let textDataArray = note.textDataArray {
+                for penTool in penTools {
+                    var alreadyRecognized = false
+                    for textData in textDataArray {
+                        if textData.paths.contains(penTool.path.boundingBox) {
+                            alreadyRecognized = true
+                            break
+                        }
+                    }
+                    if !alreadyRecognized {
+                        newPenTools.append(penTool)
                     }
                 }
-                if !alreadyRecognized {
-                    newPenTools.append(penTool)
-                }
             }
+        }
+        else {
+            self.sketchnote.textDataArray = [TextData]()
+            newPenTools = penTools
         }
         
         let canvas = UIView(frame: sketchView.frame)
@@ -630,12 +730,11 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         self.sketchnote.documents = [Document]()
         self.items = [Document]()
         self.documentsCollectionView.reloadData()
-        self.showBookshelf()
         
-        self.spotlightHelper.fetch(text: text)
-        self.bioportalHelper.fetch(text: text)
-        self.bioportalHelper.fetchCHEBI(text: text)
-        self.tagmeHelper.fetch(text: text)
+        self.spotlightHelper.fetch(text: text, note: self.sketchnote)
+        self.bioportalHelper.fetch(text: text, note: self.sketchnote)
+        self.bioportalHelper.fetchCHEBI(text: text, note: self.sketchnote)
+        self.tagmeHelper.fetch(text: text, note: self.sketchnote)
     }
     
     private func showBookshelf() {
@@ -651,7 +750,14 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     }
     
     var timer: Timer?
+    var resetHandwritingRecognition = false
     func drawView(_ view: SketchView, didEndDrawUsingTool tool: AnyObject) {
+        if tool is EraserTool {
+            self.resetHandwritingRecognition = true
+        }
+        self.startRecognitionTimer()
+    }
+    private func startRecognitionTimer() {
         if timer != nil {
             timer!.invalidate()
             timer = nil
@@ -793,8 +899,8 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
             let currentTouchPoint = touch.location(in: self.view)
             
             if resizeRect.leftTouch {
-                if UIScreen.main.bounds.maxX - currentTouchPoint.x <= 100 {
-                    bookshelfLeftConstraint.constant += 100
+                if UIScreen.main.bounds.maxX - currentTouchPoint.x <= 150 {
+                    bookshelfLeftConstraint.constant += 150
                     self.isBookshelfDraggedOut = true
                     UIView.animate(withDuration: 0.25, delay: 0, options: UIView.AnimationOptions.curveEaseIn, animations: {
                         self.view.layoutIfNeeded()
@@ -805,6 +911,15 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
                 }
             }
         }
+    }
+    @IBOutlet var rightScreenSidePanGesture: UIScreenEdgePanGestureRecognizer!
+    @IBAction func rightScreenSidePanned(_ sender: UIScreenEdgePanGestureRecognizer) {
+        if sender.state == .began {
+            if self.bookshelf.isHidden {
+                self.showBookshelf()
+            }
+        }
+        
     }
     
     // MARK: Documents Collection View
@@ -827,8 +942,21 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         // Use the outlet in our custom class to get a reference to the UILabel in the cell
         cell.titleLabel.text = self.items[indexPath.item].title
         cell.typeLabel.text = self.items[indexPath.item].documentType.rawValue
-        cell.previewImage.image = self.items[indexPath.item].previewImage
-        cell.backgroundColor = .gray
+        cell.typeLabelView.backgroundColor = #colorLiteral(red: 0.3333333333, green: 0.4588235294, blue: 0.7568627451, alpha: 1)
+        cell.typeLabelView.layer.cornerRadius = 16
+        if self.items[indexPath.item].previewImage == nil {
+            cell.abstractTextView.isHidden = false
+            cell.previewImage.isHidden = true
+            cell.abstractTextView.text = self.items[indexPath.item].description
+        }
+        else {
+            cell.previewImage.image = self.items[indexPath.item].previewImage
+            cell.abstractTextView.isHidden = true
+            cell.previewImage.isHidden = false
+        }
+        cell.backgroundColor = .lightGray
+        cell.layer.borderColor = UIColor.black.cgColor
+        cell.layer.borderWidth = 1
         
         return cell
     }
@@ -841,22 +969,23 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         showDocumentDetail(document: self.items[indexPath.item])
     }
     
-    func displayInBookshelf(document: Document) {
-        self.sketchnote.addDocument(document: document)
-        self.items = self.sketchnote.documents ?? [Document]()
-        self.documentsCollectionView.reloadData()
-    }
-    
     func displayInBookshelf(documents: [Document]) {
         for doc in documents {
             self.items.append(doc)
         }
         self.documentsCollectionView.reloadData()
         
-        self.sketchnote?.documents = items
+        self.sketchnote.documents = items
+        self.topicsBadgeHub.setCount(self.sketchnote.documents.count)
     }
     
-    func updateBookshelf() {
+    func sketchnoteHasNewDocument(sketchnote: Sketchnote, document: Document) { // Sketchnote delegate
+        self.items = self.sketchnote.documents
+        self.documentsCollectionView.reloadData()
+        self.topicsBadgeHub.setCount(self.sketchnote.documents.count)
+    }
+    
+    func sketchnoteHasChanged(sketchnote: Sketchnote) {
         self.documentsCollectionView.reloadData()
     }
     
@@ -995,31 +1124,33 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
             self.documentsCollectionView.reloadData()
             
         })
-        popMenu.addAction(allAction)
         let spotlightAction = PopMenuDefaultAction(title: "Spotlight", didSelect: { action in
             self.filterDocumentsButton.setTitle("Spotlight", for: .normal)
             self.items = self.sketchnote.documents?.filter{ $0.documentType == .Spotlight } ?? [Document]()
             self.documentsCollectionView.reloadData()
         })
-        popMenu.addAction(spotlightAction)
         let bioportalAction = PopMenuDefaultAction(title: "BioPortal", didSelect: { action in
             self.filterDocumentsButton.setTitle("BioPortal", for: .normal)
             self.items = self.sketchnote.documents?.filter{ $0.documentType == .BioPortal } ?? [Document]()
             self.documentsCollectionView.reloadData()
         })
-        popMenu.addAction(bioportalAction)
         let chebiAction = PopMenuDefaultAction(title: "CHEBI", didSelect: { action in
             self.filterDocumentsButton.setTitle("CHEBI", for: .normal)
             self.items = self.sketchnote.documents?.filter{ $0.documentType == .Chemistry } ?? [Document]()
             self.documentsCollectionView.reloadData()
         })
-        popMenu.addAction(chebiAction)
+        
         let tagmeAction = PopMenuDefaultAction(title: "TAGME", didSelect: { action in
             self.filterDocumentsButton.setTitle("TAGME", for: .normal)
             self.items = self.sketchnote.documents?.filter{ $0.documentType == .TAGME } ?? [Document]()
             self.documentsCollectionView.reloadData()
         })
+        
+        popMenu.addAction(allAction)
         popMenu.addAction(tagmeAction)
+        popMenu.addAction(spotlightAction)
+        popMenu.addAction(bioportalAction)
+        popMenu.addAction(chebiAction)
         self.present(popMenu, animated: true, completion: nil)
     }
     

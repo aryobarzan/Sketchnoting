@@ -11,13 +11,7 @@ import Alamofire
 import SwiftyJSON
 
 class SpotlightHelper {
-    var viewController: SketchNoteViewController!
-    
-    init?(viewController: SketchNoteViewController){
-        self.viewController = viewController
-    }
-    
-    func fetch(text: String) {
+    func fetch(text: String, note: Sketchnote) {
         let chunks = text.split(by: 6000)
         
         for chunk in chunks {
@@ -45,7 +39,7 @@ class SpotlightHelper {
                                 results[concept] = conceptURI
                                 if let resourceName = self.extractValueWithRegex(pageSource: conceptURI, pattern: "http://dbpedia.org/resource/(.*)"), let _ = URL(string: "http://dbpedia.org/data/" + resourceName + ".json") {
                                     print(resourceName)
-                                    self.fetchJSONOfResource(concept: concept, conceptURI: conceptURI, secondRankPercentage: Double(secondRankPercentage) ?? 0, resourceJSONURL: "http://dbpedia.org/data/" + resourceName + ".json")
+                                    self.fetchJSONOfResource(concept: concept, conceptURI: conceptURI, secondRankPercentage: Double(secondRankPercentage) ?? 0, resourceJSONURL: "http://dbpedia.org/data/" + resourceName + ".json", note: note)
                                 }
                             }
                         }
@@ -55,7 +49,7 @@ class SpotlightHelper {
         }
     }
     
-    private func fetchJSONOfResource(concept: String, conceptURI: String, secondRankPercentage: Double, resourceJSONURL: String) {
+    private func fetchJSONOfResource(concept: String, conceptURI: String, secondRankPercentage: Double, resourceJSONURL: String, note: Sketchnote) {
         let headers: HTTPHeaders = [
             "Accept": "application/json"
         ]
@@ -149,7 +143,7 @@ class SpotlightHelper {
                             }
                         }
                     }                        
-                    self.viewController.displayInBookshelf(document: document)
+                    note.addDocument(document: document)
                 }
             }
         }

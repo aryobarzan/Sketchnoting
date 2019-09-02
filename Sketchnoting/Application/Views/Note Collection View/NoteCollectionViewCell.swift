@@ -13,14 +13,14 @@ class NoteCollectionViewCell: UICollectionViewCell {
     @IBOutlet weak var moreButton: UIButton!
     @IBOutlet weak var creationDateLabel: UILabel!
     @IBOutlet weak var creationDateBackgroundView: UIView!
-    @IBOutlet weak var documentsBackgroundView: UIView!
-    @IBOutlet weak var documentsLabel: UILabel!
     @IBOutlet weak var titleBackgroundView: UIView!
     @IBOutlet weak var titleLabel: UILabel!
     
     var delegate : NoteCollectionViewCellDelegate!
     
     var sketchnote: Sketchnote!
+    
+    var longPressGesture: UILongPressGestureRecognizer?
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -31,11 +31,13 @@ class NoteCollectionViewCell: UICollectionViewCell {
     }
     
     func setNote(note: Sketchnote) {
-        self.layer.borderWidth = 1
-        self.layer.borderColor = UIColor.black.cgColor
-        creationDateBackgroundView.layer.cornerRadius = 18
-        documentsBackgroundView.layer.cornerRadius = 18
-        titleBackgroundView.layer.cornerRadius = 18
+        //self.layer.borderWidth = 1
+        //self.layer.borderColor = UIColor.black.cgColor
+        //creationDateBackgroundView.layer.cornerRadius = 18
+        //documentsBackgroundView.layer.cornerRadius = 18
+        //titleBackgroundView.layer.cornerRadius = 18
+        imageView.layer.borderWidth = 1
+        imageView.layer.borderColor = UIColor.black.cgColor
         
         sketchnote = note
         imageView.image = sketchnote.image
@@ -48,26 +50,24 @@ class NoteCollectionViewCell: UICollectionViewCell {
         let formattedDateAsString = formatter.string(from: date!)
         self.creationDateLabel.text = formattedDateAsString
         
-        if let docs = note.documents {
-            if docs.count > 0 {
-                documentsBackgroundView.isHidden = false
-                if docs.count < 100 {
-                    documentsLabel.text = "\(docs.count) Docs"
-                }
-                else {
-                    documentsLabel.text = "99+ Docs"
-                }
-            }
-            else {
-                documentsBackgroundView.isHidden = true
-            }
+        titleLabel.text = note.getTitle()
+        
+        if longPressGesture == nil {
+            longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(self.longPressed(_:)))
+            self.addGestureRecognizer(longPressGesture!)
         }
         
-        titleLabel.text = note.getTitle()
     }
     
+    @objc func longPressed(_ sender: UILongPressGestureRecognizer) {
+        self.moreButtonTrigger()
+    }
     
     @IBAction func moreButtonTapped(_ sender: UIButton) {
+        self.moreButtonTrigger()
+    }
+    
+    private func moreButtonTrigger() {
         delegate.noteCollectionViewCellMoreTapped(sketchnote: sketchnote, sender: self)
     }
 }
