@@ -243,9 +243,37 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable {
         if documents == nil {
             documents = [Document]()
         }
-        if !documents!.contains(document) {
+        if !documents!.contains(document) && checkDocument(document: document) {
             documents!.append(document)
             self.delegate?.sketchnoteHasNewDocument(sketchnote: self, document: document)
+        }
+    }
+    
+    private func checkDocument(document: Document) -> Bool {
+        if DocumentsManager.isHidden(document: document) {
+            return false
+        }
+        if let doc = document as? BioPortalDocument {
+            if doc.description?.lowercased().contains("place") ?? false || doc.description?.lowercased().contains("populated") ?? false {
+                return false
+            }
+        }
+        return true
+    }
+    
+    func removeDocument(document: Document) {
+        if documents == nil {
+            documents = [Document]()
+        }
+        if documents!.contains(document) {
+            documents.removeAll{$0 == document}
+        }
+    }
+    
+    func setDocumentPreviewImage(document: Document, image: UIImage) {
+        if self.documents.contains(document) {
+            document.previewImage = image
+            self.delegate?.sketchnoteHasChanged(sketchnote: self)
         }
     }
     // This function only stores a recognized drawing's label for a note. The drawing itself (i.e. an image) is not stored.
@@ -417,17 +445,5 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable {
     
     static func < (lhs: Sketchnote, rhs: Sketchnote) -> Bool {
         return lhs.creationDate < rhs.creationDate
-    }
-}
-
-extension UserDefaults {
-    static var sketchnotes: UserDefaults {
-        return UserDefaults(suiteName: "lu.uni.coast.sketchnoting.sketchnotes")!
-    }
-    static var collections: UserDefaults {
-        return UserDefaults(suiteName: "lu.uni.coast.sketchnoting.collections")!
-    }
-    static var settings: UserDefaults {
-        return UserDefaults(suiteName: "lu.uni.coast.sketchnoting.settings")!
     }
 }

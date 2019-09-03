@@ -47,6 +47,58 @@ class TAGMEHelper {
                                 }
                                 if let document = TAGMEDocument(title: title, description: abstract, URL: "tagme.d4science.org/tagme", type: .TAGME, previewImage: nil, spot: spot, categories: categories, wikiPageID: id) {
                                     note.addDocument(document: document)
+                                    self.fetchWikipediaImage(note: note, document: document)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    private func fetchWikipediaImage(note: Sketchnote, document: TAGMEDocument) {
+        let parameters: Parameters = ["action": "query", "prop": "info", "pageids": document.wikiPageID!, "inprop": "url", "format": "json"]
+        let headers: HTTPHeaders = [
+            "Accept": "application/json"
+        ]
+        AF.request("http://en.wikipedia.org/w/api.php", parameters: parameters, headers: headers).responseJSON { response in
+            let responseResult = response.result
+            var json = JSON()
+            switch responseResult {
+            case .success(let res):
+                json = JSON(res)
+            case .failure(let error):
+                print(error.localizedDescription)
+            }
+            if let wikiTitle = json["query"]["pages"][String(format: "%.0f", document.wikiPageID!)]["title"].string {
+                let parameters: Parameters = ["action": "query", "prop": "pageimages", "format": "json", "piprop": "original", "titles": wikiTitle]
+                let headers: HTTPHeaders = [
+                    "Accept": "application/json"
+                ]
+                AF.request("http://en.wikipedia.org/w/api.php", parameters: parameters, headers: headers).responseJSON { response in
+                    let responseResult = response.result
+                    var json = JSON()
+                    switch responseResult {
+                    case .success(let res):
+                        json = JSON(res)
+                    case .failure(let error):
+                        print(error.localizedDescription)
+                    }
+                    if let imageURL = json["query"]["pages"][String(format: "%.0f", document.wikiPageID!)]["original"]["source"].string {
+                        DispatchQueue.global().async {
+                            if let url = URL(string: imageURL) {
+                                if let data = try? Data(contentsOf: url) {
+                                    DispatchQueue.main.async {
+                                        print("Found image for TAGME document.")
+                                        if let image = UIImage(data: data) {
+                                            print("Setting image for TAGME document.")
+                                            note.setDocumentPreviewImage(document: document, image: image)
+                                        }
+                                    }
+                                }
+                                else {
+                                    print("URL image not found for TAGME document.")
                                 }
                             }
                         }

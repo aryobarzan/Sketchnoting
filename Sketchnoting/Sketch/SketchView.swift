@@ -290,7 +290,6 @@ public class SketchView: UIView {
             }
             else if let penTool = tool as? PenTool {
                 pathArray.add(penTool)
-                print(penTool.path.boundingBox)
             }
             else {
                 pathArray.add(tool)

@@ -22,6 +22,9 @@
 		9F75E47F231183EC00488BBD /* UIColor+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F75E47E231183EC00488BBD /* UIColor+Extension.swift */; };
 		9F75E482231410A100488BBD /* TAGMEHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F75E481231410A100488BBD /* TAGMEHelper.swift */; };
 		9F75E484231419FA00488BBD /* TAGMEDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F75E483231419FA00488BBD /* TAGMEDocument.swift */; };
+		9F92D10E231E95B400BC0E57 /* UICollectionViewExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F92D10D231E95B400BC0E57 /* UICollectionViewExtensions.swift */; };
+		9F92D110231E97DF00BC0E57 /* UserDefaultsExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F92D10F231E97DF00BC0E57 /* UserDefaultsExtensions.swift */; };
+		9F92D112231E98C600BC0E57 /* DocumentsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F92D111231E98C600BC0E57 /* DocumentsManager.swift */; };
 		9FA6238822CEA7FE007ED794 /* MapHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA6238722CEA7FE007ED794 /* MapHelper.swift */; };
 		9FA6238B22D37213007ED794 /* BioPortalHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA6238A22D37213007ED794 /* BioPortalHelper.swift */; };
 		9FA6238D22D38AEE007ED794 /* SpotlightHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA6238C22D38AEE007ED794 /* SpotlightHelper.swift */; };
@@ -87,6 +90,9 @@
 		9F75E47E231183EC00488BBD /* UIColor+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIColor+Extension.swift"; sourceTree = "<group>"; };
 		9F75E481231410A100488BBD /* TAGMEHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TAGMEHelper.swift; sourceTree = "<group>"; };
 		9F75E483231419FA00488BBD /* TAGMEDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TAGMEDocument.swift; sourceTree = "<group>"; };
+		9F92D10D231E95B400BC0E57 /* UICollectionViewExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UICollectionViewExtensions.swift; sourceTree = "<group>"; };
+		9F92D10F231E97DF00BC0E57 /* UserDefaultsExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsExtensions.swift; sourceTree = "<group>"; };
+		9F92D111231E98C600BC0E57 /* DocumentsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentsManager.swift; sourceTree = "<group>"; };
 		9FA6238722CEA7FE007ED794 /* MapHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapHelper.swift; sourceTree = "<group>"; };
 		9FA6238A22D37213007ED794 /* BioPortalHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BioPortalHelper.swift; sourceTree = "<group>"; };
 		9FA6238C22D38AEE007ED794 /* SpotlightHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotlightHelper.swift; sourceTree = "<group>"; };
@@ -178,6 +184,7 @@
 			children = (
 				9F5D0FC7229CBC4100BCA451 /* NotesManager.swift */,
 				9FA623A022E73DDA007ED794 /* NoteLoader.swift */,
+				9F92D111231E98C600BC0E57 /* DocumentsManager.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -372,6 +379,7 @@
 				9FD29C4D223998BC00CC969A /* UIViewControllerExtensions.swift */,
 				9FD29C55223C3C3900CC969A /* StringExtensions.swift */,
 				9FD29C57223C3CF700CC969A /* UIImageExtensions.swift */,
+				9F92D10D231E95B400BC0E57 /* UICollectionViewExtensions.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -407,6 +415,7 @@
 				9F5D0FC6229CBC2A00BCA451 /* Models */,
 				9FD29BC422249D9500CC969A /* Note.swift */,
 				9FD29BCA2224B89800CC969A /* Sketchnote.swift */,
+				9F92D10F231E97DF00BC0E57 /* UserDefaultsExtensions.swift */,
 			);
 			path = Data;
 			sourceTree = "<group>";
@@ -570,6 +579,7 @@
 				9FA6238822CEA7FE007ED794 /* MapHelper.swift in Sources */,
 				9FD29C202236EA2800CC969A /* UIImage+fill.swift in Sources */,
 				9FD29C40223861E100CC969A /* ExpandableButtonView.swift in Sources */,
+				9F92D110231E97DF00BC0E57 /* UserDefaultsExtensions.swift in Sources */,
 				9FA6239522DE3741007ED794 /* BioPortalDocument.swift in Sources */,
 				9FD29BA92220524D00CC969A /* ViewController.swift in Sources */,
 				9F75E47D231183E500488BBD /* ColorPickerViewDelegate.swift in Sources */,
@@ -579,6 +589,8 @@
 				9FD29C6422431BFA00CC969A /* DrawnImageClassifier.mlmodel in Sources */,
 				9FA6239C22E64EA2007ED794 /* TextData.swift in Sources */,
 				9FD29C342237FD2B00CC969A /* GMStepper.swift in Sources */,
+				9F92D10E231E95B400BC0E57 /* UICollectionViewExtensions.swift in Sources */,
+				9F92D112231E98C600BC0E57 /* DocumentsManager.swift in Sources */,
 				9FD29C56223C3C3900CC969A /* StringExtensions.swift in Sources */,
 				9FD29C4E223998BC00CC969A /* UIViewControllerExtensions.swift in Sources */,
 				9F75E478231183DD00488BBD /* ColorPickerCell.swift in Sources */,
