@@ -53,6 +53,16 @@ class TAGMEHelper {
                                         if isPlace {
                                             MapHelper.fetchMap(location: title, document: document, note: note)
                                         }
+                                        else {
+                                            let placeTerms = ["place", "city", "populated", "country", "capital", "location"]
+                                            for term in placeTerms {
+                                                if document.description?.lowercased().contains(term) ?? false {
+                                                    MapHelper.fetchMap(location: title, document: document, note: note)
+                                                    break
+                                                }
+                                            }
+                                            
+                                        }
                                     })
                                 }
                             }
