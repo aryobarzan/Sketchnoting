@@ -518,7 +518,12 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     @objc func handleConceptHighlightTap(_ sender: UITapGestureRecognizer) {
         if let conceptHighlightView = sender.view {
             if let documents = self.conceptHighlights[conceptHighlightView] {
-                showFilteredDocuments(documents: documents)
+                if self.items == documents {
+                    self.clearFilteredDocuments()
+                }
+                else {
+                    showFilteredDocuments(documents: documents)
+                }
                 if bookshelf.isHidden {
                     showBookshelf()
                 }
@@ -532,12 +537,10 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         }
     }
     @IBAction func conceptHighlightsSwitchTapped(_ sender: UISwitch) {
-        self.toggleConceptHighlight(isHidden: !sender.isOn)
         if sender.isOn {
-            if conceptHighlights.isEmpty {
                 setupConceptHighlights()
-            }
         }
+        self.toggleConceptHighlight(isHidden: !sender.isOn)
     }
     
     private func clearConceptHighlights() {
@@ -613,6 +616,8 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
             self.resetHelpLines()
             self.sketchnote.clear()
             self.clearConceptHighlights()
+            self.conceptHighlightsSwitch.setOn(false, animated: true)
+            self.topicsBadgeHub.setCount(0)
         }))
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
         self.present(alert, animated: true)
@@ -982,19 +987,32 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath as IndexPath) as! DocumentUICollectionViewCell
         
         // Use the outlet in our custom class to get a reference to the UILabel in the cell
-        cell.document = self.items[indexPath.item]
+        let document = self.items[indexPath.item]
+        cell.document = document
         cell.delegate = self
-        cell.titleLabel.text = self.items[indexPath.item].title
-        cell.typeLabel.text = self.items[indexPath.item].documentType.rawValue
+        cell.titleLabel.text = document.title
+        cell.typeLabel.text = document.documentType.rawValue
         cell.typeLabelView.backgroundColor = #colorLiteral(red: 0.3333333333, green: 0.4588235294, blue: 0.7568627451, alpha: 1)
         cell.typeLabelView.layer.cornerRadius = 11
-        if self.items[indexPath.item].previewImage == nil {
-            cell.abstractTextView.isHidden = false
-            cell.previewImage.isHidden = true
-            cell.abstractTextView.text = self.items[indexPath.item].description
+        if document.previewImage == nil {
+            if let tagmeDocument = document as? TAGMEDocument {
+                if tagmeDocument.mapImage != nil {
+                    cell.previewImage.image = tagmeDocument.mapImage
+                }
+            }
+            else if let spotlightDocument = document as? SpotlightDocument {
+                if spotlightDocument.mapImage != nil {
+                    cell.previewImage.image = spotlightDocument.mapImage
+                }
+            }
+            else {
+                cell.abstractTextView.isHidden = false
+                cell.previewImage.isHidden = true
+                cell.abstractTextView.text = document.description
+            }
         }
         else {
-            cell.previewImage.image = self.items[indexPath.item].previewImage
+            cell.previewImage.image = document.previewImage
             cell.abstractTextView.isHidden = true
             cell.previewImage.isHidden = false
         }
@@ -1118,6 +1136,14 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         if let description = document.description {
             self.setDetailDescription(text: description)
         }
+        if let mapImage = document.mapImage {
+            let mapImageView = UIImageView(image: mapImage)
+            documentDetailStackView.addArrangedSubview(mapImageView)
+            
+            let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(mapImageTapped(tapGestureRecognizer:)))
+            mapImageView.isUserInteractionEnabled = true
+            mapImageView.addGestureRecognizer(tapGestureRecognizer)
+        }
     }
     
     func process(document: BioPortalDocument) {
@@ -1169,8 +1195,8 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         self.tabBarController?.tabBar.isHidden = true
     }
     @objc func dismissFullscreenMapImage(_ sender: UITapGestureRecognizer) {
-        self.navigationController?.isNavigationBarHidden = false
-        self.tabBarController?.tabBar.isHidden = false
+        self.navigationController?.isNavigationBarHidden = true
+        self.tabBarController?.tabBar.isHidden = true
         sender.view?.removeFromSuperview()
     }
     @IBAction func documentDetailViewBrowseTapped(_ sender: UIButton) {

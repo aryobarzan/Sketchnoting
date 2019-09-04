@@ -24,31 +24,22 @@
                         <subviews>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="V13-sv-1Ta">
                                 <rect key="frame" x="0.0" y="0.0" width="250" height="320"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </imageView>
-                            <view userInteractionEnabled="NO" contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="IaP-fE-srS">
-                                <rect key="frame" x="0.0" y="284" width="125" height="36"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <subviews>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Creation Date" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="LaG-YG-vZi">
-                                        <rect key="frame" x="8" y="7" width="109" height="21"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                        <accessibility key="accessibilityConfiguration">
-                                            <accessibilityTraits key="traits" staticText="YES" notEnabled="YES"/>
-                                        </accessibility>
-                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                        <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                        <nil key="highlightedColor"/>
-                                    </label>
-                                </subviews>
-                                <color key="backgroundColor" red="0.37254901959999998" green="0.75686274509999996" blue="0.58039215690000001" alpha="0.84999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
-                            </view>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="lwh-05-4wr">
-                                <rect key="frame" x="0.0" y="0.0" width="250" height="36"/>
+                                <rect key="frame" x="0.0" y="284" width="250" height="36"/>
                                 <subviews>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Untitled" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="afa-LH-hYC">
+                                    <visualEffectView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="QbK-sV-2JS">
+                                        <rect key="frame" x="0.0" y="0.0" width="250" height="36"/>
+                                        <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="RVc-eS-SEx">
+                                            <rect key="frame" x="0.0" y="0.0" width="250" height="36"/>
+                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                        </view>
+                                        <blurEffect style="light"/>
+                                    </visualEffectView>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Untitled" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumScaleFactor="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="afa-LH-hYC">
                                         <rect key="frame" x="8" y="6" width="204" height="25"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                        <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <nil key="highlightedColor"/>
                                         <size key="shadowOffset" width="1" height="-1"/>
                                     </label>
@@ -58,21 +49,25 @@
                                             <constraint firstAttribute="height" constant="22" id="Iqh-hE-gGb"/>
                                             <constraint firstAttribute="width" constant="22" id="v6G-Q3-2xc"/>
                                         </constraints>
-                                        <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <color key="tintColor" red="0.33333333329999998" green="0.45882352939999999" blue="0.75686274509999996" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         <connections>
                                             <action selector="moreButtonTapped:" destination="gTV-IL-0wX" eventType="touchUpInside" id="6mc-Il-LfO"/>
                                         </connections>
                                     </button>
                                 </subviews>
-                                <color key="backgroundColor" red="0.26875244107853929" green="0.49985405115384529" blue="0.82210710104265361" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
                                     <constraint firstItem="afa-LH-hYC" firstAttribute="leading" secondItem="lwh-05-4wr" secondAttribute="leading" constant="8" id="3zU-Vf-Ymx"/>
+                                    <constraint firstAttribute="bottom" secondItem="QbK-sV-2JS" secondAttribute="bottom" id="9Pt-93-LhL"/>
+                                    <constraint firstAttribute="trailing" secondItem="QbK-sV-2JS" secondAttribute="trailing" id="AHK-Pp-Yh2"/>
                                     <constraint firstAttribute="trailing" secondItem="OiA-hP-dn8" secondAttribute="trailing" constant="8" id="BNk-RB-gr0"/>
                                     <constraint firstAttribute="bottom" secondItem="afa-LH-hYC" secondAttribute="bottom" constant="5" id="CkL-W7-yAQ"/>
+                                    <constraint firstItem="QbK-sV-2JS" firstAttribute="leading" secondItem="lwh-05-4wr" secondAttribute="leading" id="HBY-1e-sT4"/>
                                     <constraint firstItem="OiA-hP-dn8" firstAttribute="top" secondItem="lwh-05-4wr" secondAttribute="top" constant="7" id="L6A-zN-j4q"/>
                                     <constraint firstItem="afa-LH-hYC" firstAttribute="top" secondItem="lwh-05-4wr" secondAttribute="top" constant="6" id="XN3-0b-zJI"/>
                                     <constraint firstItem="OiA-hP-dn8" firstAttribute="leading" secondItem="afa-LH-hYC" secondAttribute="trailing" constant="8" id="bGH-GO-2Ic"/>
                                     <constraint firstAttribute="height" constant="36" id="p7W-za-U8u"/>
+                                    <constraint firstItem="QbK-sV-2JS" firstAttribute="top" secondItem="lwh-05-4wr" secondAttribute="top" id="rse-e3-vX1"/>
                                     <constraint firstAttribute="bottom" secondItem="OiA-hP-dn8" secondAttribute="bottom" constant="7" id="uSi-04-NYg"/>
                                 </constraints>
                             </view>
@@ -82,12 +77,12 @@
                             <constraint firstItem="lwh-05-4wr" firstAttribute="leading" secondItem="RM6-OH-sTu" secondAttribute="leading" id="6p2-ae-lSH"/>
                             <constraint firstAttribute="trailing" secondItem="V13-sv-1Ta" secondAttribute="trailing" id="9cJ-VG-jq7"/>
                             <constraint firstAttribute="height" constant="320" id="FJ6-Uk-jv2"/>
-                            <constraint firstItem="lwh-05-4wr" firstAttribute="top" secondItem="RM6-OH-sTu" secondAttribute="top" id="Pib-vT-D11"/>
                             <constraint firstAttribute="width" constant="250" id="Xca-ae-8vc"/>
                             <constraint firstItem="V13-sv-1Ta" firstAttribute="leading" secondItem="RM6-OH-sTu" secondAttribute="leading" id="ayg-PS-InK"/>
                             <constraint firstAttribute="bottom" secondItem="V13-sv-1Ta" secondAttribute="bottom" id="iCO-th-H92"/>
                             <constraint firstAttribute="trailing" secondItem="lwh-05-4wr" secondAttribute="trailing" id="pq8-EK-EhZ"/>
                             <constraint firstItem="V13-sv-1Ta" firstAttribute="top" secondItem="RM6-OH-sTu" secondAttribute="top" id="zTd-9V-vEA"/>
+                            <constraint firstAttribute="bottom" secondItem="lwh-05-4wr" secondAttribute="bottom" id="zkc-LQ-N0x"/>
                         </constraints>
                     </view>
                 </subviews>
@@ -101,8 +96,6 @@
             <viewLayoutGuide key="safeArea" id="ZTg-uK-7eu"/>
             <size key="customSize" width="220" height="320"/>
             <connections>
-                <outlet property="creationDateBackgroundView" destination="IaP-fE-srS" id="TEe-Jf-FKQ"/>
-                <outlet property="creationDateLabel" destination="LaG-YG-vZi" id="FI1-Ef-CPg"/>
                 <outlet property="imageView" destination="V13-sv-1Ta" id="Gn7-Pi-pdf"/>
                 <outlet property="moreButton" destination="OiA-hP-dn8" id="a1f-R1-KGX"/>
                 <outlet property="titleBackgroundView" destination="lwh-05-4wr" id="d9V-Ps-H1c"/>

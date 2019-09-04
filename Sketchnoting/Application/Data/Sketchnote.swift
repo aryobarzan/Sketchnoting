@@ -243,20 +243,35 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable {
         if documents == nil {
             documents = [Document]()
         }
-        if !documents!.contains(document) && checkDocument(document: document) {
+        if !documents!.contains(document) && isDocumentValid(document: document) {
             documents!.append(document)
             self.delegate?.sketchnoteHasNewDocument(sketchnote: self, document: document)
         }
     }
     
-    private func checkDocument(document: Document) -> Bool {
+    private func isDocumentValid(document: Document) -> Bool {
         if DocumentsManager.isHidden(document: document) {
             return false
         }
         if let doc = document as? BioPortalDocument {
-            if doc.description?.lowercased().contains("place") ?? false || doc.description?.lowercased().contains("populated") ?? false {
+            let blacklistedBioPortalTerms = ["place", "city", "populated", "country", "capital", "location"]
+            for term in blacklistedBioPortalTerms {
+                if doc.description?.lowercased().contains(term) ?? false {
+                    return false
+                }
+            }
+        }
+        var existingDocumentsToRemove = [Document]()
+        for doc in documents {
+            if doc.title.lowercased().contains(document.title.lowercased()) && doc.title.lowercased() != document.title.lowercased() {
                 return false
             }
+            else if document.title.lowercased().contains(doc.title.lowercased()) && document.title.lowercased() != doc.title.lowercased() {
+                existingDocumentsToRemove.append(doc)
+            }
+        }
+        for doc in existingDocumentsToRemove {
+            self.removeDocument(document: doc)
         }
         return true
     }
@@ -267,6 +282,7 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable {
         }
         if documents!.contains(document) {
             documents.removeAll{$0 == document}
+            self.delegate?.sketchnoteHasChanged(sketchnote: self)
         }
     }
     
@@ -274,6 +290,18 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable {
         if self.documents.contains(document) {
             document.previewImage = image
             self.delegate?.sketchnoteHasChanged(sketchnote: self)
+        }
+    }
+    func setDocumentMapImage(document: Document, image: UIImage) {
+        if self.documents.contains(document) {
+            if document is TAGMEDocument {
+                (document as! TAGMEDocument).mapImage = image
+                self.delegate?.sketchnoteHasChanged(sketchnote: self)
+            }
+            else if document is SpotlightDocument {
+                (document as! SpotlightDocument).mapImage = image
+                self.delegate?.sketchnoteHasChanged(sketchnote: self)
+            }
         }
     }
     // This function only stores a recognized drawing's label for a note. The drawing itself (i.e. an image) is not stored.

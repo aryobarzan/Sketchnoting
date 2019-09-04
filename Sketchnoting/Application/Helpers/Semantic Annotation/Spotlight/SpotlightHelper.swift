@@ -133,12 +133,12 @@ class SpotlightHelper {
                 
                 if let document = SpotlightDocument(title: concept, description: abstract, URL: conceptURI, type: .Spotlight, previewImage: thumbnail, rank: secondRankPercentage, label: label, types: types, wikiPageID: wikiPageID, latitude: latitude, longitude: longitude, mapImage: nil) {
                     if let latitude = latitude, let longitude = longitude {
-                        MapHelper.fetchMapImage(latitude: String(latitude), longitude: String(longitude), document: document)
+                        MapHelper.fetchMapImage(latitude: String(latitude), longitude: String(longitude), document: document, note: note)
                     }
                     else {
                         for type in types {
                             if type.lowercased().contains("place") || type.lowercased().contains("location") || type.lowercased().contains("event") {
-                                MapHelper.fetchMap(location: concept, document: document)
+                                MapHelper.fetchMap(location: concept, document: document, note: note)
                                 break
                             }
                         }

@@ -18,41 +18,26 @@
                         <rect key="frame" x="0.0" y="0.0" width="768" height="1024"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="FVD-G2-G9n">
-                                <rect key="frame" x="264" y="397" width="240" height="230"/>
-                                <subviews>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Sketchnoting" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cQw-q0-m8Y">
-                                        <rect key="frame" x="34.5" y="170" width="171" height="36"/>
-                                        <fontDescription key="fontDescription" style="UICTFontTextStyleTitle0"/>
-                                        <nil key="textColor"/>
-                                        <nil key="highlightedColor"/>
-                                    </label>
-                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Logo" translatesAutoresizingMaskIntoConstraints="NO" id="FbQ-ei-SRr">
-                                        <rect key="frame" x="46" y="19" width="148" height="143"/>
-                                        <constraints>
-                                            <constraint firstAttribute="height" constant="143" id="JJ1-xI-Akq"/>
-                                            <constraint firstAttribute="width" constant="148" id="Sb2-ol-yOp"/>
-                                        </constraints>
-                                    </imageView>
-                                </subviews>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Sketchnoting" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cQw-q0-m8Y">
+                                <rect key="frame" x="310" y="972.5" width="148.5" height="31.5"/>
+                                <fontDescription key="fontDescription" style="UICTFontTextStyleTitle1"/>
+                                <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Logo" translatesAutoresizingMaskIntoConstraints="NO" id="FbQ-ei-SRr">
+                                <rect key="frame" x="310" y="440.5" width="148" height="143"/>
                                 <constraints>
-                                    <constraint firstItem="FbQ-ei-SRr" firstAttribute="top" secondItem="FVD-G2-G9n" secondAttribute="top" constant="19" id="Gx4-TJ-yPh"/>
-                                    <constraint firstItem="cQw-q0-m8Y" firstAttribute="centerX" secondItem="FVD-G2-G9n" secondAttribute="centerX" id="Iag-zJ-Rca"/>
-                                    <constraint firstItem="cQw-q0-m8Y" firstAttribute="top" secondItem="FbQ-ei-SRr" secondAttribute="bottom" constant="8" id="Sqz-Iv-7Eb"/>
-                                    <constraint firstAttribute="width" constant="240" id="V7i-wG-22D"/>
-                                    <constraint firstItem="cQw-q0-m8Y" firstAttribute="centerX" secondItem="FVD-G2-G9n" secondAttribute="centerX" id="ngr-lw-hjC"/>
-                                    <constraint firstAttribute="trailing" secondItem="FbQ-ei-SRr" secondAttribute="trailing" constant="46" id="p5b-Vm-qUE"/>
-                                    <constraint firstItem="FbQ-ei-SRr" firstAttribute="leading" secondItem="FVD-G2-G9n" secondAttribute="leading" constant="46" id="pD5-8q-ZH6"/>
-                                    <constraint firstItem="cQw-q0-m8Y" firstAttribute="top" secondItem="FbQ-ei-SRr" secondAttribute="bottom" constant="8" id="vSn-76-E7n"/>
-                                    <constraint firstAttribute="height" constant="230" id="wEp-Rm-obG"/>
+                                    <constraint firstAttribute="height" constant="143" id="JJ1-xI-Akq"/>
+                                    <constraint firstAttribute="width" constant="148" id="Sb2-ol-yOp"/>
                                 </constraints>
-                            </view>
+                            </imageView>
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
-                            <constraint firstItem="FVD-G2-G9n" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="H9e-nM-Iah"/>
-                            <constraint firstItem="FVD-G2-G9n" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="mqA-Sb-I14"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="cQw-q0-m8Y" secondAttribute="bottom" constant="20" id="1Ya-Wc-vYG"/>
+                            <constraint firstItem="FbQ-ei-SRr" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="7Q3-gn-Zte"/>
+                            <constraint firstItem="cQw-q0-m8Y" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="jAw-Ii-9OF"/>
+                            <constraint firstItem="FbQ-ei-SRr" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="rZa-pn-gPU"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>

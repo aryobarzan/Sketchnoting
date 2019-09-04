@@ -391,14 +391,6 @@
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="jfx-Y6-PqO">
                                 <rect key="frame" x="0.0" y="70" width="768" height="95"/>
                                 <subviews>
-                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="0ol-NM-IfS">
-                                        <rect key="frame" x="555" y="5" width="2" height="36"/>
-                                        <color key="backgroundColor" white="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                        <constraints>
-                                            <constraint firstAttribute="width" constant="2" id="Mk3-gw-9iQ"/>
-                                            <constraint firstAttribute="height" constant="36" id="Nko-Kl-3VF"/>
-                                        </constraints>
-                                    </view>
                                     <view contentMode="scaleToFill" verticalHuggingPriority="249" translatesAutoresizingMaskIntoConstraints="NO" id="adN-EU-z1Z" customClass="LGButton" customModule="LGButton">
                                         <rect key="frame" x="565" y="5" width="195" height="36"/>
                                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -471,31 +463,19 @@
                                         <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                         <textInputTraits key="textInputTraits"/>
                                     </textField>
-                                    <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="x1S-iw-JgW">
-                                        <rect key="frame" x="555" y="49" width="2" height="36"/>
-                                        <color key="backgroundColor" white="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                        <constraints>
-                                            <constraint firstAttribute="width" constant="2" id="IdZ-eM-ceD"/>
-                                            <constraint firstAttribute="height" constant="36" id="vOK-ea-czz"/>
-                                        </constraints>
-                                    </view>
                                 </subviews>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
-                                    <constraint firstItem="x1S-iw-JgW" firstAttribute="leading" secondItem="uWo-fO-shM" secondAttribute="trailing" constant="8" id="2KQ-r9-eds"/>
-                                    <constraint firstItem="x1S-iw-JgW" firstAttribute="top" secondItem="jfx-Y6-PqO" secondAttribute="top" constant="49" id="2sD-br-swe"/>
                                     <constraint firstItem="kB5-c2-JaK" firstAttribute="top" secondItem="jfx-Y6-PqO" secondAttribute="top" constant="8" id="3Tg-Ac-of9"/>
                                     <constraint firstItem="uWo-fO-shM" firstAttribute="leading" secondItem="jfx-Y6-PqO" secondAttribute="leading" constant="8" id="41w-FI-HGh"/>
-                                    <constraint firstItem="jH0-gW-c2y" firstAttribute="leading" secondItem="x1S-iw-JgW" secondAttribute="trailing" constant="8" id="5Us-DF-AXB"/>
                                     <constraint firstAttribute="trailing" secondItem="jH0-gW-c2y" secondAttribute="trailing" constant="8" id="FlQ-DT-y45"/>
                                     <constraint firstItem="uWo-fO-shM" firstAttribute="top" secondItem="kB5-c2-JaK" secondAttribute="bottom" constant="10" id="Gaq-IR-bsB"/>
                                     <constraint firstAttribute="bottom" secondItem="uWo-fO-shM" secondAttribute="bottom" constant="10" id="O77-GS-aUp"/>
-                                    <constraint firstItem="0ol-NM-IfS" firstAttribute="top" secondItem="jfx-Y6-PqO" secondAttribute="top" constant="5" id="OGB-HC-Gmb"/>
                                     <constraint firstItem="jH0-gW-c2y" firstAttribute="top" secondItem="adN-EU-z1Z" secondAttribute="bottom" constant="8" id="Qk9-bU-Ydx"/>
                                     <constraint firstAttribute="trailing" secondItem="adN-EU-z1Z" secondAttribute="trailing" constant="8" id="aUu-fv-wgV"/>
-                                    <constraint firstItem="0ol-NM-IfS" firstAttribute="leading" secondItem="kB5-c2-JaK" secondAttribute="trailing" constant="8" id="agk-UO-aVy"/>
+                                    <constraint firstItem="jH0-gW-c2y" firstAttribute="leading" secondItem="uWo-fO-shM" secondAttribute="trailing" constant="18" id="gyD-Rq-eMZ"/>
                                     <constraint firstItem="adN-EU-z1Z" firstAttribute="top" secondItem="jfx-Y6-PqO" secondAttribute="top" constant="5" id="hF5-Oj-dAc"/>
-                                    <constraint firstItem="adN-EU-z1Z" firstAttribute="leading" secondItem="0ol-NM-IfS" secondAttribute="trailing" constant="8" id="vvP-NV-trV"/>
+                                    <constraint firstItem="adN-EU-z1Z" firstAttribute="leading" secondItem="kB5-c2-JaK" secondAttribute="trailing" constant="18" id="nch-Y7-5Ma"/>
                                     <constraint firstAttribute="height" constant="95" id="w0E-Qx-Z5u"/>
                                     <constraint firstItem="kB5-c2-JaK" firstAttribute="leading" secondItem="jfx-Y6-PqO" secondAttribute="leading" constant="8" id="zpF-57-rSO"/>
                                 </constraints>
@@ -586,7 +566,6 @@
                         <outlet property="searchField" destination="kB5-c2-JaK" id="bJo-4g-hfF"/>
                         <outlet property="searchFiltersScrollView" destination="uWo-fO-shM" id="WAw-JH-1fy"/>
                         <outlet property="searchPanel" destination="jfx-Y6-PqO" id="HhG-x4-33y"/>
-                        <outlet property="searchSeparator" destination="x1S-iw-JgW" id="bfs-nf-eCx"/>
                         <segue destination="lDo-DG-9fX" kind="show" identifier="NewSketchnote" id="ct4-u7-KZY"/>
                         <segue destination="lDo-DG-9fX" kind="show" identifier="EditSketchnote" id="lta-QB-BHq"/>
                     </connections>

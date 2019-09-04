@@ -65,9 +65,6 @@ class SpotlightDocument: Document {
                 }
             }
         }
-        
-        //let superencoder = container.superEncoder()
-        //try super.encode(to: superencoder)
     }
     
     required init(from decoder: Decoder) throws {

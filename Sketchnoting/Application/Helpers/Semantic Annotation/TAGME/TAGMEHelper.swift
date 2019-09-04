@@ -48,6 +48,12 @@ class TAGMEHelper {
                                 if let document = TAGMEDocument(title: title, description: abstract, URL: "tagme.d4science.org/tagme", type: .TAGME, previewImage: nil, spot: spot, categories: categories, wikiPageID: id) {
                                     note.addDocument(document: document)
                                     self.fetchWikipediaImage(note: note, document: document)
+                                    
+                                    KnowledgeGraphHelper.isPlace(name: title, completionHandler: { isPlace in
+                                        if isPlace {
+                                            MapHelper.fetchMap(location: title, document: document, note: note)
+                                        }
+                                    })
                                 }
                             }
                         }

@@ -11,8 +11,6 @@ import UIKit
 class NoteCollectionViewCell: UICollectionViewCell {
     @IBOutlet weak var imageView: UIImageView!
     @IBOutlet weak var moreButton: UIButton!
-    @IBOutlet weak var creationDateLabel: UILabel!
-    @IBOutlet weak var creationDateBackgroundView: UIView!
     @IBOutlet weak var titleBackgroundView: UIView!
     @IBOutlet weak var titleLabel: UILabel!
     
@@ -31,24 +29,12 @@ class NoteCollectionViewCell: UICollectionViewCell {
     }
     
     func setNote(note: Sketchnote) {
-        //self.layer.borderWidth = 1
-        //self.layer.borderColor = UIColor.black.cgColor
-        //creationDateBackgroundView.layer.cornerRadius = 18
-        //documentsBackgroundView.layer.cornerRadius = 18
-        //titleBackgroundView.layer.cornerRadius = 18
-        imageView.layer.borderWidth = 1
-        imageView.layer.borderColor = UIColor.black.cgColor
+        self.layer.borderWidth = 1
+        self.layer.borderColor = UIColor.black.cgColor
+        self.layer.cornerRadius = 4
         
         sketchnote = note
         imageView.image = sketchnote.image
-        
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
-        let dateAsString = formatter.string(from: sketchnote.creationDate)
-        let date = formatter.date(from: dateAsString)
-        formatter.dateFormat = "dd MMM yyyy"
-        let formattedDateAsString = formatter.string(from: date!)
-        self.creationDateLabel.text = formattedDateAsString
         
         titleLabel.text = note.getTitle()
         
@@ -56,7 +42,6 @@ class NoteCollectionViewCell: UICollectionViewCell {
             longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(self.longPressed(_:)))
             self.addGestureRecognizer(longPressGesture!)
         }
-        
     }
     
     @objc func longPressed(_ sender: UILongPressGestureRecognizer) {

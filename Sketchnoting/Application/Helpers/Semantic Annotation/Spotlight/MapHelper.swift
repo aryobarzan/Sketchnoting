@@ -10,7 +10,7 @@ import UIKit
 import Alamofire
 
 class MapHelper {
-    static func fetchMap(location: String, document: SpotlightDocument) {
+    static func fetchMap(location: String, document: Document, note: Sketchnote) {
         let parameters: Parameters = ["q": location, "maxRows": 1, "username": "aryo"]
         let headers: HTTPHeaders = [
                 "Accept": "application/json"
@@ -32,7 +32,7 @@ class MapHelper {
                 for res in resources! {
                     let latitude = res["lat"] as! String
                     let longitude = res["lng"] as! String
-                    self.fetchMapImage(latitude: latitude, longitude: longitude, document: document)
+                    self.fetchMapImage(latitude: latitude, longitude: longitude, document: document, note: note)
                 }
             }
             else {
@@ -40,21 +40,21 @@ class MapHelper {
             }
         }
     }
-    static func fetchMapImage(latitude: String, longitude: String, document: SpotlightDocument) {
+    static func fetchMapImage(latitude: String, longitude: String, document: Document, note: Sketchnote) {
         let url = URL(string: "https://www.mapquestapi.com/staticmap/v5/map?key=bAELaFV3A8vNwICyhbziI7tNeSfYdUvr&center=" + latitude + "," + longitude + "&size=800,600")
         
         DispatchQueue.global().async {
             if let data = try? Data(contentsOf: url!) {
                 DispatchQueue.main.async {
-                    print("got the image")
+                    print("Found map image for document.")
                     if let image = UIImage(data: data) {
-                        print("Setting image")
-                        document.mapImage = image
+                        print("Setting map image for document.")
+                        note.setDocumentMapImage(document: document, image: image)
                     }
                 }
             }
             else {
-                print("URL image not found.")
+                print("URL map image not found.")
             }
         }
     }

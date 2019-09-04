@@ -25,6 +25,7 @@
 		9F92D10E231E95B400BC0E57 /* UICollectionViewExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F92D10D231E95B400BC0E57 /* UICollectionViewExtensions.swift */; };
 		9F92D110231E97DF00BC0E57 /* UserDefaultsExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F92D10F231E97DF00BC0E57 /* UserDefaultsExtensions.swift */; };
 		9F92D112231E98C600BC0E57 /* DocumentsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F92D111231E98C600BC0E57 /* DocumentsManager.swift */; };
+		9F92D11523202B9900BC0E57 /* KnowledgeGraphHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F92D11423202B9900BC0E57 /* KnowledgeGraphHelper.swift */; };
 		9FA6238822CEA7FE007ED794 /* MapHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA6238722CEA7FE007ED794 /* MapHelper.swift */; };
 		9FA6238B22D37213007ED794 /* BioPortalHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA6238A22D37213007ED794 /* BioPortalHelper.swift */; };
 		9FA6238D22D38AEE007ED794 /* SpotlightHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA6238C22D38AEE007ED794 /* SpotlightHelper.swift */; };
@@ -93,6 +94,7 @@
 		9F92D10D231E95B400BC0E57 /* UICollectionViewExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UICollectionViewExtensions.swift; sourceTree = "<group>"; };
 		9F92D10F231E97DF00BC0E57 /* UserDefaultsExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsExtensions.swift; sourceTree = "<group>"; };
 		9F92D111231E98C600BC0E57 /* DocumentsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentsManager.swift; sourceTree = "<group>"; };
+		9F92D11423202B9900BC0E57 /* KnowledgeGraphHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KnowledgeGraphHelper.swift; sourceTree = "<group>"; };
 		9FA6238722CEA7FE007ED794 /* MapHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapHelper.swift; sourceTree = "<group>"; };
 		9FA6238A22D37213007ED794 /* BioPortalHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BioPortalHelper.swift; sourceTree = "<group>"; };
 		9FA6238C22D38AEE007ED794 /* SpotlightHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotlightHelper.swift; sourceTree = "<group>"; };
@@ -243,9 +245,18 @@
 			path = TAGME;
 			sourceTree = "<group>";
 		};
+		9F92D11323202B8600BC0E57 /* Knowledge Graph */ = {
+			isa = PBXGroup;
+			children = (
+				9F92D11423202B9900BC0E57 /* KnowledgeGraphHelper.swift */,
+			);
+			path = "Knowledge Graph";
+			sourceTree = "<group>";
+		};
 		9FA6238922D371F1007ED794 /* Semantic Annotation */ = {
 			isa = PBXGroup;
 			children = (
+				9F92D11323202B8600BC0E57 /* Knowledge Graph */,
 				9F75E4802314108500488BBD /* TAGME */,
 				9FA6239922DE3ACD007ED794 /* BioPortal */,
 				9FA6239822DE3AC0007ED794 /* Spotlight */,
@@ -600,6 +611,7 @@
 				9FD29C42223861E100CC969A /* ActionButton.swift in Sources */,
 				9F75E44F230D848200488BBD /* SettingsViewController.swift in Sources */,
 				9F75E484231419FA00488BBD /* TAGMEDocument.swift in Sources */,
+				9F92D11523202B9900BC0E57 /* KnowledgeGraphHelper.swift in Sources */,
 				9F75E44C230C583200488BBD /* NoteCollectionViewCell.swift in Sources */,
 				9F5D0FC8229CBC4100BCA451 /* NotesManager.swift in Sources */,
 				9FA6238F22DCD3AD007ED794 /* DocumentUICollectionViewCell.swift in Sources */,
