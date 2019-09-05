@@ -110,19 +110,8 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
                     }
                     
                 }
-                    // If the app does not manage to reload the user's drawn strokes (for any reason), the app simply loads a screenshot of the note's last state as a background for the note's canvas on the page. The latter case should preferably never occur.
-                else if sketchnote?.image != nil {
-                    let imageView = UIImageView(image: sketchnote!.image!)
-                    sketchView.addSubview(imageView)
-                    imageView.translatesAutoresizingMaskIntoConstraints = false
-                    NSLayoutConstraint.activate([
-                        imageView.topAnchor.constraint(equalTo: sketchView.topAnchor),
-                        imageView.leadingAnchor.constraint(equalTo: sketchView.leadingAnchor),
-                        imageView.trailingAnchor.constraint(equalTo: sketchView.trailingAnchor),
-                        imageView.bottomAnchor.constraint(equalTo: sketchView.bottomAnchor),
-                        imageView.widthAnchor.constraint(equalTo: sketchView.widthAnchor),
-                        imageView.heightAnchor.constraint(equalTo: sketchView.heightAnchor)
-                        ])
+                else {
+                    print("Failed to reload paths.")
                 }
             }
             if let documents = sketchnote.documents {
@@ -395,17 +384,12 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
                             documentTitle = spot.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
                         }
                     }
-                    
-                    var levenshteinThreshold = 2
-                    if documentTitle.count > 5 {
-                        levenshteinThreshold = 5
-                    }
                     if textData.original.trimmingCharacters(in: .whitespacesAndNewlines).lowercased().contains(documentTitle) {
                         for block in textData.visionTextWrapper.blocks {
                             for line in block.lines {
                                 for element in line.elements {
                                     let elementText = element.text.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-                                    if elementText == documentTitle || elementText.levenshtein(documentTitle) <= levenshteinThreshold {
+                                    if elementText == documentTitle {
                                         let scaledFrame = createScaledFrame(featureFrame: element.frame, imageSize: sketchView.frame.size)
                                         let conceptHighlightView = UIView(frame: scaledFrame)
                                         conceptHighlightView.layer.borderWidth = 2
@@ -617,6 +601,12 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
             self.sketchnote.clear()
             self.clearConceptHighlights()
             self.conceptHighlightsSwitch.setOn(false, animated: true)
+            self.items = self.sketchnote.documents
+            if self.bookshelfUpdateTimer != nil {
+                self.bookshelfUpdateTimer?.invalidate()
+                self.bookshelfUpdateTimer = nil
+            }
+            self.documentsCollectionView.reloadData()
             self.topicsBadgeHub.setCount(0)
         }))
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
@@ -697,9 +687,22 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     let handwritingRecognizer = HandwritingRecognizer()
     
     private func processHandwritingRecognition() {
-        var newPenTools = [PenTool]()
+        var tools = [SketchTool]()
         for pathObject in self.sketchView.pathArray {
-            if let penTool = pathObject as? PenTool {
+            if let eraserTool = pathObject as? EraserTool {
+                let path = eraserTool.path
+                var isDrawing = false
+                for drawingView in self.drawingViews {
+                    if drawingView.frame.contains(path.boundingBox) {
+                        isDrawing = true
+                        break
+                    }
+                }
+                if !isDrawing {
+                    tools.append(eraserTool)
+                }
+            }
+            else if let penTool = pathObject as? PenTool {
                 let path = penTool.path
                 var isDrawing = false
                 for drawingView in self.drawingViews {
@@ -709,13 +712,13 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
                     }
                 }
                 if !isDrawing {
-                    newPenTools.append(penTool)
+                    tools.append(penTool)
                 }
             }
             else {
             }
         }
-        let (image, pathBoundingBoxes) = self.generateHandwritingRecognitionImage(note: sketchnote, penTools: newPenTools)
+        let (image, pathBoundingBoxes) = self.generateHandwritingRecognitionImage(note: sketchnote, tools: tools)
         handwritingRecognizer.recognize(spellcheck: false, image: image, pathBoundingBoxes: pathBoundingBoxes) { (success, textData) in
             if success {
                 if let textData = textData {
@@ -732,41 +735,64 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
             }
         }
     }
-    private func generateHandwritingRecognitionImage(note: Sketchnote, penTools: [PenTool]) -> (UIImage, [CGRect]) {
-        var newPenTools = [PenTool]()
+    private func generateHandwritingRecognitionImage(note: Sketchnote, tools: [SketchTool]) -> (UIImage, [CGRect]) {
+        var newTools = [SketchTool]()
         if !self.resetHandwritingRecognition {
             self.resetHandwritingRecognition = false
             if let textDataArray = note.textDataArray {
-                for penTool in penTools {
+                for tool in tools {
                     var alreadyRecognized = false
-                    for textData in textDataArray {
-                        if textData.paths.contains(penTool.path.boundingBox) {
-                            alreadyRecognized = true
-                            break
+                    if let t = tool as? EraserTool {
+                        for textData in textDataArray {
+                            if textData.paths.contains(t.path.boundingBox) {
+                                alreadyRecognized = true
+                                break
+                            }
+                        }
+                        if !alreadyRecognized {
+                            newTools.append(t)
                         }
                     }
-                    if !alreadyRecognized {
-                        newPenTools.append(penTool)
+                    else if let t = tool as? PenTool {
+                        for textData in textDataArray {
+                            if textData.paths.contains(t.path.boundingBox) {
+                                alreadyRecognized = true
+                                break
+                            }
+                        }
+                        if !alreadyRecognized {
+                            newTools.append(t)
+                        }
                     }
                 }
             }
         }
         else {
             self.sketchnote.textDataArray = [TextData]()
-            newPenTools = penTools
+            newTools = tools
         }
         
         let canvas = UIView(frame: sketchView.frame)
         canvas.backgroundColor = .black
         var newPathsBoundingBoxes = [CGRect]()
-        for penTool in newPenTools {
-            newPathsBoundingBoxes.append(penTool.path.boundingBox)
-            let newPath = penTool.path.copy(strokingWithWidth: penTool.lineWidth, lineCap: .round, lineJoin: .round, miterLimit: 0)
-            let layer = CAShapeLayer()
-            layer.path = newPath
-            layer.strokeColor = UIColor.white.cgColor
-            layer.fillColor = UIColor.white.cgColor
-            canvas.layer.addSublayer(layer)
+        for t in newTools {
+            if let tool = t as? EraserTool {
+                newPathsBoundingBoxes.append(tool.path.boundingBox)
+                tool.lineAlpha = 0
+                let newPath = tool.path.copy(strokingWithWidth: tool.lineWidth, lineCap: .round, lineJoin: .round, miterLimit: 0)
+                let layer = CAShapeLayer()
+                layer.path = newPath
+                canvas.layer.addSublayer(layer)
+            }
+            else if let tool = t as? PenTool {
+                newPathsBoundingBoxes.append(tool.path.boundingBox)
+                let newPath = tool.path.copy(strokingWithWidth: tool.lineWidth, lineCap: .round, lineJoin: .round, miterLimit: 0)
+                let layer = CAShapeLayer()
+                layer.path = newPath
+                layer.strokeColor = UIColor.white.cgColor
+                layer.fillColor = UIColor.white.cgColor
+                canvas.layer.addSublayer(layer)
+            }
         }
         return (canvas.asImage(), newPathsBoundingBoxes)
     }
@@ -778,16 +804,16 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         self.items = [Document]()
         self.documentsCollectionView.reloadData()
         
+        self.tagmeHelper.fetch(text: text, note: self.sketchnote)
         self.spotlightHelper.fetch(text: text, note: self.sketchnote)
         self.bioportalHelper.fetch(text: text, note: self.sketchnote)
         self.bioportalHelper.fetchCHEBI(text: text, note: self.sketchnote)
-        self.tagmeHelper.fetch(text: text, note: self.sketchnote)
     }
     
     private func showBookshelf() {
         self.bookshelf.isHidden = false
         if self.isBookshelfDraggedOut {
-            self.bookshelfLeftConstraint.constant -= 300
+            self.bookshelfLeftConstraint.constant -= 500
             UIView.animate(withDuration: 0.25, delay: 0, options: UIView.AnimationOptions.curveEaseIn, animations: {
                 self.view.layoutIfNeeded()
             }, completion: { (ended) in
@@ -901,9 +927,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         if let touch = touches.first{
-            
             let touchStart = touch.location(in: self.view)
-            print(touchStart)
             
             resizeRect.topTouch = false
             resizeRect.leftTouch = false
@@ -924,7 +948,10 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
             let deltaX = currentTouchPoint.x - previousTouchPoint.x
             
             if resizeRect.leftTouch {
-                bookshelfLeftConstraint.constant += deltaX
+                if (bookshelfLeftConstraint.constant + deltaX) >= 5 {
+                    bookshelfLeftConstraint.constant += deltaX
+                }
+                
                 
                 if UIScreen.main.bounds.maxX - currentTouchPoint.x <= 100 {
                     bookshelf.alpha = 0.4
@@ -946,7 +973,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
             let currentTouchPoint = touch.location(in: self.view)
             
             if resizeRect.leftTouch {
-                if UIScreen.main.bounds.maxX - currentTouchPoint.x <= 150 {
+                if UIScreen.main.bounds.maxX - currentTouchPoint.x <= 200 {
                     bookshelfLeftConstraint.constant += 150
                     self.isBookshelfDraggedOut = true
                     UIView.animate(withDuration: 0.25, delay: 0, options: UIView.AnimationOptions.curveEaseIn, animations: {
@@ -1028,31 +1055,79 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         // handle tap events
-        print("You selected cell #\(indexPath.item)!")
         showDocumentDetail(document: self.items[indexPath.item])
     }
     
-    func displayInBookshelf(documents: [Document]) { // Filtering
+    func displayInBookshelf(documents: [Document]) { // Deprecated
         self.items = documents
         self.documentsCollectionView.reloadData()
     }
     
-    func sketchnoteHasNewDocument(sketchnote: Sketchnote, document: Document) { // Sketchnote delegate
-        self.items = self.sketchnote.documents
+    var bookshelfUpdateTimer: Timer?
+    private func startBookshelfUpdateTimer() {
+        if bookshelfUpdateTimer != nil {
+            bookshelfUpdateTimer!.invalidate()
+            bookshelfUpdateTimer = nil
+            print("Bookshelf Update Timer reset.")
+            
+        }
+        bookshelfUpdateTimer = Timer.scheduledTimer(timeInterval: 3.5, target: self, selector: #selector(onBookshelfUpdateTimerFires), userInfo: nil, repeats: false)
+        print("Bookshelf Update Timer started.")
+    }
+    @objc func onBookshelfUpdateTimerFires()
+    {
+        bookshelfUpdateTimer?.invalidate()
+        bookshelfUpdateTimer = nil
+        self.clearFilteredDocumentsButton.isHidden = true
+        self.items = sketchnote.documents
+        self.documentsCollectionView.refreshLayout()
         self.documentsCollectionView.reloadData()
+    }
+    
+    func sketchnoteHasNewDocument(sketchnote: Sketchnote, document: Document) { // Sketchnote delegate
+        self.startBookshelfUpdateTimer()
+        CATransaction.begin()
+        CATransaction.setDisableActions(true)
+        self.items.append(document)
+        let indexPath = IndexPath(row: self.items.count - 1, section: 0)
+        self.documentsCollectionView.insertItems(at: [indexPath])
+        CATransaction.commit()
+        self.documentsCollectionView.scrollToItem(at: indexPath, at: .bottom , animated: true)
         self.topicsBadgeHub.setCount(self.sketchnote.documents.count)
-        self.documentsCollectionView.scrollToBottom(animated: true)
+    }
+    
+    func sketchnoteHasRemovedDocument(sketchnote: Sketchnote, document: Document) {
+        self.startBookshelfUpdateTimer()
+        /*CATransaction.begin()
+        CATransaction.setDisableActions(true)
+        print(2)
+        for row in 0..<documentsCollectionView.numberOfItems(inSection: 0){
+            let indexPath = NSIndexPath(row:row, section:0)
+            if let cell = documentsCollectionView.cellForItem(at: indexPath as IndexPath) as? DocumentUICollectionViewCell {
+                if cell.document == document {
+                    
+                    self.documentsCollectionView.deleteItems(at: [indexPath as IndexPath])
+                    
+                    self.topicsBadgeHub.setCount(self.sketchnote.documents.count)
+                    break
+                }
+            }
+        }
+        CATransaction.commit()*/
+    }
+    
+    func sketchnoteDocumentHasChanged(sketchnote: Sketchnote, document: Document) {
+        self.startBookshelfUpdateTimer()
     }
     
     func sketchnoteHasChanged(sketchnote: Sketchnote) {
-        self.documentsCollectionView.reloadData()
     }
     
     func documentCollectionViewCellHideTapped(document: Document, sender: DocumentUICollectionViewCell) {
         self.sketchnote.removeDocument(document: document)
+        DocumentsManager.hide(document: document)
         self.items = self.sketchnote.documents
         self.documentsCollectionView.reloadData()
-        DocumentsManager.hide(document: document)
     }
     
     //MARK: Document Detail View
@@ -1095,7 +1170,13 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         }
         documentDetailView.isHidden = true
         documentsCollectionView.isHidden = false
-        self.displayInBookshelf(documents: documents)
+        self.items = documents
+        self.documentsCollectionView.refreshLayout()
+        self.documentsCollectionView.reloadData()
+        if bookshelfUpdateTimer != nil {
+            bookshelfUpdateTimer?.invalidate()
+            bookshelfUpdateTimer = nil
+        }
         clearFilteredDocumentsButton.isHidden = false
     }
     @IBAction func clearFilteredDocumentsTapped(_ sender: UIButton) {
@@ -1176,6 +1257,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         let descriptionLabel = UILabel(frame: documentDetailStackView.frame)
         descriptionLabel.text = text
         descriptionLabel.numberOfLines = 50
+        descriptionLabel.textColor = .white
         documentDetailStackView.addArrangedSubview(descriptionLabel)
     }
     
@@ -1465,5 +1547,23 @@ extension String {
             print("invalid regex: \(error.localizedDescription)")
             return []
         }
+    }
+}
+extension UICollectionView{
+    func refreshLayout() {
+        let oldLayout = collectionViewLayout as! UICollectionViewFlowLayout
+        let newLayout = UICollectionViewFlowLayout()
+        newLayout.estimatedItemSize = oldLayout.estimatedItemSize
+        newLayout.footerReferenceSize = oldLayout.footerReferenceSize
+        newLayout.headerReferenceSize = oldLayout.headerReferenceSize
+        newLayout.itemSize = oldLayout.itemSize
+        newLayout.minimumInteritemSpacing = oldLayout.minimumInteritemSpacing
+        newLayout.minimumLineSpacing = oldLayout.minimumLineSpacing
+        newLayout.scrollDirection = oldLayout.scrollDirection
+        newLayout.sectionFootersPinToVisibleBounds = oldLayout.sectionFootersPinToVisibleBounds
+        newLayout.sectionHeadersPinToVisibleBounds = oldLayout.sectionHeadersPinToVisibleBounds
+        newLayout.sectionInset = oldLayout.sectionInset
+        newLayout.sectionInsetReference = oldLayout.sectionInsetReference
+        collectionViewLayout = newLayout
     }
 }

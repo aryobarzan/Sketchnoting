@@ -12,6 +12,7 @@ import SwiftyJSON
 
 class KnowledgeGraphHelper {
     static let apiKey: String = "AIzaSyAY_tyXihgPFbOktnv9RxP7HFmP-dshf98"
+    
     public static func isPlace(name: String, completionHandler:@escaping (Bool) -> ()) {
         let parameters: Parameters = ["query": name, "key": apiKey, "limit": 1]
         let headers: HTTPHeaders = [
@@ -37,6 +38,42 @@ class KnowledgeGraphHelper {
                 }
             }
             completionHandler(false)
+        }
+    }
+    
+    public static func fetchWikipediaImage(note: Sketchnote, document: Document) {
+        let parameters: Parameters = ["query": document.title, "key": apiKey, "limit": 1]
+        let headers: HTTPHeaders = [
+            "Accept": "application/json"
+        ]
+        AF.request("https://kgsearch.googleapis.com/v1/entities:search", parameters: parameters, headers: headers).responseJSON { response in
+            let responseResult = response.result
+            var json = JSON()
+            switch responseResult {
+            case .success(let res):
+                json = JSON(res)
+            case .failure(let error):
+                print(error.localizedDescription)
+                return
+            }
+            print(json)
+            if let imageString = json["itemListElement"].array?[0]["result"]["image"]["contentUrl"].string {
+                DispatchQueue.global().async {
+                    if let url = URL(string: imageString) {
+                        if let data = try? Data(contentsOf: url) {
+                            DispatchQueue.main.async {
+                                print("Found wikipedia image via Knowledge Graph for TAGME document.")
+                                if let image = UIImage(data: data) {
+                                    note.setDocumentPreviewImage(document: document, image: image)
+                                }
+                            }
+                        }
+                        else {
+                            print("URL Wikipedia image not found via Knowledge Graph for TAGME document.")
+                        }
+                    }
+                }
+            }
         }
     }
 }

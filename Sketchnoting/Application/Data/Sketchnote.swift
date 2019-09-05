@@ -10,6 +10,8 @@ import UIKit
 
 protocol SketchnoteDelegate {
     func sketchnoteHasNewDocument(sketchnote: Sketchnote, document: Document)
+    func sketchnoteHasRemovedDocument(sketchnote: Sketchnote, document: Document)
+    func sketchnoteDocumentHasChanged(sketchnote: Sketchnote, document: Document)
     func sketchnoteHasChanged(sketchnote: Sketchnote)
 }
 
@@ -254,7 +256,7 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable {
             return false
         }
         if let doc = document as? BioPortalDocument {
-            let blacklistedBioPortalTerms = ["place", "city", "populated", "country", "capital", "location"]
+            let blacklistedBioPortalTerms = ["place", "city", "populated", "country", "capital", "location", "state", "town"]
             for term in blacklistedBioPortalTerms {
                 if doc.description?.lowercased().contains(term) ?? false {
                     return false
@@ -280,27 +282,27 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable {
         if documents == nil {
             documents = [Document]()
         }
-        if documents!.contains(document) {
+        else if documents!.contains(document) {
             documents.removeAll{$0 == document}
-            self.delegate?.sketchnoteHasChanged(sketchnote: self)
+            self.delegate?.sketchnoteHasRemovedDocument(sketchnote: self, document: document)
         }
     }
     
     func setDocumentPreviewImage(document: Document, image: UIImage) {
         if self.documents.contains(document) {
             document.previewImage = image
-            self.delegate?.sketchnoteHasChanged(sketchnote: self)
+            self.delegate?.sketchnoteDocumentHasChanged(sketchnote: self, document: document)
         }
     }
     func setDocumentMapImage(document: Document, image: UIImage) {
         if self.documents.contains(document) {
             if document is TAGMEDocument {
                 (document as! TAGMEDocument).mapImage = image
-                self.delegate?.sketchnoteHasChanged(sketchnote: self)
+                self.delegate?.sketchnoteDocumentHasChanged(sketchnote: self, document: document)
             }
             else if document is SpotlightDocument {
                 (document as! SpotlightDocument).mapImage = image
-                self.delegate?.sketchnoteHasChanged(sketchnote: self)
+                self.delegate?.sketchnoteDocumentHasChanged(sketchnote: self, document: document)
             }
         }
     }

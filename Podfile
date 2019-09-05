@@ -2,7 +2,7 @@
 # platform :ios, '9.0'
 use_frameworks!
 target 'Sketchnoting' do
-  pod 'Alamofire', '~> 5.0.0-beta.3'
+  pod 'Alamofire', '~> 5.0.0-rc.1'
   pod 'LGButton'
   pod 'Firebase/Core'
   pod 'Firebase/MLVision'

@@ -29,7 +29,7 @@ enum DocumentType: String, Codable {
 
 class Document: Codable, Visitable, Equatable {
     static func == (lhs: Document, rhs: Document) -> Bool {
-        if lhs.title == rhs.title {
+        if lhs.title == rhs.title && lhs.documentType == rhs.documentType {
             return true
         }
         return false
@@ -67,13 +67,14 @@ class Document: Codable, Visitable, Equatable {
         try container.encode(URL, forKey: .URL)
         try container.encode(documentType, forKey: .documentType)
         if let previewImage = previewImage {
-            print("Encoding image")
             if let pngData = previewImage.pngData() {
+                print("Encoding document's PNG preview image.")
                 let strBase64 = pngData.base64EncodedString(options: .lineLength64Characters)
                 try container.encode(strBase64, forKey: .previewImage)
             }
             else  {
                 if let jpgData = previewImage.jpegData(compressionQuality: 1) {
+                    print("Encoding document's JPEG preview image.")
                     let strBase64 = jpgData.base64EncodedString(options: .lineLength64Characters)
                     try container.encode(strBase64, forKey: .previewImage)
                 }

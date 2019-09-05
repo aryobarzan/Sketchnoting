@@ -86,6 +86,8 @@ class TAGMEHelper {
                 json = JSON(res)
             case .failure(let error):
                 print(error.localizedDescription)
+                KnowledgeGraphHelper.fetchWikipediaImage(note: note, document: document)
+                return
             }
             if let wikiTitle = json["query"]["pages"][String(format: "%.0f", document.wikiPageID!)]["title"].string {
                 let parameters: Parameters = ["action": "query", "prop": "pageimages", "format": "json", "piprop": "original", "titles": wikiTitle]
@@ -100,24 +102,30 @@ class TAGMEHelper {
                         json = JSON(res)
                     case .failure(let error):
                         print(error.localizedDescription)
+                        KnowledgeGraphHelper.fetchWikipediaImage(note: note, document: document)
+                        return
                     }
+                    var successful = false
                     if let imageURL = json["query"]["pages"][String(format: "%.0f", document.wikiPageID!)]["original"]["source"].string {
                         DispatchQueue.global().async {
                             if let url = URL(string: imageURL) {
                                 if let data = try? Data(contentsOf: url) {
                                     DispatchQueue.main.async {
-                                        print("Found image for TAGME document.")
+                                        print("Found wikipedia image for TAGME document.")
                                         if let image = UIImage(data: data) {
-                                            print("Setting image for TAGME document.")
                                             note.setDocumentPreviewImage(document: document, image: image)
+                                            successful = true
                                         }
                                     }
                                 }
                                 else {
-                                    print("URL image not found for TAGME document.")
+                                    print("URL Wikipedia image not found for TAGME document.")
                                 }
                             }
                         }
+                    }
+                    if !successful {
+                        KnowledgeGraphHelper.fetchWikipediaImage(note: note, document: document)
                     }
                 }
             }
