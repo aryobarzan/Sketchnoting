@@ -384,26 +384,52 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable {
     
     // MARK: Search
     var matchesSearch = false
-    var currentSearchFilter : String?
-    public func applySearchFilters(filters: [String]) -> Bool {
+    var currentSearchFilter : SearchFilter?
+    public func applySearchFilters(filters: [SearchFilter]) -> Bool {
         matchesSearch = false
+        var matches = 0
         for filter in filters {
-            if (self.title.lowercased().contains(filter) || self.getText().lowercased().contains(filter)) || (self.drawings?.contains(filter) ?? false) {
-                return true
-            }
-            else {
+            switch filter.type {
+            case .All:
+                if (self.title.lowercased().contains(filter.term) || self.getText().lowercased().contains(filter.term)) || (self.drawings?.contains(filter.term) ?? false) {
+                    matches += 1
+                }
+                else {
+                    currentSearchFilter = filter
+                    if let documents = self.documents {
+                        for doc in documents {
+                            doc.accept(visitor: self)
+                            if matchesSearch {
+                                matches += 1
+                            }
+                        }
+                    }
+                }
+                break
+            case .Text:
+                if (self.title.lowercased().contains(filter.term) || self.getText().lowercased().contains(filter.term)) {
+                    matches += 1
+                }
+                break
+            case .Drawing:
+                if self.drawings?.contains(filter.term) ?? false {
+                    matches += 1
+                }
+                break
+            case .Document:
                 currentSearchFilter = filter
                 if let documents = self.documents {
                     for doc in documents {
                         doc.accept(visitor: self)
                         if matchesSearch {
-                            return true
+                            matches += 1
                         }
                     }
                 }
+                break
             }
         }
-        return false
+        return matches == filters.count
     }
     func process(document: Document) {
         let _ = self.processBaseDocumentSearch(document: document)
@@ -412,13 +438,13 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable {
     func process(document: SpotlightDocument) {
         if !processBaseDocumentSearch(document: document) {
             if let label = document.label {
-                if label.lowercased().contains(currentSearchFilter!) {
+                if label.lowercased().contains(currentSearchFilter!.term) {
                     matchesSearch = true
                 }
             }
             if let types = document.types {
                 for type in types {
-                    if type.lowercased().contains(currentSearchFilter!) {
+                    if type.lowercased().contains(currentSearchFilter!.term) {
                         matchesSearch = true
                         break
                     }
@@ -429,13 +455,13 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable {
     func process(document: TAGMEDocument) {
         if !processBaseDocumentSearch(document: document) {
             if let spot = document.spot {
-                if spot.lowercased().contains(currentSearchFilter!) {
+                if spot.lowercased().contains(currentSearchFilter!.term) {
                     matchesSearch = true
                 }
             }
             if let categories = document.categories {
                 for category in categories {
-                    if category.lowercased().contains(currentSearchFilter!) {
+                    if category.lowercased().contains(currentSearchFilter!.term) {
                         matchesSearch = true
                         break
                     }
@@ -453,12 +479,12 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable {
     }
     
     private func processBaseDocumentSearch(document: Document) -> Bool {
-        if document.title.lowercased().contains(currentSearchFilter!) {
+        if document.title.lowercased().contains(currentSearchFilter!.term) {
             matchesSearch = true
             return true
         }
         else if let description = document.description {
-            if description.lowercased().contains(currentSearchFilter!) {
+            if description.lowercased().contains(currentSearchFilter!.term) {
                 matchesSearch = true
                 return true
             }

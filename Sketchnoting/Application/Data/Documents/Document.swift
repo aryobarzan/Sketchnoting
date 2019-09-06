@@ -67,17 +67,15 @@ class Document: Codable, Visitable, Equatable {
         try container.encode(URL, forKey: .URL)
         try container.encode(documentType, forKey: .documentType)
         if let previewImage = previewImage {
-            if let pngData = previewImage.pngData() {
+            if let jpgData = previewImage.jpegData(compressionQuality: 1) {
+                print("Encoding document's JPEG preview image.")
+                let strBase64 = jpgData.base64EncodedString(options: .lineLength64Characters)
+                try container.encode(strBase64, forKey: .previewImage)
+            }
+            else if let pngData = previewImage.pngData() {
                 print("Encoding document's PNG preview image.")
                 let strBase64 = pngData.base64EncodedString(options: .lineLength64Characters)
                 try container.encode(strBase64, forKey: .previewImage)
-            }
-            else  {
-                if let jpgData = previewImage.jpegData(compressionQuality: 1) {
-                    print("Encoding document's JPEG preview image.")
-                    let strBase64 = jpgData.base64EncodedString(options: .lineLength64Characters)
-                    try container.encode(strBase64, forKey: .previewImage)
-                }
             }
         }
     }

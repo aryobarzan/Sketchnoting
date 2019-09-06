@@ -26,9 +26,9 @@
 		9F92D110231E97DF00BC0E57 /* UserDefaultsExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F92D10F231E97DF00BC0E57 /* UserDefaultsExtensions.swift */; };
 		9F92D112231E98C600BC0E57 /* DocumentsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F92D111231E98C600BC0E57 /* DocumentsManager.swift */; };
 		9F92D11523202B9900BC0E57 /* KnowledgeGraphHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F92D11423202B9900BC0E57 /* KnowledgeGraphHelper.swift */; };
-		9F92D11A23217CFA00BC0E57 /* SearchTermView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9F92D11923217CFA00BC0E57 /* SearchTermView.xib */; };
-		9F92D11C23217D0500BC0E57 /* SearchTermView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F92D11B23217D0500BC0E57 /* SearchTermView.swift */; };
-		9F92D11F23217FFF00BC0E57 /* SearchType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F92D11E23217FFF00BC0E57 /* SearchType.swift */; };
+		9F92D11A23217CFA00BC0E57 /* SearchFilterView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9F92D11923217CFA00BC0E57 /* SearchFilterView.xib */; };
+		9F92D11C23217D0500BC0E57 /* SearchFilterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F92D11B23217D0500BC0E57 /* SearchFilterView.swift */; };
+		9F92D11F23217FFF00BC0E57 /* SearchFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F92D11E23217FFF00BC0E57 /* SearchFilter.swift */; };
 		9FA6238822CEA7FE007ED794 /* MapHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA6238722CEA7FE007ED794 /* MapHelper.swift */; };
 		9FA6238B22D37213007ED794 /* BioPortalHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA6238A22D37213007ED794 /* BioPortalHelper.swift */; };
 		9FA6238D22D38AEE007ED794 /* SpotlightHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA6238C22D38AEE007ED794 /* SpotlightHelper.swift */; };
@@ -98,9 +98,9 @@
 		9F92D10F231E97DF00BC0E57 /* UserDefaultsExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsExtensions.swift; sourceTree = "<group>"; };
 		9F92D111231E98C600BC0E57 /* DocumentsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentsManager.swift; sourceTree = "<group>"; };
 		9F92D11423202B9900BC0E57 /* KnowledgeGraphHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KnowledgeGraphHelper.swift; sourceTree = "<group>"; };
-		9F92D11923217CFA00BC0E57 /* SearchTermView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SearchTermView.xib; sourceTree = "<group>"; };
-		9F92D11B23217D0500BC0E57 /* SearchTermView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchTermView.swift; sourceTree = "<group>"; };
-		9F92D11E23217FFF00BC0E57 /* SearchType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchType.swift; sourceTree = "<group>"; };
+		9F92D11923217CFA00BC0E57 /* SearchFilterView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SearchFilterView.xib; sourceTree = "<group>"; };
+		9F92D11B23217D0500BC0E57 /* SearchFilterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchFilterView.swift; sourceTree = "<group>"; };
+		9F92D11E23217FFF00BC0E57 /* SearchFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchFilter.swift; sourceTree = "<group>"; };
 		9FA6238722CEA7FE007ED794 /* MapHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapHelper.swift; sourceTree = "<group>"; };
 		9FA6238A22D37213007ED794 /* BioPortalHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BioPortalHelper.swift; sourceTree = "<group>"; };
 		9FA6238C22D38AEE007ED794 /* SpotlightHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotlightHelper.swift; sourceTree = "<group>"; };
@@ -263,8 +263,8 @@
 		9F92D11623217C8300BC0E57 /* Search */ = {
 			isa = PBXGroup;
 			children = (
-				9F92D11923217CFA00BC0E57 /* SearchTermView.xib */,
-				9F92D11B23217D0500BC0E57 /* SearchTermView.swift */,
+				9F92D11923217CFA00BC0E57 /* SearchFilterView.xib */,
+				9F92D11B23217D0500BC0E57 /* SearchFilterView.swift */,
 			);
 			path = Search;
 			sourceTree = "<group>";
@@ -272,7 +272,7 @@
 		9F92D11D23217FEC00BC0E57 /* Search */ = {
 			isa = PBXGroup;
 			children = (
-				9F92D11E23217FFF00BC0E57 /* SearchType.swift */,
+				9F92D11E23217FFF00BC0E57 /* SearchFilter.swift */,
 			);
 			path = Search;
 			sourceTree = "<group>";
@@ -532,7 +532,7 @@
 				9FD29BB12220525000CC969A /* LaunchScreen.storyboard in Resources */,
 				9FD29BAE2220525000CC969A /* Assets.xcassets in Resources */,
 				9FD29BAC2220524D00CC969A /* Main.storyboard in Resources */,
-				9F92D11A23217CFA00BC0E57 /* SearchTermView.xib in Resources */,
+				9F92D11A23217CFA00BC0E57 /* SearchFilterView.xib in Resources */,
 				9FD29C6622431C0000CC969A /* labels.txt in Resources */,
 				9F75E44D230C583200488BBD /* NoteCollectionViewCell.xib in Resources */,
 				9FC788F2225CEC230074BD16 /* DrawingSearchView.xib in Resources */,
@@ -617,7 +617,7 @@
 				9FD29C202236EA2800CC969A /* UIImage+fill.swift in Sources */,
 				9FD29C40223861E100CC969A /* ExpandableButtonView.swift in Sources */,
 				9F92D110231E97DF00BC0E57 /* UserDefaultsExtensions.swift in Sources */,
-				9F92D11F23217FFF00BC0E57 /* SearchType.swift in Sources */,
+				9F92D11F23217FFF00BC0E57 /* SearchFilter.swift in Sources */,
 				9FA6239522DE3741007ED794 /* BioPortalDocument.swift in Sources */,
 				9FD29BA92220524D00CC969A /* ViewController.swift in Sources */,
 				9F75E47D231183E500488BBD /* ColorPickerViewDelegate.swift in Sources */,
@@ -630,7 +630,7 @@
 				9F92D10E231E95B400BC0E57 /* UICollectionViewExtensions.swift in Sources */,
 				9F92D112231E98C600BC0E57 /* DocumentsManager.swift in Sources */,
 				9FD29C56223C3C3900CC969A /* StringExtensions.swift in Sources */,
-				9F92D11C23217D0500BC0E57 /* SearchTermView.swift in Sources */,
+				9F92D11C23217D0500BC0E57 /* SearchFilterView.swift in Sources */,
 				9FD29C4E223998BC00CC969A /* UIViewControllerExtensions.swift in Sources */,
 				9F75E478231183DD00488BBD /* ColorPickerCell.swift in Sources */,
 				9FD29C472239588E00CC969A /* UIViewExtensions.swift in Sources */,

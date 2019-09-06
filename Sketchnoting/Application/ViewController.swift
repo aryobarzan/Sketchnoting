@@ -24,7 +24,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     @IBOutlet var searchField: UITextField!
     @IBOutlet var clearSearchButton: LGButton!
     @IBOutlet var searchFiltersScrollView: UIScrollView!
-    @IBOutlet var searchSeparator: UIView!
     var searchFiltersStackView = UIStackView()
     
     @IBOutlet var searchPanel: UIView!
@@ -36,9 +35,11 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     var drawingSearchView: DrawingSearchView!
     
     // Each search term entered is stored.
-    var searchFilters = [String]()
+    var searchFilters = [SearchFilter]()
     // Each search term is displayed as a button, which when tapped, removes the search term.
-    var searchFilterButtons = [UIButton]()
+    var searchFilterViews = [SearchFilterView]()
+    
+    var notes: [Sketchnote]!
     
     // This properties are related to note-sharing.
     // Each device is given an ID (peerID).
@@ -97,16 +98,20 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         drawingSearchView.setSearchAction(for: .touchUpInside) {
             self.searchByDrawing()
         }
- 
+        
         noteCollectionView.register(UINib(nibName: "NoteCollectionViewCell", bundle: nil), forCellWithReuseIdentifier: "NoteCollectionViewCell")
         if let notes = NoteLoader.loadSketchnotes() {
-            items = notes
-            noteCollectionView.reloadData()
+            self.notes = notes
+        }
+        else {
+            self.notes = [Sketchnote]()
         }
         
         if SettingsManager.noteSortingByNewest() {
             self.noteSortingButton.titleLabel?.text = "Newest First"
         }
+        self.items = self.notes
+        noteCollectionView.reloadData()
         
         //Drawing Recognition - This loads the labels for the drawing recognition's CoreML model.
         if let path = Bundle.main.path(forResource: "labels", ofType: "txt") {
@@ -188,9 +193,11 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     }
 
     @IBAction func newNoteTapped(_ sender: LGButton) {
+        clearSearch()
         let newNote = Sketchnote(image: nil, relatedDocuments: nil, drawings: nil)!
         newNote.save()
-        self.items.append(newNote)
+        self.notes.append(newNote)
+        self.items = self.notes
         
         selectedSketchnote = newNote
         performSegue(withIdentifier: "NewSketchnote", sender: self)
@@ -223,29 +230,16 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     private func performSearch() {
         if !searchField.text!.isEmpty {
             let searchString = searchField.text!.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-            if !searchFilters.contains(searchString) {
-                let filterButton = UIButton(frame: CGRect(x: 0, y: 0, width: 75, height: 30))
-                filterButton.backgroundColor = .gray
-                filterButton.setTitle(searchString, for: .normal)
-                searchFiltersStackView.insertArrangedSubview(filterButton, at: 0)
-                searchFilterButtons.append(filterButton)
-                filterButton.isUserInteractionEnabled = true
-                let filterTapGesture = UITapGestureRecognizer(target: self, action: #selector(self.handleFilterTap(_:)))
-                filterTapGesture.cancelsTouchesInView = false
-                filterButton.addGestureRecognizer(filterTapGesture)
-                
-                searchFilters.append(searchString)
-            }
+            createSearchFilter(term: searchString, type: .All)
             clearSearchButton.isHidden = false
-            searchSeparator.isHidden = false
             searchField.text = ""
         }
-        if items.count == 0 {
+        if self.notes.count == 0 || searchFilters.count == 0 {
             self.clearSearch()
         }
         else {
             var filteredNotes = [Sketchnote]()
-            for note in items {
+            for note in self.notes {
                 if note.applySearchFilters(filters: searchFilters) {
                     filteredNotes.append(note)
                 }
@@ -255,18 +249,32 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         }
     }
     
+    private func createSearchFilter(term: String, type: SearchType) {
+        let termTrimmed = term.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        let filter = SearchFilter(term: termTrimmed, type: type)
+        if !searchFilters.contains(filter) {
+            let filterView = SearchFilterView(filter: filter)
+            filterView.setContent(filter: filter)
+            searchFiltersStackView.insertArrangedSubview(filterView, at: 0)
+            searchFilterViews.append(filterView)
+            filterView.isUserInteractionEnabled = true
+            let filterTapGesture = UITapGestureRecognizer(target: self, action: #selector(self.handleFilterTap(_:)))
+            filterTapGesture.cancelsTouchesInView = false
+            filterView.addGestureRecognizer(filterTapGesture)
+            
+            searchFilters.append(filter)
+        }
+    }
+    
     // By pressing a search term, the search term is removed and the application re-runs the search with the remaining search terms.
     @objc func handleFilterTap(_ sender: UITapGestureRecognizer) {
-        let filterButton = sender.view as! UIButton
-        if searchFilters.contains(filterButton.title(for: .normal) ?? "") {
-            for i in 0..<searchFilters.count {
-                if searchFilters[i] == filterButton.title(for: .normal) {
-                    searchFilters.remove(at: i)
-                    break
-                }
+        let filterView = sender.view as! SearchFilterView
+        if filterView.searchFilter != nil {
+            if searchFilters.contains(filterView.searchFilter!) {
+                searchFilters.removeAll{$0 == filterView.searchFilter!}
             }
         }
-        filterButton.removeFromSuperview()
+        filterView.removeFromSuperview()
         self.performSearch()
     }
     
@@ -280,19 +288,15 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         clearSearch()
     }
     private func clearSearch() {
-        searchFilters = [String]()
-        for searchFilterButton in searchFilterButtons {
-            searchFilterButton.removeFromSuperview()
+        searchFilters = [SearchFilter]()
+        for view in searchFilterViews {
+            view.removeFromSuperview()
         }
-        searchFilterButtons = [UIButton]()
+        searchFilterViews = [SearchFilterView]()
         clearSearchButton.isHidden = true
         searchField.text = ""
-        searchSeparator.isHidden = true
         
-        self.items = [Sketchnote]()
-        if let notes = NoteLoader.loadSketchnotes() {
-            self.items = notes
-        }
+        self.items = self.notes
         noteCollectionView.reloadData()
     }
     
@@ -313,7 +317,8 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
                 for (label, score) in top5 {
                     if score > 0.5 {
                         self.hideDrawingSearchView()
-                        self.searchField.text = label
+                        createSearchFilter(term: label, type: .Drawing)
+                        self.searchField.text = ""
                         self.performSearch()
                         found = true
                         break
@@ -499,7 +504,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         print("You selected note view cell #\(indexPath.item)!")
     }
     
-    func noteCollectionViewCellMoreTapped(sketchnote: Sketchnote, sender: NoteCollectionViewCell) {
+    func noteCollectionViewCellMoreTapped(sketchnote: Sketchnote, sender: UIButton, cell: NoteCollectionViewCell) {
         print("More button of note view cell tapped.")
         let popMenu = PopMenuViewController(sourceView: sender, actions: [PopMenuAction](), appearance: nil)
         popMenu.appearance.popMenuBackgroundStyle = .blurred(.dark)
@@ -512,7 +517,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
                 
                 sketchnote.setTitle(title: title ?? "Untitled")
                 sketchnote.save()
-                sender.titleLabel.text = sketchnote.getTitle()
+                cell.titleLabel.text = sketchnote.getTitle()
             }
             let cancelAction = UIAlertAction(title: "Cancel", style: .cancel) { (_) in }
             
@@ -534,7 +539,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         let sendAction = PopMenuDefaultAction(title: "Send", color: .white, didSelect: { action in
             self.sketchnoteToShare = sketchnote
             self.pathArrayToShare = sketchnote.paths
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 self.joinSession()
             }
         })
@@ -542,12 +547,13 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         if sketchnote.image != nil {
             let shareAction = PopMenuDefaultAction(title: "Share", color: .white, didSelect: { action in
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    self.generatePDF(noteViewCell: sender)
+                    self.generatePDF(noteViewCell: cell)
                 }
             })
             popMenu.addAction(shareAction)
         }
         let action = PopMenuDefaultAction(title: "Delete", color: .red, didSelect: { action in
+            self.notes.removeAll{$0 == sketchnote}
             self.items.removeAll{$0 == sketchnote}
             sketchnote.delete()
             self.noteCollectionView.reloadData()

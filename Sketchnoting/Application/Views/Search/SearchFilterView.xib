@@ -10,11 +10,11 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
-        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="SearchTermView" customModule="Sketchnoting" customModuleProvider="target">
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="SearchFilterView" customModule="Sketchnoting" customModuleProvider="target">
             <connections>
                 <outlet property="closeButton" destination="Ae6-iV-Jir" id="oTr-4z-Bgi"/>
                 <outlet property="closeButtonView" destination="RE9-fP-Hxf" id="sQQ-Eq-zbp"/>
-                <outlet property="contentView" destination="iCT-YC-dEo" id="4II-99-iy6"/>
+                <outlet property="contentView" destination="iN0-l3-epB" id="Ots-Eg-Md1"/>
                 <outlet property="mainLabel" destination="DZM-IF-tut" id="QOh-MH-aAn"/>
                 <outlet property="subLabel" destination="g9b-EE-MEA" id="HAb-Ac-UpR"/>
             </connections>
@@ -24,11 +24,11 @@
             <rect key="frame" x="0.0" y="0.0" width="220" height="55"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="iCT-YC-dEo" customClass="SearchTermView" customModule="Sketchnoting" customModuleProvider="target">
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="iCT-YC-dEo">
                     <rect key="frame" x="0.0" y="0.0" width="220" height="55"/>
                     <subviews>
                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="RE9-fP-Hxf">
-                            <rect key="frame" x="5" y="5" width="30" height="30"/>
+                            <rect key="frame" x="5" y="12.5" width="30" height="30"/>
                             <subviews>
                                 <visualEffectView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="wPc-On-YnY">
                                     <rect key="frame" x="0.0" y="0.0" width="30" height="30"/>
@@ -36,20 +36,18 @@
                                         <rect key="frame" x="0.0" y="0.0" width="30" height="30"/>
                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     </view>
-                                    <blurEffect style="dark"/>
+                                    <blurEffect style="extraLight"/>
                                 </visualEffectView>
                                 <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Ae6-iV-Jir">
                                     <rect key="frame" x="0.0" y="0.0" width="30" height="30"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                     <state key="normal" title="X">
-                                        <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <color key="titleColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                     </state>
-                                    <connections>
-                                        <action selector="closeButtonTapped:" destination="-1" eventType="touchUpInside" id="Ava-9H-szM"/>
-                                    </connections>
                                 </button>
                             </subviews>
-                            <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            <color key="tintColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             <constraints>
                                 <constraint firstAttribute="trailing" secondItem="wPc-On-YnY" secondAttribute="trailing" id="CgJ-dV-2rt"/>
                                 <constraint firstAttribute="width" constant="30" id="HeD-ir-z9h"/>
@@ -59,27 +57,28 @@
                                 <constraint firstItem="wPc-On-YnY" firstAttribute="leading" secondItem="RE9-fP-Hxf" secondAttribute="leading" id="yEL-jf-sCC"/>
                             </constraints>
                         </view>
-                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="DZM-IF-tut">
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="DZM-IF-tut">
                             <rect key="frame" x="43" y="10" width="172" height="21"/>
                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                            <nil key="textColor"/>
+                            <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             <nil key="highlightedColor"/>
                         </label>
                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="g9b-EE-MEA">
-                            <rect key="frame" x="173" y="34" width="42" height="21"/>
-                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                            <nil key="textColor"/>
+                            <rect key="frame" x="178" y="37" width="37" height="18"/>
+                            <fontDescription key="fontDescription" type="italicSystem" pointSize="15"/>
+                            <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             <nil key="highlightedColor"/>
                         </label>
                     </subviews>
-                    <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    <color key="backgroundColor" white="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     <constraints>
                         <constraint firstItem="DZM-IF-tut" firstAttribute="top" secondItem="iCT-YC-dEo" secondAttribute="top" constant="10" id="64Q-DY-0Ai"/>
                         <constraint firstAttribute="trailing" secondItem="g9b-EE-MEA" secondAttribute="trailing" constant="5" id="CCe-d0-igs"/>
                         <constraint firstAttribute="trailing" secondItem="DZM-IF-tut" secondAttribute="trailing" constant="5" id="CLA-Ra-xAa"/>
                         <constraint firstItem="RE9-fP-Hxf" firstAttribute="leading" secondItem="iCT-YC-dEo" secondAttribute="leading" constant="5" id="RIy-zL-ZMs"/>
-                        <constraint firstItem="RE9-fP-Hxf" firstAttribute="top" secondItem="iCT-YC-dEo" secondAttribute="top" constant="5" id="fw6-G5-LfA"/>
+                        <constraint firstItem="RE9-fP-Hxf" firstAttribute="centerY" secondItem="iCT-YC-dEo" secondAttribute="centerY" id="efj-XD-UMh"/>
                         <constraint firstItem="DZM-IF-tut" firstAttribute="leading" secondItem="RE9-fP-Hxf" secondAttribute="trailing" constant="8" id="qn6-v4-3BY"/>
+                        <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="220" id="uvm-Fg-7bg"/>
                         <constraint firstAttribute="bottom" secondItem="g9b-EE-MEA" secondAttribute="bottom" id="zBn-2Y-rJk"/>
                     </constraints>
                 </view>

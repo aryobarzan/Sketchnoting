@@ -41,15 +41,13 @@ class TAGMEDocument: Document {
             try container.encode(strBase64, forKey: .mapImage)
         }
         if let mapImage = mapImage {
-            if let pngData = mapImage.pngData() {
-                let strBase64 = pngData.base64EncodedString(options: .lineLength64Characters)
+            if let jpgData = mapImage.jpegData(compressionQuality: 1) {
+                let strBase64 = jpgData.base64EncodedString(options: .lineLength64Characters)
                 try container.encode(strBase64, forKey: .mapImage)
             }
-            else  {
-                if let jpgData = mapImage.jpegData(compressionQuality: 1) {
-                    let strBase64 = jpgData.base64EncodedString(options: .lineLength64Characters)
-                    try container.encode(strBase64, forKey: .mapImage)
-                }
+            else if let pngData = mapImage.pngData() {
+                let strBase64 = pngData.base64EncodedString(options: .lineLength64Characters)
+                try container.encode(strBase64, forKey: .mapImage)
             }
         }
     }

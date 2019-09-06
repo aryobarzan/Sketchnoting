@@ -53,9 +53,9 @@ class NoteCollectionViewCell: UICollectionViewCell {
     }
     
     private func moreButtonTrigger() {
-        delegate.noteCollectionViewCellMoreTapped(sketchnote: sketchnote, sender: self)
+        delegate.noteCollectionViewCellMoreTapped(sketchnote: sketchnote, sender: moreButton, cell: self)
     }
 }
 protocol NoteCollectionViewCellDelegate {
-    func noteCollectionViewCellMoreTapped(sketchnote: Sketchnote, sender: NoteCollectionViewCell)
+    func noteCollectionViewCellMoreTapped(sketchnote: Sketchnote, sender: UIButton, cell: NoteCollectionViewCell)
 }

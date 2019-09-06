@@ -35,7 +35,6 @@ class DrawingSearchView: UIView {
         self.widthAnchor.constraint(equalToConstant: 490).isActive = true
         self.heightAnchor.constraint(equalToConstant: 600).isActive = true
         contentView.fixInView(self)
-        
         sketchView.backgroundColor = .black
         sketchView.drawTool = .pen
         sketchView.lineColor = .white
