@@ -21,7 +21,7 @@ class BioPortalHelper {
         AF.request("http://data.bioontology.org/recommender", parameters: parameters, headers: headers).responseJSON { response in
             switch response.result {
             case .success(let value):
-                print("BioPortal Recommender successful call.")
+                print("BioPortal Recommender: API call successful.")
                 let json = JSON(value)
                 
                 if json.count > 0 {
@@ -43,7 +43,6 @@ class BioPortalHelper {
     }
     
     private func annotate(text: String, ontology: String, note: Sketchnote) {
-        print(ontology)
         let parameters: Parameters = ["apikey": apiKey, "text": text, "ontologies": ontology, "include": "prefLabel,definition"]
         let headers: HTTPHeaders = [
             "Accept": "application/json"
@@ -51,10 +50,9 @@ class BioPortalHelper {
         AF.request("http://data.bioontology.org/annotator", parameters: parameters, headers: headers).responseJSON { response in
             switch response.result {
             case .success(let value):
-                print("BioPortal Annotator successful call.")
+                print("BioPortal: API call successful.")
                 
                 let json = JSON(value)
-                
                 if json.count > 0 {
                     var classes = [String: String]() // annotation : ID
                     var documents = [Document]()
@@ -65,9 +63,9 @@ class BioPortalHelper {
                                 
                                 if ontology.lowercased() == "chebi" {
                                      let document = CHEBIDocument(title: annotation, description: definition, URL: "https://bioportal.bioontology.org/search?utf8=%E2%9C%93&query=" + (prefLabel.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) ?? "https://bioportal.bioontology.org/"), type: .Chemistry, previewImage: nil, prefLabel: prefLabel, definition: definition, moleculeImage: nil)
-                                    self.fetchMoleculeImageForCHEBI(document: document, id: id, note: note)
                                     if let document = document {
                                         documents.append(document)
+                                        self.fetchMoleculeImageForCHEBI(document: document, id: id, note: note)
                                     }
                                 }
                                 else {
@@ -82,8 +80,11 @@ class BioPortalHelper {
                             }
                         }
                     }
-                    for doc in documents {
-                        note.addDocument(document: doc)
+                    DispatchQueue.main.async {
+                        for doc in documents {
+                            print("BioPortal/CHEBI: new document added - \(doc.title)")
+                            note.addDocument(document: doc)
+                        }
                     }
                 }
             case .failure(let error):
@@ -103,12 +104,10 @@ class BioPortalHelper {
                 DispatchQueue.global().async {
                     if let data = try? Data(contentsOf: url!) {
                         DispatchQueue.main.async {
-                            print("got the CHEBI image")
                             if let image = UIImage(data: data) {
-                                print("Setting CHEBI image")
-                                document.previewImage = image
-                                document.moleculeImage = image
-                                note.delegate?.sketchnoteHasChanged(sketchnote: note)
+                                print("CHEBI: molecule image added - \(document.title)")
+                                note.setDocumentPreviewImage(document: document, image: image)
+                                note.setDocumentMoleculeImage(document: document, image: image)
                             }
                         }
                     }

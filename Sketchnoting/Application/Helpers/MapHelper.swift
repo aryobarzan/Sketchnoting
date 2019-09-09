@@ -23,8 +23,9 @@ class MapHelper {
                 json = res as! [String: Any]
             case .failure(let error):
                 print(error.localizedDescription)
+                return
             }
-            print("JSON: \(json)")
+            print("GeoNames Coordinates: API call successful.")
                 
             let result = json
             let resources = result["geonames"] as? [[String: Any]]
@@ -36,7 +37,7 @@ class MapHelper {
                 }
             }
             else {
-                print("geonames didn't work")
+                print("GeoNames Coordinates: API call failed.")
             }
         }
     }
@@ -46,9 +47,8 @@ class MapHelper {
         DispatchQueue.global().async {
             if let data = try? Data(contentsOf: url!) {
                 DispatchQueue.main.async {
-                    print("Found map image for document.")
                     if let image = UIImage(data: data) {
-                        print("Setting map image for document.")
+                        print("MapQuest: Map image added - \(document.title)")
                         note.setDocumentMapImage(document: document, image: image)
                     }
                 }

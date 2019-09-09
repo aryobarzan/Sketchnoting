@@ -14,11 +14,7 @@ class DocumentUICollectionViewCell: UICollectionViewCell {
     var document: Document!
     
     @IBOutlet var titleLabel: UILabel!
-    @IBOutlet var typeLabel: UILabel!
     @IBOutlet var previewImage: UIImageView!
-    @IBOutlet var topView: UIView!
-    @IBOutlet var abstractTextView: UITextView!
-    @IBOutlet var typeLabelView: UIView!
     @IBOutlet var hideButton: UIButton!
     @IBAction func hideTapped(_ sender: UIButton) {
         delegate.documentCollectionViewCellHideTapped(document: document, sender: self)

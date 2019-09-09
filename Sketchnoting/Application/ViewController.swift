@@ -25,6 +25,8 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     @IBOutlet var clearSearchButton: LGButton!
     @IBOutlet var searchFiltersScrollView: UIScrollView!
     var searchFiltersStackView = UIStackView()
+    @IBOutlet var searchTypeButton: UIButton!
+    private var searchType = SearchType.All
     
     @IBOutlet var searchPanel: UIView!
     @IBOutlet weak var noteSortingButton: UIButton!
@@ -153,6 +155,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
                 print("Could not retrieve side menu navigation controller.")
                 return
             }
+            sideMenuNavigationController.setNavigationBarHidden(true, animated: false)
             SideMenuManager.default.leftMenuNavigationController = sideMenuNavigationController
             SideMenuManager.default.addScreenEdgePanGesturesToPresent(toView: self.navigationController!.view, forMenu: .left)
             break
@@ -251,7 +254,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     
     private func createSearchFilter(term: String, type: SearchType) {
         let termTrimmed = term.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-        let filter = SearchFilter(term: termTrimmed, type: type)
+        let filter = SearchFilter(term: termTrimmed, type: self.searchType)
         if !searchFilters.contains(filter) {
             let filterView = SearchFilterView(filter: filter)
             filterView.setContent(filter: filter)
@@ -298,6 +301,35 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         
         self.items = self.notes
         noteCollectionView.reloadData()
+    }
+    @IBAction func searchTypeButtonTapped(_ sender: UIButton) {
+        let popMenu = PopMenuViewController(sourceView: sender, actions: [PopMenuAction](), appearance: nil)
+        popMenu.appearance.popMenuBackgroundStyle = .blurred(.dark)
+        let allAction = PopMenuDefaultAction(title: "All", didSelect: { action in
+            self.searchTypeButton.setTitle("All ↓", for: .normal)
+            self.searchType = .All
+            
+        })
+        popMenu.addAction(allAction)
+        let textAction = PopMenuDefaultAction(title: "Text", didSelect: { action in
+            self.searchTypeButton.setTitle("Text ↓", for: .normal)
+            self.searchType = .Text
+            
+        })
+        popMenu.addAction(textAction)
+        let drawingAction = PopMenuDefaultAction(title: "Drawing", didSelect: { action in
+            self.searchTypeButton.setTitle("Drawing ↓", for: .normal)
+            self.searchType = .Drawing
+            
+        })
+        popMenu.addAction(drawingAction)
+        let documentAction = PopMenuDefaultAction(title: "Document", didSelect: { action in
+            self.searchTypeButton.setTitle("Document ↓", for: .normal)
+            self.searchType = .Document
+            
+        })
+        popMenu.addAction(documentAction)
+        self.present(popMenu, animated: true, completion: nil)
     }
     
     // Drawing recognition

@@ -292,7 +292,6 @@
 			isa = PBXGroup;
 			children = (
 				9FA6238C22D38AEE007ED794 /* SpotlightHelper.swift */,
-				9FA6238722CEA7FE007ED794 /* MapHelper.swift */,
 			);
 			path = Spotlight;
 			sourceTree = "<group>";
@@ -461,6 +460,7 @@
 			children = (
 				9FA6239F22E66D92007ED794 /* Handwriting Recognition */,
 				9FA6238922D371F1007ED794 /* Semantic Annotation */,
+				9FA6238722CEA7FE007ED794 /* MapHelper.swift */,
 				9F75E450230D8AE100488BBD /* SettingsManager.swift */,
 			);
 			path = Helpers;

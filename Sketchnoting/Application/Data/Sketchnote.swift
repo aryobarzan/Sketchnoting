@@ -166,15 +166,17 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable {
             print("Encoding failed for note " + id + ".")
         }
     }
-    private func savePaths() {
-        let DocumentsDirectory = FileManager().urls(for: .documentDirectory, in: .userDomainMask).first!
-        let ArchiveURLPathArray = DocumentsDirectory.appendingPathComponent("NotePaths-" + self.id)
-        if let encoded = try? NSKeyedArchiver.archivedData(withRootObject: self.paths, requiringSecureCoding: false) {
-            try! encoded.write(to: ArchiveURLPathArray)
-            print("Note " + id + " paths saved.")
-        }
-        else {
-            print("Failed to encode paths for note " + id + ".")
+    public func savePaths() {
+        if self.paths != nil {
+            let DocumentsDirectory = FileManager().urls(for: .documentDirectory, in: .userDomainMask).first!
+            let ArchiveURLPathArray = DocumentsDirectory.appendingPathComponent("NotePaths-" + self.id)
+            if let encoded = try? NSKeyedArchiver.archivedData(withRootObject: self.paths as Any, requiringSecureCoding: false) {
+                try! encoded.write(to: ArchiveURLPathArray)
+                print("Note " + id + " paths saved.")
+            }
+            else {
+                print("Failed to encode paths for note " + id + ".")
+            }
         }
     }
     private func loadPaths() {
@@ -186,10 +188,10 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable {
         print("Paths for note " + id + " loaded.")
         self.paths = data
     }
-    private func saveTextDataArray() {
+    public func saveTextDataArray() {
         let DocumentsDirectory = FileManager().urls(for: .documentDirectory, in: .userDomainMask).first!
         let ArchiveURLPathArray = DocumentsDirectory.appendingPathComponent("NoteTextDataArray-" + self.id)
-        if let encoded = try? NSKeyedArchiver.archivedData(withRootObject: self.textDataArray, requiringSecureCoding: false) {
+        if let encoded = try? NSKeyedArchiver.archivedData(withRootObject: self.textDataArray as Any, requiringSecureCoding: false) {
             try! encoded.write(to: ArchiveURLPathArray)
             print("Note " + id + " text data array saved.")
         }
@@ -304,6 +306,12 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable {
                 (document as! SpotlightDocument).mapImage = image
                 self.delegate?.sketchnoteDocumentHasChanged(sketchnote: self, document: document)
             }
+        }
+    }
+    func setDocumentMoleculeImage(document: CHEBIDocument, image: UIImage) {
+        if self.documents.contains(document) {
+            document.moleculeImage = image
+            self.delegate?.sketchnoteDocumentHasChanged(sketchnote: self, document: document)
         }
     }
     // This function only stores a recognized drawing's label for a note. The drawing itself (i.e. an image) is not stored.

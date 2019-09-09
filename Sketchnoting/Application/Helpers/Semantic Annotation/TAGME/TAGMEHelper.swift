@@ -20,6 +20,7 @@ class TAGMEHelper {
             let headers: HTTPHeaders = [
                 "Accept": "application/json"
             ]
+
             AF.request("http://tagme.d4science.org/tagme/tag", parameters: parameters, headers: headers).responseJSON { response in
                 let responseResult = response.result
                 var json = JSON()
@@ -28,10 +29,11 @@ class TAGMEHelper {
                     json = JSON(res)
                 case .failure(let error):
                     print(error.localizedDescription)
+                    return
                 }
-                print("JSON: \(json)")
-                var results = [String: String]()
+                print("TAGME: API call successful.")
                 
+                var results = [String: String]()
                 if let annotations = json["annotations"].array {
                     for annotation in annotations {
                         if let spot = annotation["spot"].string, let id = annotation["id"].double, let abstract = annotation["abstract"].string, let title = annotation["title"].string {
@@ -46,15 +48,23 @@ class TAGMEHelper {
                                     }
                                 }
                                 if let document = TAGMEDocument(title: title, description: abstract, URL: "tagme.d4science.org/tagme", type: .TAGME, previewImage: nil, spot: spot, categories: categories, wikiPageID: id) {
-                                    note.addDocument(document: document)
-                                    self.fetchWikipediaImage(note: note, document: document)
+                                    DispatchQueue.main.async {
+                                        print("TAGME: new document added - \(document.title)")
+                                        note.addDocument(document: document)
+                                    }
+                                    
+                                    self.fetchWikipediaImage(note: note, document: document, completion: {foundImage in
+                                        if !foundImage {
+                                            KnowledgeGraphHelper.fetchWikipediaImage(note: note, document: document)
+                                        }
+                                    })
                                     
                                     KnowledgeGraphHelper.isPlace(name: title, completionHandler: { isPlace in
                                         if isPlace {
                                             MapHelper.fetchMap(location: title, document: document, note: note)
                                         }
                                         else {
-                                            let placeTerms = ["place", "city", "populated", "country", "capital", "location"]
+                                            let placeTerms = ["place", "city", "populated", "country", "capital", "location", "state", "village"]
                                             for term in placeTerms {
                                                 if document.description?.lowercased().contains(term) ?? false {
                                                     MapHelper.fetchMap(location: title, document: document, note: note)
@@ -73,7 +83,7 @@ class TAGMEHelper {
         }
     }
     
-    private func fetchWikipediaImage(note: Sketchnote, document: TAGMEDocument) {
+    private func fetchWikipediaImage(note: Sketchnote, document: TAGMEDocument, completion:@escaping (Bool) -> ()) {
         let parameters: Parameters = ["action": "query", "prop": "info", "pageids": document.wikiPageID!, "inprop": "url", "format": "json"]
         let headers: HTTPHeaders = [
             "Accept": "application/json"
@@ -84,50 +94,59 @@ class TAGMEHelper {
             switch responseResult {
             case .success(let res):
                 json = JSON(res)
-            case .failure(let error):
-                print(error.localizedDescription)
-                KnowledgeGraphHelper.fetchWikipediaImage(note: note, document: document)
-                return
-            }
-            if let wikiTitle = json["query"]["pages"][String(format: "%.0f", document.wikiPageID!)]["title"].string {
-                let parameters: Parameters = ["action": "query", "prop": "pageimages", "format": "json", "piprop": "original", "titles": wikiTitle]
-                let headers: HTTPHeaders = [
-                    "Accept": "application/json"
-                ]
-                AF.request("http://en.wikipedia.org/w/api.php", parameters: parameters, headers: headers).responseJSON { response in
-                    let responseResult = response.result
-                    var json = JSON()
-                    switch responseResult {
-                    case .success(let res):
-                        json = JSON(res)
-                    case .failure(let error):
-                        print(error.localizedDescription)
-                        KnowledgeGraphHelper.fetchWikipediaImage(note: note, document: document)
-                        return
-                    }
-                    var successful = false
-                    if let imageURL = json["query"]["pages"][String(format: "%.0f", document.wikiPageID!)]["original"]["source"].string {
-                        DispatchQueue.global().async {
-                            if let url = URL(string: imageURL) {
-                                if let data = try? Data(contentsOf: url) {
-                                    DispatchQueue.main.async {
-                                        print("Found wikipedia image for TAGME document.")
-                                        if let image = UIImage(data: data) {
-                                            note.setDocumentPreviewImage(document: document, image: image)
-                                            successful = true
+                
+                if let wikiTitle = json["query"]["pages"][String(format: "%.0f", document.wikiPageID!)]["title"].string {
+                    let parameters: Parameters = ["action": "query", "prop": "pageimages", "format": "json", "piprop": "original", "titles": wikiTitle]
+                    let headers: HTTPHeaders = [
+                        "Accept": "application/json"
+                    ]
+                    AF.request("http://en.wikipedia.org/w/api.php", parameters: parameters, headers: headers).responseJSON { response in
+                        let responseResult = response.result
+                        var json = JSON()
+                        switch responseResult {
+                        case .success(let res):
+                            json = JSON(res)
+                            
+                            if let imageURL = json["query"]["pages"][String(format: "%.0f", document.wikiPageID!)]["original"]["source"].string {
+                                DispatchQueue.global().async {
+                                    if let url = URL(string: imageURL) {
+                                        if let data = try? Data(contentsOf: url) {
+                                            DispatchQueue.main.async {
+                                                print("TAGME: Preview image added - \(document.title)")
+                                                if let image = UIImage(data: data) {
+                                                    note.setDocumentPreviewImage(document: document, image: image)
+                                                    completion(true)
+                                                }
+                                                else {
+                                                    completion(false)
+                                                }
+                                            }
+                                        }
+                                        else {
+                                            print("URL Wikipedia image not found for TAGME document.")
+                                            completion(false)
                                         }
                                     }
-                                }
-                                else {
-                                    print("URL Wikipedia image not found for TAGME document.")
+                                    else {
+                                        completion(false)
+                                    }
                                 }
                             }
+                            else {
+                                completion(false)
+                            }
+                        case .failure(let error):
+                            print(error.localizedDescription)
+                            completion(false)
+                            return
                         }
                     }
-                    if !successful {
-                        KnowledgeGraphHelper.fetchWikipediaImage(note: note, document: document)
-                    }
                 }
+                break
+            case .failure(let error):
+                print(error.localizedDescription)
+                completion(false)
+                return
             }
         }
     }

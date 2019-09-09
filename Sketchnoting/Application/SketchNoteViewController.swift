@@ -77,7 +77,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         topContainer.layer.borderWidth = 1
         
         
-        self.setupDocumentDetailScrollView()
+        self.setupDocumentDetailView()
         self.bookshelfLeftDragView.curveTopCorners(size: 5)
         self.topContainerLeftDragView.curveTopCorners(size: 5)
         
@@ -158,8 +158,8 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
             print("Placeholder")
             break
         case "CloseNote":
-            if timer != nil {
-                timer!.invalidate()
+            if textRecognitionTimer != nil {
+                textRecognitionTimer!.invalidate()
             }
             for helpLine in self.helpLinesHorizontal {
                 helpLine.removeFromSuperview()
@@ -636,11 +636,13 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     private func undo() {
         self.startRecognitionTimer()
         self.resetHandwritingRecognition = true
+        self.startSaveTimer()
         sketchView.undo()
     }
     private func redo() {
         self.startRecognitionTimer()
         self.resetHandwritingRecognition = true
+        self.startSaveTimer()
         sketchView.redo()
     }
     
@@ -812,14 +814,13 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     func annotateText(text: String) {
         self.activityIndicator.stopAnimating()
         self.clearConceptHighlights()
-        //self.sketchnote.documents = [Document]()
-        //self.items = [Document]()
-        //self.updateBookshelf()
         
-        self.tagmeHelper.fetch(text: text, note: self.sketchnote)
-        self.spotlightHelper.fetch(text: text, note: self.sketchnote)
-        self.bioportalHelper.fetch(text: text, note: self.sketchnote)
-        self.bioportalHelper.fetchCHEBI(text: text, note: self.sketchnote)
+        DispatchQueue.global(qos: .utility).async {
+            self.tagmeHelper.fetch(text: text, note: self.sketchnote)
+            //self.spotlightHelper.fetch(text: text, note: self.sketchnote)
+            self.bioportalHelper.fetch(text: text, note: self.sketchnote)
+            self.bioportalHelper.fetchCHEBI(text: text, note: self.sketchnote)
+        }
     }
     
     private func showBookshelf() {
@@ -834,30 +835,51 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         }
     }
     
-    var timer: Timer?
+    var textRecognitionTimer: Timer?
     var resetHandwritingRecognition = false
     func drawView(_ view: SketchView, didEndDrawUsingTool tool: AnyObject) {
         if tool is EraserTool {
             self.resetHandwritingRecognition = true
         }
         self.startRecognitionTimer()
+        self.startSaveTimer()
     }
     private func startRecognitionTimer() {
-        if timer != nil {
-            timer!.invalidate()
-            timer = nil
+        if textRecognitionTimer != nil {
+            textRecognitionTimer!.invalidate()
+            textRecognitionTimer = nil
             print("Recognition timer reset.")
             
         }
-        timer = Timer.scheduledTimer(timeInterval: 5.0, target: self, selector: #selector(onTimerFires), userInfo: nil, repeats: false)
+        textRecognitionTimer = Timer.scheduledTimer(timeInterval: 5.0, target: self, selector: #selector(onRecognitionTimerFires), userInfo: nil, repeats: false)
         self.activityIndicator.startAnimating()
         print("Recognition timer started.")
     }
-    @objc func onTimerFires()
+    @objc func onRecognitionTimerFires()
     {
-        timer?.invalidate()
-        timer = nil
+        textRecognitionTimer?.invalidate()
+        textRecognitionTimer = nil
         self.processHandwritingRecognition()
+    }
+    
+    var saveTimer: Timer?
+    private func startSaveTimer() {
+        if saveTimer != nil {
+            saveTimer!.invalidate()
+            saveTimer = nil
+            print("Save timer reset.")
+        }
+        saveTimer = Timer.scheduledTimer(timeInterval: 2.0, target: self, selector: #selector(onSaveTimerFires), userInfo: nil, repeats: false)
+        print("Save timer started.")
+    }
+    @objc func onSaveTimerFires()
+    {
+        saveTimer?.invalidate()
+        saveTimer = nil
+        print("Auto-saving sketchnote strokes and text data.")
+        self.sketchnote.paths =  self.sketchView.pathArray
+        self.sketchnote.savePaths()
+        self.sketchnote.saveTextDataArray()
     }
     
     // Drawing recognition
@@ -867,8 +889,6 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     private var currentPrediction: DrawnImageClassifierOutput? {
         didSet {
             if let currentPrediction = currentPrediction {
-                
-                // display top 5 scores
                 let sorted = currentPrediction.category_softmax_scores.sorted { $0.value > $1.value }
                 let top5 = sorted.prefix(5)
                 print(top5.map { $0.key + "(" + String($0.value) + ")"}.joined(separator: ", "))
@@ -960,12 +980,12 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
             let deltaX = currentTouchPoint.x - previousTouchPoint.x
             
             if resizeRect.leftTouch {
-                if (bookshelfLeftConstraint.constant + deltaX) >= 5 {
+                if (bookshelfLeftConstraint.constant + deltaX) >= 0 && UIScreen.main.bounds.maxX - currentTouchPoint.x >= 300 {
                     bookshelfLeftConstraint.constant += deltaX
                 }
                 
                 
-                if UIScreen.main.bounds.maxX - currentTouchPoint.x <= 100 {
+                if UIScreen.main.bounds.maxX - currentTouchPoint.x <= 300 {
                     bookshelf.alpha = 0.4
                 }
                 else {
@@ -985,7 +1005,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
             let currentTouchPoint = touch.location(in: self.view)
             
             if resizeRect.leftTouch {
-                if UIScreen.main.bounds.maxX - currentTouchPoint.x <= 200 {
+                if UIScreen.main.bounds.maxX - currentTouchPoint.x <= 300 {
                     bookshelfLeftConstraint.constant += 150
                     self.isBookshelfDraggedOut = true
                     UIView.animate(withDuration: 0.25, delay: 0, options: UIView.AnimationOptions.curveEaseIn, animations: {
@@ -1041,18 +1061,10 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         cell.document = document
         cell.delegate = self
         cell.titleLabel.text = document.title
-        cell.typeLabel.text = document.documentType.rawValue
-        cell.typeLabelView.backgroundColor = #colorLiteral(red: 0.3333333333, green: 0.4588235294, blue: 0.7568627451, alpha: 1)
-        cell.typeLabelView.layer.cornerRadius = 11
-        cell.abstractTextView.isHidden = true
-        cell.previewImage.isHidden = false
         if document.previewImage == nil {
             if let tagmeDocument = document as? TAGMEDocument {
                 if tagmeDocument.mapImage != nil {
                     cell.previewImage.image = tagmeDocument.mapImage
-                }
-                else {
-                    cell.previewImage.image = nil
                 }
             }
             else if let spotlightDocument = document as? SpotlightDocument {
@@ -1063,22 +1075,56 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
                     cell.previewImage.image = nil
                 }
             }
-            if cell.previewImage == nil {
-                cell.abstractTextView.isHidden = false
-                cell.previewImage.isHidden = true
-            }
         }
         else {
             cell.previewImage.image = document.previewImage
-            cell.abstractTextView.isHidden = true
-            cell.previewImage.isHidden = false
         }
-        cell.backgroundColor = .lightGray
-        cell.layer.cornerRadius = 4
-        cell.layer.borderColor = UIColor.black.cgColor
-        cell.layer.borderWidth = 1
+        cell.previewImage.layer.masksToBounds = true
+        cell.previewImage.layer.cornerRadius = 90
+        
+        switch document.documentType {
+            
+        case .Spotlight:
+            cell.previewImage.layer.borderColor = #colorLiteral(red: 0.1764705926, green: 0.01176470611, blue: 0.5607843399, alpha: 1)
+            break
+        case .TAGME:
+            cell.previewImage.layer.borderColor = #colorLiteral(red: 0.1764705926, green: 0.4980392158, blue: 0.7568627596, alpha: 1)
+            break
+        case .BioPortal:
+            cell.previewImage.layer.borderColor = #colorLiteral(red: 0.3411764801, green: 0.6235294342, blue: 0.1686274558, alpha: 1)
+            break
+        case .Chemistry:
+            cell.previewImage.layer.borderColor = #colorLiteral(red: 0.9529411793, green: 0.6862745285, blue: 0.1333333403, alpha: 1)
+            break
+        case .Other:
+            cell.previewImage.layer.borderColor = #colorLiteral(red: 0.6000000238, green: 0.6000000238, blue: 0.6000000238, alpha: 1)
+            break
+        }
+        cell.previewImage.layer.borderWidth = 3
+        
+        cell.layer.cornerRadius = 2
         
         return cell
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didHighlightItemAt indexPath: IndexPath) {
+        UIView.animate(withDuration: 0.5) {
+            if let cell = collectionView.cellForItem(at: indexPath) as? DocumentUICollectionViewCell {
+                cell.previewImage.transform = .init(scaleX: 0.95, y: 0.95)
+                cell.titleLabel.textColor = .black
+                cell.contentView.backgroundColor = UIColor(red: 0.95, green: 0.95, blue: 0.95, alpha: 1)
+            }
+        }
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didUnhighlightItemAt indexPath: IndexPath) {
+        UIView.animate(withDuration: 0.5) {
+            if let cell = collectionView.cellForItem(at: indexPath) as? DocumentUICollectionViewCell {
+                cell.previewImage.transform = .identity
+                cell.titleLabel.textColor = .white
+                cell.contentView.backgroundColor = .clear
+            }
+        }
     }
     
     // MARK: - UICollectionViewDelegate protocol
@@ -1151,7 +1197,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
             print("Bookshelf Update Timer reset.")
             
         }
-        bookshelfUpdateTimer = Timer.scheduledTimer(timeInterval: 3.5, target: self, selector: #selector(onBookshelfUpdateTimerFires), userInfo: nil, repeats: false)
+        bookshelfUpdateTimer = Timer.scheduledTimer(timeInterval: 2.0, target: self, selector: #selector(onBookshelfUpdateTimerFires), userInfo: nil, repeats: false)
         print("Bookshelf Update Timer started.")
     }
     @objc func onBookshelfUpdateTimerFires()
@@ -1162,7 +1208,6 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     }
     
     func sketchnoteHasNewDocument(sketchnote: Sketchnote, document: Document) { // Sketchnote delegate
-        //self.startBookshelfUpdateTimer()
         if self.bookshelfState == .All && self.documentTypeMatchesBookshelfFilter(type: document.documentType) {
             print(1)
             CATransaction.begin()
@@ -1231,8 +1276,11 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     @IBOutlet var documentTitleLabel: UILabel!
     @IBOutlet var documentDetailScrollView: UIScrollView!
     var documentDetailStackView = UIStackView()
+    @IBOutlet weak var documentDetailTypeView: UIView!
+    @IBOutlet weak var documentDetailTypeLabel: UILabel!
+    @IBOutlet weak var documentDetailPreviewImageView: UIImageView!
     
-    private func setupDocumentDetailScrollView() {
+    private func setupDocumentDetailView() {
         documentDetailStackView.axis = .vertical
         documentDetailStackView.distribution = .equalSpacing
         documentDetailStackView.alignment = .fill
@@ -1246,6 +1294,13 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
             documentDetailStackView.bottomAnchor.constraint(equalTo: documentDetailScrollView.bottomAnchor),
             documentDetailStackView.widthAnchor.constraint(equalTo: documentDetailScrollView.widthAnchor)
             ])
+        
+        documentDetailPreviewImageView.layer.masksToBounds = true
+        documentDetailPreviewImageView.layer.cornerRadius = 75
+        documentDetailPreviewImageView.layer.borderWidth = 1
+        documentDetailPreviewImageView.layer.borderColor = UIColor.black.cgColor
+        documentDetailTypeView.layer.masksToBounds = true
+        documentDetailTypeView.layer.cornerRadius = 15
     }
     
     private func showDocumentDetail(document: Document) {
@@ -1254,6 +1309,10 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         }
         
         documentTitleLabel.text = document.title
+        documentDetailTypeLabel.text = "Document"
+        if let previewImage = document.previewImage {
+            documentDetailPreviewImageView.image = previewImage
+        }
         document.accept(visitor: self)
         
         documentDetailView.isHidden = false
@@ -1289,6 +1348,8 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     }
     
     func process(document: SpotlightDocument) {
+        documentDetailTypeView.backgroundColor = #colorLiteral(red: 0.1764705926, green: 0.01176470611, blue: 0.5607843399, alpha: 1)
+        documentDetailTypeLabel.text = "Spotlight"
         if let label = document.label {
             documentTitleLabel.text = label
         }
@@ -1306,6 +1367,8 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     }
     
     func process(document: TAGMEDocument) {
+        documentDetailTypeView.backgroundColor = #colorLiteral(red: 0.1764705926, green: 0.4980392158, blue: 0.7568627596, alpha: 1)
+        documentDetailTypeLabel.text = "TAGME"
         documentTitleLabel.text = document.title
         if let description = document.description {
             self.setDetailDescription(text: description)
@@ -1321,6 +1384,8 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     }
     
     func process(document: BioPortalDocument) {
+        documentDetailTypeView.backgroundColor = #colorLiteral(red: 0.3411764801, green: 0.6235294342, blue: 0.1686274558, alpha: 1)
+        documentDetailTypeLabel.text = "BioPortal"
         if let definition = document.definition {
             let descriptionLabel = UILabel(frame: documentDetailStackView.frame)
             descriptionLabel.text = definition
@@ -1330,6 +1395,8 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     }
     
     func process(document: CHEBIDocument) {
+        documentDetailTypeView.backgroundColor = #colorLiteral(red: 0.9529411793, green: 0.6862745285, blue: 0.1333333403, alpha: 1)
+        documentDetailTypeLabel.text = "CHEBI"
         if let definition = document.definition {
             let descriptionLabel = UILabel(frame: documentDetailStackView.frame)
             descriptionLabel.text = definition
@@ -1384,29 +1451,28 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     @IBAction func filterDocumentsButtonTapped(_ sender: UIButton) {
         let popMenu = PopMenuViewController(sourceView: sender, actions: [PopMenuAction](), appearance: nil)
         popMenu.appearance.popMenuBackgroundStyle = .blurred(.dark)
-        let allAction = PopMenuDefaultAction(title: "All", didSelect: { action in
+        let allAction = PopMenuDefaultAction(title: "All", color: #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1), didSelect: { action in
             self.bookshelfFilter = .All
             self.updateBookshelf()
             self.filterDocumentsButton.setTitle("All", for: .normal)
             
         })
-        let spotlightAction = PopMenuDefaultAction(title: "Spotlight", didSelect: { action in
+        let spotlightAction = PopMenuDefaultAction(title: "Spotlight", color: #colorLiteral(red: 0.1764705926, green: 0.01176470611, blue: 0.5607843399, alpha: 1), didSelect: { action in
             self.bookshelfFilter = .Spotlight
             self.updateBookshelf()
             self.filterDocumentsButton.setTitle("Spotlight", for: .normal)
         })
-        let bioportalAction = PopMenuDefaultAction(title: "BioPortal", didSelect: { action in
+        let bioportalAction = PopMenuDefaultAction(title: "BioPortal", color: #colorLiteral(red: 0.3411764801, green: 0.6235294342, blue: 0.1686274558, alpha: 1), didSelect: { action in
             self.bookshelfFilter = .BioPortal
             self.updateBookshelf()
             self.filterDocumentsButton.setTitle("BioPortal", for: .normal)
         })
-        let chebiAction = PopMenuDefaultAction(title: "CHEBI", didSelect: { action in
+        let chebiAction = PopMenuDefaultAction(title: "CHEBI", color: #colorLiteral(red: 0.9529411793, green: 0.6862745285, blue: 0.1333333403, alpha: 1), didSelect: { action in
             self.bookshelfFilter = .CHEBI
             self.updateBookshelf()
             self.filterDocumentsButton.setTitle("CHEBI", for: .normal)
         })
-        
-        let tagmeAction = PopMenuDefaultAction(title: "TAGME", didSelect: { action in
+        let tagmeAction = PopMenuDefaultAction(title: "TAGME", color: #colorLiteral(red: 0.1764705926, green: 0.4980392158, blue: 0.7568627596, alpha: 1), didSelect: { action in
             self.bookshelfFilter = .TAGME
             self.updateBookshelf()
             self.filterDocumentsButton.setTitle("TAGME", for: .normal)

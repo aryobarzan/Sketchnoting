@@ -26,11 +26,13 @@ class KnowledgeGraphHelper {
                 json = JSON(res)
             case .failure(let error):
                 print(error.localizedDescription)
+                return
             }
             if let typeArray = json["itemListElement"].array?[0]["result"]["@type"].array {
                 for type in typeArray {
                     if let value = type.string {
                         if value.lowercased().contains("place") {
+                            print("Knowledge Graph Helper: Is a place - \(name)")
                             completionHandler(true)
                             return
                         }
@@ -56,13 +58,12 @@ class KnowledgeGraphHelper {
                 print(error.localizedDescription)
                 return
             }
-            print(json)
             if let imageString = json["itemListElement"].array?[0]["result"]["image"]["contentUrl"].string {
                 DispatchQueue.global().async {
                     if let url = URL(string: imageString) {
                         if let data = try? Data(contentsOf: url) {
                             DispatchQueue.main.async {
-                                print("Found wikipedia image via Knowledge Graph for TAGME document.")
+                                print("Knowledge Graph: Preview image added - \(document.title)")
                                 if let image = UIImage(data: data) {
                                     note.setDocumentPreviewImage(document: document, image: image)
                                 }
