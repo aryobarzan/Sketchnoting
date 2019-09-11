@@ -20,21 +20,31 @@ import SideMenu
 
 //This controller handles all interactions of the user on the home page, including creating new note collections and new notes, searching, sharing notes, and generating pdfs from notes.
 class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextFieldDelegate, MCSessionDelegate, MCBrowserViewControllerDelegate, UICollectionViewDelegate, UICollectionViewDataSource, NoteCollectionViewCellDelegate {
+    @IBOutlet var newNoteButton: UIButton!
     
     @IBOutlet var searchField: UITextField!
-    @IBOutlet var clearSearchButton: LGButton!
     @IBOutlet var searchFiltersScrollView: UIScrollView!
     var searchFiltersStackView = UIStackView()
     @IBOutlet var searchTypeButton: UIButton!
     private var searchType = SearchType.All
+    @IBOutlet var searchPanelButton: UIButton!
+    @IBOutlet var clearSearchButton: UIButton!
     
     @IBOutlet var searchPanel: UIView!
-    @IBOutlet weak var noteSortingButton: UIButton!
+    @IBOutlet var noteSortingButton: UIButton!
+    @IBOutlet var searchPanelHeightConstraint: NSLayoutConstraint!
+    var searchPanelIsOpen = false
     
+    @IBOutlet var drawingSearchPanel: UIView!
+    @IBOutlet var closeDrawingSearchPanelButton: UIButton!
+    @IBOutlet var clearDrawingSearchButton: UIButton!
+    @IBOutlet var drawingSearchButton: UIButton!
+    @IBOutlet var drawingSearchCanvas: SketchView!
+    @IBOutlet var drawingSearchBlurView: UIVisualEffectView!
+    @IBOutlet var noteLargePreviewView: UIImageView!
     // When the user taps a sketchnote to open it for editing, the app stores it in this property to remember which note is currently being edited.
     var selectedSketchnote: Sketchnote?
     // The view that is displayed as a pop-up for the user to draw a shape which is used for searching.
-    var drawingSearchView: DrawingSearchView!
     
     // Each search term entered is stored.
     var searchFilters = [SearchFilter]()
@@ -73,6 +83,26 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         mcSession = MCSession(peer: peerID, securityIdentity: nil, encryptionPreference: .required)
         mcSession.delegate = self
         
+        newNoteButton.layer.masksToBounds = true
+        newNoteButton.layer.cornerRadius = 25
+        
+        searchPanelHeightConstraint.constant = 0
+        
+        drawingSearchPanel.layer.masksToBounds = true
+        drawingSearchPanel.layer.cornerRadius = 5
+        drawingSearchCanvas.backgroundColor = .black
+        drawingSearchCanvas.drawTool = .pen
+        drawingSearchCanvas.lineColor = .white
+        drawingSearchCanvas.lineWidth = 350 * 0.04
+        self.drawingSearchPanel.alpha = 0.0
+        self.drawingSearchBlurView.alpha = 0.0
+        
+        noteLargePreviewView.alpha = 0.0
+        noteLargePreviewView.layer.masksToBounds = true
+        noteLargePreviewView.layer.cornerRadius = 5
+        noteLargePreviewView.layer.borderColor = UIColor.black.cgColor
+        noteLargePreviewView.layer.borderWidth = 2
+        
         // The search views are setup, including the search field and the pop-up view for searching by drawing
         self.searchField.delegate = self
         searchFiltersStackView.isUserInteractionEnabled = true
@@ -89,17 +119,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             searchFiltersStackView.bottomAnchor.constraint(equalTo: searchFiltersScrollView.bottomAnchor),
             searchFiltersStackView.heightAnchor.constraint(equalTo: searchFiltersScrollView.heightAnchor)
             ])
-        
-        drawingSearchView = DrawingSearchView(frame: CGRect(x: 0, y: 0, width: 490, height: 600))
-        drawingSearchView.center = self.view.center
-        drawingSearchView.alpha = 1
-        drawingSearchView.transform = CGAffineTransform(scaleX: 0.8, y: 1.2)
-        drawingSearchView.setCloseAction(for: .touchUpInside) {
-            self.hideDrawingSearchView()
-        }
-        drawingSearchView.setSearchAction(for: .touchUpInside) {
-            self.searchByDrawing()
-        }
         
         noteCollectionView.register(UINib(nibName: "NoteCollectionViewCell", bundle: nil), forCellWithReuseIdentifier: "NoteCollectionViewCell")
         if let notes = NoteLoader.loadSketchnotes() {
@@ -195,7 +214,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         return true
     }
 
-    @IBAction func newNoteTapped(_ sender: LGButton) {
+    @IBAction func newNoteButtonTapped(_ sender: UIButton) {
         clearSearch()
         let newNote = Sketchnote(image: nil, relatedDocuments: nil, drawings: nil)!
         newNote.save()
@@ -205,6 +224,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         selectedSketchnote = newNote
         performSegue(withIdentifier: "NewSketchnote", sender: self)
     }
+    
     @IBAction func noteSortingTapped(_ sender: UIButton) {
         let popMenu = PopMenuViewController(sourceView: sender, actions: [PopMenuAction](), appearance: nil)
         popMenu.appearance.popMenuBackgroundStyle = .blurred(.dark)
@@ -228,8 +248,36 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         self.present(popMenu, animated: true, completion: nil)
     }
     
-    // This function loops through each search term and checks each sketchnote on the homepage.
-    // If a sketchnote matches EVERY search term, the sketchnote remains visible. Otherwise it is hidden and not considered a matchin result.
+    // MARK: Search
+    
+    @IBAction func searchPanelButtonTapped(_ sender: UIButton) {
+        if searchPanelIsOpen {
+            self.collapseSearchPanel()
+        }
+        else {
+            self.expandSearchPanel()
+        }
+    }
+    
+    private func expandSearchPanel() {
+        self.view.layoutIfNeeded()
+        UIView.animate(withDuration: 0.5, delay: 0, animations: {
+            self.searchPanelHeightConstraint.constant = 113
+            self.view.layoutIfNeeded()
+        }, completion: { (ended) in
+        })
+        searchPanelIsOpen = true
+    }
+    private func collapseSearchPanel() {
+        self.view.layoutIfNeeded()
+        UIView.animate(withDuration: 0.5, delay: 0, animations: {
+            self.searchPanelHeightConstraint.constant = 0
+            self.view.layoutIfNeeded()
+        }, completion: { (ended) in
+        })
+        searchPanelIsOpen = false
+    }
+    
     private func performSearch() {
         if !searchField.text!.isEmpty {
             let searchString = searchField.text!.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
@@ -241,6 +289,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             self.clearSearch()
         }
         else {
+            clearSearchButton.isHidden = false
             var filteredNotes = [Sketchnote]()
             for note in self.notes {
                 if note.applySearchFilters(filters: searchFilters) {
@@ -281,15 +330,21 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         self.performSearch()
     }
     
-    @IBAction func searchByDrawingTapped(_ sender: LGButton) {
-        self.view.addSubview(self.drawingSearchView)
-        UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 0, options: [],  animations: {
-            self.drawingSearchView.transform = .identity
-        })
+    @IBAction func drawingSearchButtonTapped(_ sender: UIButton) {
+        self.view.layoutIfNeeded()
+        UIView.animate(withDuration: 0.5, delay: 0.0, options: UIView.AnimationOptions.curveEaseIn, animations: {
+            self.drawingSearchPanel.alpha = 1.0
+            self.drawingSearchBlurView.alpha = 1.0
+            self.drawingSearchBlurView.isHidden = false
+            self.drawingSearchPanel.isHidden = false
+            self.view.layoutIfNeeded()
+        }, completion: nil)
     }
-    @IBAction func clearSearchTapped(_ sender: LGButton) {
+
+    @IBAction func clearSearchButtonTapped(_ sender: UIButton) {
         clearSearch()
     }
+
     private func clearSearch() {
         searchFilters = [SearchFilter]()
         for view in searchFilterViews {
@@ -332,6 +387,47 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         self.present(popMenu, animated: true, completion: nil)
     }
     
+    // MARK: Drawing Search
+    private func closeDrawingSearchPanel() {
+        self.view.layoutIfNeeded()
+        UIView.animate(withDuration: 0.5, delay: 0.0, options: UIView.AnimationOptions.curveEaseOut, animations: {
+            self.drawingSearchPanel.alpha = 0.0
+            self.drawingSearchBlurView.alpha = 0.0
+        }, completion: { completed in
+            self.drawingSearchBlurView.isHidden = true
+            self.drawingSearchPanel.isHidden = true
+             self.view.layoutIfNeeded()
+        })
+    }
+    @IBAction func closeDrawingSearchTapped(_ sender: UIButton) {
+        self.closeDrawingSearchPanel()
+    }
+    @IBAction func drawingSearchBlurViewTapped(_ sender: UITapGestureRecognizer) {
+        if sender.state == .ended {
+            self.closeDrawingSearchPanel()
+        }
+    }
+    @IBAction func clearDrawingSearchTapped(_ sender: UIButton) {
+        drawingSearchCanvas.clear()
+    }
+    @IBAction func drawingSearchTapped(_ sender: UIButton) {
+        let croppedCGImage:CGImage = (drawingSearchCanvas.asImage().cgImage)!
+        let croppedImage = UIImage(cgImage: croppedCGImage)
+        
+        let resized = croppedImage.resize(newSize: CGSize(width: 28, height: 28))
+        
+        guard let pixelBuffer = resized.grayScalePixelBuffer() else {
+            print("couldn't create pixel buffer")
+            return
+        }
+        do {
+            currentPrediction = try drawnImageClassifier.prediction(image: pixelBuffer)
+        }
+        catch {
+            print("error making prediction: \(error)")
+        }
+    }
+    
     // Drawing recognition
     private var labelNames: [String] = []
     // THis variable is used to run predictions using the drawing recognition model.
@@ -348,7 +444,10 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
                 var found = false
                 for (label, score) in top5 {
                     if score > 0.5 {
-                        self.hideDrawingSearchView()
+                        self.closeDrawingSearchPanel()
+                        if !searchPanelIsOpen {
+                            self.expandSearchPanel()
+                        }
                         createSearchFilter(term: label, type: .Drawing)
                         self.searchField.text = ""
                         self.performSearch()
@@ -365,31 +464,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             else {
                 print("Waiting for drawing...")
             }
-        }
-    }
-    private func searchByDrawing() {
-        let croppedCGImage:CGImage = (drawingSearchView.sketchView.asImage().cgImage)!
-        let croppedImage = UIImage(cgImage: croppedCGImage)
-        
-        let resized = croppedImage.resize(newSize: CGSize(width: 28, height: 28))
-        
-        guard let pixelBuffer = resized.grayScalePixelBuffer() else {
-            print("couldn't create pixel buffer")
-            return
-        }
-        do {
-            currentPrediction = try drawnImageClassifier.prediction(image: pixelBuffer)
-        }
-        catch {
-            print("error making prediction: \(error)")
-        }
-    }
-    private func hideDrawingSearchView() {
-        UIView.animate(withDuration: 0.0, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 0, options: [], animations: {
-            self.drawingSearchView.transform = CGAffineTransform(scaleX: 0.2, y: 0.2)
-            
-        }) { (success) in
-            self.drawingSearchView.removeFromSuperview()
         }
     }
     
@@ -576,14 +650,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             }
         })
         popMenu.addAction(sendAction)
-        if sketchnote.image != nil {
-            let shareAction = PopMenuDefaultAction(title: "Share", color: .white, didSelect: { action in
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    self.generatePDF(noteViewCell: cell)
-                }
-            })
-            popMenu.addAction(shareAction)
-        }
         let action = PopMenuDefaultAction(title: "Delete", color: .red, didSelect: { action in
             self.notes.removeAll{$0 == sketchnote}
             self.items.removeAll{$0 == sketchnote}
@@ -593,5 +659,49 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         })
         popMenu.addAction(action)
         self.present(popMenu, animated: true, completion: nil)
+    }
+    
+    func noteCollectionViewCellShareTapped(sketchnote: Sketchnote, sender: UIButton, cell: NoteCollectionViewCell) {
+        self.generatePDF(noteViewCell: cell)
+    }
+    
+    func noteCollectionViewCellLongPressed(sketchnote: Sketchnote, sender: UILongPressGestureRecognizer, cell: NoteCollectionViewCell) {
+        switch sender.state {
+        case .began:
+            showLargeNotePreview(note: sketchnote)
+        case .ended:
+            hideLargeNotePreview()
+        case .cancelled:
+            hideLargeNotePreview()
+        case .failed:
+            hideLargeNotePreview()
+        default:
+            break
+        }
+    }
+    
+    private func showLargeNotePreview(note: Sketchnote) {
+        self.noteLargePreviewView.image = note.image
+        self.view.layoutIfNeeded()
+        UIView.animate(withDuration: 0.25, delay: 0.0, options: UIView.AnimationOptions.curveEaseIn, animations: {
+            self.noteLargePreviewView.alpha = 1.0
+            self.drawingSearchBlurView.alpha = 1.0
+            self.noteLargePreviewView.isHidden = false
+            self.drawingSearchBlurView.isHidden = false
+            self.view.layoutIfNeeded()
+        }, completion: { completed in
+        })
+    }
+    
+    private func hideLargeNotePreview() {
+        self.view.layoutIfNeeded()
+        UIView.animate(withDuration: 0.25, delay: 0.0, options: UIView.AnimationOptions.curveEaseOut, animations: {
+            self.noteLargePreviewView.alpha = 0.0
+            self.drawingSearchBlurView.alpha = 0.0
+        }, completion: { completed in
+            self.noteLargePreviewView.isHidden = true
+            self.drawingSearchBlurView.isHidden = true
+            self.view.layoutIfNeeded()
+        })
     }
 }

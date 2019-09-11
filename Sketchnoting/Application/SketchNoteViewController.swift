@@ -161,6 +161,9 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
             if textRecognitionTimer != nil {
                 textRecognitionTimer!.invalidate()
             }
+            if saveTimer != nil {
+                saveTimer!.invalidate()
+            }
             for helpLine in self.helpLinesHorizontal {
                 helpLine.removeFromSuperview()
             }
