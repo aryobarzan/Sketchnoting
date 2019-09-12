@@ -43,11 +43,11 @@
                                             <constraint firstAttribute="height" constant="20" id="dzD-RK-ZFs"/>
                                             <constraint firstAttribute="width" constant="20" id="wuR-yf-hbK"/>
                                         </constraints>
-                                        <state key="normal" image="ShareNoteIcon">
+                                        <state key="normal" image="TagIcon">
                                             <color key="titleColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         </state>
                                         <connections>
-                                            <action selector="shareTapped:" destination="gTV-IL-0wX" eventType="touchUpInside" id="sIH-JB-g8V"/>
+                                            <action selector="tagTapped:" destination="gTV-IL-0wX" eventType="touchUpInside" id="sIH-JB-g8V"/>
                                         </connections>
                                     </button>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Untitled" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumScaleFactor="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="afa-LH-hYC">
@@ -114,7 +114,7 @@
             <connections>
                 <outlet property="imageView" destination="V13-sv-1Ta" id="Gn7-Pi-pdf"/>
                 <outlet property="moreButton" destination="JfA-oa-Y9v" id="xfi-9x-rDv"/>
-                <outlet property="shareButton" destination="f4M-Cz-pek" id="VTG-eW-GwL"/>
+                <outlet property="tagButton" destination="f4M-Cz-pek" id="VTG-eW-GwL"/>
                 <outlet property="titleBackgroundView" destination="lwh-05-4wr" id="d9V-Ps-H1c"/>
                 <outlet property="titleLabel" destination="afa-LH-hYC" id="o9d-Ae-bBp"/>
             </connections>
@@ -123,6 +123,6 @@
     </objects>
     <resources>
         <image name="MoreNoteActionsIcon" width="48" height="48"/>
-        <image name="ShareNoteIcon" width="48" height="48"/>
+        <image name="TagIcon" width="48" height="48"/>
     </resources>
 </document>

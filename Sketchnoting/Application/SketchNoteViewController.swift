@@ -24,9 +24,9 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     @IBOutlet var undoButton: LGButton!
     @IBOutlet var drawingsButton: LGButton!
     @IBOutlet var closeButton: UIButton!
-    @IBOutlet weak var viewToolsButton: LGButton!
     @IBOutlet weak var topicsLabel: UILabel!
     var topicsBadgeHub: BadgeHub!
+    @IBOutlet weak var viewToolsButton: UIButton!
     
     @IBOutlet var bookshelf: UIView!
     @IBOutlet var activityIndicator: UIActivityIndicatorView!
@@ -41,7 +41,6 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     var new = false
     var storedPathArray: NSMutableArray?
     
-    @IBOutlet var helpLinesButton: LGButton!
     var helpLinesHorizontal = [HoritonzalHelpLine]()
     var helpLinesVertical = [VerticalHelpLine]()
     enum HelpLinesStatus {
@@ -50,6 +49,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         case Grid
     }
     var helpLinesStatus : HelpLinesStatus = .None
+    @IBOutlet weak var helpLinesButton: UIButton!
     
     var drawingViews = [UIView]()
     var drawingViewsShown = false
@@ -543,17 +543,18 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     private func toggleToolsView() {
         topContainer.isHidden = !topContainer.isHidden
         if topContainer.isHidden {
-            viewToolsButton.bgColor = .lightGray
+            viewToolsButton.tintColor = .white
         }
         else {
-            viewToolsButton.bgColor = UIColor(red: 85.0/255.0, green: 117.0/255.0, blue: 193.0/255.0, alpha: 1)
+            viewToolsButton.tintColor = self.view.tintColor
         }
     }
-    @IBAction func viewToolsTapped(_ sender: LGButton) {
+
+    @IBAction func viewToolsButtonTapped(_ sender: UIButton) {
         toggleToolsView()
     }
     
-    @IBAction func moreTapped(_ sender: LGButton) {
+    @IBAction func moreButtonTapped(_ sender: UIButton) {
         let alert = UIAlertController(title: "Edit Your Note", message: "", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Set Title", style: .default, handler: { action in
             let alertController = UIAlertController(title: "Title for this note", message: nil, preferredStyle: .alert)
@@ -660,12 +661,13 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
             drawingsButton.bgColor = .lightGray
         }
     }
-    @IBAction func toggleHelpLinesTapped(_ sender: LGButton) {
+    @IBAction func helpLinesButtonTapped(_ sender: UIButton) {
         switch self.helpLinesStatus {
         case .None:
             self.helpLinesStatus = .Horizontal
-            helpLinesButton.leftIconString = "dehaze"
-            helpLinesButton.bgColor = UIColor(red: 85.0/255.0, green: 117.0/255.0, blue: 193.0/255.0, alpha: 1)
+            helpLinesButton.tintColor = self.view.tintColor
+            helpLinesButton.setImage(#imageLiteral(resourceName: "MenuIcon"), for: .normal)
+            
             for line in helpLinesHorizontal {
                 line.isHidden = false
             }
@@ -675,7 +677,8 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
             break
         case .Horizontal:
             self.helpLinesStatus = .Grid
-            helpLinesButton.leftIconString = "grid_on"
+            helpLinesButton.tintColor = self.view.tintColor
+            helpLinesButton.setImage(#imageLiteral(resourceName: "GridHelpLinesIcon"), for: .normal)
             for line in helpLinesHorizontal {
                 line.isHidden = false
             }
@@ -685,12 +688,13 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
             break
         case .Grid:
             self.helpLinesStatus = .None
-            helpLinesButton.leftIconString = "grid_off"
-            helpLinesButton.bgColor = .lightGray
+            helpLinesButton.setImage(#imageLiteral(resourceName: "NoHelpLinesIcon"), for: .normal)
+            helpLinesButton.tintColor = .white
             hideAllHelpLines()
             break
         }
     }
+
     private func hideAllHelpLines() {
         for line in helpLinesHorizontal {
             line.isHidden = true

@@ -19,7 +19,8 @@ import SideMenu
 // It also contains note collection views, which in turn contain sketchnote views.
 
 //This controller handles all interactions of the user on the home page, including creating new note collections and new notes, searching, sharing notes, and generating pdfs from notes.
-class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextFieldDelegate, MCSessionDelegate, MCBrowserViewControllerDelegate, UICollectionViewDelegate, UICollectionViewDataSource, NoteCollectionViewCellDelegate {
+class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextFieldDelegate, MCSessionDelegate, MCBrowserViewControllerDelegate, UICollectionViewDelegate, UICollectionViewDataSource, NoteCollectionViewCellDelegate, UITableViewDataSource, UITableViewDelegate, TagTableViewCellDelegate, ColorPickerViewDelegate, ColorPickerViewDelegateFlowLayout {
+    
     @IBOutlet var newNoteButton: UIButton!
     
     @IBOutlet var searchField: UITextField!
@@ -40,8 +41,14 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     @IBOutlet var clearDrawingSearchButton: UIButton!
     @IBOutlet var drawingSearchButton: UIButton!
     @IBOutlet var drawingSearchCanvas: SketchView!
-    @IBOutlet var drawingSearchBlurView: UIVisualEffectView!
+    @IBOutlet var blurView: UIVisualEffectView!
     @IBOutlet var noteLargePreviewView: UIImageView!
+    
+    @IBOutlet weak var tagsPanel: UIView!
+    @IBOutlet weak var tagsTableView: UITableView!
+    @IBOutlet weak var newTagTextField: UITextField!
+    @IBOutlet weak var newTagColorPickerView: ColorPickerView!
+    @IBOutlet weak var tagsPanelTitleLabel: UILabel!
     // When the user taps a sketchnote to open it for editing, the app stores it in this property to remember which note is currently being edited.
     var selectedSketchnote: Sketchnote?
     // The view that is displayed as a pop-up for the user to draw a shape which is used for searching.
@@ -78,6 +85,18 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         super.viewDidLoad()
         self.navigationController?.setNavigationBarHidden(true, animated: false)
         
+        // Tags table view setup
+        tagsPanel.alpha = 0.0
+        tagsPanel.layer.masksToBounds = true
+        tagsPanel.layer.cornerRadius = 5
+        tagsTableView.delegate = self
+        tagsTableView.dataSource = self
+        newTagColorPickerView.delegate = self
+        newTagColorPickerView.layoutDelegate = self
+        newTagColorPickerView.isSelectedColorTappable = false
+        newTagColorPickerView.colors = [#colorLiteral(red: 0, green: 0, blue: 0, alpha: 1), #colorLiteral(red: 0.1215686277, green: 0.01176470611, blue: 0.4235294163, alpha: 1), #colorLiteral(red: 0.2196078449, green: 0.007843137719, blue: 0.8549019694, alpha: 1), #colorLiteral(red: 0.5568627715, green: 0.3529411852, blue: 0.9686274529, alpha: 1), #colorLiteral(red: 0.2392156869, green: 0.6745098233, blue: 0.9686274529, alpha: 1), #colorLiteral(red: 0.1411764771, green: 0.3960784376, blue: 0.5647059083, alpha: 1), #colorLiteral(red: 0.1294117719, green: 0.2156862766, blue: 0.06666667014, alpha: 1), #colorLiteral(red: 0.3411764801, green: 0.6235294342, blue: 0.1686274558, alpha: 1), #colorLiteral(red: 0.721568644, green: 0.8862745166, blue: 0.5921568871, alpha: 1), #colorLiteral(red: 0.9764705896, green: 0.850980401, blue: 0.5490196347, alpha: 1), #colorLiteral(red: 0.9529411793, green: 0.6862745285, blue: 0.1333333403, alpha: 1), #colorLiteral(red: 0.3098039329, green: 0.2039215714, blue: 0.03921568766, alpha: 1), #colorLiteral(red: 0.3176470697, green: 0.07450980693, blue: 0.02745098062, alpha: 1), #colorLiteral(red: 0.7450980544, green: 0.1568627506, blue: 0.07450980693, alpha: 1), #colorLiteral(red: 0.9372549057, green: 0.3490196168, blue: 0.1921568662, alpha: 1), #colorLiteral(red: 0.9568627477, green: 0.6588235497, blue: 0.5450980663, alpha: 1), #colorLiteral(red: 0.8549019694, green: 0.250980407, blue: 0.4784313738, alpha: 1), #colorLiteral(red: 0.5725490451, green: 0, blue: 0.2313725501, alpha: 1), #colorLiteral(red: 0.1921568662, green: 0.007843137719, blue: 0.09019608051, alpha: 1)]
+        newTagColorPickerView.preselectedIndex = 0
+        
         // The note-sharing related variables are instantiated
         peerID = MCPeerID(displayName: UIDevice.current.name)
         mcSession = MCSession(peer: peerID, securityIdentity: nil, encryptionPreference: .required)
@@ -95,7 +114,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         drawingSearchCanvas.lineColor = .white
         drawingSearchCanvas.lineWidth = 350 * 0.04
         self.drawingSearchPanel.alpha = 0.0
-        self.drawingSearchBlurView.alpha = 0.0
+        self.blurView.alpha = 0.0
         
         noteLargePreviewView.alpha = 0.0
         noteLargePreviewView.layer.masksToBounds = true
@@ -128,9 +147,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             self.notes = [Sketchnote]()
         }
         
-        if SettingsManager.noteSortingByNewest() {
-            self.noteSortingButton.titleLabel?.text = "Newest First"
-        }
         self.items = self.notes
         noteCollectionView.reloadData()
         
@@ -229,7 +245,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         let popMenu = PopMenuViewController(sourceView: sender, actions: [PopMenuAction](), appearance: nil)
         popMenu.appearance.popMenuBackgroundStyle = .blurred(.dark)
         let newestFirstAction = PopMenuDefaultAction(title: "Newest First", didSelect: { action in
-            self.noteSortingButton.titleLabel?.text = "Newest First"
             UserDefaults.settings.set(true, forKey: SettingsKeys.NoteSortingByNewest.rawValue)
             self.items = self.items.sorted(by: { (note0: Sketchnote, note1: Sketchnote) -> Bool in
                 return note0 > note1
@@ -239,7 +254,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         })
         popMenu.addAction(newestFirstAction)
         let oldestFirstAction = PopMenuDefaultAction(title: "Oldest First", didSelect: { action in
-            self.noteSortingButton.titleLabel?.text = "Oldest First"
             UserDefaults.settings.set(false, forKey: SettingsKeys.NoteSortingByNewest.rawValue)
             self.items = self.items.sorted()
             self.noteCollectionView.reloadData()
@@ -261,7 +275,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     
     private func expandSearchPanel() {
         self.view.layoutIfNeeded()
-        UIView.animate(withDuration: 0.5, delay: 0, animations: {
+        UIView.animate(withDuration: 0.25, delay: 0, animations: {
             self.searchPanelHeightConstraint.constant = 113
             self.view.layoutIfNeeded()
         }, completion: { (ended) in
@@ -270,7 +284,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     }
     private func collapseSearchPanel() {
         self.view.layoutIfNeeded()
-        UIView.animate(withDuration: 0.5, delay: 0, animations: {
+        UIView.animate(withDuration: 0.25, delay: 0, animations: {
             self.searchPanelHeightConstraint.constant = 0
             self.view.layoutIfNeeded()
         }, completion: { (ended) in
@@ -332,10 +346,10 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     
     @IBAction func drawingSearchButtonTapped(_ sender: UIButton) {
         self.view.layoutIfNeeded()
-        UIView.animate(withDuration: 0.5, delay: 0.0, options: UIView.AnimationOptions.curveEaseIn, animations: {
+        UIView.animate(withDuration: 0.25, delay: 0.0, options: UIView.AnimationOptions.curveEaseIn, animations: {
             self.drawingSearchPanel.alpha = 1.0
-            self.drawingSearchBlurView.alpha = 1.0
-            self.drawingSearchBlurView.isHidden = false
+            self.blurView.alpha = 1.0
+            self.blurView.isHidden = false
             self.drawingSearchPanel.isHidden = false
             self.view.layoutIfNeeded()
         }, completion: nil)
@@ -390,11 +404,11 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     // MARK: Drawing Search
     private func closeDrawingSearchPanel() {
         self.view.layoutIfNeeded()
-        UIView.animate(withDuration: 0.5, delay: 0.0, options: UIView.AnimationOptions.curveEaseOut, animations: {
+        UIView.animate(withDuration: 0.25, delay: 0.0, options: UIView.AnimationOptions.curveEaseOut, animations: {
             self.drawingSearchPanel.alpha = 0.0
-            self.drawingSearchBlurView.alpha = 0.0
+            self.blurView.alpha = 0.0
         }, completion: { completed in
-            self.drawingSearchBlurView.isHidden = true
+            self.blurView.isHidden = true
             self.drawingSearchPanel.isHidden = true
              self.view.layoutIfNeeded()
         })
@@ -402,9 +416,14 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     @IBAction func closeDrawingSearchTapped(_ sender: UIButton) {
         self.closeDrawingSearchPanel()
     }
-    @IBAction func drawingSearchBlurViewTapped(_ sender: UITapGestureRecognizer) {
+    @IBAction func blurViewTapped(_ sender: UITapGestureRecognizer) {
         if sender.state == .ended {
-            self.closeDrawingSearchPanel()
+            if !drawingSearchPanel.isHidden {
+                 self.closeDrawingSearchPanel()
+            }
+            else {
+                self.closeTagsPanel()
+            }
         }
     }
     @IBAction func clearDrawingSearchTapped(_ sender: UIButton) {
@@ -650,6 +669,12 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             }
         })
         popMenu.addAction(sendAction)
+        let shareAction = PopMenuDefaultAction(title: "Share", color: .white, didSelect: { action in
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                self.generatePDF(noteViewCell: cell)
+            }
+        })
+        popMenu.addAction(shareAction)
         let action = PopMenuDefaultAction(title: "Delete", color: .red, didSelect: { action in
             self.notes.removeAll{$0 == sketchnote}
             self.items.removeAll{$0 == sketchnote}
@@ -661,8 +686,22 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         self.present(popMenu, animated: true, completion: nil)
     }
     
-    func noteCollectionViewCellShareTapped(sketchnote: Sketchnote, sender: UIButton, cell: NoteCollectionViewCell) {
-        self.generatePDF(noteViewCell: cell)
+    func noteCollectionViewCellTagTapped(sketchnote: Sketchnote, sender: UIButton, cell: NoteCollectionViewCell) {
+        var looseTagsToRemove = [Tag]()
+        for tag in sketchnote.tags {
+            if !TagsManager.tags.contains(tag) {
+                looseTagsToRemove.append(tag)
+            }
+        }
+        if looseTagsToRemove.count > 0 {
+            for t in looseTagsToRemove {
+                sketchnote.tags.removeAll{$0 == t}
+            }
+            sketchnote.save()
+        }
+        self.selectedNoteForTagEditing = sketchnote
+        self.tagsPanelState = .EditNote
+        self.showTagsPanel()
     }
     
     func noteCollectionViewCellLongPressed(sketchnote: Sketchnote, sender: UILongPressGestureRecognizer, cell: NoteCollectionViewCell) {
@@ -685,9 +724,9 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         self.view.layoutIfNeeded()
         UIView.animate(withDuration: 0.25, delay: 0.0, options: UIView.AnimationOptions.curveEaseIn, animations: {
             self.noteLargePreviewView.alpha = 1.0
-            self.drawingSearchBlurView.alpha = 1.0
+            self.blurView.alpha = 1.0
             self.noteLargePreviewView.isHidden = false
-            self.drawingSearchBlurView.isHidden = false
+            self.blurView.isHidden = false
             self.view.layoutIfNeeded()
         }, completion: { completed in
         })
@@ -697,11 +736,151 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         self.view.layoutIfNeeded()
         UIView.animate(withDuration: 0.25, delay: 0.0, options: UIView.AnimationOptions.curveEaseOut, animations: {
             self.noteLargePreviewView.alpha = 0.0
-            self.drawingSearchBlurView.alpha = 0.0
+            self.blurView.alpha = 0.0
         }, completion: { completed in
             self.noteLargePreviewView.isHidden = true
-            self.drawingSearchBlurView.isHidden = true
+            self.blurView.isHidden = true
             self.view.layoutIfNeeded()
         })
+    }
+    
+    // MARK: Tags
+    private var tagsPanelState = TagsPanelState.EditTags
+    private enum TagsPanelState: String {
+        case EditTags
+        case EditNote
+        case NewNote
+    }
+    private var selectedNoteForTagEditing: Sketchnote?
+    
+    private func updateTagsPanel() {
+        switch self.tagsPanelState {
+        case .EditTags:
+            self.tagsPanelTitleLabel.text = "Manage Tags"
+            self.tagsTableView.allowsSelection = false
+            self.tagsTableView.allowsMultipleSelection = false
+        case .EditNote:
+            self.tagsPanelTitleLabel.text = "Edit Note Tags"
+            self.tagsTableView.allowsSelection = true
+            self.tagsTableView.allowsMultipleSelection = true
+        case .NewNote:
+            self.tagsPanelTitleLabel.text = "New Note With Tags"
+            self.tagsTableView.allowsSelection = true
+            self.tagsTableView.allowsMultipleSelection = true
+        }
+        tagsTableView.reloadData()
+    }
+    
+    @IBAction func tagsButtonTapped(_ sender: UIButton) {
+        showTagsPanel()
+    }
+    
+    private func showTagsPanel() {
+        self.updateTagsPanel()
+        self.view.layoutIfNeeded()
+        UIView.animate(withDuration: 0.25, delay: 0.0, options: UIView.AnimationOptions.curveEaseIn, animations: {
+            self.tagsPanel.alpha = 1.0
+            self.blurView.alpha = 1.0
+            self.blurView.isHidden = false
+            self.tagsPanel.isHidden = false
+            self.view.layoutIfNeeded()
+        }, completion: nil)
+    }
+    
+    private func closeTagsPanel() {
+        if self.tagsPanelState == .EditNote && selectedNoteForTagEditing != nil {
+            selectedNoteForTagEditing!.save()
+        }
+        self.tagsPanelState = .EditTags
+        self.view.layoutIfNeeded()
+        UIView.animate(withDuration: 0.25, delay: 0.0, options: UIView.AnimationOptions.curveEaseOut, animations: {
+            self.tagsPanel.alpha = 0.0
+            self.blurView.alpha = 0.0
+        }, completion: { completed in
+            self.blurView.isHidden = true
+            self.tagsPanel.isHidden = true
+            self.view.layoutIfNeeded()
+        })
+    }
+    @IBAction func newTagTapped(_ sender: UIButton) {
+        if let title = newTagTextField.text {
+            let trimmed = title.trimmingCharacters(in: .whitespacesAndNewlines)
+            if !trimmed.isEmpty {
+                let newTag = Tag(title: trimmed, color: newTagColorPickerView.colors[newTagColorPickerView.indexOfSelectedColor ?? 0])
+                TagsManager.add(tag: newTag)
+                tagsTableView.reloadData()
+                
+                newTagTextField.text = ""
+            }
+        }
+    }
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return TagsManager.tags.count
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tagsTableView.dequeueReusableCell(withIdentifier: "TagTableViewCell", for: indexPath) as! TagTableViewCell
+        
+        let tag = TagsManager.tags[indexPath.row]
+        cell.setTag(tag: tag)
+        cell.delegate = self
+        
+        return cell
+    }
+    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        if let cell = cell as? TagTableViewCell {
+            if self.tagsPanelState == .EditNote && selectedNoteForTagEditing != nil {
+                for t in selectedNoteForTagEditing!.tags {
+                    if cell.noteTag == t {
+                        tableView.selectRow(at: indexPath, animated: false, scrollPosition: .none)
+                        break
+                    }
+                }
+            }
+        }
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+       self.updateTagSelections()
+    }
+    func tableView(_ tableView: UITableView, didDeselectRowAt indexPath: IndexPath) {
+        self.updateTagSelections()
+    }
+    private func updateTagSelections() {
+        if self.tagsPanelState == .EditNote && selectedNoteForTagEditing != nil {
+            var selectedTags = [Tag]()
+            if let indexPathsForSelectedRows = tagsTableView.indexPathsForSelectedRows {
+                for i in indexPathsForSelectedRows {
+                    if i.row < TagsManager.tags.count {
+                        let tag = TagsManager.tags[i.row]
+                        selectedTags.append(tag)
+                    }
+                }
+            }
+            selectedNoteForTagEditing!.tags = selectedTags
+        }
+    }
+    
+    func deleteTagTapped(tag: Tag, sender: TagTableViewCell) {
+        TagsManager.delete(tag: tag)
+        tagsTableView.reloadData()
+        self.updateTagSelections()
+    }
+    
+    func colorPickerView(_ colorPickerView: ColorPickerView, didSelectItemAt indexPath: IndexPath) {
+    }
+    
+    func colorPickerView(_ colorPickerView: ColorPickerView, didDeselectItemAt indexPath: IndexPath) {
+    }
+    
+    func colorPickerView(_ colorPickerView: ColorPickerView, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        return CGSize(width: 25, height: 25)
+    }
+    func colorPickerView(_ colorPickerView: ColorPickerView, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
+        return CGFloat(3)
+    }
+    func colorPickerView(_ colorPickerView: ColorPickerView, insetForSectionAt section: Int) -> UIEdgeInsets {
+        return UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
     }
 }

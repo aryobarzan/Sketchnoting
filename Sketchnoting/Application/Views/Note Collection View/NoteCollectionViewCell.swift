@@ -12,7 +12,7 @@ class NoteCollectionViewCell: UICollectionViewCell {
     @IBOutlet weak var imageView: UIImageView!
     @IBOutlet weak var titleBackgroundView: UIView!
     @IBOutlet weak var titleLabel: UILabel!
-    @IBOutlet weak var shareButton: UIButton!
+    @IBOutlet weak var tagButton: UIButton!
     @IBOutlet weak var moreButton: UIButton!
     
     var delegate : NoteCollectionViewCellDelegate!
@@ -49,8 +49,8 @@ class NoteCollectionViewCell: UICollectionViewCell {
         delegate.noteCollectionViewCellLongPressed(sketchnote: sketchnote, sender: sender, cell: self)
     }
     
-    @IBAction func shareTapped(_ sender: UIButton) {
-        delegate.noteCollectionViewCellShareTapped(sketchnote: sketchnote, sender: sender, cell: self)
+    @IBAction func tagTapped(_ sender: UIButton) {
+        delegate.noteCollectionViewCellTagTapped(sketchnote: sketchnote, sender: sender, cell: self)
     }
     @IBAction func moreTapped(_ sender: UIButton) {
         delegate.noteCollectionViewCellMoreTapped(sketchnote: sketchnote, sender: moreButton, cell: self)
@@ -58,6 +58,6 @@ class NoteCollectionViewCell: UICollectionViewCell {
 }
 protocol NoteCollectionViewCellDelegate {
     func noteCollectionViewCellMoreTapped(sketchnote: Sketchnote, sender: UIButton, cell: NoteCollectionViewCell)
-    func noteCollectionViewCellShareTapped(sketchnote: Sketchnote, sender: UIButton, cell: NoteCollectionViewCell)
+    func noteCollectionViewCellTagTapped(sketchnote: Sketchnote, sender: UIButton, cell: NoteCollectionViewCell)
     func noteCollectionViewCellLongPressed(sketchnote: Sketchnote, sender: UILongPressGestureRecognizer, cell: NoteCollectionViewCell)
 }

@@ -72,6 +72,9 @@
 		9FD29C6422431BFA00CC969A /* DrawnImageClassifier.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29C6322431BFA00CC969A /* DrawnImageClassifier.mlmodel */; };
 		9FD29C6622431C0000CC969A /* labels.txt in Resources */ = {isa = PBXBuildFile; fileRef = 9FD29C6522431C0000CC969A /* labels.txt */; };
 		9FFE07DB232955B200DBD0AC /* SideMenuTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FFE07DA232955B200DBD0AC /* SideMenuTableViewController.swift */; };
+		9FFE07E6232A5FE500DBD0AC /* TagTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FFE07E5232A5FE500DBD0AC /* TagTableViewCell.swift */; };
+		9FFE07E8232A622A00DBD0AC /* Tag.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FFE07E7232A622A00DBD0AC /* Tag.swift */; };
+		9FFE07EA232A63BA00DBD0AC /* TagsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FFE07E9232A63BA00DBD0AC /* TagsManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -146,6 +149,9 @@
 		9FD29C6322431BFA00CC969A /* DrawnImageClassifier.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = DrawnImageClassifier.mlmodel; sourceTree = "<group>"; };
 		9FD29C6522431C0000CC969A /* labels.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = labels.txt; sourceTree = "<group>"; };
 		9FFE07DA232955B200DBD0AC /* SideMenuTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SideMenuTableViewController.swift; sourceTree = "<group>"; };
+		9FFE07E5232A5FE500DBD0AC /* TagTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagTableViewCell.swift; sourceTree = "<group>"; };
+		9FFE07E7232A622A00DBD0AC /* Tag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tag.swift; sourceTree = "<group>"; };
+		9FFE07E9232A63BA00DBD0AC /* TagsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagsManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -180,6 +186,7 @@
 		9F5010CA22491F8900425424 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				9FFE07DC232A595D00DBD0AC /* Tags */,
 				9F92D11623217C8300BC0E57 /* Search */,
 				9F75E449230C580300488BBD /* Note Collection View */,
 				9FC788F1225CEC230074BD16 /* DrawingSearchView.xib */,
@@ -196,6 +203,7 @@
 				9F5D0FC7229CBC4100BCA451 /* NotesManager.swift */,
 				9FA623A022E73DDA007ED794 /* NoteLoader.swift */,
 				9F92D111231E98C600BC0E57 /* DocumentsManager.swift */,
+				9FFE07E9232A63BA00DBD0AC /* TagsManager.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -454,6 +462,7 @@
 				9FD29BC422249D9500CC969A /* Note.swift */,
 				9FD29BCA2224B89800CC969A /* Sketchnote.swift */,
 				9F92D10F231E97DF00BC0E57 /* UserDefaultsExtensions.swift */,
+				9FFE07E7232A622A00DBD0AC /* Tag.swift */,
 			);
 			path = Data;
 			sourceTree = "<group>";
@@ -467,6 +476,14 @@
 				9F75E450230D8AE100488BBD /* SettingsManager.swift */,
 			);
 			path = Helpers;
+			sourceTree = "<group>";
+		};
+		9FFE07DC232A595D00DBD0AC /* Tags */ = {
+			isa = PBXGroup;
+			children = (
+				9FFE07E5232A5FE500DBD0AC /* TagTableViewCell.swift */,
+			);
+			path = Tags;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -622,6 +639,7 @@
 				9F92D110231E97DF00BC0E57 /* UserDefaultsExtensions.swift in Sources */,
 				9F92D11F23217FFF00BC0E57 /* SearchFilter.swift in Sources */,
 				9FA6239522DE3741007ED794 /* BioPortalDocument.swift in Sources */,
+				9FFE07E6232A5FE500DBD0AC /* TagTableViewCell.swift in Sources */,
 				9FD29BA92220524D00CC969A /* ViewController.swift in Sources */,
 				9F75E47D231183E500488BBD /* ColorPickerViewDelegate.swift in Sources */,
 				9FA6239722DE3806007ED794 /* CHEBIDocument.swift in Sources */,
@@ -634,6 +652,7 @@
 				9F92D112231E98C600BC0E57 /* DocumentsManager.swift in Sources */,
 				9FD29C56223C3C3900CC969A /* StringExtensions.swift in Sources */,
 				9F92D11C23217D0500BC0E57 /* SearchFilterView.swift in Sources */,
+				9FFE07EA232A63BA00DBD0AC /* TagsManager.swift in Sources */,
 				9FD29C4E223998BC00CC969A /* UIViewControllerExtensions.swift in Sources */,
 				9F75E478231183DD00488BBD /* ColorPickerCell.swift in Sources */,
 				9FD29C472239588E00CC969A /* UIViewExtensions.swift in Sources */,
@@ -663,6 +682,7 @@
 				9FA6239E22E66D73007ED794 /* HandwritingRecognizer.swift in Sources */,
 				9FD29BCB2224B89800CC969A /* Sketchnote.swift in Sources */,
 				9FA6238D22D38AEE007ED794 /* SpotlightHelper.swift in Sources */,
+				9FFE07E8232A622A00DBD0AC /* Tag.swift in Sources */,
 				9FFE07DB232955B200DBD0AC /* SideMenuTableViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -29,6 +29,7 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable {
     var drawingViewRects: [CGRect]?
     var paths: NSMutableArray?
     var textDataArray: [TextData]!
+    var tags: [Tag]!
     
     var sharedByDevice: String?
     
@@ -41,6 +42,7 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable {
         case relatedDocuments = "relatedDocuments"
         case drawings = "drawings"
         case drawingViewRects = "drawingViewRects"
+        case tags = "tags"
     }
     
     //MARK: Initialization
@@ -53,6 +55,7 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable {
         self.drawings = drawings ?? [String]()
         self.image = image
         self.textDataArray = [TextData]()
+        self.tags = [Tag]()
     }
     
     //MARK: Persistence
@@ -77,6 +80,7 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable {
             let strBase64 = imageData.base64EncodedString(options: .lineLength64Characters)
             try container.encode(strBase64, forKey: .image)
         }
+        try container.encode(tags, forKey: .tags)
     }
     
     required init(from decoder: Decoder) throws {
@@ -133,6 +137,11 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable {
             let dataDecoded: Data = Data(base64Encoded: strBase64, options: .ignoreUnknownCharacters)!
             image = UIImage(data: dataDecoded)
         } catch {
+        }
+        
+        tags = try? container.decode([Tag].self, forKey: .tags)
+        if tags == nil {
+            tags = [Tag]()
         }
         
         self.loadPaths()
