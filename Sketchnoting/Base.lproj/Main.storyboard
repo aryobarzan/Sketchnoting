@@ -469,7 +469,7 @@
                                     <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="uWo-fO-shM">
                                         <rect key="frame" x="8" y="48" width="712" height="55"/>
                                     </scrollView>
-                                    <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Search your notes..." textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="kB5-c2-JaK">
+                                    <textField opaque="NO" tag="100" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Search your notes..." textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="kB5-c2-JaK">
                                         <rect key="frame" x="8" y="8" width="652" height="30"/>
                                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <constraints>
@@ -524,7 +524,7 @@
                                 <rect key="frame" x="0.0" y="189" width="768" height="835"/>
                                 <subviews>
                                     <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="khA-pa-wBN">
-                                        <rect key="frame" x="0.0" y="45" width="768" height="790"/>
+                                        <rect key="frame" x="0.0" y="40" width="768" height="795"/>
                                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="5" minimumInteritemSpacing="5" id="TAb-Qi-OQa">
                                             <size key="itemSize" width="220" height="320"/>
@@ -539,12 +539,12 @@
                                         </connections>
                                     </collectionView>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="leading" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="IRa-tg-YTc">
-                                        <rect key="frame" x="8" y="0.0" width="40" height="40"/>
+                                        <rect key="frame" x="8" y="0.0" width="35" height="35"/>
                                         <constraints>
-                                            <constraint firstAttribute="width" constant="40" id="3Yd-ln-SdJ"/>
-                                            <constraint firstAttribute="height" constant="40" id="h4z-Xi-uVx"/>
+                                            <constraint firstAttribute="width" constant="35" id="3Yd-ln-SdJ"/>
+                                            <constraint firstAttribute="height" constant="35" id="h4z-Xi-uVx"/>
                                         </constraints>
-                                        <fontDescription key="fontDescription" type="system" pointSize="18"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="15"/>
                                         <state key="normal" image="SortIcon">
                                             <color key="titleColor" red="0.26875244110000002" green="0.49985405119999998" blue="0.82210710099999995" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         </state>
@@ -552,15 +552,47 @@
                                             <action selector="noteSortingTapped:" destination="BYZ-38-t0r" eventType="touchUpInside" id="WgW-HJ-mc2"/>
                                         </connections>
                                     </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="leading" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="m24-sJ-j5X">
+                                        <rect key="frame" x="725" y="0.0" width="35" height="35"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="35" id="KNE-cQ-XXY"/>
+                                            <constraint firstAttribute="height" constant="35" id="Zpb-4j-iPf"/>
+                                        </constraints>
+                                        <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                        <state key="normal" image="FilterIcon">
+                                            <color key="titleColor" red="0.26875244110000002" green="0.49985405119999998" blue="0.82210710099999995" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="filterNotesByTagsButtonTapped:" destination="BYZ-38-t0r" eventType="touchUpInside" id="C22-3H-n4S"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="leading" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="vgL-tn-nRc">
+                                        <rect key="frame" x="366.5" y="0.0" width="35" height="35"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="35" id="WZ3-hr-6Or"/>
+                                            <constraint firstAttribute="width" constant="35" id="kbW-Ja-QOc"/>
+                                        </constraints>
+                                        <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                        <state key="normal" image="ListIcon">
+                                            <color key="titleColor" red="0.26875244110000002" green="0.49985405119999998" blue="0.82210710099999995" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="noteListViewButtonTapped:" destination="BYZ-38-t0r" eventType="touchUpInside" id="bg9-rS-6x4"/>
+                                        </connections>
+                                    </button>
                                 </subviews>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
                                     <constraint firstItem="khA-pa-wBN" firstAttribute="top" secondItem="IRa-tg-YTc" secondAttribute="bottom" constant="5" id="3W4-x1-N6q"/>
+                                    <constraint firstItem="vgL-tn-nRc" firstAttribute="top" secondItem="hut-mJ-mJj" secondAttribute="top" id="CUe-JV-3Kx"/>
                                     <constraint firstAttribute="trailing" secondItem="khA-pa-wBN" secondAttribute="trailing" id="D8W-Hb-YF9"/>
                                     <constraint firstItem="IRa-tg-YTc" firstAttribute="top" secondItem="hut-mJ-mJj" secondAttribute="top" id="FB6-RC-YDp"/>
                                     <constraint firstAttribute="bottom" secondItem="khA-pa-wBN" secondAttribute="bottom" id="Hrv-Xf-kaF"/>
+                                    <constraint firstAttribute="trailing" secondItem="m24-sJ-j5X" secondAttribute="trailing" constant="8" id="Nwa-sA-bgE"/>
                                     <constraint firstItem="IRa-tg-YTc" firstAttribute="leading" secondItem="hut-mJ-mJj" secondAttribute="leading" constant="8" id="gCO-xa-ccc"/>
+                                    <constraint firstItem="vgL-tn-nRc" firstAttribute="centerX" secondItem="hut-mJ-mJj" secondAttribute="centerX" id="oXL-LI-6ZI"/>
                                     <constraint firstItem="khA-pa-wBN" firstAttribute="leading" secondItem="hut-mJ-mJj" secondAttribute="leading" id="rrk-Ek-z9e"/>
+                                    <constraint firstItem="m24-sJ-j5X" firstAttribute="top" secondItem="hut-mJ-mJj" secondAttribute="top" id="uwv-hz-Wcs"/>
                                 </constraints>
                             </view>
                             <visualEffectView hidden="YES" opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="aXb-h3-W9j">
@@ -644,7 +676,7 @@
                                             <constraint firstAttribute="height" constant="1" id="ega-Lj-h6v"/>
                                         </constraints>
                                     </view>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Manage Tags" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="moq-8M-LnT">
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Manage Tags" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumScaleFactor="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="moq-8M-LnT">
                                         <rect key="frame" x="8" y="8" width="234" height="32"/>
                                         <fontDescription key="fontDescription" style="UICTFontTextStyleTitle1"/>
                                         <nil key="textColor"/>
@@ -789,6 +821,7 @@
                         <outlet property="drawingSearchCanvas" destination="l9j-vR-p5a" id="QnX-BW-Ouc"/>
                         <outlet property="drawingSearchPanel" destination="6gt-6K-gVF" id="w6m-Ke-2QR"/>
                         <outlet property="newNoteButton" destination="UAF-TK-CJG" id="BJS-Sr-u5U"/>
+                        <outlet property="newTagButton" destination="pwJ-zm-kL8" id="swz-F9-MSZ"/>
                         <outlet property="newTagColorPickerView" destination="GWm-Mt-qEy" id="lS5-T3-RWa"/>
                         <outlet property="newTagTextField" destination="p0L-PX-Pbz" id="Pjn-rr-hTM"/>
                         <outlet property="noteCollectionView" destination="khA-pa-wBN" id="jLd-Rn-697"/>
@@ -1632,6 +1665,8 @@
         <image name="ClearDrawingIcon" width="48" height="48"/>
         <image name="ClearSearchIcon" width="48" height="48"/>
         <image name="DrawingSearchIcon" width="48" height="48"/>
+        <image name="FilterIcon" width="48" height="48"/>
+        <image name="ListIcon" width="48" height="48"/>
         <image name="MenuIcon" width="48" height="48"/>
         <image name="MoreNoteActionsIcon" width="48" height="48"/>
         <image name="NoHelpLinesIcon" width="48" height="48"/>
