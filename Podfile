@@ -2,7 +2,7 @@
 # platform :ios, '9.0'
 use_frameworks!
 target 'Sketchnoting' do
-  pod 'Alamofire', '~> 5.0.0-rc.1'
+  pod 'Alamofire', '~> 5.0.0-rc.2'
   pod 'LGButton'
   pod 'Firebase/Core'
   pod 'Firebase/MLVision'
@@ -10,7 +10,6 @@ target 'Sketchnoting' do
   pod 'Firebase/MLVisionTextModel'
   pod 'GPUImage'
   pod 'NewPopMenu'
-  pod 'PDFGenerator'
   pod 'GSMessages'
   pod 'BadgeHub'
   pod 'SwiftyJSON'

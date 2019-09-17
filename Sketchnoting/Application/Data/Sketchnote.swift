@@ -7,6 +7,8 @@
 //
 
 import UIKit
+import PDFKit
+
 
 protocol SketchnoteDelegate {
     func sketchnoteHasNewDocument(sketchnote: Sketchnote, document: Document)
@@ -508,6 +510,33 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable {
         }
         return false
     }
+    
+    // MARK: PDF Generation
+    
+    func createPDF() -> Data? {
+        if let image = self.image {
+            let pdfMetaData = [
+                kCGPDFContextCreator: "Sketchnoting iOS App",
+                kCGPDFContextAuthor: UIDevice.current.name
+            ]
+            let format = UIGraphicsPDFRendererFormat()
+            format.documentInfo = pdfMetaData as [String: Any]
+            
+            let pageWidth = image.size.width
+            let pageHeight = image.size.height
+            let pageRect = CGRect(x: 0, y: 0, width: pageWidth, height: pageHeight)
+            
+            let renderer = UIGraphicsPDFRenderer(bounds: pageRect, format: format)
+            let data = renderer.pdfData { (context) in
+                context.beginPage()
+                image.draw(at: CGPoint(x: 0, y: 0))
+            }
+            return data
+        }
+        return nil
+    }
+    
+    // MARK: Comparable, equatable
 
     static func == (lhs: Sketchnote, rhs: Sketchnote) -> Bool {
         if lhs.id == rhs.id {

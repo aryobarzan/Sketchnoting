@@ -1458,28 +1458,47 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     @IBAction func filterDocumentsButtonTapped(_ sender: UIButton) {
         let popMenu = PopMenuViewController(sourceView: sender, actions: [PopMenuAction](), appearance: nil)
         popMenu.appearance.popMenuBackgroundStyle = .blurred(.dark)
-        let allAction = PopMenuDefaultAction(title: "All", color: #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1), didSelect: { action in
+        
+        var allImage: UIImage? = nil
+        var spotlightImage: UIImage? = nil
+        var bioportalImage: UIImage? = nil
+        var chebiImage: UIImage? = nil
+        var tagmeImage: UIImage? = nil
+        switch self.bookshelfFilter {
+        case .All:
+            allImage = #imageLiteral(resourceName: "CheckmarkIcon")
+        case .TAGME:
+            tagmeImage = #imageLiteral(resourceName: "CheckmarkIcon")
+        case .Spotlight:
+            spotlightImage = #imageLiteral(resourceName: "CheckmarkIcon")
+        case .BioPortal:
+            bioportalImage = #imageLiteral(resourceName: "CheckmarkIcon")
+        case .CHEBI:
+            chebiImage = #imageLiteral(resourceName: "CheckmarkIcon")
+        }
+        
+        let allAction = PopMenuDefaultAction(title: "All", image: allImage, color: #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1), didSelect: { action in
             self.bookshelfFilter = .All
             self.updateBookshelf()
             self.filterDocumentsButton.setTitle("All", for: .normal)
             
         })
-        let spotlightAction = PopMenuDefaultAction(title: "Spotlight", color: #colorLiteral(red: 0.1764705926, green: 0.01176470611, blue: 0.5607843399, alpha: 1), didSelect: { action in
+        let spotlightAction = PopMenuDefaultAction(title: "Spotlight", image: spotlightImage, color: #colorLiteral(red: 0.1764705926, green: 0.01176470611, blue: 0.5607843399, alpha: 1), didSelect: { action in
             self.bookshelfFilter = .Spotlight
             self.updateBookshelf()
             self.filterDocumentsButton.setTitle("Spotlight", for: .normal)
         })
-        let bioportalAction = PopMenuDefaultAction(title: "BioPortal", color: #colorLiteral(red: 0.3411764801, green: 0.6235294342, blue: 0.1686274558, alpha: 1), didSelect: { action in
+        let bioportalAction = PopMenuDefaultAction(title: "BioPortal", image: bioportalImage, color: #colorLiteral(red: 0.3411764801, green: 0.6235294342, blue: 0.1686274558, alpha: 1), didSelect: { action in
             self.bookshelfFilter = .BioPortal
             self.updateBookshelf()
             self.filterDocumentsButton.setTitle("BioPortal", for: .normal)
         })
-        let chebiAction = PopMenuDefaultAction(title: "CHEBI", color: #colorLiteral(red: 0.9529411793, green: 0.6862745285, blue: 0.1333333403, alpha: 1), didSelect: { action in
+        let chebiAction = PopMenuDefaultAction(title: "CHEBI", image: chebiImage, color: #colorLiteral(red: 0.9529411793, green: 0.6862745285, blue: 0.1333333403, alpha: 1), didSelect: { action in
             self.bookshelfFilter = .CHEBI
             self.updateBookshelf()
             self.filterDocumentsButton.setTitle("CHEBI", for: .normal)
         })
-        let tagmeAction = PopMenuDefaultAction(title: "TAGME", color: #colorLiteral(red: 0.1764705926, green: 0.4980392158, blue: 0.7568627596, alpha: 1), didSelect: { action in
+        let tagmeAction = PopMenuDefaultAction(title: "TAGME", image: tagmeImage, color: #colorLiteral(red: 0.1764705926, green: 0.4980392158, blue: 0.7568627596, alpha: 1), didSelect: { action in
             self.bookshelfFilter = .TAGME
             self.updateBookshelf()
             self.filterDocumentsButton.setTitle("TAGME", for: .normal)

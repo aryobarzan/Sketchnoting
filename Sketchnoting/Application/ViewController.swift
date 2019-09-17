@@ -10,9 +10,9 @@ import UIKit
 import LGButton
 import PopMenu
 import MultipeerConnectivity
-import PDFGenerator
 import GSMessages
 import SideMenu
+import BadgeHub
 
 // This is the controller for the app's home page view.
 // It contains the search bar and all the buttons related to it.
@@ -25,19 +25,21 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     
     @IBOutlet var searchField: UITextField!
     @IBOutlet var searchFiltersScrollView: UIScrollView!
-    var searchFiltersStackView = UIStackView()
+    @IBOutlet var searchFiltersStackView: UIStackView!
     @IBOutlet var searchTypeButton: UIButton!
     private var searchType = SearchType.All
     @IBOutlet var searchPanelButton: UIButton!
     @IBOutlet var clearSearchButton: UIButton!
+    @IBOutlet var noteListViewButton: UIButton!
+    @IBOutlet var filtersButton: UIButton!
     
     @IBOutlet var searchPanel: UIView!
     @IBOutlet var noteSortingButton: UIButton!
     @IBOutlet var searchPanelHeightConstraint: NSLayoutConstraint!
     var searchPanelIsOpen = false
+    @IBOutlet weak var searchFiltersPanel: UIView!
     
     @IBOutlet var drawingSearchPanel: UIView!
-    @IBOutlet var closeDrawingSearchPanelButton: UIButton!
     @IBOutlet var clearDrawingSearchButton: UIButton!
     @IBOutlet var drawingSearchButton: UIButton!
     @IBOutlet var drawingSearchCanvas: SketchView!
@@ -50,6 +52,9 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     @IBOutlet weak var newTagColorPickerView: ColorPickerView!
     @IBOutlet weak var tagsPanelTitleLabel: UILabel!
     @IBOutlet weak var newTagButton: UIButton!
+    
+    var activeFiltersBadge: BadgeHub!
+    var activeSearchFiltersBadge: BadgeHub!
     // When the user taps a sketchnote to open it for editing, the app stores it in this property to remember which note is currently being edited.
     var selectedSketchnote: Sketchnote?
     // The view that is displayed as a pop-up for the user to draw a shape which is used for searching.
@@ -85,6 +90,14 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     override func viewDidLoad() {
         super.viewDidLoad()
         self.navigationController?.setNavigationBarHidden(true, animated: false)
+        self.navigationController?.navigationBar.barStyle = .black
+        
+        // Badge Hubs
+        
+        activeFiltersBadge = BadgeHub(view: filtersButton)
+        activeSearchFiltersBadge = BadgeHub(view: searchPanelButton)
+        activeFiltersBadge.scaleCircleSize(by: 0.45)
+        activeSearchFiltersBadge.scaleCircleSize(by: 0.45)
         
         // Tags table view setup
         tagsPanel.alpha = 0.0
@@ -106,6 +119,9 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         newNoteButton.layer.masksToBounds = true
         newNoteButton.layer.cornerRadius = 25
         
+        noteListViewButton.layer.masksToBounds = true
+        noteListViewButton.layer.cornerRadius = 5
+        
         searchPanelHeightConstraint.constant = 0
         
         drawingSearchPanel.layer.masksToBounds = true
@@ -125,20 +141,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         
         // The search views are setup, including the search field and the pop-up view for searching by drawing
         self.searchField.delegate = self
-        searchFiltersStackView.isUserInteractionEnabled = true
-        searchFiltersStackView.axis = .horizontal
-        searchFiltersStackView.distribution = .equalSpacing
-        searchFiltersStackView.alignment = .fill
-        searchFiltersStackView.spacing = 5
-        searchFiltersScrollView.addSubview(searchFiltersStackView)
-        searchFiltersStackView.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            searchFiltersStackView.topAnchor.constraint(equalTo: searchFiltersScrollView.topAnchor),
-            searchFiltersStackView.leadingAnchor.constraint(equalTo: searchFiltersScrollView.leadingAnchor),
-            searchFiltersStackView.trailingAnchor.constraint(equalTo: searchFiltersScrollView.trailingAnchor),
-            searchFiltersStackView.bottomAnchor.constraint(equalTo: searchFiltersScrollView.bottomAnchor),
-            searchFiltersStackView.heightAnchor.constraint(equalTo: searchFiltersScrollView.heightAnchor)
-            ])
         
         noteCollectionView.register(UINib(nibName: "NoteCollectionViewCell", bundle: nil), forCellWithReuseIdentifier: reuseIdentifier)
         noteCollectionView.register(UINib(nibName: "NoteCollectionViewDetailCell", bundle: nil), forCellWithReuseIdentifier: reuseIdentifierDetailCell)
@@ -161,6 +163,15 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
                 print("error loading labels: \(error)")
             }
         }
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        self.navigationController?.setNavigationBarHidden(true, animated: true)
+        self.setNeedsStatusBarAppearanceUpdate()
+    }
+    override var preferredStatusBarStyle : UIStatusBarStyle {
+        return .lightContent
     }
     
     // This function handles the cases where the user either creates a new note or wants to edit an existing note.
@@ -198,10 +209,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         default:
             print("Not creating or editing sketchnote.")
         }
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        self.navigationController?.setNavigationBarHidden(true, animated: true)
     }
     
     // This function is called when the user closes a note they were editing and the user returns to the homepage.
@@ -292,19 +299,27 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     @IBAction func noteSortingTapped(_ sender: UIButton) {
         let popMenu = PopMenuViewController(sourceView: sender, actions: [PopMenuAction](), appearance: nil)
         popMenu.appearance.popMenuBackgroundStyle = .blurred(.dark)
-        let newestFirstAction = PopMenuDefaultAction(title: "Newest First", didSelect: { action in
+        
+        var newestFirstImage: UIImage? = nil
+        var oldestFirstImage: UIImage? = nil
+        if SettingsManager.noteSortingByNewest() {
+            newestFirstImage = #imageLiteral(resourceName: "CheckmarkIcon")
+        }
+        else {
+            oldestFirstImage = #imageLiteral(resourceName: "CheckmarkIcon")
+        }
+        let newestFirstAction = PopMenuDefaultAction(title: "Newest First", image: newestFirstImage,  didSelect: { action in
             UserDefaults.settings.set(true, forKey: SettingsKeys.NoteSortingByNewest.rawValue)
-            
             self.updateDisplayedNotes()
             
         })
         popMenu.addAction(newestFirstAction)
-        let oldestFirstAction = PopMenuDefaultAction(title: "Oldest First", didSelect: { action in
+        let oldestFirstAction = PopMenuDefaultAction(title: "Oldest First", image: oldestFirstImage, didSelect: { action in
             UserDefaults.settings.set(false, forKey: SettingsKeys.NoteSortingByNewest.rawValue)
-            
             self.updateDisplayedNotes()
         })
         popMenu.addAction(oldestFirstAction)
+        
         self.present(popMenu, animated: true, completion: nil)
     }
     
@@ -322,26 +337,70 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     private func expandSearchPanel() {
         self.view.layoutIfNeeded()
         UIView.animate(withDuration: 0.25, delay: 0, animations: {
-            self.searchPanelHeightConstraint.constant = 113
+            self.searchPanel.isHidden = false
+            self.searchPanelHeightConstraint.constant = 48
             self.view.layoutIfNeeded()
         }, completion: { (ended) in
+            self.expandSearchFiltersPanel()
         })
         searchPanelIsOpen = true
     }
     private func collapseSearchPanel() {
-        self.view.layoutIfNeeded()
-        UIView.animate(withDuration: 0.25, delay: 0, animations: {
-            self.searchPanelHeightConstraint.constant = 0
+        if self.searchPanelHeightConstraint.constant == 113 {
             self.view.layoutIfNeeded()
-        }, completion: { (ended) in
-        })
+            UIView.animate(withDuration: 0.25, delay: 0, animations: {
+                self.searchPanelHeightConstraint.constant = 48
+                self.view.layoutIfNeeded()
+            }, completion: { (ended) in
+                self.searchFiltersPanel.isHidden = true
+                self.view.layoutIfNeeded()
+                UIView.animate(withDuration: 0.25, delay: 0, animations: {
+                    self.searchPanelHeightConstraint.constant = 0
+                    self.view.layoutIfNeeded()
+                }, completion: { (ended) in
+                    self.searchPanel.isHidden = true
+                })
+            })
+        }
+        else {
+            self.view.layoutIfNeeded()
+            UIView.animate(withDuration: 0.25, delay: 0, animations: {
+                self.searchPanelHeightConstraint.constant = 0
+                self.view.layoutIfNeeded()
+            }, completion: { (ended) in
+                self.searchPanel.isHidden = true
+            })
+        }
         searchPanelIsOpen = false
+    }
+    
+    private func expandSearchFiltersPanel() {
+        if self.searchFilters.count > 0 {
+            self.view.layoutIfNeeded()
+            UIView.animate(withDuration: 0.25, delay: 0, animations: {
+                self.searchFiltersPanel.isHidden = false
+                self.searchPanelHeightConstraint.constant = 113
+                self.view.layoutIfNeeded()
+            }, completion: { (ended) in
+            })
+        }
+    }
+    private func collapseSearchFiltersPanel() {
+        if self.searchPanelHeightConstraint.constant == 113 {
+            self.view.layoutIfNeeded()
+            UIView.animate(withDuration: 0.25, delay: 0, animations: {
+                self.searchPanelHeightConstraint.constant = 48
+                self.view.layoutIfNeeded()
+            }, completion: { (ended) in
+                self.searchFiltersPanel.isHidden = true
+            })
+        }
     }
     
     private func performSearch() {
         if !searchField.text!.isEmpty {
             let searchString = searchField.text!.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-            createSearchFilter(term: searchString, type: .All)
+            createSearchFilter(term: searchString, type: self.searchType)
             clearSearchButton.isHidden = false
             searchField.text = ""
         }
@@ -350,14 +409,16 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         }
         else {
             clearSearchButton.isHidden = false
-            
+            self.expandSearchFiltersPanel()
             self.updateDisplayedNotes()
         }
+        
+        activeSearchFiltersBadge.setCount(self.searchFilters.count)
     }
     
     private func createSearchFilter(term: String, type: SearchType) {
         let termTrimmed = term.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-        let filter = SearchFilter(term: termTrimmed, type: self.searchType)
+        let filter = SearchFilter(term: termTrimmed, type: type)
         if !searchFilters.contains(filter) {
             let filterView = SearchFilterView(filter: filter)
             filterView.setContent(filter: filter)
@@ -408,31 +469,34 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         clearSearchButton.isHidden = true
         searchField.text = ""
         
+        activeSearchFiltersBadge.setCount(0)
+        
         self.updateDisplayedNotes()
+        self.collapseSearchFiltersPanel()
     }
     @IBAction func searchTypeButtonTapped(_ sender: UIButton) {
         let popMenu = PopMenuViewController(sourceView: sender, actions: [PopMenuAction](), appearance: nil)
         popMenu.appearance.popMenuBackgroundStyle = .blurred(.dark)
-        let allAction = PopMenuDefaultAction(title: "All", didSelect: { action in
-            self.searchTypeButton.setTitle("All ↓", for: .normal)
+        let allAction = PopMenuDefaultAction(title: "All", image: #imageLiteral(resourceName: "DetailsIcon"), didSelect: { action in
+            self.searchTypeButton.setImage(#imageLiteral(resourceName: "DetailsIcon"), for: .normal)
             self.searchType = .All
             
         })
         popMenu.addAction(allAction)
-        let textAction = PopMenuDefaultAction(title: "Text", didSelect: { action in
-            self.searchTypeButton.setTitle("Text ↓", for: .normal)
+        let textAction = PopMenuDefaultAction(title: "Text", image: #imageLiteral(resourceName: "CopyTextIcon"), didSelect: { action in
+            self.searchTypeButton.setImage(#imageLiteral(resourceName: "CopyTextIcon"), for: .normal)
             self.searchType = .Text
             
         })
         popMenu.addAction(textAction)
-        let drawingAction = PopMenuDefaultAction(title: "Drawing", didSelect: { action in
-            self.searchTypeButton.setTitle("Drawing ↓", for: .normal)
+        let drawingAction = PopMenuDefaultAction(title: "Drawing", image: #imageLiteral(resourceName: "ImageIcon"), didSelect: { action in
+            self.searchTypeButton.setImage(#imageLiteral(resourceName: "ImageIcon"), for: .normal)
             self.searchType = .Drawing
             
         })
         popMenu.addAction(drawingAction)
-        let documentAction = PopMenuDefaultAction(title: "Document", didSelect: { action in
-            self.searchTypeButton.setTitle("Document ↓", for: .normal)
+        let documentAction = PopMenuDefaultAction(title: "Document", image: #imageLiteral(resourceName: "FileIcon"), didSelect: { action in
+            self.searchTypeButton.setImage(#imageLiteral(resourceName: "FileIcon"), for: .normal)
             self.searchType = .Document
             
         })
@@ -452,9 +516,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
              self.view.layoutIfNeeded()
         })
     }
-    @IBAction func closeDrawingSearchTapped(_ sender: UIButton) {
-        self.closeDrawingSearchPanel()
-    }
+
     @IBAction func blurViewTapped(_ sender: UITapGestureRecognizer) {
         if sender.state == .ended {
             if !drawingSearchPanel.isHidden {
@@ -740,15 +802,15 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     
     private func shareNote(note: Sketchnote, sender: UICollectionViewCell) {
         if note.image != nil {
-            do {
-                let data = try PDFGenerator.generated(by: [note.image!])
-                let activityController = UIActivityViewController(activityItems: [data], applicationActivities: nil)
-                self.present(activityController, animated: true, completion: nil)
-                if let popOver = activityController.popoverPresentationController {
-                   popOver.sourceView = sender
-                }
-            } catch (let error) {
-                print(error)
+            var data = [Any]()
+            if let pdf = note.createPDF() {
+                data.append(pdf)
+            }
+            
+            let activityController = UIActivityViewController(activityItems: data, applicationActivities: nil)
+            self.present(activityController, animated: true, completion: nil)
+            if let popOver = activityController.popoverPresentationController {
+                popOver.sourceView = sender
             }
         }
     }
@@ -905,6 +967,8 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             self.activeTags = self.getSelectedTags()
             
             self.updateDisplayedNotes()
+            
+            activeFiltersBadge.setCount(self.activeTags.count)
         }
     }
     @IBAction func newTagTapped(_ sender: UIButton) {
