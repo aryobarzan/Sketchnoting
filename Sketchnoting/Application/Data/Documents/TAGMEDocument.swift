@@ -19,7 +19,6 @@ class TAGMEDocument: Document {
         case spot
         case categories = "categories"
         case wikiPageID
-        case mapImage
     }
     
     init?(title: String, description: String?, URL: String, type: DocumentType, previewImage: UIImage?, spot: String?, categories: [String]?, wikiPageID: Double?) {
@@ -35,21 +34,6 @@ class TAGMEDocument: Document {
         try container.encode(spot, forKey: .spot)
         try container.encode(categories, forKey: .categories)
         try container.encode(wikiPageID, forKey: .wikiPageID)
-        if mapImage != nil {
-            let imageData: Data = mapImage!.pngData()!
-            let strBase64 = imageData.base64EncodedString(options: .lineLength64Characters)
-            try container.encode(strBase64, forKey: .mapImage)
-        }
-        if let mapImage = mapImage {
-            if let jpgData = mapImage.jpegData(compressionQuality: 1) {
-                let strBase64 = jpgData.base64EncodedString(options: .lineLength64Characters)
-                try container.encode(strBase64, forKey: .mapImage)
-            }
-            else if let pngData = mapImage.pngData() {
-                let strBase64 = pngData.base64EncodedString(options: .lineLength64Characters)
-                try container.encode(strBase64, forKey: .mapImage)
-            }
-        }
     }
     
     required init(from decoder: Decoder) throws {
@@ -59,17 +43,37 @@ class TAGMEDocument: Document {
         spot = try? container.decode(String.self, forKey: .spot)
         categories = try? container.decode([String].self, forKey: .categories)
         wikiPageID = try? container.decode(Double.self, forKey: .wikiPageID)
-        do {
-            let strBase64: String = try container.decode(String.self, forKey: .mapImage)
-            let dataDecoded: Data = Data(base64Encoded: strBase64, options: .ignoreUnknownCharacters)!
-            mapImage = UIImage(data: dataDecoded)
-        } catch {
-            print("No map image for this document.")
-        }
+        
+        loadMapImage()
     }
     
     //MARK: Visitable
     override func accept(visitor: DocumentVisitor) {
         visitor.process(document: self)
+    }
+    
+    private func loadMapImage() {
+        self.retrieveImage(type: .Map, completion: { result in
+            switch result {
+            case .success(let value):
+                if value != nil {
+                    log.info("Map image found for document \(self.title).")
+                    DispatchQueue.main.async {
+                        self.mapImage = value!
+                        if self.previewImage == nil {
+                            self.previewImage = value!
+                        }
+                    }
+                }
+            case .failure(_):
+                log.error("No map image found for document \(self.title).")
+            }
+        })
+    }
+    
+    override func reload() {
+        loadPreviewImage()
+        loadMapImage()
+        delegate?.documentHasChanged(document: self)
     }
 }

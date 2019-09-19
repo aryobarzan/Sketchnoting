@@ -607,15 +607,30 @@
                                             <action selector="noteListViewButtonTapped:" destination="BYZ-38-t0r" eventType="touchUpInside" id="bg9-rS-6x4"/>
                                         </connections>
                                     </button>
+                                    <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="sHd-m9-c4G" customClass="NVActivityIndicatorView" customModule="NVActivityIndicatorView">
+                                        <rect key="frame" x="359" y="392.5" width="50" height="50"/>
+                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="50" id="Kvk-lQ-ttW"/>
+                                            <constraint firstAttribute="width" constant="50" id="UWj-ug-van"/>
+                                        </constraints>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="color" keyPath="color">
+                                                <color key="value" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                            </userDefinedRuntimeAttribute>
+                                        </userDefinedRuntimeAttributes>
+                                    </view>
                                 </subviews>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
+                                    <constraint firstItem="sHd-m9-c4G" firstAttribute="centerX" secondItem="hut-mJ-mJj" secondAttribute="centerX" id="2iA-iP-5h0"/>
                                     <constraint firstItem="vgL-tn-nRc" firstAttribute="top" secondItem="hut-mJ-mJj" secondAttribute="top" constant="5" id="CUe-JV-3Kx"/>
                                     <constraint firstAttribute="trailing" secondItem="khA-pa-wBN" secondAttribute="trailing" id="D8W-Hb-YF9"/>
                                     <constraint firstItem="khA-pa-wBN" firstAttribute="top" secondItem="IRa-tg-YTc" secondAttribute="bottom" constant="5" id="ETC-GU-g5G"/>
                                     <constraint firstAttribute="bottom" secondItem="khA-pa-wBN" secondAttribute="bottom" id="Hrv-Xf-kaF"/>
                                     <constraint firstAttribute="trailing" secondItem="m24-sJ-j5X" secondAttribute="trailing" constant="8" id="Nwa-sA-bgE"/>
                                     <constraint firstItem="IRa-tg-YTc" firstAttribute="leading" secondItem="hut-mJ-mJj" secondAttribute="leading" constant="8" id="gCO-xa-ccc"/>
+                                    <constraint firstItem="sHd-m9-c4G" firstAttribute="centerY" secondItem="hut-mJ-mJj" secondAttribute="centerY" id="hGF-da-dfx"/>
                                     <constraint firstItem="vgL-tn-nRc" firstAttribute="centerX" secondItem="hut-mJ-mJj" secondAttribute="centerX" id="oXL-LI-6ZI"/>
                                     <constraint firstItem="khA-pa-wBN" firstAttribute="leading" secondItem="hut-mJ-mJj" secondAttribute="leading" id="rrk-Ek-z9e"/>
                                     <constraint firstItem="m24-sJ-j5X" firstAttribute="top" secondItem="hut-mJ-mJj" secondAttribute="top" constant="5" id="uwv-hz-Wcs"/>
@@ -847,6 +862,7 @@
                         <outlet property="noteCollectionView" destination="khA-pa-wBN" id="jLd-Rn-697"/>
                         <outlet property="noteLargePreviewView" destination="l7P-WO-imV" id="7PA-DO-8NT"/>
                         <outlet property="noteListViewButton" destination="vgL-tn-nRc" id="UiN-4X-xgz"/>
+                        <outlet property="noteLoadingIndicator" destination="sHd-m9-c4G" id="mVH-2C-P8E"/>
                         <outlet property="noteSortingButton" destination="IRa-tg-YTc" id="AT7-Iy-uvD"/>
                         <outlet property="searchField" destination="kB5-c2-JaK" id="bJo-4g-hfF"/>
                         <outlet property="searchFiltersPanel" destination="MA8-vJ-sSi" id="9aQ-0l-K6X"/>
@@ -1082,6 +1098,20 @@
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Nvg-e1-5lr" customClass="SketchView" customModule="Sketchnoting" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="0.0" width="768" height="964"/>
                                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    </view>
+                                    <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="oTc-jX-dZM" customClass="NVActivityIndicatorView" customModule="NVActivityIndicatorView">
+                                        <rect key="frame" x="359" y="457" width="50" height="50"/>
+                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="50" id="hDc-GW-a1t"/>
+                                            <constraint firstAttribute="width" constant="50" id="p48-EB-4QZ"/>
+                                        </constraints>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="color" keyPath="color">
+                                                <color key="value" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="string" keyPath="typeName" value="ballGridPulse"/>
+                                        </userDefinedRuntimeAttributes>
                                     </view>
                                     <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="P5Z-5P-6jH">
                                         <rect key="frame" x="0.0" y="0.0" width="768" height="964"/>
@@ -1327,9 +1357,13 @@
                                             <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="sjN-VI-3Ol">
                                                 <rect key="frame" x="24" y="52" width="336" height="904"/>
                                                 <subviews>
-                                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="OG5-Sa-qvK">
-                                                        <rect key="frame" x="8" y="8" width="64" height="30"/>
-                                                        <state key="normal" title="&lt; Browse"/>
+                                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="OG5-Sa-qvK">
+                                                        <rect key="frame" x="8" y="8" width="30" height="30"/>
+                                                        <constraints>
+                                                            <constraint firstAttribute="width" constant="30" id="WH6-Il-xuG"/>
+                                                            <constraint firstAttribute="height" constant="30" id="dTW-9d-Eis"/>
+                                                        </constraints>
+                                                        <state key="normal" image="BackIcon"/>
                                                         <connections>
                                                             <action selector="documentDetailViewBrowseTapped:" destination="lDo-DG-9fX" eventType="touchUpInside" id="qDa-uN-jm1"/>
                                                         </connections>
@@ -1445,6 +1479,7 @@
                                     <constraint firstItem="oqt-gq-XGG" firstAttribute="top" secondItem="tz5-2Q-OEW" secondAttribute="top" id="BtJ-fp-Oyj"/>
                                     <constraint firstItem="P5Z-5P-6jH" firstAttribute="width" secondItem="Nvg-e1-5lr" secondAttribute="width" id="DQn-08-zMM"/>
                                     <constraint firstAttribute="trailing" secondItem="Nvg-e1-5lr" secondAttribute="trailing" id="EPG-Nj-jHP"/>
+                                    <constraint firstItem="oTc-jX-dZM" firstAttribute="centerX" secondItem="tz5-2Q-OEW" secondAttribute="centerX" id="GnH-IV-etL"/>
                                     <constraint firstItem="Nvg-e1-5lr" firstAttribute="leading" secondItem="tz5-2Q-OEW" secondAttribute="leading" id="IWW-db-hNH"/>
                                     <constraint firstItem="P5Z-5P-6jH" firstAttribute="height" secondItem="Nvg-e1-5lr" secondAttribute="height" id="Kk7-h5-0wB"/>
                                     <constraint firstItem="Nvg-e1-5lr" firstAttribute="height" secondItem="tz5-2Q-OEW" secondAttribute="height" id="M3g-cJ-G5b"/>
@@ -1454,6 +1489,7 @@
                                     <constraint firstItem="oqt-gq-XGG" firstAttribute="leading" secondItem="tz5-2Q-OEW" secondAttribute="leading" constant="400" id="YAl-f6-SsH"/>
                                     <constraint firstItem="aMI-wG-bBD" firstAttribute="leading" secondItem="tz5-2Q-OEW" secondAttribute="leading" constant="143" id="ZlW-YL-dfY"/>
                                     <constraint firstItem="Nvg-e1-5lr" firstAttribute="top" secondItem="tz5-2Q-OEW" secondAttribute="top" id="aBv-2X-NAe"/>
+                                    <constraint firstItem="oTc-jX-dZM" firstAttribute="centerY" secondItem="tz5-2Q-OEW" secondAttribute="centerY" id="cNm-83-OD5"/>
                                     <constraint firstAttribute="bottom" secondItem="Nvg-e1-5lr" secondAttribute="bottom" id="gxg-n0-lFe"/>
                                     <constraint firstItem="P5Z-5P-6jH" firstAttribute="leading" secondItem="tz5-2Q-OEW" secondAttribute="leading" id="ibZ-nv-vhM"/>
                                     <constraint firstAttribute="bottom" secondItem="P5Z-5P-6jH" secondAttribute="bottom" id="tSV-0h-1nS"/>
@@ -1533,6 +1569,7 @@
                         <outlet property="bookshelfLeftConstraint" destination="YAl-f6-SsH" id="pB3-3n-VxF"/>
                         <outlet property="bookshelfLeftDragView" destination="O1Y-Db-0EN" id="IYp-8e-St4"/>
                         <outlet property="bookshelfRightConstraint" destination="SiT-MD-RCf" id="kNS-8p-MJz"/>
+                        <outlet property="canvasLoadingIndicator" destination="oTc-jX-dZM" id="9j8-Gn-uJB"/>
                         <outlet property="clearFilteredDocumentsButton" destination="znP-Ip-v8c" id="n7e-jB-GEm"/>
                         <outlet property="closeButton" destination="YQI-WO-Gvp" id="6So-lp-acO"/>
                         <outlet property="colorPicker" destination="FQa-yu-RwE" id="d2D-hM-mY6"/>

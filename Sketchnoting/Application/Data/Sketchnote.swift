@@ -17,7 +17,7 @@ protocol SketchnoteDelegate {
     func sketchnoteHasChanged(sketchnote: Sketchnote)
 }
 
-class Sketchnote: Note, Equatable, DocumentVisitor, Comparable {
+class Sketchnote: Note, Equatable, DocumentVisitor, Comparable, DocumentDelegate {
     
     var delegate: SketchnoteDelegate?
     
@@ -67,12 +67,9 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable {
         try container.encode(title, forKey: .title)
         try container.encode(creationDate.timeIntervalSince1970, forKey: .creationDate)
         try container.encode(updateDate?.timeIntervalSince1970, forKey: .updateDate)
-        print("Encoding documents.")
         do {
             try container.encode(documents, forKey: .relatedDocuments)
-            print("Documents encoded.")
         } catch {
-            print("Document encoding failed.")
         }
         
         try container.encode(drawings, forKey: .drawings)
@@ -86,7 +83,6 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable {
     }
     
     required init(from decoder: Decoder) throws {
-        print("Decoding sketchnote.")
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         id = try? container.decode(String.self, forKey: .id)
@@ -105,32 +101,35 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable {
         var docs = [Document]()
         var docsArray = docsArrayForType
         do {
-        while(!docsArrayForType.isAtEnd) {
-            let doc = try docsArrayForType.nestedContainer(keyedBy: DocumentTypeKey.self)
-            let t = try doc.decode(DocumentType.self, forKey: DocumentTypeKey.type)
-            switch t {
-            case .Spotlight:
-                docs.append(try docsArray.decode(SpotlightDocument.self))
-                break
-            case .BioPortal:
-                docs.append(try docsArray.decode(BioPortalDocument.self))
-                break
-            case .Chemistry:
-                docs.append(try docsArray.decode(CHEBIDocument.self))
-                break
-            case .TAGME:
-                docs.append(try docsArray.decode(TAGMEDocument.self))
-                break
-            case .Other:
-                docs.append(try docsArray.decode(Document.self))
-                break
+            while(!docsArrayForType.isAtEnd) {
+                let doc = try docsArrayForType.nestedContainer(keyedBy: DocumentTypeKey.self)
+                let t = try doc.decode(DocumentType.self, forKey: DocumentTypeKey.type)
+                switch t {
+                case .Spotlight:
+                    docs.append(try docsArray.decode(SpotlightDocument.self))
+                    break
+                case .BioPortal:
+                    docs.append(try docsArray.decode(BioPortalDocument.self))
+                    break
+                case .Chemistry:
+                    docs.append(try docsArray.decode(CHEBIDocument.self))
+                    break
+                case .TAGME:
+                    docs.append(try docsArray.decode(TAGMEDocument.self))
+                    break
+                case .Other:
+                    docs.append(try docsArray.decode(Document.self))
+                    break
+                }
             }
-            print(docs.count)
-        }
         } catch {
+            log.error("Decoding a note's documents failed.")
             print(error)
         }
         self.documents = docs
+        for doc in documents {
+            doc.delegate = self
+        }
         
         drawings = try? container.decode([String].self, forKey: .drawings)
         drawingViewRects = try? container.decode([CGRect].self, forKey: .drawingViewRects)
@@ -148,8 +147,7 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable {
         
         self.loadPaths()
         self.loadTextDataArray()
-        print("Sketchnote decoded")
-        print("Sketchnote has \(documents?.count ?? -1) documents.")
+        log.info("Sketchnote " + self.id + " decoded.")
     }
     
     private enum DocumentTypeKey : String, CodingKey {
@@ -167,14 +165,14 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable {
         
         if let encoded = try? encoder.encode(self) {
             UserDefaults.sketchnotes.set(encoded, forKey: self.id)
-            print("Note " + id + " saved.")
+            log.info("Note \(self.id ?? "") saved.")
             if self.paths != nil {
                 self.savePaths()
             }
             self.saveTextDataArray()
         }
         else {
-            print("Encoding failed for note " + id + ".")
+            log.error("Encoding failed for note " + id + ".")
         }
     }
     public func savePaths() {
@@ -183,10 +181,10 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable {
             let ArchiveURLPathArray = DocumentsDirectory.appendingPathComponent("NotePaths-" + self.id)
             if let encoded = try? NSKeyedArchiver.archivedData(withRootObject: self.paths as Any, requiringSecureCoding: false) {
                 try! encoded.write(to: ArchiveURLPathArray)
-                print("Note " + id + " paths saved.")
+                log.info("Note " + id + " paths saved.")
             }
             else {
-                print("Failed to encode paths for note " + id + ".")
+                log.error("Failed to encode paths for note " + id + ".")
             }
         }
     }
@@ -195,19 +193,21 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable {
         let ArchiveURLPathArray = DocumentsDirectory.appendingPathComponent("NotePaths-" + self.id)
         guard let codedData = try? Data(contentsOf: ArchiveURLPathArray) else { return }
         guard let data = ((try? NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(codedData) as?
-            NSMutableArray) as NSMutableArray??) else { return }
-        print("Paths for note " + id + " loaded.")
+            NSMutableArray) as NSMutableArray??) else {
+                log.error("Failed to load paths for note " + id + ".")
+                return }
         self.paths = data
+        log.info("Paths for note " + id + " loaded.")
     }
     public func saveTextDataArray() {
         let DocumentsDirectory = FileManager().urls(for: .documentDirectory, in: .userDomainMask).first!
         let ArchiveURLPathArray = DocumentsDirectory.appendingPathComponent("NoteTextDataArray-" + self.id)
         if let encoded = try? NSKeyedArchiver.archivedData(withRootObject: self.textDataArray as Any, requiringSecureCoding: false) {
             try! encoded.write(to: ArchiveURLPathArray)
-            print("Note " + id + " text data array saved.")
+            log.info("Note " + id + " text data array saved.")
         }
         else {
-            print("Failed to encode text data array for note " + id + ".")
+            log.error("Failed to encode text data array for note " + id + ".")
         }
     }
     private func loadTextDataArray() {
@@ -215,9 +215,11 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable {
         let ArchiveURLPathArray = DocumentsDirectory.appendingPathComponent("NoteTextDataArray-" + self.id)
         guard let codedData = try? Data(contentsOf: ArchiveURLPathArray) else { return }
         guard let data = ((try? NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(codedData) as?
-            [TextData]) as [TextData]??) else { return }
-        print("Text data array for note " + id + " loaded.")
+            [TextData]) as [TextData]??) else {
+                log.error("Failed to load text data array for note " + id + ".")
+                return }
         self.textDataArray = data
+        log.info("Text data array for note " + id + " loaded.")
     }
     
     public func delete() {
@@ -260,6 +262,7 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable {
         }
         if !documents!.contains(document) && isDocumentValid(document: document) {
             documents!.append(document)
+            document.delegate = self
             self.delegate?.sketchnoteHasNewDocument(sketchnote: self, document: document)
         }
     }
@@ -325,6 +328,11 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable {
             self.delegate?.sketchnoteDocumentHasChanged(sketchnote: self, document: document)
         }
     }
+    
+    func documentHasChanged(document: Document) {
+        self.delegate?.sketchnoteDocumentHasChanged(sketchnote: self, document: document)
+    }
+
     // This function only stores a recognized drawing's label for a note. The drawing itself (i.e. an image) is not stored.
     // Only the label is necessary, as it is used for search results.
     func addDrawing(drawing: String) {

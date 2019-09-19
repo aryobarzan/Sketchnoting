@@ -15,4 +15,9 @@ target 'Sketchnoting' do
   pod 'SwiftyJSON'
   pod 'M13Checkbox', '~> 3.4.0'
   pod 'SideMenu', '~> 6.1.5'
+  pod 'NVActivityIndicatorView'
+  pod 'SwiftyBeaver'
+  pod 'Kingfisher', '~> 5.0'
+  pod 'PocketSVG', '~> 2.0'
+  pod 'SVGKit'
 end

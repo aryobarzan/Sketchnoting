@@ -12,6 +12,7 @@ import Firebase
 import PopMenu
 import GSMessages
 import BadgeHub
+import NVActivityIndicatorView
 
 // This is the controller for the other page of the application, i.e. not the home page, but for the page displayed when the user wants to edit a note.
 
@@ -30,6 +31,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     
     @IBOutlet var bookshelf: UIView!
     @IBOutlet var activityIndicator: UIActivityIndicatorView!
+    @IBOutlet weak var canvasLoadingIndicator: NVActivityIndicatorView!
     
     @IBOutlet var pencilButton: LGButton!
     @IBOutlet var eraserButton: LGButton!
@@ -66,8 +68,6 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         super.viewDidLoad()
         self.navigationController?.setNavigationBarHidden(true, animated: false)
         
-        self.sketchnote.delegate = self
-        
         colorPicker.delegate = self
         colorPicker.layoutDelegate = self
         colorPicker.isSelectedColorTappable = false
@@ -75,7 +75,6 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         colorPicker.preselectedIndex = 0
         topContainer.layer.borderColor = UIColor.black.cgColor
         topContainer.layer.borderWidth = 1
-        
         
         self.setupDocumentDetailView()
         self.bookshelfLeftDragView.curveTopCorners(size: 5)
@@ -96,6 +95,32 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
             }
         }
         
+        setupHelpLines()
+        self.rightScreenSidePanGesture.edges = [.right]
+        self.topicsBadgeHub = BadgeHub(view: topicsLabel)
+        self.topicsBadgeHub.scaleCircleSize(by: 0.55)
+        self.topicsBadgeHub.moveCircleBy(x: 4, y: -6)
+        self.topicsBadgeHub.setCount(self.sketchnote.documents.count)
+        
+        let interaction = UIPencilInteraction()
+        interaction.delegate = self
+        view.addInteraction(interaction)
+        
+        spotlightHelper = SpotlightHelper()
+        bioportalHelper = BioPortalHelper()
+        tagmeHelper = TAGMEHelper()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        self.sketchnote.delegate = self
+        
+        setupConceptHighlights()
+        setupDrawingRegions()
+        
+        self.recognizedTextLogView.text = self.sketchnote.getText(raw: true)
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
         // If the user has not created a new note, but is trying to edit an existing note, this existing note is reloaded.
         // This reload consists of redrawing the user's strokes for that note on the note's canvas on this page.
         if sketchnote != nil {
@@ -104,18 +129,24 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
             }
             else {
                 if sketchnote.paths != nil && sketchnote.paths!.count > 0 {
-                    print("Reloading paths.")
+                    log.info("Loading paths for note.")
+                    canvasLoadingIndicator.isHidden = false
+                    canvasLoadingIndicator.startAnimating()
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                        self.sketchView.reloadPathArray(array: self.sketchnote.paths!)
+                        self.sketchView.reloadPathArray(array: self.sketchnote.paths!, completion: { bool in
+                            log.info("Paths for note loaded.")
+                            self.canvasLoadingIndicator.stopAnimating()
+                            self.canvasLoadingIndicator.isHidden = true
+                        })
                     }
                     
                 }
                 else {
-                    print("Failed to reload paths.")
+                    log.error("Failed to reload paths for note.")
                 }
             }
             if let documents = sketchnote.documents {
-                print("Reloading documents.")
+                log.info("Reloading documents")
                 self.items = documents
                 documentsCollectionView.reloadData()
             }
@@ -127,26 +158,6 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         } else {
             sketchnote = Sketchnote(image: sketchView.asImage(), relatedDocuments: nil, drawings: nil)
         }
-        
-        setupHelpLines()
-        setupConceptHighlights()
-        setupDrawingRegions()
-        self.rightScreenSidePanGesture.edges = [.right]
-        self.topicsBadgeHub = BadgeHub(view: topicsLabel)
-        self.topicsBadgeHub.scaleCircleSize(by: 0.55)
-        self.topicsBadgeHub.moveCircleBy(x: 4, y: -6)
-        self.topicsBadgeHub.setCount(self.sketchnote.documents.count)
-        
-        
-        let interaction = UIPencilInteraction()
-        interaction.delegate = self
-        view.addInteraction(interaction)
-        
-        spotlightHelper = SpotlightHelper()
-        bioportalHelper = BioPortalHelper()
-        tagmeHelper = TAGMEHelper()
-        
-        self.recognizedTextLogView.text = self.sketchnote.getText(raw: true)
     }
     
     // This function is called when the user closes the page, i.e. stops editing the note, and the app returns to the home page.
@@ -175,7 +186,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
             sketchnote.image = sketchView.asImage()
             sketchnote.setUpdateDate()
             self.storedPathArray = sketchView.pathArray
-            print("Closing & Saving sketchnote")
+            log.info("Closing & saving note.")
         default:
             print("Default segue case triggered.")
         }
@@ -885,12 +896,11 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         saveTimer = nil
         print("Auto-saving sketchnote strokes and text data.")
         self.sketchnote.paths =  self.sketchView.pathArray
-        self.sketchnote.savePaths()
-        self.sketchnote.saveTextDataArray()
+        self.sketchnote.save()
     }
     
     // Drawing recognition
-    // In case the user's drawing has been recognized with at least a >50% confidence, the recognized drawing's label, e.g. "light bulb", is stored for the sketchnote.
+    // In case the user's drawing has been recognized with at least a >40% confidence, the recognized drawing's label, e.g. "light bulb", is stored for the sketchnote.
     private var labelNames: [String] = []
     private let drawnImageClassifier = DrawnImageClassifier()
     private var currentPrediction: DrawnImageClassifierOutput? {
@@ -1068,24 +1078,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         cell.document = document
         cell.delegate = self
         cell.titleLabel.text = document.title
-        if document.previewImage == nil {
-            if let tagmeDocument = document as? TAGMEDocument {
-                if tagmeDocument.mapImage != nil {
-                    cell.previewImage.image = tagmeDocument.mapImage
-                }
-            }
-            else if let spotlightDocument = document as? SpotlightDocument {
-                if spotlightDocument.mapImage != nil {
-                    cell.previewImage.image = spotlightDocument.mapImage
-                }
-                else {
-                    cell.previewImage.image = nil
-                }
-            }
-        }
-        else {
-            cell.previewImage.image = document.previewImage
-        }
+        cell.previewImage.image = document.previewImage
         cell.previewImage.layer.masksToBounds = true
         cell.previewImage.layer.cornerRadius = 90
         
@@ -1317,6 +1310,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         
         documentTitleLabel.text = document.title
         documentDetailTypeLabel.text = "Document"
+        documentDetailPreviewImageView.image = nil
         if let previewImage = document.previewImage {
             documentDetailPreviewImageView.image = previewImage
         }

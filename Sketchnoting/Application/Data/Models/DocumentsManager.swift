@@ -14,7 +14,7 @@ class DocumentsManager {
         
         if let encoded = try? encoder.encode(document) {
             UserDefaults.hiddenDocuments.set(encoded, forKey: document.title)
-            print("Document \(document.title) hidden.")
+            log.info("Document \(document.title) hidden.")
         }
         else {
             print("Failed hiding document \(document.title).")

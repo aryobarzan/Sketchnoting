@@ -29,9 +29,6 @@ class BioPortalDocument: Document {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(prefLabel, forKey: .prefLabel)
         try container.encode(definition, forKey: .definition)
-        
-        //let superencoder = container.superEncoder()
-        //try super.encode(to: superencoder)
     }
     
     required init(from decoder: Decoder) throws {

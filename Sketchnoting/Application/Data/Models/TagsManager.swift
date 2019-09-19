@@ -17,7 +17,6 @@ class TagsManager {
         for (key, _) in UserDefaults.tags.dictionaryRepresentation() {
             if let data = UserDefaults.tags.data(forKey: key),
                 let loadedTag = try? decoder.decode(Tag.self, from: data) {
-                print("Tag " + key + " loaded.")
                 tags.append(loadedTag)
             }
         }
@@ -33,10 +32,10 @@ class TagsManager {
             self.tags.append(tag)
             if let encoded = try? encoder.encode(tag) {
                 UserDefaults.tags.set(encoded, forKey: tag.title)
-                print("Tag \(tag.title) added.")
+                log.info("Tag \(String(describing: tag.title)) added.")
             }
             else {
-                print("Failed adding new tag \(tag.title).")
+                log.error("Failed adding new tag \(String(describing: tag.title)).")
             }
         }
     }

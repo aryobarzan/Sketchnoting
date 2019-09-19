@@ -8,7 +8,7 @@
 
 import UIKit
 
-class SpotlightDocument: Document {
+class SpotlightDocument: Document { // Out of date and currently unused
     
     var secondRankPercentage: Double?
     var label: String?
@@ -80,7 +80,7 @@ class SpotlightDocument: Document {
             let dataDecoded: Data = Data(base64Encoded: strBase64, options: .ignoreUnknownCharacters)!
             mapImage = UIImage(data: dataDecoded)
         } catch {
-            print("No map image for this document.")
+            log.info("No map image found for this Spotlight document.")
         }
     }
     

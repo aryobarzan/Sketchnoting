@@ -99,20 +99,14 @@ class BioPortalHelper {
         if let match = regex?.firstMatch(in: id, options: [], range: NSRange(location: 0, length: id.utf16.count)) {
             if let valueRange = Range(match.range(at: 1), in: id) {
                 let value = id[valueRange].lowercased()
-                let url = URL(string: "https://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=" + value + "&dimensions=900")
                 
                 DispatchQueue.global().async {
-                    if let data = try? Data(contentsOf: url!) {
-                        DispatchQueue.main.async {
-                            if let image = UIImage(data: data) {
-                                print("CHEBI: molecule image added - \(document.title)")
-                                note.setDocumentPreviewImage(document: document, image: image)
-                                note.setDocumentMoleculeImage(document: document, image: image)
-                            }
-                        }
+                    if let url = URL(string: "https://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=" + value + "&dimensions=900") {
+                        document.downloadImage(url: url, type: .Molecule)
+                        log.info("CHEBI: molecule image added - \(document.title)")
                     }
                     else {
-                        print("URL CHEBI image not found.")
+                        log.error("URL CHEBI image not found.")
                     }
                 }
             }

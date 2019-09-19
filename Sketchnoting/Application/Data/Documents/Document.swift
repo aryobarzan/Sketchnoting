@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Kingfisher
 
 protocol Visitable {
     func accept(visitor: DocumentVisitor)
@@ -41,12 +42,13 @@ class Document: Codable, Visitable, Equatable {
     var documentType: DocumentType
     var previewImage: UIImage?
     
+    var delegate: DocumentDelegate?
+    
     private enum CodingKeys: String, CodingKey {
         case title = "Title"
         case description = "Description"
         case URL = "URL"
         case documentType = "DocumentType"
-        case previewImage = "PreviewImage"
     }
     
     init?(title: String, description: String?, URL: String, documentType: DocumentType, previewImage: UIImage?){
@@ -66,18 +68,6 @@ class Document: Codable, Visitable, Equatable {
         try container.encode(description, forKey: .description)
         try container.encode(URL, forKey: .URL)
         try container.encode(documentType, forKey: .documentType)
-        if let previewImage = previewImage {
-            if let jpgData = previewImage.jpegData(compressionQuality: 1) {
-                print("Encoding document's JPEG preview image.")
-                let strBase64 = jpgData.base64EncodedString(options: .lineLength64Characters)
-                try container.encode(strBase64, forKey: .previewImage)
-            }
-            else if let pngData = previewImage.pngData() {
-                print("Encoding document's PNG preview image.")
-                let strBase64 = pngData.base64EncodedString(options: .lineLength64Characters)
-                try container.encode(strBase64, forKey: .previewImage)
-            }
-        }
     }
     
     required init(from decoder: Decoder) throws {
@@ -95,21 +85,89 @@ class Document: Codable, Visitable, Equatable {
             print("Note description decoding failed.")
             description = ""
         }
-        
         URL = try container.decode(String.self, forKey: .URL)
         documentType = DocumentType(rawValue: try container.decode(String.self, forKey: .documentType)) ?? .Other
-        do {
-            let strBase64: String = try container.decode(String.self, forKey: .previewImage)
-            let dataDecoded: Data = Data(base64Encoded: strBase64, options: .ignoreUnknownCharacters)!
-            previewImage = UIImage(data: dataDecoded)
-            print("Document preview image decoded.")
-        } catch {
-            print("Document preview image decoding failed.")
-        }
+        
+        loadPreviewImage()
     }
     
     //MARK: Visitable
     func accept(visitor: DocumentVisitor) {
         visitor.process(document: self)
     }
+    
+    // MARK: Image resources downloading
+    public enum DocumentImageType : String {
+        case Standard
+        case Map
+        case Molecule
+    }
+    
+    public func downloadImage(url: URL, type: DocumentImageType) {
+        let processor = SVGProcessor()
+        let serializer = SVGCacheSerializer()
+        let cache = ImageCache.default
+        let key = type.rawValue + "-" + self.title
+        let downloader = ImageDownloader.default
+        downloader.downloadImage(with: url, options: [.processor(processor), .forceRefresh, .cacheSerializer(serializer)]) { result in
+            switch result {
+            case .success(let value):
+                cache.store(value.image, original: value.originalData, forKey: key)
+                self.reload()
+            case .failure(let error):
+                print(error)
+            }
+        }
+    }
+    
+    internal func retrieveImage(type: DocumentImageType, completion:@escaping (Result<Image?, KingfisherError>) -> ()) {
+        let key = type.rawValue + "-" + self.title
+        let cache = ImageCache.default
+        cache.retrieveImageInDiskCache(forKey: key, completionHandler: { result in
+            completion(result)
+            })
+        /*
+         let processor = SVGProcessor()
+         let serializer = SVGCacheSerializer()
+         ImageCache.default.retrieveImageInDiskCache(forKey: key, options: [.processor(processor), .forceRefresh, .cacheSerializer(serializer), .waitForCache]) { result in
+            switch result {
+            case .success(let value):
+                if value != nil {
+                    log.info("Image found for key \(key).")
+                    DispatchQueue.main.async {
+                        self.previewImage = value!
+                        print(self.previewImage)
+                    }
+                }
+            case .failure(let error):
+                log.error("No image found for key \(key).")
+                print(error)
+            }
+        }*/
+    }
+    internal func loadPreviewImage() {
+        self.retrieveImage(type: .Standard, completion: { result in
+            switch result {
+            case .success(let value):
+                if value != nil {
+                    log.info("Preview image found for document \(self.title).")
+                    DispatchQueue.main.async {
+                        self.previewImage = value!
+                    }
+                }
+            case .failure(let error):
+                log.error("No preview image found for document \(self.title).")
+                print(error)
+            }
+        })
+    }
+    
+    public func reload() {
+        loadPreviewImage()
+        delegate?.documentHasChanged(document: self)
+    }
+}
+
+protocol DocumentDelegate {
+    func documentHasChanged(document: Document)
 }

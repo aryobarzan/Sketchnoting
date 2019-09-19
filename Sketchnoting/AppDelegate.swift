@@ -9,6 +9,9 @@
 import UIKit
 import Firebase
 import Alamofire
+import SwiftyBeaver
+let log = SwiftyBeaver.self
+import Kingfisher
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -16,8 +19,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
 
+    // Override point for customization after application launch.
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
+        let console = ConsoleDestination()
+        let file = FileDestination()  // log to default swiftybeaver.log file
+        console.format = "$DHH:mm:ss$d $L $M"
+        console.levelString.info = "\u{1F49C} (INFO)"
+        console.levelString.error = "\u{2764} (ERROR)"
+        log.addDestination(console)
+        log.addDestination(file)
+        
+        let cache = ImageCache.default
+        cache.diskStorage.config.expiration = .never
+        cache.diskStorage.config.sizeLimit = 1000 * 1024 * 1024 // 1GB
+        
         FirebaseApp.configure()
         return true
     }

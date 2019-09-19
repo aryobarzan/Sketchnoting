@@ -13,6 +13,7 @@ import MultipeerConnectivity
 import GSMessages
 import SideMenu
 import BadgeHub
+import NVActivityIndicatorView
 
 // This is the controller for the app's home page view.
 // It contains the search bar and all the buttons related to it.
@@ -22,6 +23,7 @@ import BadgeHub
 class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextFieldDelegate, MCSessionDelegate, MCBrowserViewControllerDelegate, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, NoteCollectionViewCellCommonDelegate,NoteCollectionViewCellDelegate, NoteCollectionViewDetailCellDelegate, UITableViewDataSource, UITableViewDelegate, TagTableViewCellDelegate, ColorPickerViewDelegate, ColorPickerViewDelegateFlowLayout {
     
     @IBOutlet var newNoteButton: UIButton!
+    @IBOutlet var noteLoadingIndicator: NVActivityIndicatorView!
     
     @IBOutlet var searchField: UITextField!
     @IBOutlet var searchFiltersScrollView: UIScrollView!
@@ -144,14 +146,24 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         
         noteCollectionView.register(UINib(nibName: "NoteCollectionViewCell", bundle: nil), forCellWithReuseIdentifier: reuseIdentifier)
         noteCollectionView.register(UINib(nibName: "NoteCollectionViewDetailCell", bundle: nil), forCellWithReuseIdentifier: reuseIdentifierDetailCell)
-        if let notes = NoteLoader.loadSketchnotes() {
-            self.notes = notes
+        self.noteLoadingIndicator.isHidden = false
+        self.noteLoadingIndicator.startAnimating()
+        self.newNoteButton.isEnabled = false
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            if let notes = NoteLoader.loadSketchnotes() {
+                self.notes = notes
+            }
+            else {
+                self.notes = [Sketchnote]()
+            }
+            self.items = self.notes
+            self.noteCollectionView.reloadData()
+            log.info("Notes loaded.")
+            self.noteLoadingIndicator.stopAnimating()
+            self.noteLoadingIndicator.isHidden = true
+            self.newNoteButton.isEnabled = true
         }
-        else {
-            self.notes = [Sketchnote]()
-        }
-        self.items = self.notes
-        noteCollectionView.reloadData()
+        
         
         //Drawing Recognition - This loads the labels for the drawing recognition's CoreML model.
         if let path = Bundle.main.path(forResource: "labels", ofType: "txt") {
@@ -197,7 +209,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             self.navigationController?.setNavigationBarHidden(false, animated: false)
             break
         case "SideMenu":
-            print("Side menu opened.")
             guard let sideMenuNavigationController = segue.destination as? UISideMenuNavigationController else {
                 print("Could not retrieve side menu navigation controller.")
                 return
@@ -748,30 +759,29 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     }
     
     func noteCollectionViewCellMoreTapped(sketchnote: Sketchnote, sender: UIButton, cell: NoteCollectionViewCell) {
-        print("More button of note view cell tapped.")
         let popMenu = PopMenuViewController(sourceView: sender, actions: [PopMenuAction](), appearance: nil)
         popMenu.appearance.popMenuBackgroundStyle = .blurred(.dark)
-        let setTitleAction = PopMenuDefaultAction(title: "Set Title", color: .white, didSelect: { action in
+        let setTitleAction = PopMenuDefaultAction(title: "Set Title", image: #imageLiteral(resourceName: "EditTitleIcon"), color: .white, didSelect: { action in
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 self.editNoteTitle(note: sketchnote)
             }
         })
         popMenu.addAction(setTitleAction)
-        let copyTextAction = PopMenuDefaultAction(title: "Copy Text", color: .white, didSelect: { action in
+        let copyTextAction = PopMenuDefaultAction(title: "Copy Text", image: #imageLiteral(resourceName: "CopyTextIcon"), color: .white, didSelect: { action in
             UIPasteboard.general.string = sketchnote.getText()
         })
         popMenu.addAction(copyTextAction)
-        let sendAction = PopMenuDefaultAction(title: "Send", color: .white, didSelect: { action in
+        let sendAction = PopMenuDefaultAction(title: "Send", image: #imageLiteral(resourceName: "SendIcon"), color: .white, didSelect: { action in
             self.sendNote(note: sketchnote)
         })
         popMenu.addAction(sendAction)
-        let shareAction = PopMenuDefaultAction(title: "Share", color: .white, didSelect: { action in
+        let shareAction = PopMenuDefaultAction(title: "Share", image: #imageLiteral(resourceName: "ShareNoteIcon"), color: .white, didSelect: { action in
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 self.shareNote(note: sketchnote, sender: cell)
             }
         })
         popMenu.addAction(shareAction)
-        let action = PopMenuDefaultAction(title: "Delete", color: .red, didSelect: { action in
+        let action = PopMenuDefaultAction(title: "Delete", image: #imageLiteral(resourceName: "DeleteIcon"), color: .red, didSelect: { action in
             self.deleteNote(note: sketchnote)
         })
         popMenu.addAction(action)
@@ -793,6 +803,9 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         
         alertController.addTextField { (textField) in
             textField.placeholder = "Enter Note Title"
+            if !note.getTitle().isEmpty && note.getTitle() != "Untitled" {
+                textField.text = note.getTitle()
+            }
         }
         
         alertController.addAction(confirmAction)

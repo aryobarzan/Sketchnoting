@@ -279,12 +279,15 @@ public class SketchView: UIView {
         }
     }
     
-    public func reloadPathArray(array: NSMutableArray) {
+    public func reloadPathArray(array: NSMutableArray, completion:@escaping (Bool) -> ()) {
+        self.isUserInteractionEnabled = false
         for obj in array {
             guard let tool = obj as? SketchTool else { return }
-            bufferArray.add(tool)
+            self.bufferArray.add(tool)
             self.redo()
         }
+        self.isUserInteractionEnabled = true
+        completion(true)
     }
 
     public func canUndo() -> Bool {

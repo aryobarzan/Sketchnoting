@@ -59,20 +59,19 @@ class KnowledgeGraphHelper {
                 return
             }
             if let imageString = json["itemListElement"].array?[0]["result"]["image"]["contentUrl"].string {
-                DispatchQueue.global().async {
-                    if let url = URL(string: imageString) {
-                        if let data = try? Data(contentsOf: url) {
-                            DispatchQueue.main.async {
-                                print("Knowledge Graph: Preview image added - \(document.title)")
-                                if let image = UIImage(data: data) {
-                                    note.setDocumentPreviewImage(document: document, image: image)
-                                }
-                            }
+                if !imageString.contains(".svg") || !imageString.contains(".SVG") {
+                    DispatchQueue.global().async {
+                        if let url = URL(string: imageString) {
+                            document.downloadImage(url: url, type: .Standard)
+                            log.info("Knowledge Graph: Preview image added - \(document.title)")
                         }
                         else {
-                            print("URL Wikipedia image not found via Knowledge Graph for TAGME document.")
+                            log.error("URL Wikipedia image not found via Knowledge Graph for TAGME document.")
                         }
                     }
+                }
+                else {
+                    log.error("SVG Wikipedia image found from Knowledge Graph, skipping!")
                 }
             }
         }

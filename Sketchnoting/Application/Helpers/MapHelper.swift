@@ -42,19 +42,13 @@ class MapHelper {
         }
     }
     static func fetchMapImage(latitude: String, longitude: String, document: Document, note: Sketchnote) {
-        let url = URL(string: "https://www.mapquestapi.com/staticmap/v5/map?key=bAELaFV3A8vNwICyhbziI7tNeSfYdUvr&center=" + latitude + "," + longitude + "&size=800,600")
-        
         DispatchQueue.global().async {
-            if let data = try? Data(contentsOf: url!) {
-                DispatchQueue.main.async {
-                    if let image = UIImage(data: data) {
-                        print("MapQuest: Map image added - \(document.title)")
-                        note.setDocumentMapImage(document: document, image: image)
-                    }
-                }
+            if let url = URL(string: "https://www.mapquestapi.com/staticmap/v5/map?key=bAELaFV3A8vNwICyhbziI7tNeSfYdUvr&center=" + latitude + "," + longitude + "&size=800,600") {
+                document.downloadImage(url: url, type: .Map)
+                log.info("Map image could be found for document \(document.title).")
             }
             else {
-                print("URL map image not found.")
+                log.error("No map image could be found for document \(document.title).")
             }
         }
     }

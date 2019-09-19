@@ -16,12 +16,12 @@ class NoteLoader {
         for (key, _) in UserDefaults.sketchnotes.dictionaryRepresentation() {
             if let data = UserDefaults.sketchnotes.data(forKey: key),
                 let loadedSketchnote = try? decoder.decode(Sketchnote.self, from: data) {
-                print("Note " + key + " loaded.")
+                log.info("Note \(key) loaded.")
                 sketchnotes.append(loadedSketchnote)
             }
         }
         if SettingsManager.noteSortingByNewest() {
-            print("Sorting notes by newest.")
+            log.info("Sorting notes by newest first.")
             return sketchnotes.sorted(by: { (note0: Sketchnote, note1: Sketchnote) -> Bool in
                 return note0 > note1
             })
@@ -36,7 +36,7 @@ class NoteLoader {
         var sketchnote: Sketchnote?
         if let data = UserDefaults.sketchnotes.data(forKey: id), let loadedSketchnote = try? decoder.decode(Sketchnote.self, from: data) {
             sketchnote = loadedSketchnote
-            print("Note " + id + " loaded.")
+            log.info("Specific note \(id) loaded.")
         }
         return sketchnote
     }
