@@ -8,6 +8,7 @@
 
 import UIKit
 import Kingfisher
+import SVGKit
 
 protocol Visitable {
     func accept(visitor: DocumentVisitor)
@@ -104,18 +105,39 @@ class Document: Codable, Visitable, Equatable {
     }
     
     public func downloadImage(url: URL, type: DocumentImageType) {
-        let processor = SVGProcessor()
-        let serializer = SVGCacheSerializer()
         let cache = ImageCache.default
         let key = type.rawValue + "-" + self.title
         let downloader = ImageDownloader.default
-        downloader.downloadImage(with: url, options: [.processor(processor), .forceRefresh, .cacheSerializer(serializer)]) { result in
-            switch result {
-            case .success(let value):
-                cache.store(value.image, original: value.originalData, forKey: key)
-                self.reload()
-            case .failure(let error):
-                print(error)
+        if !url.absoluteString.lowercased().contains(".svg") {
+            downloader.downloadImage(with: url) { result in
+                switch result {
+                case .success(let value):
+                    cache.store(value.image, original: value.originalData, forKey: key)
+                    self.reload()
+                case .failure(let error):
+                    print(error)
+                }
+            }
+        }
+        else {
+            log.info("SVG preview image detected.")
+            if let svgImage = SVGKImage(contentsOf: url)?.uiImage {
+                if let jpegData = svgImage.jpegData(compressionQuality: 1) {
+                    if let jpegImage = UIImage(data: jpegData) {
+                        log.info("Preview image from SVG image to jpeg image created.")
+                        cache.store(jpegImage, forKey: key)
+                        self.reload()
+                    }
+                    else {
+                        log.error("Could not create UIImage from jpeg data.")
+                    }
+                }
+                else {
+                    log.error("Could not get JPEG data from SVG image.")
+                }
+            }
+            else {
+                log.error("Could not retrieve SVG image from URL content.")
             }
         }
     }

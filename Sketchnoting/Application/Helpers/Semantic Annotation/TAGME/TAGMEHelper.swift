@@ -108,20 +108,14 @@ class TAGMEHelper {
                             json = JSON(res)
                             
                             if let imageURL = json["query"]["pages"][String(format: "%.0f", document.wikiPageID!)]["original"]["source"].string {
-                                if !imageURL.contains(".svg") || !imageURL.contains(".SVG") {
-                                    DispatchQueue.global().async {
-                                        if let url = URL(string: imageURL) {
-                                            document.downloadImage(url: url, type: .Standard)
-                                            completion(true)
-                                        }
-                                        else {
-                                            completion(false)
-                                        }
+                                DispatchQueue.global().async {
+                                    if let url = URL(string: imageURL) {
+                                        document.downloadImage(url: url, type: .Standard)
+                                        completion(true)
                                     }
-                                }
-                                else {
-                                    log.error("SVG Wikipedia image found, skipping!")
-                                    completion(false)
+                                    else {
+                                        completion(false)
+                                    }
                                 }
                             }
                             else {
