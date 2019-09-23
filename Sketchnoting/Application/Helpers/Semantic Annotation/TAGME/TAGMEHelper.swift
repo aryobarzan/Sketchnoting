@@ -52,8 +52,9 @@ class TAGMEHelper {
                                         print("TAGME: new document added - \(document.title)")
                                         note.addDocument(document: document)
                                     }
+                                    self.fetchWikipediaIntroText(document: document)
                                     
-                                    self.fetchWikipediaImage(note: note, document: document, completion: {foundImage in
+                                    self.fetchWikipediaImage(document: document, completion: {foundImage in
                                         if !foundImage {
                                             KnowledgeGraphHelper.fetchWikipediaImage(note: note, document: document)
                                         }
@@ -83,57 +84,88 @@ class TAGMEHelper {
         }
     }
     
-    private func fetchWikipediaImage(note: Sketchnote, document: TAGMEDocument, completion:@escaping (Bool) -> ()) {
-        let parameters: Parameters = ["action": "query", "prop": "info", "pageids": document.wikiPageID!, "inprop": "url", "format": "json"]
-        let headers: HTTPHeaders = [
-            "Accept": "application/json"
-        ]
-        AF.request("http://en.wikipedia.org/w/api.php", parameters: parameters, headers: headers).responseJSON { response in
-            let responseResult = response.result
-            var json = JSON()
-            switch responseResult {
-            case .success(let res):
-                json = JSON(res)
-                
-                if let wikiTitle = json["query"]["pages"][String(format: "%.0f", document.wikiPageID!)]["title"].string {
-                    let parameters: Parameters = ["action": "query", "prop": "pageimages", "format": "json", "piprop": "original", "titles": wikiTitle]
-                    let headers: HTTPHeaders = [
-                        "Accept": "application/json"
-                    ]
-                    AF.request("http://en.wikipedia.org/w/api.php", parameters: parameters, headers: headers).responseJSON { response in
-                        let responseResult = response.result
-                        var json = JSON()
-                        switch responseResult {
-                        case .success(let res):
-                            json = JSON(res)
-                            
-                            if let imageURL = json["query"]["pages"][String(format: "%.0f", document.wikiPageID!)]["original"]["source"].string {
-                                DispatchQueue.global().async {
-                                    if let url = URL(string: imageURL) {
-                                        document.downloadImage(url: url, type: .Standard)
-                                        completion(true)
-                                    }
-                                    else {
-                                        completion(false)
+    private func fetchWikipediaIntroText(document: TAGMEDocument) {
+        if document.wikiPageID != nil {
+            let parameters: Parameters = ["action": "query", "prop": "extracts", "exintro": "", "explaintext": "", "pageids": Int(document.wikiPageID!), "format": "json"]
+            let headers: HTTPHeaders = [
+                "Accept": "application/json"
+            ]
+            AF.request("http://en.wikipedia.org/w/api.php", parameters: parameters, headers: headers).responseJSON { response in
+                let responseResult = response.result
+                var json = JSON()
+                switch responseResult {
+                case .success(let res):
+                    json = JSON(res)
+                    if let wikiExtract = json["query"]["pages"][String(format: "%.0f", document.wikiPageID!)]["extract"].string {
+                        document.description = wikiExtract
+                        log.info("Retrieved wikipedia intro extract for document \(document.title).")
+                    }
+                    break
+                case .failure(let error):
+                    log.error("Failed to retrieve wikipedia intro extract for document \(document.title).")
+                    print(error.localizedDescription)
+                    return
+                }
+            }
+        }
+    }
+    
+    private func fetchWikipediaImage(document: TAGMEDocument, completion:@escaping (Bool) -> ()) {
+        if document.wikiPageID != nil {
+            let parameters: Parameters = ["action": "query", "prop": "info", "pageids": Int(document.wikiPageID!), "inprop": "url", "format": "json"]
+            let headers: HTTPHeaders = [
+                "Accept": "application/json"
+            ]
+            AF.request("http://en.wikipedia.org/w/api.php", parameters: parameters, headers: headers).responseJSON { response in
+                let responseResult = response.result
+                var json = JSON()
+                switch responseResult {
+                case .success(let res):
+                    json = JSON(res)
+                    
+                    if let wikiTitle = json["query"]["pages"][String(format: "%.0f", document.wikiPageID!)]["title"].string {
+                        let parameters: Parameters = ["action": "query", "prop": "pageimages", "format": "json", "piprop": "original", "titles": wikiTitle]
+                        let headers: HTTPHeaders = [
+                            "Accept": "application/json"
+                        ]
+                        AF.request("http://en.wikipedia.org/w/api.php", parameters: parameters, headers: headers).responseJSON { response in
+                            let responseResult = response.result
+                            var json = JSON()
+                            switch responseResult {
+                            case .success(let res):
+                                json = JSON(res)
+                                
+                                if let imageURL = json["query"]["pages"][String(format: "%.0f", document.wikiPageID!)]["original"]["source"].string {
+                                    DispatchQueue.global().async {
+                                        if let url = URL(string: imageURL) {
+                                            document.downloadImage(url: url, type: .Standard)
+                                            completion(true)
+                                        }
+                                        else {
+                                            completion(false)
+                                        }
                                     }
                                 }
-                            }
-                            else {
+                                else {
+                                    completion(false)
+                                }
+                            case .failure(let error):
+                                print(error.localizedDescription)
                                 completion(false)
+                                return
                             }
-                        case .failure(let error):
-                            print(error.localizedDescription)
-                            completion(false)
-                            return
                         }
                     }
+                    break
+                case .failure(let error):
+                    print(error.localizedDescription)
+                    completion(false)
+                    return
                 }
-                break
-            case .failure(let error):
-                print(error.localizedDescription)
-                completion(false)
-                return
             }
+        }
+        else {
+            completion(false)
         }
     }
 }

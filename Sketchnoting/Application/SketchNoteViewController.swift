@@ -13,6 +13,7 @@ import PopMenu
 import GSMessages
 import BadgeHub
 import NVActivityIndicatorView
+import Repeat
 
 // This is the controller for the other page of the application, i.e. not the home page, but for the page displayed when the user wants to edit a note.
 
@@ -31,7 +32,8 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
     
     @IBOutlet var bookshelf: UIView!
     @IBOutlet var activityIndicator: UIActivityIndicatorView!
-    @IBOutlet weak var canvasLoadingIndicator: NVActivityIndicatorView!
+    @IBOutlet var canvasLoadingIndicator: NVActivityIndicatorView!
+    @IBOutlet var bookshelfUpdateIndicator: NVActivityIndicatorView!
     
     @IBOutlet var pencilButton: LGButton!
     @IBOutlet var eraserButton: LGButton!
@@ -630,8 +632,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
             self.bookshelfFilter = .All
             self.items = self.sketchnote.documents
             if self.bookshelfUpdateTimer != nil {
-                self.bookshelfUpdateTimer?.invalidate()
-                self.bookshelfUpdateTimer = nil
+                self.bookshelfUpdateTimer!.reset(nil)
             }
             self.documentsCollectionView.reloadData()
             self.topicsBadgeHub.setCount(0)
@@ -1189,22 +1190,27 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         }
     }
     
-    var bookshelfUpdateTimer: Timer?
+    var bookshelfUpdateTimer: Repeater?
     private func startBookshelfUpdateTimer() {
-        if bookshelfUpdateTimer != nil {
-            bookshelfUpdateTimer!.invalidate()
-            bookshelfUpdateTimer = nil
-            print("Bookshelf Update Timer reset.")
-            
+        bookshelfUpdateIndicator.isHidden = false
+        if !bookshelfUpdateIndicator.isAnimating {
+            bookshelfUpdateIndicator.startAnimating()
         }
-        bookshelfUpdateTimer = Timer.scheduledTimer(timeInterval: 2.0, target: self, selector: #selector(onBookshelfUpdateTimerFires), userInfo: nil, repeats: false)
-        print("Bookshelf Update Timer started.")
-    }
-    @objc func onBookshelfUpdateTimerFires()
-    {
-        bookshelfUpdateTimer?.invalidate()
-        bookshelfUpdateTimer = nil
-        self.updateBookshelf()
+        if self.bookshelfUpdateTimer != nil {
+            log.info("Bookshelf Update Timer reset.")
+            self.bookshelfUpdateTimer!.reset(nil)
+        }
+        else {
+            log.info("Bookshelf Update Timer started.")
+            self.bookshelfUpdateTimer = Repeater.once(after: .seconds(2)) { timer in
+                DispatchQueue.main.async {
+                    self.updateBookshelf()
+                    self.bookshelfUpdateIndicator.stopAnimating()
+                    self.bookshelfUpdateIndicator.isHidden = true
+                }
+                
+            }
+        }
     }
     
     func sketchnoteHasNewDocument(sketchnote: Sketchnote, document: Document) { // Sketchnote delegate
@@ -1329,8 +1335,8 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, Sket
         self.documentsCollectionView.refreshLayout()
         self.documentsCollectionView.reloadData()
         if bookshelfUpdateTimer != nil {
-            bookshelfUpdateTimer?.invalidate()
-            bookshelfUpdateTimer = nil
+            bookshelfUpdateTimer!.reset(nil)
+            //bookshelfUpdateTimer = nil
         }
         clearFilteredDocumentsButton.isHidden = false
     }

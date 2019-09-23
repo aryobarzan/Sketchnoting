@@ -20,4 +20,5 @@ target 'Sketchnoting' do
   pod 'Kingfisher', '~> 5.0'
   pod 'PocketSVG', '~> 2.0'
   pod 'SVGKit'
+  pod 'Repeat'
 end

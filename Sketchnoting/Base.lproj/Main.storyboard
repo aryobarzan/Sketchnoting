@@ -1436,6 +1436,19 @@
                                                     <action selector="filterDocumentsButtonTapped:" destination="lDo-DG-9fX" eventType="touchUpInside" id="Jj1-P0-AfQ"/>
                                                 </connections>
                                             </button>
+                                            <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="0n7-8b-iL7" customClass="NVActivityIndicatorView" customModule="NVActivityIndicatorView">
+                                                <rect key="frame" x="256.5" y="15" width="25" height="25"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="height" constant="25" id="EVc-Or-Rpe"/>
+                                                    <constraint firstAttribute="width" constant="25" id="YPJ-hO-pFV"/>
+                                                </constraints>
+                                                <userDefinedRuntimeAttributes>
+                                                    <userDefinedRuntimeAttribute type="string" keyPath="typeName" value="ballPulse"/>
+                                                    <userDefinedRuntimeAttribute type="color" keyPath="color">
+                                                        <color key="value" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                </userDefinedRuntimeAttributes>
+                                            </view>
                                             <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="znP-Ip-v8c">
                                                 <rect key="frame" x="285" y="11" width="75" height="30"/>
                                                 <state key="normal" title="Clear Filter"/>
@@ -1449,12 +1462,15 @@
                                         <constraints>
                                             <constraint firstItem="Hw6-ha-FLR" firstAttribute="leading" secondItem="oqt-gq-XGG" secondAttribute="leading" constant="16" id="0DC-g9-43i"/>
                                             <constraint firstAttribute="trailing" secondItem="znP-Ip-v8c" secondAttribute="trailing" constant="8" id="0PB-hi-r6f"/>
+                                            <constraint firstItem="znP-Ip-v8c" firstAttribute="leading" secondItem="0n7-8b-iL7" secondAttribute="trailing" constant="3.5" id="3Zi-OP-YZe"/>
                                             <constraint firstItem="Soc-lK-uIi" firstAttribute="top" secondItem="Hw6-ha-FLR" secondAttribute="bottom" constant="7" id="3hf-nw-9BD"/>
                                             <constraint firstItem="Soc-lK-uIi" firstAttribute="leading" secondItem="O1Y-Db-0EN" secondAttribute="trailing" constant="12" id="8FP-Wx-niV"/>
+                                            <constraint firstItem="0n7-8b-iL7" firstAttribute="leading" secondItem="dT1-d9-SEx" secondAttribute="trailing" constant="3.5" id="9oA-z8-luY"/>
                                             <constraint firstAttribute="trailing" secondItem="Soc-lK-uIi" secondAttribute="trailing" constant="8" id="A0Z-SM-eyN"/>
                                             <constraint firstAttribute="trailing" secondItem="sjN-VI-3Ol" secondAttribute="trailing" constant="8" id="Crh-dI-dhp"/>
                                             <constraint firstItem="sjN-VI-3Ol" firstAttribute="top" secondItem="Hw6-ha-FLR" secondAttribute="bottom" constant="12" id="EHN-dl-bov"/>
                                             <constraint firstAttribute="trailing" secondItem="S7U-4b-lPQ" secondAttribute="trailing" id="GjG-Yp-cOP"/>
+                                            <constraint firstItem="0n7-8b-iL7" firstAttribute="top" secondItem="oqt-gq-XGG" secondAttribute="top" constant="15" id="HTJ-jb-Ajr"/>
                                             <constraint firstItem="Soc-lK-uIi" firstAttribute="leading" secondItem="oqt-gq-XGG" secondAttribute="leading" constant="24" id="JS5-zj-oGt"/>
                                             <constraint firstAttribute="bottom" secondItem="S7U-4b-lPQ" secondAttribute="bottom" id="LYb-B1-Aex"/>
                                             <constraint firstItem="S7U-4b-lPQ" firstAttribute="top" secondItem="oqt-gq-XGG" secondAttribute="top" id="NcC-Yp-TKK"/>
@@ -1569,6 +1585,7 @@
                         <outlet property="bookshelfLeftConstraint" destination="YAl-f6-SsH" id="pB3-3n-VxF"/>
                         <outlet property="bookshelfLeftDragView" destination="O1Y-Db-0EN" id="IYp-8e-St4"/>
                         <outlet property="bookshelfRightConstraint" destination="SiT-MD-RCf" id="kNS-8p-MJz"/>
+                        <outlet property="bookshelfUpdateIndicator" destination="0n7-8b-iL7" id="K8h-t7-JrB"/>
                         <outlet property="canvasLoadingIndicator" destination="oTc-jX-dZM" id="9j8-Gn-uJB"/>
                         <outlet property="clearFilteredDocumentsButton" destination="znP-Ip-v8c" id="n7e-jB-GEm"/>
                         <outlet property="closeButton" destination="YQI-WO-Gvp" id="6So-lp-acO"/>
