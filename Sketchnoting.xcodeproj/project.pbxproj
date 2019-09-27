@@ -10,7 +10,6 @@
 		9F05B5A1232BE4EC00983AF2 /* NoteCollectionViewDetailCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9F05B59F232BE4EC00983AF2 /* NoteCollectionViewDetailCell.xib */; };
 		9F05B5A3232BF0C800983AF2 /* NoteCollectionViewDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F05B5A2232BF0C800983AF2 /* NoteCollectionViewDetailCell.swift */; };
 		9F08F3F0230AEE0E00A0587C /* SizeSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F08F3EF230AEE0E00A0587C /* SizeSlider.swift */; };
-		9F5D0FC8229CBC4100BCA451 /* NotesManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5D0FC7229CBC4100BCA451 /* NotesManager.swift */; };
 		9F5D80F02332D32600552D58 /* SVGImageProcessorExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5D80EF2332D32600552D58 /* SVGImageProcessorExtension.swift */; };
 		9F75E448230C368F00488BBD /* NoteSharingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F75E447230C368F00488BBD /* NoteSharingViewController.swift */; };
 		9F75E44C230C583200488BBD /* NoteCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F75E44A230C583200488BBD /* NoteCollectionViewCell.swift */; };
@@ -85,7 +84,6 @@
 		9F05B59F232BE4EC00983AF2 /* NoteCollectionViewDetailCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NoteCollectionViewDetailCell.xib; sourceTree = "<group>"; };
 		9F05B5A2232BF0C800983AF2 /* NoteCollectionViewDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteCollectionViewDetailCell.swift; sourceTree = "<group>"; };
 		9F08F3EF230AEE0E00A0587C /* SizeSlider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SizeSlider.swift; sourceTree = "<group>"; };
-		9F5D0FC7229CBC4100BCA451 /* NotesManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotesManager.swift; sourceTree = "<group>"; };
 		9F5D80EF2332D32600552D58 /* SVGImageProcessorExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SVGImageProcessorExtension.swift; sourceTree = "<group>"; };
 		9F5D8B2B228B9D7000F56FEC /* CREDITS.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CREDITS.md; sourceTree = "<group>"; };
 		9F5D8B2C228B9EF800F56FEC /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
@@ -202,7 +200,6 @@
 		9F5D0FC6229CBC2A00BCA451 /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				9F5D0FC7229CBC4100BCA451 /* NotesManager.swift */,
 				9FA623A022E73DDA007ED794 /* NoteLoader.swift */,
 				9F92D111231E98C600BC0E57 /* DocumentsManager.swift */,
 				9FFE07E9232A63BA00DBD0AC /* TagsManager.swift */,
@@ -670,7 +667,6 @@
 				9F75E484231419FA00488BBD /* TAGMEDocument.swift in Sources */,
 				9F92D11523202B9900BC0E57 /* KnowledgeGraphHelper.swift in Sources */,
 				9F75E44C230C583200488BBD /* NoteCollectionViewCell.swift in Sources */,
-				9F5D0FC8229CBC4100BCA451 /* NotesManager.swift in Sources */,
 				9FA6238F22DCD3AD007ED794 /* DocumentUICollectionViewCell.swift in Sources */,
 				9F75E448230C368F00488BBD /* NoteSharingViewController.swift in Sources */,
 				9FBF6AB422E9F391001FD730 /* VisionTextWrapper.swift in Sources */,
@@ -844,7 +840,7 @@
 					"$(PROJECT_DIR)",
 				);
 				INFOPLIST_FILE = Sketchnoting/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -871,7 +867,7 @@
 					"$(PROJECT_DIR)",
 				);
 				INFOPLIST_FILE = Sketchnoting/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

@@ -11,14 +11,12 @@ import Firebase
 
 class TextData: NSObject, NSCoding {
     let visionTextWrapper: VisionTextWrapper!
-    let paths: [CGRect]!
     
     let original: String!
     let spellchecked: String!
     var corrected: String?
     
-    init(visionText: VisionText, original: String, paths: [CGRect], spellcheck: Bool) {
-        self.paths = paths
+    init(visionText: VisionText, original: String, spellcheck: Bool) {
         self.original = original
         if spellcheck {
             self.spellchecked = OCRHelper.postprocess(text: original)
@@ -48,14 +46,12 @@ class TextData: NSObject, NSCoding {
     //MARK: Decode / Encode
     enum Keys: String {
         case visionTextWrapper = "VisionTextWrapper"
-        case paths = "Paths"
         case original = "Original"
         case spellchecked = "Spellchecked"
         case corrected = "Corrected"
     }
 
     func encode(with aCoder: NSCoder) {
-        aCoder.encode(paths, forKey: Keys.paths.rawValue)
         aCoder.encode(original, forKey: Keys.original.rawValue)
         aCoder.encode(spellchecked, forKey: Keys.spellchecked.rawValue)
         aCoder.encode(corrected, forKey: Keys.corrected.rawValue)
@@ -63,7 +59,6 @@ class TextData: NSObject, NSCoding {
     }
     
     required init?(coder aDecoder: NSCoder) {
-        paths = aDecoder.decodeObject(forKey: Keys.paths.rawValue) as? [CGRect]
         original = aDecoder.decodeObject(forKey: Keys.original.rawValue) as? String
         spellchecked = aDecoder.decodeObject(forKey: Keys.spellchecked.rawValue) as? String
         corrected = aDecoder.decodeObject(forKey: Keys.corrected.rawValue) as? String

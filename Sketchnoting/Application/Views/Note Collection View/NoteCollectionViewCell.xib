@@ -1,11 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
-    <device id="retina6_1" orientation="portrait">
-        <adaptation id="fullscreen"/>
-    </device>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14868" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
-        <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14490.49"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14824"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -35,56 +32,27 @@
                                             <rect key="frame" x="0.0" y="0.0" width="200" height="30"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                         </view>
-                                        <blurEffect style="light"/>
+                                        <blurEffect style="systemMaterial"/>
                                     </visualEffectView>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="f4M-Cz-pek">
-                                        <rect key="frame" x="8" y="5" width="20" height="20"/>
-                                        <constraints>
-                                            <constraint firstAttribute="height" constant="20" id="dzD-RK-ZFs"/>
-                                            <constraint firstAttribute="width" constant="20" id="wuR-yf-hbK"/>
-                                        </constraints>
-                                        <state key="normal" image="TagIcon">
-                                            <color key="titleColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                        </state>
-                                        <connections>
-                                            <action selector="tagTapped:" destination="gTV-IL-0wX" eventType="touchUpInside" id="sIH-JB-g8V"/>
-                                        </connections>
-                                    </button>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Untitled" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumScaleFactor="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="afa-LH-hYC">
-                                        <rect key="frame" x="33" y="5" width="134" height="20.5"/>
+                                        <rect key="frame" x="5" y="5" width="190" height="20.5"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                         <size key="shadowOffset" width="1" height="-1"/>
                                     </label>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="JfA-oa-Y9v">
-                                        <rect key="frame" x="172" y="5" width="20" height="20"/>
-                                        <constraints>
-                                            <constraint firstAttribute="height" constant="20" id="Z7b-I1-xSR"/>
-                                            <constraint firstAttribute="width" constant="20" id="jte-zs-M9z"/>
-                                        </constraints>
-                                        <state key="normal" image="MoreNoteActionsIcon">
-                                            <color key="titleColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                        </state>
-                                        <connections>
-                                            <action selector="moreTapped:" destination="gTV-IL-0wX" eventType="touchUpInside" id="RCc-zJ-0nn"/>
-                                        </connections>
-                                    </button>
                                 </subviews>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
                                     <constraint firstAttribute="bottom" secondItem="QbK-sV-2JS" secondAttribute="bottom" id="9Pt-93-LhL"/>
-                                    <constraint firstItem="JfA-oa-Y9v" firstAttribute="centerY" secondItem="lwh-05-4wr" secondAttribute="centerY" id="A2b-r3-z3R"/>
                                     <constraint firstAttribute="trailing" secondItem="QbK-sV-2JS" secondAttribute="trailing" id="AHK-Pp-Yh2"/>
                                     <constraint firstItem="afa-LH-hYC" firstAttribute="centerY" secondItem="lwh-05-4wr" secondAttribute="centerY" id="DCY-LQ-0ji"/>
                                     <constraint firstItem="QbK-sV-2JS" firstAttribute="leading" secondItem="lwh-05-4wr" secondAttribute="leading" id="HBY-1e-sT4"/>
                                     <constraint firstItem="afa-LH-hYC" firstAttribute="centerX" secondItem="lwh-05-4wr" secondAttribute="centerX" id="KNp-y5-zkn"/>
-                                    <constraint firstAttribute="trailing" secondItem="JfA-oa-Y9v" secondAttribute="trailing" constant="8" id="Kh5-MC-f51"/>
-                                    <constraint firstItem="JfA-oa-Y9v" firstAttribute="leading" secondItem="afa-LH-hYC" secondAttribute="trailing" constant="5" id="LXf-cI-IQn"/>
-                                    <constraint firstItem="f4M-Cz-pek" firstAttribute="leading" secondItem="lwh-05-4wr" secondAttribute="leading" constant="8" id="kyP-S4-kCj"/>
-                                    <constraint firstItem="f4M-Cz-pek" firstAttribute="centerY" secondItem="lwh-05-4wr" secondAttribute="centerY" id="ogq-gm-70T"/>
+                                    <constraint firstItem="afa-LH-hYC" firstAttribute="leading" secondItem="lwh-05-4wr" secondAttribute="leading" constant="5" id="gIn-Iy-gqC"/>
                                     <constraint firstAttribute="height" constant="30" id="p7W-za-U8u"/>
-                                    <constraint firstItem="afa-LH-hYC" firstAttribute="leading" secondItem="f4M-Cz-pek" secondAttribute="trailing" constant="5" id="qIR-Xp-Juc"/>
                                     <constraint firstItem="QbK-sV-2JS" firstAttribute="top" secondItem="lwh-05-4wr" secondAttribute="top" id="rse-e3-vX1"/>
+                                    <constraint firstAttribute="trailing" secondItem="afa-LH-hYC" secondAttribute="trailing" constant="5" id="xu2-bV-6GW"/>
                                 </constraints>
                             </view>
                         </subviews>
@@ -113,16 +81,10 @@
             <size key="customSize" width="220" height="320"/>
             <connections>
                 <outlet property="imageView" destination="V13-sv-1Ta" id="Gn7-Pi-pdf"/>
-                <outlet property="moreButton" destination="JfA-oa-Y9v" id="xfi-9x-rDv"/>
-                <outlet property="tagButton" destination="f4M-Cz-pek" id="VTG-eW-GwL"/>
                 <outlet property="titleBackgroundView" destination="lwh-05-4wr" id="d9V-Ps-H1c"/>
                 <outlet property="titleLabel" destination="afa-LH-hYC" id="o9d-Ae-bBp"/>
             </connections>
             <point key="canvasLocation" x="-126.08695652173914" y="180.13392857142856"/>
         </collectionViewCell>
     </objects>
-    <resources>
-        <image name="MoreNoteActionsIcon" width="48" height="48"/>
-        <image name="TagIcon" width="48" height="48"/>
-    </resources>
 </document>

@@ -10,17 +10,9 @@ import UIKit
 
 class DocumentUICollectionViewCell: UICollectionViewCell {
     
-    var delegate: DocumentCollectionViewCellDelegate!
     var document: Document!
     
     @IBOutlet var titleLabel: UILabel!
     @IBOutlet var previewImage: UIImageView!
     @IBOutlet var hideButton: UIButton!
-    @IBAction func hideTapped(_ sender: UIButton) {
-        delegate.documentCollectionViewCellHideTapped(document: document, sender: self)
-    }
-}
-
-protocol DocumentCollectionViewCellDelegate {
-    func documentCollectionViewCellHideTapped(document: Document, sender: DocumentUICollectionViewCell)
 }

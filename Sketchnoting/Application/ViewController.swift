@@ -14,13 +14,15 @@ import GSMessages
 import SideMenu
 import BadgeHub
 import NVActivityIndicatorView
+import Vision
+import PencilKit
 
 // This is the controller for the app's home page view.
 // It contains the search bar and all the buttons related to it.
 // It also contains note collection views, which in turn contain sketchnote views.
 
 //This controller handles all interactions of the user on the home page, including creating new note collections and new notes, searching, sharing notes, and generating pdfs from notes.
-class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextFieldDelegate, MCSessionDelegate, MCBrowserViewControllerDelegate, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, NoteCollectionViewCellCommonDelegate,NoteCollectionViewCellDelegate, NoteCollectionViewDetailCellDelegate, UITableViewDataSource, UITableViewDelegate, TagTableViewCellDelegate, ColorPickerViewDelegate, ColorPickerViewDelegateFlowLayout {
+class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextFieldDelegate, MCSessionDelegate, MCBrowserViewControllerDelegate, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, NoteCollectionViewDetailCellDelegate, UITableViewDataSource, UITableViewDelegate, TagTableViewCellDelegate, ColorPickerViewDelegate, ColorPickerViewDelegateFlowLayout {
     
     @IBOutlet var newNoteButton: UIButton!
     @IBOutlet var noteLoadingIndicator: NVActivityIndicatorView!
@@ -44,9 +46,8 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     @IBOutlet var drawingSearchPanel: UIView!
     @IBOutlet var clearDrawingSearchButton: UIButton!
     @IBOutlet var drawingSearchButton: UIButton!
-    @IBOutlet var drawingSearchCanvas: SketchView!
+    @IBOutlet var drawingSearchCanvas: PKCanvasView!
     @IBOutlet var blurView: UIVisualEffectView!
-    @IBOutlet var noteLargePreviewView: UIImageView!
     
     @IBOutlet weak var tagsPanel: UIView!
     @IBOutlet weak var tagsTableView: UITableView!
@@ -78,8 +79,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     
     // The note the user has selected to send to other devices is stored here.
     var sketchnoteToShare: Sketchnote?
-    // Since the strokes of a note are stored separately from the note itself, the strokes linked to the above variable are stored in this following variable.
-    var pathArrayToShare: NSMutableArray?
     // The two above variables are added to this following array and this array is sent to the receiving device(s)
     var dataToShare = [Data]()
     
@@ -118,9 +117,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         mcSession = MCSession(peer: peerID, securityIdentity: nil, encryptionPreference: .required)
         mcSession.delegate = self
         
-        newNoteButton.layer.masksToBounds = true
-        newNoteButton.layer.cornerRadius = 25
-        
         noteListViewButton.layer.masksToBounds = true
         noteListViewButton.layer.cornerRadius = 5
         
@@ -128,18 +124,14 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         
         drawingSearchPanel.layer.masksToBounds = true
         drawingSearchPanel.layer.cornerRadius = 5
-        drawingSearchCanvas.backgroundColor = .black
-        drawingSearchCanvas.drawTool = .pen
-        drawingSearchCanvas.lineColor = .white
-        drawingSearchCanvas.lineWidth = 350 * 0.04
-        self.drawingSearchPanel.alpha = 0.0
-        self.blurView.alpha = 0.0
         
-        noteLargePreviewView.alpha = 0.0
-        noteLargePreviewView.layer.masksToBounds = true
-        noteLargePreviewView.layer.cornerRadius = 5
-        noteLargePreviewView.layer.borderColor = UIColor.black.cgColor
-        noteLargePreviewView.layer.borderWidth = 2
+        drawingSearchCanvas.overrideUserInterfaceStyle = .light
+        drawingSearchCanvas.backgroundColor = .white
+        drawingSearchCanvas.isOpaque = false
+        drawingSearchCanvas.tool = PKInkingTool(.pen, color: .black, width: 75)
+        self.drawingSearchPanel.alpha = 0.0
+        
+        self.blurView.alpha = 0.0
         
         // The search views are setup, including the search field and the pop-up view for searching by drawing
         self.searchField.delegate = self
@@ -226,7 +218,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     // Upon return, the edited note is saved to disk.
     @IBAction func unwindToHome(sender: UIStoryboardSegue) {
         if let sourceViewController = sender.source as? SketchNoteViewController, let note = sourceViewController.sketchnote {
-            NotesManager.shared.update(note: note, pathArray: sourceViewController.storedPathArray)
+            note.save()
             
             self.updateDisplayedNotes()
         }
@@ -332,6 +324,37 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         popMenu.addAction(oldestFirstAction)
         
         self.present(popMenu, animated: true, completion: nil)
+    }
+    func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
+
+        return UIContextMenuConfiguration(identifier: nil, previewProvider: nil, actionProvider: { suggestedActions in
+
+            // "puppers" is the array backing the collection view
+            return self.makeNoteContextMenu(note: self.items[indexPath.row], point: point)
+        })
+    }
+    private func makeNoteContextMenu(note: Sketchnote, point: CGPoint) -> UIMenu {
+        // Create a UIAction for sharing
+        let renameAction = UIAction(title: "Rename", image: UIImage(systemName: "text.cursor")) { action in
+            self.editNoteTitle(note: note)
+        }
+        let tagsAction = UIAction(title: "Manage Tags", image: UIImage(systemName: "tag.fill")) { action in
+            self.editNoteTags(sketchnote: note)
+        }
+        let copyTextAction = UIAction(title: "Copy Text", image: UIImage(systemName: "doc.text")) { action in
+            UIPasteboard.general.string = note.getText()
+        }
+        let shareAction = UIAction(title: "Share", image: UIImage(systemName: "square.and.arrow.up")) { action in
+            self.shareNote(note: note, sender: UIView(frame: CGRect(x: point.x, y: point.y, width: point.x, height: point.y)))
+        }
+        let sendAction = UIAction(title: "Send", image: UIImage(systemName: "paperplane")) { action in
+            self.sendNote(note: note)
+        }
+        let deleteAction = UIAction(title: "Delete", image: UIImage(systemName: "trash")) { action in
+            self.deleteNote(note: note)
+        }
+        // Create and return a UIMenu with the share action
+        return UIMenu(title: note.getTitle(), children: [renameAction, tagsAction, copyTextAction, shareAction, sendAction, deleteAction])
     }
     
     // MARK: Search
@@ -494,19 +517,19 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             
         })
         popMenu.addAction(allAction)
-        let textAction = PopMenuDefaultAction(title: "Text", image: #imageLiteral(resourceName: "CopyTextIcon"), didSelect: { action in
+        let textAction = PopMenuDefaultAction(title: "Text", image: UIImage(systemName: "text.alignleft"), didSelect: { action in
             self.searchTypeButton.setImage(#imageLiteral(resourceName: "CopyTextIcon"), for: .normal)
             self.searchType = .Text
             
         })
         popMenu.addAction(textAction)
-        let drawingAction = PopMenuDefaultAction(title: "Drawing", image: #imageLiteral(resourceName: "ImageIcon"), didSelect: { action in
+        let drawingAction = PopMenuDefaultAction(title: "Drawing", image: UIImage(systemName: "scribble"), didSelect: { action in
             self.searchTypeButton.setImage(#imageLiteral(resourceName: "ImageIcon"), for: .normal)
             self.searchType = .Drawing
             
         })
         popMenu.addAction(drawingAction)
-        let documentAction = PopMenuDefaultAction(title: "Document", image: #imageLiteral(resourceName: "FileIcon"), didSelect: { action in
+        let documentAction = PopMenuDefaultAction(title: "Document", image: UIImage(systemName: "doc"), didSelect: { action in
             self.searchTypeButton.setImage(#imageLiteral(resourceName: "FileIcon"), for: .normal)
             self.searchType = .Document
             
@@ -539,12 +562,13 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         }
     }
     @IBAction func clearDrawingSearchTapped(_ sender: UIButton) {
-        drawingSearchCanvas.clear()
+        drawingSearchCanvas.drawing = PKDrawing()
     }
     @IBAction func drawingSearchTapped(_ sender: UIButton) {
-        let croppedCGImage:CGImage = (drawingSearchCanvas.asImage().cgImage)!
+        var image = drawingSearchCanvas.asImage()
+        image = image.invertedImage() ?? image
+        let croppedCGImage:CGImage = (image.cgImage)!
         let croppedImage = UIImage(cgImage: croppedCGImage)
-        
         let resized = croppedImage.resize(newSize: CGSize(width: 28, height: 28))
         
         guard let pixelBuffer = resized.grayScalePixelBuffer() else {
@@ -558,6 +582,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             print("error making prediction: \(error)")
         }
     }
+
     
     // Drawing recognition
     private var labelNames: [String] = []
@@ -612,8 +637,8 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     func browserViewControllerDidFinish(_ browserViewController: MCBrowserViewController) {
         dismiss(animated: true)
         // After the user has selected the nearby devices to send a note to, the main sharing function shareNote is called
-        if sketchnoteToShare != nil && pathArrayToShare != nil {
-            self.shareNote(note: sketchnoteToShare!, pathArray: pathArrayToShare!)
+        if sketchnoteToShare != nil {
+            self.sendNoteInternal(note: sketchnoteToShare!)
         }
     }
     
@@ -637,7 +662,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         }
     }
     
-    func shareNote(note: Sketchnote, pathArray: NSMutableArray) {
+    private func sendNoteInternal(note: Sketchnote) {
         if mcSession.connectedPeers.count > 0 {
             dataToShare = [Data]()
             let encoder = JSONEncoder()
@@ -647,12 +672,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             else {
                 print("Encoding failed for note.")
             }
-            if let encoded = try? NSKeyedArchiver.archivedData(withRootObject: pathArray, requiringSecureCoding: false) {
-                dataToShare.append(encoded)
-            }
-            else {
-                print("Failed to encode path array.")
-            }
+            dataToShare.append(note.canvasData.dataRepresentation())
             do {
                 let dataEncoded = try? NSKeyedArchiver.archivedData(withRootObject: dataToShare, requiringSecureCoding: false)
                 if dataEncoded != nil {
@@ -728,14 +748,11 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         case .Grid:
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath as IndexPath) as! NoteCollectionViewCell
             cell.setNote(note: self.items[indexPath.item])
-            cell.delegate = self
-            cell.commonDelegate = self
             return cell
         case .Detail:
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifierDetailCell, for: indexPath as IndexPath) as! NoteCollectionViewDetailCell
             cell.setNote(note: self.items[indexPath.item])
             cell.delegate = self
-            cell.commonDelegate = self
             return cell
         }
     }
@@ -756,36 +773,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         self.selectedSketchnote = self.items[indexPath.item]
         self.performSegue(withIdentifier: "EditSketchnote", sender: self)
         print("You selected note view cell #\(indexPath.item)!")
-    }
-    
-    func noteCollectionViewCellMoreTapped(sketchnote: Sketchnote, sender: UIButton, cell: NoteCollectionViewCell) {
-        let popMenu = PopMenuViewController(sourceView: sender, actions: [PopMenuAction](), appearance: nil)
-        popMenu.appearance.popMenuBackgroundStyle = .blurred(.dark)
-        let setTitleAction = PopMenuDefaultAction(title: "Set Title", image: #imageLiteral(resourceName: "EditTitleIcon"), color: .white, didSelect: { action in
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                self.editNoteTitle(note: sketchnote)
-            }
-        })
-        popMenu.addAction(setTitleAction)
-        let copyTextAction = PopMenuDefaultAction(title: "Copy Text", image: #imageLiteral(resourceName: "CopyTextIcon"), color: .white, didSelect: { action in
-            UIPasteboard.general.string = sketchnote.getText()
-        })
-        popMenu.addAction(copyTextAction)
-        let sendAction = PopMenuDefaultAction(title: "Send", image: #imageLiteral(resourceName: "SendIcon"), color: .white, didSelect: { action in
-            self.sendNote(note: sketchnote)
-        })
-        popMenu.addAction(sendAction)
-        let shareAction = PopMenuDefaultAction(title: "Share", image: #imageLiteral(resourceName: "ShareNoteIcon"), color: .white, didSelect: { action in
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                self.shareNote(note: sketchnote, sender: cell)
-            }
-        })
-        popMenu.addAction(shareAction)
-        let action = PopMenuDefaultAction(title: "Delete", image: #imageLiteral(resourceName: "DeleteIcon"), color: .red, didSelect: { action in
-            self.deleteNote(note: sketchnote)
-        })
-        popMenu.addAction(action)
-        self.present(popMenu, animated: true, completion: nil)
     }
     
     private func editNoteTitle(note: Sketchnote) {
@@ -813,7 +800,26 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         self.present(alertController, animated: true, completion: nil)
     }
     
-    private func shareNote(note: Sketchnote, sender: UICollectionViewCell) {
+    private func editNoteTags(sketchnote: Sketchnote) {
+           var looseTagsToRemove = [Tag]()
+           for tag in sketchnote.tags {
+               if !TagsManager.tags.contains(tag) {
+                   looseTagsToRemove.append(tag)
+               }
+           }
+           if looseTagsToRemove.count > 0 {
+               for t in looseTagsToRemove {
+                   sketchnote.tags.removeAll{$0 == t}
+               }
+               sketchnote.save()
+           }
+           self.selectedNoteForTagEditing = sketchnote
+           self.tagsPanelState = .EditNote
+           self.showTagsPanel()
+       }
+
+    
+    private func shareNote(note: Sketchnote, sender: UIView) {
         if note.image != nil {
             var data = [Any]()
             if let pdf = note.createPDF() {
@@ -830,70 +836,24 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     
     private func sendNote(note: Sketchnote) {
         self.sketchnoteToShare = note
-        self.pathArrayToShare = note.paths
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             self.joinSession()
         }
     }
     
     private func deleteNote(note: Sketchnote) {
-        self.notes.removeAll{$0 == note}
-        self.items.removeAll{$0 == note}
-        note.delete()
-        self.noteCollectionView.reloadData()
-    }
-    
-    // MARK: Note Collection View Cell COMMON delegate
-    func noteCollectionViewCellTagTapped(sketchnote: Sketchnote) {
-        var looseTagsToRemove = [Tag]()
-        for tag in sketchnote.tags {
-            if !TagsManager.tags.contains(tag) {
-                looseTagsToRemove.append(tag)
-            }
-        }
-        if looseTagsToRemove.count > 0 {
-            for t in looseTagsToRemove {
-                sketchnote.tags.removeAll{$0 == t}
-            }
-            sketchnote.save()
-        }
-        self.selectedNoteForTagEditing = sketchnote
-        self.tagsPanelState = .EditNote
-        self.showTagsPanel()
-    }
-    
-    func noteCollectionViewCellLongPressed(sketchnote: Sketchnote, status: Bool) {
-        if status {
-            showLargeNotePreview(note: sketchnote)
-        }
-        else {
-            hideLargeNotePreview()
-        }
-    }
-    
-    private func showLargeNotePreview(note: Sketchnote) {
-        self.noteLargePreviewView.image = note.image
-        self.view.layoutIfNeeded()
-        UIView.animate(withDuration: 0.25, delay: 0.0, options: UIView.AnimationOptions.curveEaseIn, animations: {
-            self.noteLargePreviewView.alpha = 1.0
-            self.blurView.alpha = 1.0
-            self.noteLargePreviewView.isHidden = false
-            self.blurView.isHidden = false
-            self.view.layoutIfNeeded()
-        }, completion: { completed in
-        })
-    }
-    
-    private func hideLargeNotePreview() {
-        self.view.layoutIfNeeded()
-        UIView.animate(withDuration: 0.25, delay: 0.0, options: UIView.AnimationOptions.curveEaseOut, animations: {
-            self.noteLargePreviewView.alpha = 0.0
-            self.blurView.alpha = 0.0
-        }, completion: { completed in
-            self.noteLargePreviewView.isHidden = true
-            self.blurView.isHidden = true
-            self.view.layoutIfNeeded()
-        })
+        let alert = UIAlertController(title: "Delete Note", message: "Are you sure you want to delete this note?", preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Delete", style: .destructive, handler: { action in
+              self.notes.removeAll{$0 == note}
+              self.items.removeAll{$0 == note}
+              note.delete()
+              self.noteCollectionView.reloadData()
+        }))
+        alert.addAction(UIAlertAction(title: "Cancel", style: .default, handler: { action in
+              log.info("Not deleting note.")
+        }))
+        self.present(alert, animated: true, completion: nil)
+        
     }
     
     // MARK: Tags
@@ -1099,6 +1059,10 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     // MARK: Note Collection View DETAIL cell delegate
     func noteCollectionViewDetailCellEditTitleTapped(sketchnote: Sketchnote, sender: UIButton, cell: NoteCollectionViewDetailCell) {
         self.editNoteTitle(note: sketchnote)
+    }
+    
+    func noteCollectionViewDetailCellTagTapped(sketchnote: Sketchnote, sender: UIButton, cell: NoteCollectionViewDetailCell) {
+        self.editNoteTags(sketchnote: sketchnote)
     }
     
     func noteCollectionViewDetailCellShareTapped(sketchnote: Sketchnote, sender: UIButton, cell: NoteCollectionViewDetailCell) {

@@ -22,7 +22,7 @@ class HandwritingRecognizer {
         self.textRecognizerCloud = vision.cloudTextRecognizer(options: options)
     }
     
-    public func recognize(spellcheck: Bool = true, image: UIImage, pathBoundingBoxes: [CGRect], handleFinish:@escaping ((_ success: Bool, _ param: TextData?)->())){
+    public func recognize(spellcheck: Bool = true, image: UIImage, handleFinish:@escaping ((_ success: Bool, _ param: TextData?)->())){
         let visionImage = VisionImage(image: image)
         
         switch SettingsManager.textRecognitionSetting() {
@@ -32,18 +32,18 @@ class HandwritingRecognizer {
                     handleFinish(false, nil)
                     return
                 }
-                let textData = TextData(visionText: result, original: result.text, paths: pathBoundingBoxes, spellcheck: spellcheck)
+                let textData = TextData(visionText: result, original: result.text, spellcheck: spellcheck)
                 handleFinish(true, textData)
             }
         case .CloudSparse:
             self.textRecognizerCloud = vision.cloudTextRecognizer()
             textRecognizerCloud.process(visionImage) { result, error in
                 guard error == nil, let result = result else {
-                    print(error)
+                    log.error(error?.localizedDescription)
                     handleFinish(false, nil)
                     return
                 }
-                let textData = TextData(visionText: result, original: result.text, paths: pathBoundingBoxes, spellcheck: spellcheck)
+                let textData = TextData(visionText: result, original: result.text, spellcheck: spellcheck)
                 handleFinish(true, textData)
             }
         case .CloudDense:
@@ -52,11 +52,11 @@ class HandwritingRecognizer {
             self.textRecognizerCloud = vision.cloudTextRecognizer(options: options)
             textRecognizerCloud.process(visionImage) { result, error in
                 guard error == nil, let result = result else {
-                    print(error)
+                    log.error(error?.localizedDescription)
                     handleFinish(false, nil)
                     return
                 }
-                let textData = TextData(visionText: result, original: result.text, paths: pathBoundingBoxes, spellcheck: spellcheck)
+                let textData = TextData(visionText: result, original: result.text, spellcheck: spellcheck)
                 handleFinish(true, textData)
             }
         }

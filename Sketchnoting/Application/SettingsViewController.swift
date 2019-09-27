@@ -45,12 +45,9 @@ class SettingsViewController: UITableViewController {
             UserDefaults.settings.set(PencilSideButtonKeys.ToggleEraserPencil, forKey: SettingsKeys.PencilSideButton.rawValue)
             break
         case 2:
-            UserDefaults.settings.set(PencilSideButtonKeys.ShowHideTools, forKey: SettingsKeys.PencilSideButton.rawValue)
-            break
-        case 3:
             UserDefaults.settings.set(PencilSideButtonKeys.Undo, forKey: SettingsKeys.PencilSideButton.rawValue)
             break
-        case 4:
+        case 3:
             UserDefaults.settings.set(PencilSideButtonKeys.Redo, forKey: SettingsKeys.PencilSideButton.rawValue)
             break
         default:

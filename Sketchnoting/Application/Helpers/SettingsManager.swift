@@ -20,8 +20,6 @@ class SettingsManager {
                 return PencilSideButtonKeys.ManageDrawings
             case PencilSideButtonKeys.ToggleEraserPencil.rawValue:
                 return PencilSideButtonKeys.ToggleEraserPencil
-            case PencilSideButtonKeys.ShowHideTools.rawValue:
-                return PencilSideButtonKeys.ShowHideTools
             case PencilSideButtonKeys.Undo.rawValue:
                 return PencilSideButtonKeys.Undo
             case PencilSideButtonKeys.Redo.rawValue:
@@ -61,7 +59,6 @@ public enum SettingsKeys : String, Any {
 public enum PencilSideButtonKeys : String {
     case ManageDrawings
     case ToggleEraserPencil
-    case ShowHideTools
     case Undo
     case Redo
 }

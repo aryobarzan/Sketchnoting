@@ -8,7 +8,7 @@
 
 import UIKit
 import PDFKit
-
+import PencilKit
 
 protocol SketchnoteDelegate {
     func sketchnoteHasNewDocument(sketchnote: Sketchnote, document: Document)
@@ -29,9 +29,10 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable, DocumentDelegate
     var documents: [Document]!
     var drawings: [String]? // recognized drawings' labels
     var drawingViewRects: [CGRect]?
-    var paths: NSMutableArray?
     var textDataArray: [TextData]!
     var tags: [Tag]!
+    
+    var canvasData: PKDrawing!
     
     var sharedByDevice: String?
     
@@ -58,6 +59,8 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable, DocumentDelegate
         self.image = image
         self.textDataArray = [TextData]()
         self.tags = [Tag]()
+        
+        self.canvasData = PKDrawing()
     }
     
     //MARK: Persistence
@@ -71,7 +74,7 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable, DocumentDelegate
             try container.encode(documents, forKey: .relatedDocuments)
         } catch {
         }
-        
+                
         try container.encode(drawings, forKey: .drawings)
         try container.encode(drawingViewRects, forKey: .drawingViewRects)
         if image != nil {
@@ -145,7 +148,7 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable, DocumentDelegate
             tags = [Tag]()
         }
         
-        self.loadPaths()
+        self.loadCanvasData()
         self.loadTextDataArray()
         log.info("Sketchnote " + self.id + " decoded.")
     }
@@ -160,45 +163,59 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable, DocumentDelegate
         case tagme = "TAGME"
     }
     
+    private let serializationQueue = DispatchQueue(label: "SerializationQueue", qos: .background)
+    
     public func save() {
-        let encoder = JSONEncoder()
-        
-        if let encoded = try? encoder.encode(self) {
-            UserDefaults.sketchnotes.set(encoded, forKey: self.id)
-            log.info("Note \(self.id ?? "") saved.")
-            if self.paths != nil {
-                self.savePaths()
-            }
-            self.saveTextDataArray()
-        }
-        else {
-            log.error("Encoding failed for note " + id + ".")
-        }
-    }
-    public func savePaths() {
-        if self.paths != nil {
-            let DocumentsDirectory = FileManager().urls(for: .documentDirectory, in: .userDomainMask).first!
-            let ArchiveURLPathArray = DocumentsDirectory.appendingPathComponent("NotePaths-" + self.id)
-            if let encoded = try? NSKeyedArchiver.archivedData(withRootObject: self.paths as Any, requiringSecureCoding: false) {
-                try! encoded.write(to: ArchiveURLPathArray)
-                log.info("Note " + id + " paths saved.")
+        serializationQueue.async {
+            let encoder = JSONEncoder()
+            
+            if let encoded = try? encoder.encode(self) {
+                UserDefaults.sketchnotes.set(encoded, forKey: self.id)
+                log.info("Note \(self.id ?? "") saved.")
+                self.saveCanvasData()
+                self.saveTextDataArray()
             }
             else {
-                log.error("Failed to encode paths for note " + id + ".")
+                log.error("Encoding failed for note " + self.id + ".")
             }
         }
     }
-    private func loadPaths() {
-        let DocumentsDirectory = FileManager().urls(for: .documentDirectory, in: .userDomainMask).first!
-        let ArchiveURLPathArray = DocumentsDirectory.appendingPathComponent("NotePaths-" + self.id)
-        guard let codedData = try? Data(contentsOf: ArchiveURLPathArray) else { return }
-        guard let data = ((try? NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(codedData) as?
-            NSMutableArray) as NSMutableArray??) else {
-                log.error("Failed to load paths for note " + id + ".")
-                return }
-        self.paths = data
-        log.info("Paths for note " + id + " loaded.")
+    
+    private func saveCanvasData() {
+        let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
+        let documentsDirectory = paths.first!
+        let url = documentsDirectory.appendingPathComponent("NoteCanvasData-" + self.id + ".data")
+        do {
+            let encoder = PropertyListEncoder()
+            let data = try encoder.encode(self.canvasData)
+            try data.write(to: url)
+        } catch {
+            log.error("Could not save note canvas data for note " + self.id + ".")
+        }
     }
+    
+    private func loadCanvasData() {
+        let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
+        let documentsDirectory = paths.first!
+        let url = documentsDirectory.appendingPathComponent("NoteCanvasData-" + self.id + ".data")
+        
+        serializationQueue.async {
+            if FileManager.default.fileExists(atPath: url.path) {
+                do {
+                    let decoder = PropertyListDecoder()
+                    let data = try Data(contentsOf: url)
+                    let drawing = try decoder.decode(PKDrawing.self, from: data)
+                    self.canvasData = drawing
+                } catch {
+                    log.error("Could not load note drawing data for note " + self.id + ".")
+                    self.canvasData = PKDrawing()
+                }
+            } else {
+                self.canvasData = PKDrawing()
+            }
+        }
+    }
+    
     public func saveTextDataArray() {
         let DocumentsDirectory = FileManager().urls(for: .documentDirectory, in: .userDomainMask).first!
         let ArchiveURLPathArray = DocumentsDirectory.appendingPathComponent("NoteTextDataArray-" + self.id)
@@ -223,19 +240,8 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable, DocumentDelegate
     }
     
     public func delete() {
-        clearPaths()
         clearTextData()
         UserDefaults.sketchnotes.removeObject(forKey: id)
-    }
-    
-    public func clearPaths() {
-        do {
-            let DocumentsDirectory = FileManager().urls(for: .documentDirectory, in: .userDomainMask).first!
-            let ArchiveURLPathArray = DocumentsDirectory.appendingPathComponent("NotePaths-" + id)
-            try FileManager().removeItem(atPath: ArchiveURLPathArray.absoluteString)
-        } catch {
-        }
-        self.paths = nil
     }
     
     public func clearTextData() {
@@ -252,8 +258,8 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable, DocumentDelegate
     public func clear() {
         documents = [Document]()
         drawings = [String]()
+        canvasData = PKDrawing()
         clearTextData()
-        clearPaths()
     }
     
     func addDocument(document: Document) {

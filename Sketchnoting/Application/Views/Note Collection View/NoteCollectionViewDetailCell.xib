@@ -1,11 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
-    <device id="retina6_1" orientation="portrait">
-        <adaptation id="fullscreen"/>
-    </device>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14868" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
-        <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14490.49"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14824"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -31,31 +28,31 @@
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Note Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="PJ2-PF-qai">
                                 <rect key="frame" x="98" y="36.5" width="264" height="32"/>
                                 <fontDescription key="fontDescription" style="UICTFontTextStyleTitle1"/>
-                                <nil key="textColor"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Created: 6 Aug 2019" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="k0v-ST-wt7">
                                 <rect key="frame" x="95" y="5" width="142" height="18"/>
                                 <fontDescription key="fontDescription" style="UICTFontTextStyleSubhead"/>
-                                <nil key="textColor"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Updated: Never" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="srw-cZ-38I">
                                 <rect key="frame" x="258" y="5" width="108" height="18"/>
                                 <fontDescription key="fontDescription" style="UICTFontTextStyleSubhead"/>
-                                <nil key="textColor"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="3 Documents" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="QVV-mB-xkT">
                                 <rect key="frame" x="387" y="5" width="92" height="18"/>
                                 <fontDescription key="fontDescription" style="UICTFontTextStyleSubhead"/>
-                                <nil key="textColor"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Tags: Bach" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="QZS-Fe-uVH">
                                 <rect key="frame" x="98" y="82" width="494" height="18"/>
                                 <fontDescription key="fontDescription" style="UICTFontTextStyleSubhead"/>
-                                <nil key="textColor"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="upo-Ij-hdB">
@@ -64,7 +61,9 @@
                                     <constraint firstAttribute="height" constant="30" id="LUe-cT-gy3"/>
                                     <constraint firstAttribute="width" constant="30" id="gaF-qJ-jZz"/>
                                 </constraints>
-                                <state key="normal" image="TagIcon"/>
+                                <state key="normal" image="tag" catalog="system">
+                                    <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="large"/>
+                                </state>
                                 <connections>
                                     <action selector="tagTapped:" destination="D54-Ht-Gil" eventType="touchUpInside" id="dOr-Tn-eZw"/>
                                 </connections>
@@ -75,7 +74,9 @@
                                     <constraint firstAttribute="width" constant="30" id="OfB-vy-FLH"/>
                                     <constraint firstAttribute="height" constant="30" id="kFh-P3-fv0"/>
                                 </constraints>
-                                <state key="normal" image="ShareNoteIcon"/>
+                                <state key="normal" image="square.and.arrow.up" catalog="system">
+                                    <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="large"/>
+                                </state>
                                 <connections>
                                     <action selector="shareTapped:" destination="D54-Ht-Gil" eventType="touchUpInside" id="DHN-Sc-0UH"/>
                                 </connections>
@@ -86,7 +87,9 @@
                                     <constraint firstAttribute="width" constant="30" id="TQC-Jx-iFe"/>
                                     <constraint firstAttribute="height" constant="30" id="oSg-Q0-5vH"/>
                                 </constraints>
-                                <state key="normal" image="SendIcon"/>
+                                <state key="normal" image="paperplane" catalog="system">
+                                    <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="large"/>
+                                </state>
                                 <connections>
                                     <action selector="sendTapped:" destination="D54-Ht-Gil" eventType="touchUpInside" id="Ox5-pd-m2u"/>
                                 </connections>
@@ -98,7 +101,9 @@
                                     <constraint firstAttribute="height" constant="30" id="FAx-0X-vDn"/>
                                 </constraints>
                                 <color key="tintColor" red="0.73333333329999995" green="0.1333333333" blue="0.15686274510000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                <state key="normal" image="DeleteIcon"/>
+                                <state key="normal" image="trash.circle.fill" catalog="system">
+                                    <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="large"/>
+                                </state>
                                 <connections>
                                     <action selector="deleteTapped:" destination="D54-Ht-Gil" eventType="touchUpInside" id="6n4-sx-nAu"/>
                                 </connections>
@@ -109,7 +114,9 @@
                                     <constraint firstAttribute="width" constant="30" id="hDb-h4-oBU"/>
                                     <constraint firstAttribute="height" constant="30" id="mCA-Io-jVH"/>
                                 </constraints>
-                                <state key="normal" image="CopyTextIcon"/>
+                                <state key="normal" image="doc.text" catalog="system">
+                                    <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="large"/>
+                                </state>
                                 <connections>
                                     <action selector="copyTextTapped:" destination="D54-Ht-Gil" eventType="touchUpInside" id="4dN-2s-CQa"/>
                                 </connections>
@@ -117,13 +124,13 @@
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="·" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wom-v2-ChK">
                                 <rect key="frame" x="374" y="5" width="5" height="18"/>
                                 <fontDescription key="fontDescription" style="UICTFontTextStyleSubhead"/>
-                                <nil key="textColor"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="·" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="H9N-Sk-6vo">
                                 <rect key="frame" x="245" y="5" width="5" height="18"/>
                                 <fontDescription key="fontDescription" style="UICTFontTextStyleSubhead"/>
-                                <nil key="textColor"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="J89-fd-1Fn">
@@ -132,7 +139,9 @@
                                     <constraint firstAttribute="width" constant="30" id="Fuq-Ao-Flo"/>
                                     <constraint firstAttribute="height" constant="30" id="YIq-x3-1QM"/>
                                 </constraints>
-                                <state key="normal" image="EditTitleIcon"/>
+                                <state key="normal" image="text.cursor" catalog="system">
+                                    <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="large"/>
+                                </state>
                                 <connections>
                                     <action selector="editTitleTapped:" destination="D54-Ht-Gil" eventType="touchUpInside" id="y3t-eX-fSu"/>
                                 </connections>
@@ -200,11 +209,11 @@
         </collectionViewCell>
     </objects>
     <resources>
-        <image name="CopyTextIcon" width="54" height="54"/>
-        <image name="DeleteIcon" width="48" height="48"/>
-        <image name="EditTitleIcon" width="48" height="48"/>
-        <image name="SendIcon" width="48" height="48"/>
-        <image name="ShareNoteIcon" width="48" height="48"/>
-        <image name="TagIcon" width="48" height="48"/>
+        <image name="doc.text" catalog="system" width="56" height="64"/>
+        <image name="paperplane" catalog="system" width="64" height="60"/>
+        <image name="square.and.arrow.up" catalog="system" width="56" height="64"/>
+        <image name="tag" catalog="system" width="64" height="58"/>
+        <image name="text.cursor" catalog="system" width="64" height="62"/>
+        <image name="trash.circle.fill" catalog="system" width="64" height="62"/>
     </resources>
 </document>

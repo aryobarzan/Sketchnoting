@@ -24,7 +24,6 @@ class NoteCollectionViewDetailCell: UICollectionViewCell {
     @IBOutlet weak var deleteButton: UIButton!
     
     var delegate : NoteCollectionViewDetailCellDelegate!
-    var commonDelegate: NoteCollectionViewCellCommonDelegate!
     
     var sketchnote: Sketchnote!
     
@@ -89,33 +88,13 @@ class NoteCollectionViewDetailCell: UICollectionViewCell {
             self.documentsLabel.text = ""
         }
 
-        
-        if longPressGesture == nil {
-            longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(self.longPressed(_:)))
-            self.addGestureRecognizer(longPressGesture!)
-        }
-    }
-    
-    @objc func longPressed(_ sender: UILongPressGestureRecognizer) {
-        switch sender.state {
-        case .began:
-            commonDelegate.noteCollectionViewCellLongPressed(sketchnote: sketchnote, status: true)
-        case .ended:
-            commonDelegate.noteCollectionViewCellLongPressed(sketchnote: sketchnote, status: false)
-        case .cancelled:
-            commonDelegate.noteCollectionViewCellLongPressed(sketchnote: sketchnote, status: false)
-        case .failed:
-            commonDelegate.noteCollectionViewCellLongPressed(sketchnote: sketchnote, status: false)
-        default:
-            break
-        }
     }
     
     @IBAction func editTitleTapped(_ sender: UIButton) {
         delegate.noteCollectionViewDetailCellEditTitleTapped(sketchnote: sketchnote, sender: sender, cell: self)
     }
     @IBAction func tagTapped(_ sender: UIButton) {
-        commonDelegate.noteCollectionViewCellTagTapped(sketchnote: sketchnote)
+        delegate.noteCollectionViewDetailCellTagTapped(sketchnote: sketchnote, sender: sender, cell: self)
     }
     @IBAction func shareTapped(_ sender: UIButton) {
         delegate.noteCollectionViewDetailCellShareTapped(sketchnote: sketchnote, sender: sender, cell: self)
@@ -133,6 +112,7 @@ class NoteCollectionViewDetailCell: UICollectionViewCell {
 
 protocol NoteCollectionViewDetailCellDelegate {
     func noteCollectionViewDetailCellEditTitleTapped(sketchnote: Sketchnote, sender: UIButton, cell: NoteCollectionViewDetailCell)
+    func noteCollectionViewDetailCellTagTapped(sketchnote: Sketchnote, sender: UIButton, cell: NoteCollectionViewDetailCell)
     func noteCollectionViewDetailCellShareTapped(sketchnote: Sketchnote, sender: UIButton, cell: NoteCollectionViewDetailCell)
     func noteCollectionViewDetailCellSendTapped(sketchnote: Sketchnote, sender: UIButton, cell: NoteCollectionViewDetailCell)
     func noteCollectionViewDetailCellCopyTextTapped(sketchnote: Sketchnote, sender: UIButton, cell: NoteCollectionViewDetailCell)

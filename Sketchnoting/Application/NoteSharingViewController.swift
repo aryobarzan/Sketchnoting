@@ -9,6 +9,7 @@
 import UIKit
 import LGButton
 import MultipeerConnectivity
+import PencilKit
 
 class NoteSharingViewController: UIViewController, MCSessionDelegate {
 
@@ -55,11 +56,10 @@ class NoteSharingViewController: UIViewController, MCSessionDelegate {
     }
     @IBAction func acceptNoteTapped(_ sender: LGButton) {
         print("Accepted shared note")
-        if selectedSketchnote != nil && selectedPathArray != nil {
+        if selectedSketchnote != nil {
             if pendingSharedNotes.count > 0 {
                 pendingSharedNotes.remove(at: currentIndex)
             }
-            selectedSketchnote!.paths = selectedPathArray
             selectedSketchnote!.save()
         }
         self.view.showMessage("Shared note accepted and stored to your device.", type: .success)
@@ -73,7 +73,7 @@ class NoteSharingViewController: UIViewController, MCSessionDelegate {
     }
     @IBAction func declineNoteTapped(_ sender: LGButton) {
         print("Rejected shared note")
-        if selectedSketchnote != nil && selectedPathArray != nil {
+        if selectedSketchnote != nil{
             if pendingSharedNotes.count > 0 {
                 pendingSharedNotes.remove(at: currentIndex)
             }
@@ -113,8 +113,7 @@ class NoteSharingViewController: UIViewController, MCSessionDelegate {
     var mcAdvertiserAssistant: MCAdvertiserAssistant?
     
     var selectedSketchnote: Sketchnote?
-    var selectedPathArray: NSMutableArray?
-    var pendingSharedNotes = [(Sketchnote, NSMutableArray)]()
+    var pendingSharedNotes = [Sketchnote]()
     
     var currentIndex : Int = 0
     
@@ -131,14 +130,14 @@ class NoteSharingViewController: UIViewController, MCSessionDelegate {
             return
         }
         received.sharedByDevice = peerID.displayName
-        guard let receivedPath = ((try? NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(receivedData![1]) as?
-            NSMutableArray) as NSMutableArray??) else { return }
-        if receivedPath != nil {
-            DispatchQueue.main.async {
-                self.pendingSharedNotes.append((received, receivedPath!))
-                self.view.showMessage("Device \(peerID.displayName) shared a note with you!", type: .info)
-                self.updateViews()
-            }
+        guard let canvasData = try? PKDrawing(data: receivedData![1]) else {
+            return
+        }
+        received.canvasData = canvasData
+        DispatchQueue.main.async {
+            self.pendingSharedNotes.append(received)
+            self.view.showMessage("Device \(peerID.displayName) shared a note with you!", type: .info)
+            self.updateViews()
         }
     }
     
@@ -164,8 +163,7 @@ class NoteSharingViewController: UIViewController, MCSessionDelegate {
     
     private func updateViews() {
         if pendingSharedNotes.count > 0 && currentIndex < pendingSharedNotes.count {
-            let note = Array(pendingSharedNotes)[currentIndex].0
-            let pathArray = Array(pendingSharedNotes)[currentIndex].1
+            let note = pendingSharedNotes[currentIndex]
             
             noteImageView.image = note.image
             sharedNoteLabel.text = "\(note.sharedByDevice ?? "Unknown") has shared a note with you."
@@ -177,14 +175,12 @@ class NoteSharingViewController: UIViewController, MCSessionDelegate {
             notePageControl.currentPage = currentIndex
             
             selectedSketchnote = note
-            selectedPathArray = pathArray
         }
         else {
             sharedNoteLabel.text = "There are no pending shared notes to view."
             acceptNoteButton.isHidden = true
             declineNoteButton.isHidden = true
             selectedSketchnote = nil
-            selectedPathArray = nil
             noteImageView.image = nil
         }
     }
