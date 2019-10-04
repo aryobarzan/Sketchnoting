@@ -34,6 +34,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         cache.diskStorage.config.sizeLimit = 1000 * 1024 * 1024 // 1GB
         
         FirebaseApp.configure()
+        
+        if SettingsManager.firstAppStartup() {
+            UserDefaults.settings.set(true, forKey: SettingsKeys.AutomaticAnnotation.rawValue)
+        }
         return true
     }
 

@@ -11,6 +11,8 @@ import LGButton
 import MultipeerConnectivity
 import PencilKit
 
+import NotificationBannerSwift
+
 class NoteSharingViewController: UIViewController, MCSessionDelegate {
 
     @IBOutlet weak var acceptNoteButton: LGButton!
@@ -55,14 +57,16 @@ class NoteSharingViewController: UIViewController, MCSessionDelegate {
         }
     }
     @IBAction func acceptNoteTapped(_ sender: LGButton) {
-        print("Accepted shared note")
+        log.info("Accepted shared note")
         if selectedSketchnote != nil {
+            selectedSketchnote!.clearTextData()
             if pendingSharedNotes.count > 0 {
                 pendingSharedNotes.remove(at: currentIndex)
             }
             selectedSketchnote!.save()
         }
-        self.view.showMessage("Shared note accepted and stored to your device.", type: .success)
+        let banner = FloatingNotificationBanner(title: selectedSketchnote?.getTitle() ?? "Untitled", subtitle: "The shared note has been accepted and stored to your device.", style: .success)
+        banner.show()
         
         DispatchQueue.main.async {
             if self.currentIndex > 0 {
@@ -72,13 +76,14 @@ class NoteSharingViewController: UIViewController, MCSessionDelegate {
         }
     }
     @IBAction func declineNoteTapped(_ sender: LGButton) {
-        print("Rejected shared note")
+        log.info("Rejected shared note")
         if selectedSketchnote != nil{
             if pendingSharedNotes.count > 0 {
                 pendingSharedNotes.remove(at: currentIndex)
             }
         }
-        self.view.showMessage("Shared note declined.", type: .error)
+        let banner = FloatingNotificationBanner(title: "Note declined.", subtitle: "The shared note has been deleted.", style: .info)
+        banner.show()
         
         DispatchQueue.main.async {
             if self.currentIndex > 0 {
@@ -136,7 +141,8 @@ class NoteSharingViewController: UIViewController, MCSessionDelegate {
         received.canvasData = canvasData
         DispatchQueue.main.async {
             self.pendingSharedNotes.append(received)
-            self.view.showMessage("Device \(peerID.displayName) shared a note with you!", type: .info)
+            let banner = FloatingNotificationBanner(title: "New Note", subtitle: "Device \(peerID.displayName) shared a note with you!", style: .info)
+            banner.show()
             self.updateViews()
         }
     }

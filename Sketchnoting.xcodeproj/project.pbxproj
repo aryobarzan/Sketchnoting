@@ -3,13 +3,15 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 51;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
 		9F05B5A1232BE4EC00983AF2 /* NoteCollectionViewDetailCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9F05B59F232BE4EC00983AF2 /* NoteCollectionViewDetailCell.xib */; };
 		9F05B5A3232BF0C800983AF2 /* NoteCollectionViewDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F05B5A2232BF0C800983AF2 /* NoteCollectionViewDetailCell.swift */; };
 		9F08F3F0230AEE0E00A0587C /* SizeSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F08F3EF230AEE0E00A0587C /* SizeSlider.swift */; };
+		9F10EC162347D64C005340AA /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 9F10EC152347D64C005340AA /* Kingfisher */; };
+		9F10EC192347E4B4005340AA /* SwiftyBeaver in Frameworks */ = {isa = PBXBuildFile; productRef = 9F10EC182347E4B4005340AA /* SwiftyBeaver */; };
 		9F5D80F02332D32600552D58 /* SVGImageProcessorExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5D80EF2332D32600552D58 /* SVGImageProcessorExtension.swift */; };
 		9F75E448230C368F00488BBD /* NoteSharingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F75E447230C368F00488BBD /* NoteSharingViewController.swift */; };
 		9F75E44C230C583200488BBD /* NoteCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F75E44A230C583200488BBD /* NoteCollectionViewCell.swift */; };
@@ -54,15 +56,8 @@
 		9FD29BC72224B58600CC969A /* Document.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29BC62224B58600CC969A /* Document.swift */; };
 		9FD29BCB2224B89800CC969A /* Sketchnote.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29BCA2224B89800CC969A /* Sketchnote.swift */; };
 		9FD29C192236DCFC00CC969A /* SketchNoteViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29C182236DCFC00CC969A /* SketchNoteViewController.swift */; };
-		9FD29C1E2236EA2800CC969A /* SketchTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29C1B2236EA2800CC969A /* SketchTool.swift */; };
-		9FD29C1F2236EA2800CC969A /* SketchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29C1C2236EA2800CC969A /* SketchView.swift */; };
-		9FD29C202236EA2800CC969A /* UIImage+fill.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29C1D2236EA2800CC969A /* UIImage+fill.swift */; };
 		9FD29C342237FD2B00CC969A /* GMStepper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29C332237FD2B00CC969A /* GMStepper.swift */; };
 		9FD29C392238571700CC969A /* Pods_Sketchnoting.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9DC8B7BD96FB5DF71C8C0CA0 /* Pods_Sketchnoting.framework */; };
-		9FD29C3F223861E100CC969A /* ExpandableButtonItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29C3B223861E000CC969A /* ExpandableButtonItem.swift */; };
-		9FD29C40223861E100CC969A /* ExpandableButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29C3C223861E000CC969A /* ExpandableButtonView.swift */; };
-		9FD29C41223861E100CC969A /* ArrowButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29C3D223861E000CC969A /* ArrowButton.swift */; };
-		9FD29C42223861E100CC969A /* ActionButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29C3E223861E100CC969A /* ActionButton.swift */; };
 		9FD29C442239525A00CC969A /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 9FD29C432239525900CC969A /* GoogleService-Info.plist */; };
 		9FD29C472239588E00CC969A /* UIViewExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29C462239588E00CC969A /* UIViewExtensions.swift */; };
 		9FD29C4E223998BC00CC969A /* UIViewControllerExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29C4D223998BC00CC969A /* UIViewControllerExtensions.swift */; };
@@ -132,14 +127,7 @@
 		9FD29BC62224B58600CC969A /* Document.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Document.swift; sourceTree = "<group>"; };
 		9FD29BCA2224B89800CC969A /* Sketchnote.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sketchnote.swift; sourceTree = "<group>"; };
 		9FD29C182236DCFC00CC969A /* SketchNoteViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SketchNoteViewController.swift; sourceTree = "<group>"; };
-		9FD29C1B2236EA2800CC969A /* SketchTool.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SketchTool.swift; sourceTree = "<group>"; };
-		9FD29C1C2236EA2800CC969A /* SketchView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SketchView.swift; sourceTree = "<group>"; };
-		9FD29C1D2236EA2800CC969A /* UIImage+fill.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIImage+fill.swift"; sourceTree = "<group>"; };
 		9FD29C332237FD2B00CC969A /* GMStepper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GMStepper.swift; sourceTree = "<group>"; };
-		9FD29C3B223861E000CC969A /* ExpandableButtonItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExpandableButtonItem.swift; sourceTree = "<group>"; };
-		9FD29C3C223861E000CC969A /* ExpandableButtonView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExpandableButtonView.swift; sourceTree = "<group>"; };
-		9FD29C3D223861E000CC969A /* ArrowButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ArrowButton.swift; sourceTree = "<group>"; };
-		9FD29C3E223861E100CC969A /* ActionButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ActionButton.swift; sourceTree = "<group>"; };
 		9FD29C432239525900CC969A /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		9FD29C462239588E00CC969A /* UIViewExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIViewExtensions.swift; sourceTree = "<group>"; };
 		9FD29C4D223998BC00CC969A /* UIViewControllerExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIViewControllerExtensions.swift; sourceTree = "<group>"; };
@@ -160,7 +148,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9F10EC162347D64C005340AA /* Kingfisher in Frameworks */,
 				9FD29C392238571700CC969A /* Pods_Sketchnoting.framework in Frameworks */,
+				9F10EC192347E4B4005340AA /* SwiftyBeaver in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -378,24 +368,12 @@
 				9FD29C67224589BE00CC969A /* Application */,
 				9FD29C6222431BDD00CC969A /* DrawingRecognition */,
 				9FD29C452239587D00CC969A /* Extensions */,
-				9FD29C3A223861D200CC969A /* ExpandableButton */,
 				9FD29C322237FD1600CC969A /* GMStepper */,
-				9FD29C1A2236EA1700CC969A /* Sketch */,
 				9F75E4642311830500488BBD /* IGColorPicker */,
 				9F5D8B2B228B9D7000F56FEC /* CREDITS.md */,
 				9F5D8B2C228B9EF800F56FEC /* README.md */,
 			);
 			path = Sketchnoting;
-			sourceTree = "<group>";
-		};
-		9FD29C1A2236EA1700CC969A /* Sketch */ = {
-			isa = PBXGroup;
-			children = (
-				9FD29C1B2236EA2800CC969A /* SketchTool.swift */,
-				9FD29C1C2236EA2800CC969A /* SketchView.swift */,
-				9FD29C1D2236EA2800CC969A /* UIImage+fill.swift */,
-			);
-			path = Sketch;
 			sourceTree = "<group>";
 		};
 		9FD29C322237FD1600CC969A /* GMStepper */ = {
@@ -404,17 +382,6 @@
 				9FD29C332237FD2B00CC969A /* GMStepper.swift */,
 			);
 			path = GMStepper;
-			sourceTree = "<group>";
-		};
-		9FD29C3A223861D200CC969A /* ExpandableButton */ = {
-			isa = PBXGroup;
-			children = (
-				9FD29C3E223861E100CC969A /* ActionButton.swift */,
-				9FD29C3D223861E000CC969A /* ArrowButton.swift */,
-				9FD29C3B223861E000CC969A /* ExpandableButtonItem.swift */,
-				9FD29C3C223861E000CC969A /* ExpandableButtonView.swift */,
-			);
-			path = ExpandableButton;
 			sourceTree = "<group>";
 		};
 		9FD29C452239587D00CC969A /* Extensions */ = {
@@ -507,6 +474,10 @@
 			dependencies = (
 			);
 			name = Sketchnoting;
+			packageProductDependencies = (
+				9F10EC152347D64C005340AA /* Kingfisher */,
+				9F10EC182347E4B4005340AA /* SwiftyBeaver */,
+			);
 			productName = Sketchnoting;
 			productReference = 9FD29BA32220524D00CC969A /* Sketchnoting.app */;
 			productType = "com.apple.product-type.application";
@@ -536,6 +507,10 @@
 				Base,
 			);
 			mainGroup = 9FD29B9A2220524D00CC969A;
+			packageReferences = (
+				9F10EC142347D64C005340AA /* XCRemoteSwiftPackageReference "Kingfisher" */,
+				9F10EC172347E4B3005340AA /* XCRemoteSwiftPackageReference "SwiftyBeaver" */,
+			);
 			productRefGroup = 9FD29BA42220524D00CC969A /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -630,15 +605,12 @@
 				9F75E47F231183EC00488BBD /* UIColor+Extension.swift in Sources */,
 				9F75E451230D8AE100488BBD /* SettingsManager.swift in Sources */,
 				9F75E482231410A100488BBD /* TAGMEHelper.swift in Sources */,
-				9FD29C3F223861E100CC969A /* ExpandableButtonItem.swift in Sources */,
 				9FA6238B22D37213007ED794 /* BioPortalHelper.swift in Sources */,
 				9FA6239322DE30AC007ED794 /* SpotlightDocument.swift in Sources */,
 				9FD29C58223C3CF700CC969A /* UIImageExtensions.swift in Sources */,
 				9FD29C192236DCFC00CC969A /* SketchNoteViewController.swift in Sources */,
 				9FA6238822CEA7FE007ED794 /* MapHelper.swift in Sources */,
 				9F05B5A3232BF0C800983AF2 /* NoteCollectionViewDetailCell.swift in Sources */,
-				9FD29C202236EA2800CC969A /* UIImage+fill.swift in Sources */,
-				9FD29C40223861E100CC969A /* ExpandableButtonView.swift in Sources */,
 				9F92D110231E97DF00BC0E57 /* UserDefaultsExtensions.swift in Sources */,
 				9F92D11F23217FFF00BC0E57 /* SearchFilter.swift in Sources */,
 				9FA6239522DE3741007ED794 /* BioPortalDocument.swift in Sources */,
@@ -661,8 +633,6 @@
 				9F75E478231183DD00488BBD /* ColorPickerCell.swift in Sources */,
 				9FD29C472239588E00CC969A /* UIViewExtensions.swift in Sources */,
 				9FBF6AB822E9F428001FD730 /* VisionTextLineWrapper.swift in Sources */,
-				9FD29C1F2236EA2800CC969A /* SketchView.swift in Sources */,
-				9FD29C42223861E100CC969A /* ActionButton.swift in Sources */,
 				9F75E44F230D848200488BBD /* SettingsViewController.swift in Sources */,
 				9F75E484231419FA00488BBD /* TAGMEDocument.swift in Sources */,
 				9F92D11523202B9900BC0E57 /* KnowledgeGraphHelper.swift in Sources */,
@@ -676,8 +646,6 @@
 				9F75E479231183DD00488BBD /* ColorPickerView.swift in Sources */,
 				9FBF6ABA22E9F439001FD730 /* VisionTextElementWrapper.swift in Sources */,
 				9F75E47C231183E500488BBD /* ColorPickerViewDelegateFlowLayout.swift in Sources */,
-				9FD29C41223861E100CC969A /* ArrowButton.swift in Sources */,
-				9FD29C1E2236EA2800CC969A /* SketchTool.swift in Sources */,
 				9FD29BC72224B58600CC969A /* Document.swift in Sources */,
 				9FBF6AB622E9F3FE001FD730 /* VisionTextBlockWrapper.swift in Sources */,
 				9F75E475231183B700488BBD /* DefaultValues.swift in Sources */,
@@ -903,6 +871,38 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		9F10EC142347D64C005340AA /* XCRemoteSwiftPackageReference "Kingfisher" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/onevcat/Kingfisher.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.8.2;
+			};
+		};
+		9F10EC172347E4B3005340AA /* XCRemoteSwiftPackageReference "SwiftyBeaver" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SwiftyBeaver/SwiftyBeaver.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.8.2;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		9F10EC152347D64C005340AA /* Kingfisher */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9F10EC142347D64C005340AA /* XCRemoteSwiftPackageReference "Kingfisher" */;
+			productName = Kingfisher;
+		};
+		9F10EC182347E4B4005340AA /* SwiftyBeaver */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9F10EC172347E4B3005340AA /* XCRemoteSwiftPackageReference "SwiftyBeaver" */;
+			productName = SwiftyBeaver;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 9FD29B9B2220524D00CC969A /* Project object */;
 }

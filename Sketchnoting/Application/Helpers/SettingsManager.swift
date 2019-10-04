@@ -9,9 +9,16 @@
 import UIKit
 
 class SettingsManager {
-    public static func ignoreTouchInput() -> Bool {
-        let ignoreTouchInput = UserDefaults.settings.bool(forKey: SettingsKeys.IgnoreTouchInput.rawValue)
-        return ignoreTouchInput
+    public static func firstAppStartup() -> Bool {
+        let startup = UserDefaults.settings.bool(forKey: "FirstAppStartup")
+        if !startup {
+            UserDefaults.settings.set(true, forKey: "FirstAppStartup")
+            return true
+        }
+        return false
+    }
+    public static func automaticAnnotation() -> Bool {
+        return UserDefaults.settings.bool(forKey: SettingsKeys.AutomaticAnnotation.rawValue)
     }
     public static func pencilSideButton() -> PencilSideButtonKeys {
         if let sideButton = UserDefaults.settings.string(forKey: SettingsKeys.PencilSideButton.rawValue) {
@@ -50,7 +57,7 @@ class SettingsManager {
 
 
 public enum SettingsKeys : String, Any {
-    case IgnoreTouchInput
+    case AutomaticAnnotation
     case PencilSideButton
     case NoteSortingByNewest
     case TextRecognitionCloud

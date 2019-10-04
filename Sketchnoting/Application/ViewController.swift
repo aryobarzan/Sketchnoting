@@ -7,13 +7,14 @@
 //
 
 import UIKit
-import LGButton
+
 import PopMenu
-import MultipeerConnectivity
-import GSMessages
 import SideMenu
 import BadgeHub
 import NVActivityIndicatorView
+import NotificationBannerSwift
+
+import MultipeerConnectivity
 import Vision
 import PencilKit
 
@@ -343,6 +344,9 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         }
         let copyTextAction = UIAction(title: "Copy Text", image: UIImage(systemName: "doc.text")) { action in
             UIPasteboard.general.string = note.getText()
+            let banner = FloatingNotificationBanner(title: note.getTitle(), subtitle: "Copied text to clipboard.", style: .info)
+            banner.dismissDuration = 1.0
+            banner.show()
         }
         let shareAction = UIAction(title: "Share", image: UIImage(systemName: "square.and.arrow.up")) { action in
             self.shareNote(note: note, sender: UIView(frame: CGRect(x: point.x, y: point.y, width: point.x, height: point.y)))
@@ -684,7 +688,9 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
                 ac.addAction(UIAlertAction(title: "Close", style: .default))
                 present(ac, animated: true)
             }
-            self.view.showMessage("Note shared with the selected device(s).", type: .success)
+            let banner = FloatingNotificationBanner(title: note.getTitle(), subtitle: "Note shared with the selected device(s).", style: .success)
+            banner.dismissDuration = 1.0
+            banner.show()
         }
     }
     

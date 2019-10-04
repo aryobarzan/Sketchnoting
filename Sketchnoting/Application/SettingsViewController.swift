@@ -10,14 +10,14 @@ import UIKit
 
 class SettingsViewController: UITableViewController {
 
-    @IBOutlet weak var ignoreTouchSwitch: UISwitch!
+    @IBOutlet weak var automaticAnnotationSwitch: UISwitch!
     @IBOutlet weak var pencilSideButtonSegmentedControl: UISegmentedControl!
     @IBOutlet weak var textRecognitionSegmentedControl: UISegmentedControl!
     override func viewDidLoad() {
         super.viewDidLoad()
         self.navigationController?.setNavigationBarHidden(false, animated: false)
         
-        ignoreTouchSwitch.setOn(SettingsManager.ignoreTouchInput(), animated: false)
+        automaticAnnotationSwitch.setOn(SettingsManager.automaticAnnotation(), animated: false)
         
         switch SettingsManager.textRecognitionSetting() {
         case .OnDevice:
@@ -33,8 +33,8 @@ class SettingsViewController: UITableViewController {
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
     }
-    @IBAction func ignoreTouchSwitchChanged(_ sender: UISwitch) {
-        UserDefaults.settings.set(sender.isOn, forKey: SettingsKeys.IgnoreTouchInput.rawValue)
+    @IBAction func automaticAnnotationSwitchChanged(_ sender: UISwitch) {
+        UserDefaults.settings.set(sender.isOn, forKey: SettingsKeys.AutomaticAnnotation.rawValue)
     }
     @IBAction func pencilSideButtonSegmentedControlChanged(_ sender: UISegmentedControl) {
         switch sender.selectedSegmentIndex {

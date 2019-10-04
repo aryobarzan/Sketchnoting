@@ -7,16 +7,18 @@
 //
 
 import UIKit
+
 import LGButton
 import Firebase
 import PopMenu
-import GSMessages
 import BadgeHub
 import NVActivityIndicatorView
 import Repeat
+import NotificationBannerSwift
+
 import PencilKit
 
-class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, UIPencilInteractionDelegate, UICollectionViewDataSource, UICollectionViewDelegate, DocumentVisitor, SketchnoteDelegate, PKCanvasViewDelegate, PKToolPickerObserver, UIScreenshotServiceDelegate {
+class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, UICollectionViewDataSource, UICollectionViewDelegate, DocumentVisitor, SketchnoteDelegate, PKCanvasViewDelegate, PKToolPickerObserver, UIScreenshotServiceDelegate {
     
     @IBOutlet var canvasView: PKCanvasView!
     
@@ -106,9 +108,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, UIPe
         setupDrawingRegions()
         
         self.recognizedTextLogView.text = self.sketchnote.getText(raw: true)
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
+        
         // If the user has not created a new note, but is trying to edit an existing note, this existing note is reloaded.
         // This reload consists of redrawing the user's strokes for that note on the note's canvas on this page.
         if sketchnote != nil {
@@ -117,7 +117,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, UIPe
             }
             else {
                 log.info("Loading canvas data for note.")
-                self.canvasView.drawing = self.sketchnote.canvasData                
+                self.canvasView.drawing = self.sketchnote.canvasData
             }
             if let documents = sketchnote.documents {
                 log.info("Reloading documents")
@@ -160,6 +160,9 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, UIPe
             self.processDrawingRecognition()
             traitCollection.performAsCurrent {
                 sketchnote.image = canvasView.drawing.image(from: canvasView.bounds, scale: 2.0)
+                if traitCollection.userInterfaceStyle == .dark {
+                    sketchnote.image = sketchnote.image?.invert() ?? sketchnote.image
+                }
             }
             sketchnote.setUpdateDate()
             self.sketchnote.canvasData = self.canvasView.drawing
@@ -487,6 +490,11 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, UIPe
     
     @IBAction func moreButtonTapped(_ sender: UIButton) {
         let alert = UIAlertController(title: "Edit Your Note", message: "", preferredStyle: .alert)
+        if !SettingsManager.automaticAnnotation() {
+            alert.addAction(UIAlertAction(title: "Annotate", style: .default, handler: { action in
+                self.processHandwritingRecognition()
+            }))
+        }
         alert.addAction(UIAlertAction(title: "Set Title", style: .default, handler: { action in
             let alertController = UIAlertController(title: "Title for this note", message: nil, preferredStyle: .alert)
             
@@ -511,6 +519,9 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, UIPe
         if !sketchnote.getText().isEmpty {
             alert.addAction(UIAlertAction(title: "Copy Text", style: .default, handler: { action in
                 UIPasteboard.general.string = self.sketchnote.getText()
+                let banner = FloatingNotificationBanner(title: self.sketchnote.getTitle(), subtitle: "Copied text to clipboard.", style: .info)
+                banner.dismissDuration = 1.0
+                banner.show()
             }))
         }
         if bookshelf.isHidden {
@@ -636,6 +647,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, UIPe
     
     private func processHandwritingRecognition() {
         let image = self.generateHandwritingRecognitionImage()
+        self.sketchnote.clearTextData()
         handwritingRecognizer.recognize(spellcheck: false, image: image) { (success, textData) in
             if success {
                 if let textData = textData {
@@ -691,7 +703,9 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, UIPe
         self.resetHandwritingRecognition = true
         self.startSaveTimer()
         if (canvasView.tool is PKInkingTool && (canvasView.tool as! PKInkingTool).inkType != PKInkingTool.InkType.marker) || canvasView.tool is PKEraserTool {
-             self.startRecognitionTimer()
+            if SettingsManager.automaticAnnotation() {
+                self.startRecognitionTimer()
+            }
         }
     }
     private func startRecognitionTimer() {
@@ -1048,7 +1062,7 @@ class SketchNoteViewController: UIViewController, ExpandableButtonDelegate, UIPe
         })
     }
     private func makeDocumentContextMenu(document: Document) -> UIMenu {
-        let hideAction = UIAction(title: "Hide", image: #imageLiteral(resourceName: "EditTitleIcon")) { action in
+        let hideAction = UIAction(title: "Hide", image: UIImage(systemName: "eye.slash")) { action in
             self.sketchnote.removeDocument(document: document)
             DocumentsManager.hide(document: document)
             if self.bookshelfState == .Topic {
