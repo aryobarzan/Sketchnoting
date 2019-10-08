@@ -28,13 +28,15 @@ class KnowledgeGraphHelper {
                 print(error.localizedDescription)
                 return
             }
-            if let typeArray = json["itemListElement"].array?[0]["result"]["@type"].array {
-                for type in typeArray {
-                    if let value = type.string {
-                        if value.lowercased().contains("place") {
-                            print("Knowledge Graph Helper: Is a place - \(name)")
-                            completionHandler(true)
-                            return
+            if json["itemListElement"].exists() && json["itemListElement"].array != nil && json["itemListElement"].array!.count > 0 {
+                if let typeArray = json["itemListElement"].array?[0]["result"]["@type"].array {
+                    for type in typeArray {
+                        if let value = type.string {
+                            if value.lowercased().contains("place") {
+                                print("Knowledge Graph Helper: Is a place - \(name)")
+                                completionHandler(true)
+                                return
+                            }
                         }
                     }
                 }
@@ -58,17 +60,21 @@ class KnowledgeGraphHelper {
                 print(error.localizedDescription)
                 return
             }
-            if let imageString = json["itemListElement"].array?[0]["result"]["image"]["contentUrl"].string {
-                DispatchQueue.global().async {
-                    if let url = URL(string: imageString) {
-                        document.downloadImage(url: url, type: .Standard)
-                        log.info("Knowledge Graph: Preview image added - \(document.title)")
-                    }
-                    else {
-                        log.error("URL Wikipedia image not found via Knowledge Graph for TAGME document.")
+            
+             if json["itemListElement"].exists() && json["itemListElement"].array != nil && json["itemListElement"].array!.count > 0 {
+                if let imageString = json["itemListElement"].array?[0]["result"]["image"]["contentUrl"].string {
+                    DispatchQueue.global().async {
+                        if let url = URL(string: imageString) {
+                            document.downloadImage(url: url, type: .Standard)
+                            log.info("Knowledge Graph: Preview image added - \(document.title)")
+                        }
+                        else {
+                            log.error("URL Wikipedia image not found via Knowledge Graph for TAGME document.")
+                        }
                     }
                 }
             }
+            
         }
     }
 }

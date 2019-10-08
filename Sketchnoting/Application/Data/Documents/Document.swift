@@ -142,7 +142,7 @@ class Document: Codable, Visitable, Equatable {
         }
     }
     
-    internal func retrieveImage(type: DocumentImageType, completion:@escaping (Result<Image?, KingfisherError>) -> ()) {
+    internal func retrieveImage(type: DocumentImageType, completion:@escaping (Result<KFCrossPlatformImage?, KingfisherError>) -> ()) {
         let key = type.rawValue + "-" + self.title
         let cache = ImageCache.default
         cache.retrieveImageInDiskCache(forKey: key, completionHandler: { result in

@@ -981,23 +981,25 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
     
     var bookshelfUpdateTimer: Repeater?
     private func startBookshelfUpdateTimer() {
-        bookshelfUpdateIndicator.isHidden = false
-        if !bookshelfUpdateIndicator.isAnimating {
-            bookshelfUpdateIndicator.startAnimating()
-        }
-        if self.bookshelfUpdateTimer != nil {
-            log.info("Bookshelf Update Timer reset.")
-            self.bookshelfUpdateTimer!.reset(nil)
-        }
-        else {
-            log.info("Bookshelf Update Timer started.")
-            self.bookshelfUpdateTimer = Repeater.once(after: .seconds(2)) { timer in
-                DispatchQueue.main.async {
-                    self.updateBookshelf()
-                    self.bookshelfUpdateIndicator.stopAnimating()
-                    self.bookshelfUpdateIndicator.isHidden = true
+        DispatchQueue.main.async {
+            self.bookshelfUpdateIndicator.isHidden = false
+            if !self.bookshelfUpdateIndicator.isAnimating {
+                self.bookshelfUpdateIndicator.startAnimating()
+            }
+            if self.bookshelfUpdateTimer != nil {
+                log.info("Bookshelf Update Timer reset.")
+                self.bookshelfUpdateTimer!.reset(nil)
+            }
+            else {
+                log.info("Bookshelf Update Timer started.")
+                self.bookshelfUpdateTimer = Repeater.once(after: .seconds(2)) { timer in
+                    DispatchQueue.main.async {
+                        self.updateBookshelf()
+                        self.bookshelfUpdateIndicator.stopAnimating()
+                        self.bookshelfUpdateIndicator.isHidden = true
+                    }
+                    
                 }
-                
             }
         }
     }
@@ -1005,7 +1007,6 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
     func sketchnoteHasNewDocument(sketchnote: Sketchnote, document: Document) { // Sketchnote delegate
         DispatchQueue.main.async {
             if self.bookshelfState == .All && self.documentTypeMatchesBookshelfFilter(type: document.documentType) {
-                print(1)
                 CATransaction.begin()
                 CATransaction.setDisableActions(true)
                 self.items.append(document)
