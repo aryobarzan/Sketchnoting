@@ -12,6 +12,8 @@
 		9F08F3F0230AEE0E00A0587C /* SizeSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F08F3EF230AEE0E00A0587C /* SizeSlider.swift */; };
 		9F10EC162347D64C005340AA /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 9F10EC152347D64C005340AA /* Kingfisher */; };
 		9F10EC192347E4B4005340AA /* SwiftyBeaver in Frameworks */ = {isa = PBXBuildFile; productRef = 9F10EC182347E4B4005340AA /* SwiftyBeaver */; };
+		9F2C00062351123700D53EE9 /* SwiftyJSON in Frameworks */ = {isa = PBXBuildFile; productRef = 9F2C00052351123700D53EE9 /* SwiftyJSON */; };
+		9F2C00092351126800D53EE9 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 9F2C00082351126800D53EE9 /* Alamofire */; };
 		9F5D80F02332D32600552D58 /* SVGImageProcessorExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5D80EF2332D32600552D58 /* SVGImageProcessorExtension.swift */; };
 		9F75E448230C368F00488BBD /* NoteSharingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F75E447230C368F00488BBD /* NoteSharingViewController.swift */; };
 		9F75E44C230C583200488BBD /* NoteCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F75E44A230C583200488BBD /* NoteCollectionViewCell.swift */; };
@@ -148,8 +150,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9F2C00092351126800D53EE9 /* Alamofire in Frameworks */,
 				9F10EC162347D64C005340AA /* Kingfisher in Frameworks */,
 				9FD29C392238571700CC969A /* Pods_Sketchnoting.framework in Frameworks */,
+				9F2C00062351123700D53EE9 /* SwiftyJSON in Frameworks */,
 				9F10EC192347E4B4005340AA /* SwiftyBeaver in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -477,6 +481,8 @@
 			packageProductDependencies = (
 				9F10EC152347D64C005340AA /* Kingfisher */,
 				9F10EC182347E4B4005340AA /* SwiftyBeaver */,
+				9F2C00052351123700D53EE9 /* SwiftyJSON */,
+				9F2C00082351126800D53EE9 /* Alamofire */,
 			);
 			productName = Sketchnoting;
 			productReference = 9FD29BA32220524D00CC969A /* Sketchnoting.app */;
@@ -510,6 +516,8 @@
 			packageReferences = (
 				9F10EC142347D64C005340AA /* XCRemoteSwiftPackageReference "Kingfisher" */,
 				9F10EC172347E4B3005340AA /* XCRemoteSwiftPackageReference "SwiftyBeaver" */,
+				9F2C00042351123700D53EE9 /* XCRemoteSwiftPackageReference "SwiftyJSON" */,
+				9F2C00072351126800D53EE9 /* XCRemoteSwiftPackageReference "Alamofire" */,
 			);
 			productRefGroup = 9FD29BA42220524D00CC969A /* Products */;
 			projectDirPath = "";
@@ -889,6 +897,22 @@
 				minimumVersion = 1.8.2;
 			};
 		};
+		9F2C00042351123700D53EE9 /* XCRemoteSwiftPackageReference "SwiftyJSON" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SwiftyJSON/SwiftyJSON.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.0.0;
+			};
+		};
+		9F2C00072351126800D53EE9 /* XCRemoteSwiftPackageReference "Alamofire" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Alamofire/Alamofire.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = "5.0.0-rc.2";
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -901,6 +925,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 9F10EC172347E4B3005340AA /* XCRemoteSwiftPackageReference "SwiftyBeaver" */;
 			productName = SwiftyBeaver;
+		};
+		9F2C00052351123700D53EE9 /* SwiftyJSON */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9F2C00042351123700D53EE9 /* XCRemoteSwiftPackageReference "SwiftyJSON" */;
+			productName = SwiftyJSON;
+		};
+		9F2C00082351126800D53EE9 /* Alamofire */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9F2C00072351126800D53EE9 /* XCRemoteSwiftPackageReference "Alamofire" */;
+			productName = Alamofire;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

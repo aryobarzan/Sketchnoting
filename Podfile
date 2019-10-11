@@ -2,7 +2,6 @@
 # platform :ios, '9.0'
 use_frameworks!
 target 'Sketchnoting' do
-  pod 'Alamofire', '~> 5.0.0-rc.2'
   pod 'LGButton'
   pod 'Firebase/Core'
   pod 'Firebase/MLVision'
@@ -12,7 +11,6 @@ target 'Sketchnoting' do
   pod 'NewPopMenu'
   pod 'NotificationBannerSwift'
   pod 'BadgeHub'
-  pod 'SwiftyJSON'
   pod 'M13Checkbox', '~> 3.4.0'
   pod 'SideMenu', '~> 6.1.5'
   pod 'NVActivityIndicatorView'

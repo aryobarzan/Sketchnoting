@@ -239,6 +239,19 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable, DocumentDelegate
         log.info("Text data array for note " + id + " loaded.")
     }
     
+    public func duplicate() -> Sketchnote {
+        let image = self.image
+        let documents = self.documents
+        let drawings = self.drawings
+        let duplicate = Sketchnote(image: image, relatedDocuments: documents, drawings: drawings)!
+        duplicate.setTitle(title: self.getTitle() + " #2")
+        duplicate.canvasData = self.canvasData
+        duplicate.textDataArray = self.textDataArray
+        duplicate.tags = self.tags
+        duplicate.save()
+        return duplicate
+    }
+    
     public func delete() {
         clearTextData()
         UserDefaults.sketchnotes.removeObject(forKey: id)

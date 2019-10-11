@@ -8,7 +8,6 @@
 
 import UIKit
 
-import LGButton
 import Firebase
 import PopMenu
 import BadgeHub
@@ -22,9 +21,12 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
     
     @IBOutlet var canvasView: PKCanvasView!
     
-    @IBOutlet var drawingsButton: LGButton!
+    @IBOutlet var topicsButton: UIButton!
+    @IBOutlet var bookshelfButton: UIButton!
+    @IBOutlet var drawingsButton: UIButton!
+    @IBOutlet var manageDrawingsButton: UIButton!
+    
     @IBOutlet var closeButton: UIButton!
-    @IBOutlet weak var topicsLabel: UILabel!
     var topicsBadgeHub: BadgeHub!
     
     @IBOutlet var bookshelf: UIView!
@@ -87,7 +89,7 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
         
         setupHelpLines()
         self.rightScreenSidePanGesture.edges = [.right]
-        self.topicsBadgeHub = BadgeHub(view: topicsLabel)
+        self.topicsBadgeHub = BadgeHub(view: topicsButton)
         self.topicsBadgeHub.scaleCircleSize(by: 0.55)
         self.topicsBadgeHub.moveCircleBy(x: 4, y: -6)
         self.topicsBadgeHub.setCount(self.sketchnote.documents.count)
@@ -189,71 +191,28 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
         }
     }
     
+    @IBOutlet weak var imageTestView: UIImageView!
     private func processDrawingRecognition() {
-        /*hideAllHelpLines()
+        hideAllHelpLines()
         
-        self.sketchnote?.drawings = [String]()
-        for drawingView in self.drawingViews {
-            drawingView.layer.sublayers?.forEach { $0.removeFromSuperlayer() }
-            drawingView.backgroundColor = .black
-            drawingView.layer.borderColor = UIColor.clear.cgColor
-        }
-        for pathObject in self.sketchView.pathArray {
-            if let penTool = pathObject as? EraserTool {
-                let path = penTool.path
-                for drawingView in self.drawingViews {
-                    if drawingView.frame.contains(path.boundingBox) {
-                        let absoluteFrame = sketchView.convert(sketchView.bounds, to: drawingView)
-                        let newPath = path.copy(strokingWithWidth: drawingView.frame.width * 0.04, lineCap: .round, lineJoin: .round, miterLimit: 0)
-                        let layer = CAShapeLayer()
-                        layer.frame = absoluteFrame
-                        layer.path = newPath
-                        layer.strokeColor = UIColor.black.cgColor
-                        layer.fillColor = UIColor.black.cgColor
-                        drawingView.layer.addSublayer(layer)
-                        drawingView.setNeedsDisplay()
-                        drawingView.isHidden = false
-                    }
-                }
-            }
-            else if let penTool = pathObject as? PenTool {
-                let path = penTool.path
-                for drawingView in self.drawingViews {
-                    if drawingView.frame.contains(path.boundingBox) {
-                        let absoluteFrame = sketchView.convert(sketchView.bounds, to: drawingView)
-                        let newPath = path.copy(strokingWithWidth: drawingView.frame.width * 0.04, lineCap: .round, lineJoin: .round, miterLimit: 0)
-                        let layer = CAShapeLayer()
-                        layer.frame = absoluteFrame
-                        layer.path = newPath
-                        layer.strokeColor = UIColor.white.cgColor
-                        layer.fillColor = UIColor.white.cgColor
-                        drawingView.layer.addSublayer(layer)
-                        drawingView.setNeedsDisplay()
-                        drawingView.isHidden = false
-                    }
-                }
-            }
-            else {
-            }
-        }
-        for drawingView in self.drawingViews {
-            let croppedCGImage:CGImage = (drawingView.asImage().cgImage)!
-            let croppedImage = UIImage(cgImage: croppedCGImage)
+        let canvasImage = canvasView.drawing.image(from: canvasView.bounds, scale: 1.0)
+        let mainImage = canvasImage.invertedImage() ?? canvasImage
+        for region in self.drawingViews {
+            let image = UIImage(cgImage: mainImage.cgImage!.cropping(to: region.frame)!)
             
-            let resized = croppedImage.resize(newSize: CGSize(width: 28, height: 28))
+            let resized = image.resize(newSize: CGSize(width: 28, height: 28))
             
             guard let pixelBuffer = resized.grayScalePixelBuffer() else {
-                print("couldn't create pixel buffer")
+                print("Pixel buffer for drawing recognition could not be created.")
                 return
             }
             do {
                 currentPrediction = try drawnImageClassifier.prediction(image: pixelBuffer)
             }
             catch {
-                print("error making prediction: \(error)")
+                print("Drawing recognition prediction error: \(error)")
             }
-            drawingView.isHidden = true
-        }*/
+        }
     }
     
     private func setupHelpLines() {
@@ -323,7 +282,6 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
     }
     
     // MARK: Highlighting recognized concepts/topics on the canvas
-    @IBOutlet var conceptHighlightsSwitch: UISwitch!
     private func setupConceptHighlights() {
         conceptHighlights = [UIView : [Document]]()
         if let documents = sketchnote.documents {
@@ -473,11 +431,20 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
             view.isHidden = isHidden
         }
     }
-    @IBAction func conceptHighlightsSwitchTapped(_ sender: UISwitch) {
-        if sender.isOn {
-                setupConceptHighlights()
+    
+    var topicsShown = false
+    @IBAction func topicsTapped(_ sender: UIButton) {
+        topicsShown = !topicsShown
+        if topicsShown {
+            setupConceptHighlights()
+            topicsButton.tintColor = self.view.tintColor
+            topicsButton.setTitleColor(self.view.tintColor, for: .normal)
         }
-        self.toggleConceptHighlight(isHidden: !sender.isOn)
+        else {
+            topicsButton.tintColor = .white
+            topicsButton.setTitleColor(.white, for: .normal)
+        }
+        self.toggleConceptHighlight(isHidden: !topicsShown)
     }
     
     private func clearConceptHighlights() {
@@ -485,11 +452,12 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
             view.removeFromSuperview()
         }
         self.conceptHighlights = [UIView : [Document]]()
-        conceptHighlightsSwitch.isOn = false
+        topicsButton.tintColor = .white
+        topicsButton.setTitleColor(.white, for: .normal)
     }
     
     @IBAction func moreButtonTapped(_ sender: UIButton) {
-        let alert = UIAlertController(title: "Edit Your Note", message: "", preferredStyle: .alert)
+        let alert = UIAlertController(title: self.sketchnote.getTitle(), message: "", preferredStyle: .alert)
         if !SettingsManager.automaticAnnotation() {
             alert.addAction(UIAlertAction(title: "Annotate", style: .default, handler: { action in
                 self.processHandwritingRecognition()
@@ -516,17 +484,26 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
             
             self.present(alertController, animated: true, completion: nil)
         }))
+        alert.addAction(UIAlertAction(title: "Share", style: .default, handler: { action in
+            self.sketchnote.image = self.canvasView.drawing.image(from: self.canvasView.bounds, scale: 1.0)
+            if self.sketchnote.image != nil {
+                var data = [Any]()
+                if let pdf = self.sketchnote.createPDF() {
+                    data.append(pdf)
+                }
+                
+                let activityController = UIActivityViewController(activityItems: data, applicationActivities: nil)
+                self.present(activityController, animated: true, completion: nil)
+                if let popOver = activityController.popoverPresentationController {
+                    popOver.sourceView = self.canvasView
+                }
+            }
+        }))
         if !sketchnote.getText().isEmpty {
             alert.addAction(UIAlertAction(title: "Copy Text", style: .default, handler: { action in
                 UIPasteboard.general.string = self.sketchnote.getText()
                 let banner = FloatingNotificationBanner(title: self.sketchnote.getTitle(), subtitle: "Copied text to clipboard.", style: .info)
-                banner.dismissDuration = 1.0
                 banner.show()
-            }))
-        }
-        if bookshelf.isHidden {
-            alert.addAction(UIAlertAction(title: "View Documents", style: .default, handler: { action in
-                self.showBookshelf()
             }))
         }
         alert.addAction(UIAlertAction(title: "Reset Documents", style: .default, handler: { action in
@@ -557,7 +534,8 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
             
             self.sketchnote.clear()
             self.clearConceptHighlights()
-            self.conceptHighlightsSwitch.setOn(false, animated: true)
+            self.topicsButton.tintColor = .white
+            self.topicsButton.setTitleColor(.white, for: .normal)
             self.updateBookshelfState(state: .All)
             self.bookshelfFilter = .All
             self.items = self.sketchnote.documents
@@ -588,23 +566,24 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
         }
     }
     
-    @IBAction func drawingsTapped(_ sender: LGButton) {
+    @IBAction func drawingsTapped(_ sender: UIButton) {
         drawingViewsShown = !drawingViewsShown
         if drawingViewsShown {
             toggleDrawingRegions(isHidden: false, canInteract: false)
-            drawingsButton.bgColor = UIColor(red: 85.0/255.0, green: 117.0/255.0, blue: 193.0/255.0, alpha: 1)
+            drawingsButton.tintColor = self.view.tintColor
         }
         else {
             toggleDrawingRegions(isHidden: true, canInteract: false)
-            drawingsButton.bgColor = .lightGray
+            drawingsButton.tintColor = .white
         }
     }
+    
     @IBAction func helpLinesButtonTapped(_ sender: UIButton) {
         switch self.helpLinesStatus {
         case .None:
             self.helpLinesStatus = .Horizontal
+            helpLinesButton.setImage(UIImage(systemName: "line.horizontal.3"), for: .normal)
             helpLinesButton.tintColor = self.view.tintColor
-            helpLinesButton.setImage(#imageLiteral(resourceName: "MenuIcon"), for: .normal)
             
             for line in helpLinesHorizontal {
                 line.isHidden = false
@@ -616,7 +595,7 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
         case .Horizontal:
             self.helpLinesStatus = .Grid
             helpLinesButton.tintColor = self.view.tintColor
-            helpLinesButton.setImage(#imageLiteral(resourceName: "GridHelpLinesIcon"), for: .normal)
+            helpLinesButton.setImage(UIImage(systemName: "grid"), for: .normal)
             for line in helpLinesHorizontal {
                 line.isHidden = false
             }
@@ -626,7 +605,7 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
             break
         case .Grid:
             self.helpLinesStatus = .None
-            helpLinesButton.setImage(#imageLiteral(resourceName: "NoHelpLinesIcon"), for: .normal)
+            helpLinesButton.setImage(#imageLiteral(resourceName: "line.horizontal.3"), for: .normal)
             helpLinesButton.tintColor = .white
             hideAllHelpLines()
             break
@@ -684,7 +663,18 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
         }
     }
     
+    
+    @IBAction func bookshelfButtonTapped(_ sender: UIButton) {
+        if self.bookshelf.isHidden {
+            showBookshelf()
+        }
+        else {
+            closeBookshelf()
+        }
+    }
+    
     private func showBookshelf() {
+        bookshelfButton.tintColor = self.view.tintColor
         self.bookshelf.isHidden = false
         if self.isBookshelfDraggedOut {
             self.bookshelfLeftConstraint.constant -= 500
@@ -694,6 +684,18 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
             })
             self.isBookshelfDraggedOut = false
         }
+    }
+    
+    private func closeBookshelf() {
+         bookshelfButton.tintColor = .white
+        bookshelfLeftConstraint.constant = UIScreen.main.bounds.width
+        self.isBookshelfDraggedOut = true
+        UIView.animate(withDuration: 0.25, delay: 0, options: UIView.AnimationOptions.curveEaseIn, animations: {
+            self.view.layoutIfNeeded()
+        }, completion: { (ended) in
+            self.bookshelf.isHidden = true
+        })
+        bookshelf.alpha = 1.0
     }
     
     var textRecognitionTimer: Timer?
@@ -837,14 +839,7 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
             
             if resizeRect.leftTouch {
                 if UIScreen.main.bounds.maxX - currentTouchPoint.x <= 300 {
-                    bookshelfLeftConstraint.constant += 150
-                    self.isBookshelfDraggedOut = true
-                    UIView.animate(withDuration: 0.25, delay: 0, options: UIView.AnimationOptions.curveEaseIn, animations: {
-                        self.view.layoutIfNeeded()
-                    }, completion: { (ended) in
-                        self.bookshelf.isHidden = true
-                    })
-                    bookshelf.alpha = 1.0
+                    self.closeBookshelf()
                 }
             }
         }
@@ -1194,10 +1189,7 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
         documentDetailTypeView.backgroundColor = #colorLiteral(red: 0.3411764801, green: 0.6235294342, blue: 0.1686274558, alpha: 1)
         documentDetailTypeLabel.text = "BioPortal"
         if let definition = document.definition {
-            let descriptionLabel = UILabel(frame: documentDetailStackView.frame)
-            descriptionLabel.text = definition
-            descriptionLabel.numberOfLines = 50
-            documentDetailStackView.addArrangedSubview(descriptionLabel)
+            self.setDetailDescription(text: definition)
         }
     }
     
@@ -1205,10 +1197,7 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
         documentDetailTypeView.backgroundColor = #colorLiteral(red: 0.9529411793, green: 0.6862745285, blue: 0.1333333403, alpha: 1)
         documentDetailTypeLabel.text = "CHEBI"
         if let definition = document.definition {
-            let descriptionLabel = UILabel(frame: documentDetailStackView.frame)
-            descriptionLabel.text = definition
-            descriptionLabel.numberOfLines = 50
-            documentDetailStackView.addArrangedSubview(descriptionLabel)
+            self.setDetailDescription(text: definition)
         }
         if let moleculeImage = document.moleculeImage {
             let mapImageView = UIImageView(image: moleculeImage)
@@ -1323,6 +1312,7 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
                 let tapGesture = UITapGestureRecognizer(target: self, action: #selector(self.handleDrawingRegionTap(_:)))
                 region.addGestureRecognizer(tapGesture)
                 region.isUserInteractionEnabled = true
+                drawingViews.append(region)
             }
         }
     }
@@ -1335,28 +1325,29 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
     }
     @IBOutlet weak var drawingInsertionCanvas: UIView!
     
-    @IBOutlet weak var manageDrawingsButton: LGButton!
     var isManageDrawings = false
-    @IBAction func manageDrawingsTapped(_ sender: LGButton) {
-        toggleManageDrawings()
+    @IBAction func manageDrawingsTapped(_ sender: UIButton) {
+        self.toggleManageDrawings()
     }
+    
     private func toggleManageDrawings() {
         isManageDrawings = !isManageDrawings
         if isManageDrawings {
             drawingsButton.isEnabled = false
-            conceptHighlightsSwitch.isEnabled = false
+            topicsButton.isEnabled = false
             toggleDrawingRegions(isHidden: false, canInteract: true)
             canvasView.isUserInteractionEnabled = false
             canvasView.resignFirstResponder()
-            if conceptHighlightsSwitch.isOn {
-                conceptHighlightsSwitch.isOn = false
-                conceptHighlightsSwitch.setOn(false, animated: true)
+            if topicsShown {
+                topicsShown = false
+                topicsButton.tintColor = .white
+                topicsButton.setTitleColor(.white, for: .normal)
             }
-            manageDrawingsButton.bgColor = UIColor(red: 85.0/255.0, green: 117.0/255.0, blue: 193.0/255.0, alpha: 1)
+            manageDrawingsButton.tintColor = self.view.tintColor
         }
         else {
             drawingsButton.isEnabled = true
-            conceptHighlightsSwitch.isEnabled = true
+            topicsButton.isEnabled = true
             if drawingViewsShown {
                 toggleDrawingRegions(isHidden: false, canInteract: false)
             }
@@ -1365,7 +1356,7 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
             }
             canvasView.isUserInteractionEnabled = true
             canvasView.becomeFirstResponder()
-            manageDrawingsButton.bgColor = .lightGray
+            manageDrawingsButton.tintColor = .white
         }
     }
 

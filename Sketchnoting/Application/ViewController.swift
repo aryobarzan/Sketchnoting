@@ -342,10 +342,13 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         let tagsAction = UIAction(title: "Manage Tags", image: UIImage(systemName: "tag.fill")) { action in
             self.editNoteTags(sketchnote: note)
         }
+        let duplicateAction = UIAction(title: "Duplicate", image: UIImage(systemName: "doc.on.doc")) { action in
+            self.notes.append(note.duplicate())
+            self.updateDisplayedNotes()
+        }
         let copyTextAction = UIAction(title: "Copy Text", image: UIImage(systemName: "doc.text")) { action in
             UIPasteboard.general.string = note.getText()
             let banner = FloatingNotificationBanner(title: note.getTitle(), subtitle: "Copied text to clipboard.", style: .info)
-            banner.dismissDuration = 1.0
             banner.show()
         }
         let shareAction = UIAction(title: "Share", image: UIImage(systemName: "square.and.arrow.up")) { action in
@@ -358,7 +361,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             self.deleteNote(note: note)
         }
         // Create and return a UIMenu with the share action
-        return UIMenu(title: note.getTitle(), children: [renameAction, tagsAction, copyTextAction, shareAction, sendAction, deleteAction])
+        return UIMenu(title: note.getTitle(), children: [renameAction, tagsAction, duplicateAction, copyTextAction, shareAction, sendAction, deleteAction])
     }
     
     // MARK: Search
@@ -689,7 +692,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
                 present(ac, animated: true)
             }
             let banner = FloatingNotificationBanner(title: note.getTitle(), subtitle: "Note shared with the selected device(s).", style: .success)
-            banner.dismissDuration = 1.0
             banner.show()
         }
     }
