@@ -605,7 +605,7 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
             break
         case .Grid:
             self.helpLinesStatus = .None
-            helpLinesButton.setImage(#imageLiteral(resourceName: "line.horizontal.3"), for: .normal)
+            helpLinesButton.setImage(UIImage(systemName: "line.horizontal.3"), for: .normal)
             helpLinesButton.tintColor = .white
             hideAllHelpLines()
             break
