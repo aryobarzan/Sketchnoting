@@ -219,7 +219,7 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
         self.helpLinesHorizontal = [HoritonzalHelpLine]()
         self.helpLinesVertical = [VerticalHelpLine]()
         var height = CGFloat(40)
-        while (CGFloat(height) < UIScreen.main.bounds.height + 80) {
+        while (CGFloat(height) < self.canvasView.contentSize.height + 80) {
             let line = HoritonzalHelpLine(frame: CGRect(x: 0, y: height, width: UIScreen.main.bounds.width, height: 1))
             
             line.isUserInteractionEnabled = false
@@ -230,7 +230,7 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
         }
         var width = CGFloat(40)
         while (CGFloat(width) < UIScreen.main.bounds.width + 80) {
-            let line = VerticalHelpLine(frame: CGRect(x: width, y: 0, width: 1, height: UIScreen.main.bounds.height))
+            let line = VerticalHelpLine(frame: CGRect(x: width, y: 0, width: 1, height: self.canvasView.contentSize.height))
             
             line.isUserInteractionEnabled = false
             line.isHidden = true
@@ -364,6 +364,7 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
             }
         }
     }
+    
     private func conceptHighlightExists(new: CGRect) -> UIView? {
         for (view, _) in self.conceptHighlights {
             if view.frame == new {
@@ -527,12 +528,16 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
             self.processHandwritingRecognition()
         }))
         alert.addAction(UIAlertAction(title: "Clear Note", style: .destructive, handler: { action in
+            for helpLine in self.helpLinesHorizontal {
+                helpLine.removeFromSuperview()
+            }
+            for helpLine in self.helpLinesVertical {
+                helpLine.removeFromSuperview()
+            }
             self.canvasView.drawing = PKDrawing()
-            self.sketchnote.canvasData = PKDrawing()
-            self.canvasView.subviews.forEach { $0.removeFromSuperview() }
-            self.resetHelpLines()
-            
             self.sketchnote.clear()
+            
+            self.resetHelpLines()
             self.clearConceptHighlights()
             self.topicsButton.tintColor = .white
             self.topicsButton.setTitleColor(.white, for: .normal)
@@ -644,7 +649,7 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
         }
     }
     private func generateHandwritingRecognitionImage() -> UIImage {
-        var noteImage = canvasView.drawing.image(from: canvasView.bounds, scale: 1.0)
+        var noteImage = canvasView.drawing.image(from: CGRect(x: canvasView.frame.minX, y: canvasView.frame.minY, width: canvasView.contentSize.width, height: canvasView.contentSize.height), scale: 1.0)
         if UITraitCollection.current.userInterfaceStyle == .dark {
             log.info("Handwriting recognition image generation - dark mode detected, inverting image")
             noteImage = noteImage.invertedImage() ?? noteImage
@@ -710,6 +715,7 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
             }
         }
     }
+    
     private func startRecognitionTimer() {
         if textRecognitionTimer != nil {
             textRecognitionTimer!.invalidate()
@@ -1067,6 +1073,11 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
                 }
             }
             self.updateBookshelf()
+            self.clearConceptHighlights()
+            if self.topicsShown {
+                self.topicsShown = false
+            }
+            self.setupConceptHighlights()
         }
         return UIMenu(title: document.title, children: [hideAction])
     }
@@ -1425,6 +1436,21 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
     }
     @IBAction func closeLogView(_ sender: UIButton) {
         logView.isHidden = true
+    }
+    
+    // Mark: Canvas scroll
+    func canvasViewDrawingDidChange(_ canvasView: PKCanvasView) {
+        let drawing = canvasView.drawing
+        let contentHeight: CGFloat
+        
+        // Adjust the content size to always be bigger than the drawing height.
+        if !drawing.bounds.isNull {
+            contentHeight = max(canvasView.bounds.height, (drawing.bounds.maxY + 500))
+        } else {
+            contentHeight = canvasView.bounds.height
+        }
+        canvasView.contentSize = CGSize(width: canvasView.bounds.width, height: contentHeight)
+        self.resetHelpLines()
     }
     
 }

@@ -13,6 +13,7 @@ import SideMenu
 import BadgeHub
 import NVActivityIndicatorView
 import NotificationBannerSwift
+import DataCompression
 
 import MultipeerConnectivity
 import Vision
@@ -23,7 +24,7 @@ import PencilKit
 // It also contains note collection views, which in turn contain sketchnote views.
 
 //This controller handles all interactions of the user on the home page, including creating new note collections and new notes, searching, sharing notes, and generating pdfs from notes.
-class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextFieldDelegate, MCSessionDelegate, MCBrowserViewControllerDelegate, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, NoteCollectionViewDetailCellDelegate, UITableViewDataSource, UITableViewDelegate, TagTableViewCellDelegate, ColorPickerViewDelegate, ColorPickerViewDelegateFlowLayout {
+class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextFieldDelegate, MCSessionDelegate, MCBrowserViewControllerDelegate, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, NoteCollectionViewDetailCellDelegate, UITableViewDataSource, UITableViewDelegate, TagTableViewCellDelegate, ColorPickerViewDelegate, ColorPickerViewDelegateFlowLayout, UIApplicationDelegate {
     
     @IBOutlet var newNoteButton: UIButton!
     @IBOutlet var noteLoadingIndicator: NVActivityIndicatorView!
@@ -833,13 +834,45 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             if let pdf = note.createPDF() {
                 data.append(pdf)
             }
+            dataToShare = [Data]()
+            let encoder = JSONEncoder()
+            if let encoded = try? encoder.encode(note) {
+                dataToShare.append(encoded)
+            }
+            else {
+                print("Encoding failed for note.")
+            }
+            dataToShare.append(note.canvasData.dataRepresentation())
             
-            let activityController = UIActivityViewController(activityItems: data, applicationActivities: nil)
+            
+            /*let dataEncoded = try? NSKeyedArchiver.archivedData(withRootObject: dataToShare, requiringSecureCoding: false)
+            let attachmentData = dataEncoded!
+            let zipped: Data! = attachmentData.zip()
+            let path = NSURL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("Sketchnote.sketchnote")!
+            do {
+                try zipped.write(to: path)
+            } catch {
+                print("Failed to prepare zipped sketchnote file for sharing.")
+            }*/
+            
+            
+            let activityController = UIActivityViewController(activityItems: dataToShare, applicationActivities: nil)
             self.present(activityController, animated: true, completion: nil)
             if let popOver = activityController.popoverPresentationController {
                 popOver.sourceView = sender
             }
         }
+    }
+    
+    
+    func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any]) -> Bool {
+        do {
+            let decoder = PropertyListDecoder()
+            let data = try Data(contentsOf: url)
+        } catch {
+            print("Failed to open imported file.")
+        }
+        return true
     }
     
     private func sendNote(note: Sketchnote) {
@@ -1088,4 +1121,5 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     func noteCollectionViewDetailCellDeleteTapped(sketchnote: Sketchnote, sender: UIButton, cell: NoteCollectionViewDetailCell) {
         self.deleteNote(note: sketchnote)
     }
+
 }

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14868" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="IOd-hj-hEE">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="15400" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="IOd-hj-hEE">
     <device id="ipad9_7" orientation="portrait" layout="fullscreen" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14824"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15404"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -22,7 +22,7 @@
                                         <rect key="frame" x="0.0" y="28" width="712" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="Urg-gi-D3P" id="UTY-PV-b49">
-                                            <rect key="frame" x="0.0" y="0.0" width="680.5" height="44"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="681" height="44"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Note Sharing" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="JwC-mH-Cy4">
@@ -46,7 +46,7 @@
                                         <rect key="frame" x="0.0" y="72" width="712" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="ztX-zO-VNS" id="rzO-lJ-a0E">
-                                            <rect key="frame" x="0.0" y="0.0" width="680.5" height="44"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="681" height="44"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Settings" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="f0t-bm-Plb">
@@ -671,7 +671,7 @@
                                 <rect key="frame" x="259" y="287" width="250" height="450"/>
                                 <subviews>
                                     <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="none" allowsMultipleSelection="YES" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="Xcv-VB-a1j">
-                                        <rect key="frame" x="5" y="143" width="240" height="299"/>
+                                        <rect key="frame" x="5" y="144.5" width="240" height="297.5"/>
                                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                                         <prototypes>
                                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="TagTableViewCell" id="8vr-nB-nUh" customClass="TagTableViewCell" customModule="Sketchnoting" customModuleProvider="target">
@@ -712,7 +712,7 @@
                                         </prototypes>
                                     </tableView>
                                     <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="New Tag..." textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="p0L-PX-Pbz">
-                                        <rect key="frame" x="8" y="58" width="204" height="30"/>
+                                        <rect key="frame" x="8" y="59.5" width="204" height="30"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="30" id="d3x-aV-yDk"/>
                                             <constraint firstAttribute="width" constant="204" id="orD-U8-l3h"/>
@@ -721,7 +721,7 @@
                                         <textInputTraits key="textInputTraits"/>
                                     </textField>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="GWm-Mt-qEy" customClass="ColorPickerView" customModule="Sketchnoting" customModuleProvider="target">
-                                        <rect key="frame" x="8" y="96" width="234" height="30"/>
+                                        <rect key="frame" x="8" y="97.5" width="234" height="30"/>
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="234" id="R8X-d2-D0b"/>
@@ -729,20 +729,20 @@
                                         </constraints>
                                     </view>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="7oV-y6-HXy">
-                                        <rect key="frame" x="0.0" y="134" width="250" height="1"/>
+                                        <rect key="frame" x="0.0" y="135.5" width="250" height="1"/>
                                         <color key="backgroundColor" systemColor="separatorColor" red="0.23529411759999999" green="0.23529411759999999" blue="0.26274509800000001" alpha="0.28999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="1" id="ega-Lj-h6v"/>
                                         </constraints>
                                     </view>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Manage Tags" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumScaleFactor="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="moq-8M-LnT">
-                                        <rect key="frame" x="8" y="8" width="234" height="32"/>
+                                        <rect key="frame" x="8" y="8" width="234" height="33.5"/>
                                         <fontDescription key="fontDescription" style="UICTFontTextStyleTitle1"/>
                                         <color key="textColor" systemColor="secondaryLabelColor" red="0.23529411759999999" green="0.23529411759999999" blue="0.26274509800000001" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="contactAdd" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="pwJ-zm-kL8">
-                                        <rect key="frame" x="220" y="62" width="22" height="22"/>
+                                        <rect key="frame" x="220" y="63.5" width="22" height="22"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="22" id="HPM-Gh-1lv"/>
                                             <constraint firstAttribute="width" constant="22" id="WyJ-GX-Bdw"/>
@@ -797,7 +797,7 @@
                                         </constraints>
                                     </view>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Search by drawing" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="UOR-Oe-sUz">
-                                        <rect key="frame" x="25" y="8" width="207" height="32"/>
+                                        <rect key="frame" x="25" y="8" width="222.5" height="33.5"/>
                                         <fontDescription key="fontDescription" style="UICTFontTextStyleTitle1"/>
                                         <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <nil key="highlightedColor"/>
@@ -936,6 +936,8 @@
                                             <constraint firstAttribute="width" constant="30" id="5EF-r7-M79"/>
                                             <constraint firstAttribute="height" constant="30" id="hUn-GH-EVo"/>
                                         </constraints>
+                                        <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                        <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <state key="normal" image="arrow.left" catalog="system">
                                             <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="large"/>
                                         </state>
@@ -1577,19 +1579,19 @@
         <image name="ClearSearchIcon" width="48" height="48"/>
         <image name="DetailsIcon" width="48" height="48"/>
         <image name="arrow.left" catalog="system" width="64" height="48"/>
-        <image name="arrow.up.arrow.down.circle" catalog="system" width="64" height="62"/>
-        <image name="book.circle" catalog="system" width="64" height="62"/>
-        <image name="doc.text.viewfinder" catalog="system" width="64" height="58"/>
-        <image name="ellipsis.circle" catalog="system" width="64" height="62"/>
-        <image name="gear" catalog="system" width="64" height="60"/>
+        <image name="arrow.up.arrow.down.circle" catalog="system" width="64" height="60"/>
+        <image name="book.circle" catalog="system" width="64" height="60"/>
+        <image name="doc.text.viewfinder" catalog="system" width="64" height="56"/>
+        <image name="ellipsis.circle" catalog="system" width="64" height="60"/>
+        <image name="gear" catalog="system" width="64" height="58"/>
         <image name="line.horizontal.3" catalog="system" width="64" height="32"/>
-        <image name="line.horizontal.3.decrease.circle" catalog="system" width="64" height="62"/>
-        <image name="list.dash" catalog="system" width="64" height="44"/>
-        <image name="magnifyingglass" catalog="system" width="64" height="60"/>
-        <image name="magnifyingglass.circle.fill" catalog="system" width="64" height="62"/>
+        <image name="line.horizontal.3.decrease.circle" catalog="system" width="64" height="60"/>
+        <image name="list.dash" catalog="system" width="64" height="42"/>
+        <image name="magnifyingglass" catalog="system" width="64" height="56"/>
+        <image name="magnifyingglass.circle.fill" catalog="system" width="64" height="60"/>
         <image name="paperplane.fill" catalog="system" width="64" height="60"/>
-        <image name="plus.circle.fill" catalog="system" width="64" height="62"/>
-        <image name="scribble" catalog="system" width="64" height="56"/>
+        <image name="plus.circle.fill" catalog="system" width="64" height="60"/>
+        <image name="scribble" catalog="system" width="64" height="54"/>
         <image name="square" catalog="system" width="64" height="56"/>
         <image name="tag.fill" catalog="system" width="64" height="58"/>
     </resources>
