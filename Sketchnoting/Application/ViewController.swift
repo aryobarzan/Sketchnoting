@@ -94,7 +94,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         super.viewDidLoad()
         self.navigationController?.setNavigationBarHidden(true, animated: false)
         self.navigationController?.navigationBar.barStyle = .black
-        
         // Badge Hubs
         
         activeFiltersBadge = BadgeHub(view: filtersButton)
@@ -169,6 +168,8 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
                 print("error loading labels: \(error)")
             }
         }
+        let notificationCentre = NotificationCenter.default
+        notificationCentre.addObserver(self, selector: #selector(self.notifiedImportSketchnote(_:)), name: NSNotification.Name(rawValue: "ImportSketchnote"), object: nil)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -178,6 +179,23 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     }
     override var preferredStatusBarStyle : UIStatusBarStyle {
         return .lightContent
+    }
+    
+    @objc func notifiedImportSketchnote(_ noti : Notification)  {
+        let importURL = (noti.userInfo as? [String : URL])!["importURL"]!
+        print(importURL)
+        self.importSketchnote(url: importURL)
+    }
+    
+    private func loadData() {
+        if let notes = NoteLoader.loadSketchnotes() {
+            self.notes = notes
+        }
+        else {
+            self.notes = [Sketchnote]()
+        }
+        self.items = self.notes
+        self.updateDisplayedNotes()
     }
     
     // This function handles the cases where the user either creates a new note or wants to edit an existing note.
@@ -352,9 +370,18 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             let banner = FloatingNotificationBanner(title: note.getTitle(), subtitle: "Copied text to clipboard.", style: .info)
             banner.show()
         }
-        let shareAction = UIAction(title: "Share", image: UIImage(systemName: "square.and.arrow.up")) { action in
-            self.shareNote(note: note, sender: UIView(frame: CGRect(x: point.x, y: point.y, width: point.x, height: point.y)))
+        
+        let shareAsImageAction = UIAction(title: "Image", image: UIImage(systemName: "photo")) { action in
+            self.shareNote(note: note, asType: .Image, sender: UIView(frame: CGRect(x: point.x, y: point.y, width: point.x, height: point.y)))
         }
+        let shareAsPDFAction = UIAction(title: "PDF", image: UIImage(systemName: "doc.plaintext")) { action in
+            self.shareNote(note: note, asType: .PDF, sender: UIView(frame: CGRect(x: point.x, y: point.y, width: point.x, height: point.y)))
+        }
+        let shareAsFileAction = UIAction(title: "File", image: UIImage(systemName: "doc")) { action in
+            self.shareNote(note: note, asType: .File, sender: UIView(frame: CGRect(x: point.x, y: point.y, width: point.x, height: point.y)))
+        }
+        let shareAction = UIMenu(title: "Share as...", children: [shareAsImageAction, shareAsPDFAction, shareAsFileAction])
+        
         let sendAction = UIAction(title: "Send", image: UIImage(systemName: "paperplane")) { action in
             self.sendNote(note: note)
         }
@@ -827,14 +854,37 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
            self.showTagsPanel()
        }
 
-    
-    private func shareNote(note: Sketchnote, sender: UIView) {
-        if note.image != nil {
-            var data = [Any]()
-            if let pdf = note.createPDF() {
-                data.append(pdf)
-            }
-            dataToShare = [Data]()
+    private enum ShareNoteType: String {
+        case Image
+        case PDF
+        case File
+    }
+    private func shareNote(note: Sketchnote, asType: ShareNoteType, sender: UIView) {
+        switch asType {
+        case .Image:
+             if note.image != nil {
+                if let jpegData = note.image!.jpegData(compressionQuality: 1) {
+                    let activityController = UIActivityViewController(activityItems: [jpegData], applicationActivities: nil)
+                        self.present(activityController, animated: true, completion: nil)
+                        if let popOver = activityController.popoverPresentationController {
+                            popOver.sourceView = sender
+                        }
+                    }
+                }
+            break
+        case .PDF:
+            if note.image != nil {
+                if let pdf = note.createPDF() {
+                    let activityController = UIActivityViewController(activityItems: [pdf], applicationActivities: nil)
+                        self.present(activityController, animated: true, completion: nil)
+                        if let popOver = activityController.popoverPresentationController {
+                            popOver.sourceView = sender
+                        }
+                    }
+                }
+            break
+        case .File:
+            var dataToShare = [Data]()
             let encoder = JSONEncoder()
             if let encoded = try? encoder.encode(note) {
                 dataToShare.append(encoded)
@@ -842,37 +892,54 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             else {
                 print("Encoding failed for note.")
             }
-            dataToShare.append(note.canvasData.dataRepresentation())
+            let drawingEncoder = PropertyListEncoder()
+            if let drawingEncoded = try? drawingEncoder.encode(note.canvasData) {
+                dataToShare.append(drawingEncoded)
+            }
             
-            
-            /*let dataEncoded = try? NSKeyedArchiver.archivedData(withRootObject: dataToShare, requiringSecureCoding: false)
-            let attachmentData = dataEncoded!
-            let zipped: Data! = attachmentData.zip()
+            let dataEncoded = try? NSKeyedArchiver.archivedData(withRootObject: dataToShare, requiringSecureCoding: false)
             let path = NSURL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("Sketchnote.sketchnote")!
-            do {
-                try zipped.write(to: path)
-            } catch {
-                print("Failed to prepare zipped sketchnote file for sharing.")
-            }*/
+            try? dataEncoded!.write(to: path)
             
             
-            let activityController = UIActivityViewController(activityItems: dataToShare, applicationActivities: nil)
+            let activityController = UIActivityViewController(activityItems: [path], applicationActivities: nil)
             self.present(activityController, animated: true, completion: nil)
             if let popOver = activityController.popoverPresentationController {
                 popOver.sourceView = sender
             }
+            break
         }
+        
     }
     
-    
-    func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any]) -> Bool {
+    func importSketchnote(url: URL) {
         do {
-            let decoder = PropertyListDecoder()
             let data = try Data(contentsOf: url)
+            if let decodedDataArray = try? NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(data) as? [Data] {
+                if decodedDataArray.count >= 2 {
+                    let jsonDecoder = JSONDecoder()
+                    if let sketchnote = try? jsonDecoder.decode(Sketchnote.self, from: decodedDataArray[0]) {
+                        let drawingDecoder = PropertyListDecoder()
+                        if let drawingDataDecoded = try? drawingDecoder.decode(PKDrawing.self, from: decodedDataArray[1]) {
+                            sketchnote.canvasData = drawingDataDecoded
+                            sketchnote.textDataArray = [TextData]()
+                            sketchnote.save()
+                            if self.notes.contains(sketchnote) {
+                                log.info("Sketchnote already in application, updating its data.")
+                            }
+                            else {
+                                log.info("Importing new sketchnote.")
+                                self.notes.append(sketchnote)
+                            }
+                            self.updateDisplayedNotes()
+                        }
+                    }
+                }
+            }
         } catch {
-            print("Failed to open imported file.")
+            let alert = UIAlertController(title: "Error", message: "Sorry, the sketchnote file could not be imported.", preferredStyle: .alert)
+            self.present(alert, animated: true, completion: nil)
         }
-        return true
     }
     
     private func sendNote(note: Sketchnote) {
@@ -1107,7 +1174,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     }
     
     func noteCollectionViewDetailCellShareTapped(sketchnote: Sketchnote, sender: UIButton, cell: NoteCollectionViewDetailCell) {
-        self.shareNote(note: sketchnote, sender: cell)
+        self.shareNote(note: sketchnote, asType: .PDF, sender: cell)
     }
     
     func noteCollectionViewDetailCellSendTapped(sketchnote: Sketchnote, sender: UIButton, cell: NoteCollectionViewDetailCell) {

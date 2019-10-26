@@ -37,6 +37,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         if SettingsManager.firstAppStartup() {
             UserDefaults.settings.set(true, forKey: SettingsKeys.AutomaticAnnotation.rawValue)
+            UserDefaults.settings.set(true, forKey: SettingsKeys.TextRecognitionCloud.rawValue)
+            UserDefaults.settings.set(true, forKey: SettingsKeys.TextRecognitionCloudOption.rawValue)
         }
         return true
     }
@@ -57,10 +59,24 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func applicationDidBecomeActive(_ application: UIApplication) {
         // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
+        if importURL != nil {
+            let notificationCentre = NotificationCenter.default
+            var info = [String : URL]()
+            info["importURL"] = importURL
+            notificationCentre.post(name: NSNotification.Name(rawValue: "ImportSketchnote"), object: self, userInfo: info)
+            importURL = nil
+        }
     }
 
     func applicationWillTerminate(_ application: UIApplication) {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
+    }
+
+    var importURL: URL?
+    func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any]) -> Bool {
+        log.info("Attempting to import sketchnote file from outside.")
+        importURL = url
+        return true
     }
 
 
