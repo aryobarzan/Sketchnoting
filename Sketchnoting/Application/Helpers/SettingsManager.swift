@@ -21,21 +21,18 @@ class SettingsManager {
         return UserDefaults.settings.bool(forKey: SettingsKeys.AutomaticAnnotation.rawValue)
     }
     public static func pencilSideButton() -> PencilSideButtonKeys {
-        if let sideButton = UserDefaults.settings.string(forKey: SettingsKeys.PencilSideButton.rawValue) {
-            switch sideButton {
-            case PencilSideButtonKeys.ManageDrawings.rawValue:
+        switch UserDefaults.settings.integer(forKey: SettingsKeys.PencilSideButtonDoubleTap.rawValue) {
+            case 0:
                 return PencilSideButtonKeys.ManageDrawings
-            case PencilSideButtonKeys.ToggleEraserPencil.rawValue:
+            case 1:
                 return PencilSideButtonKeys.ToggleEraserPencil
-            case PencilSideButtonKeys.Undo.rawValue:
+            case 2:
                 return PencilSideButtonKeys.Undo
-            case PencilSideButtonKeys.Redo.rawValue:
+            case 3:
                 return PencilSideButtonKeys.Redo
             default:
-                break
-            }
+                return PencilSideButtonKeys.ManageDrawings
         }
-        return PencilSideButtonKeys.ManageDrawings
     }
     public static func noteSortingByNewest() -> Bool {
         return UserDefaults.settings.bool(forKey: SettingsKeys.NoteSortingByNewest.rawValue)
@@ -58,7 +55,7 @@ class SettingsManager {
 
 public enum SettingsKeys : String, Any {
     case AutomaticAnnotation
-    case PencilSideButton
+    case PencilSideButtonDoubleTap
     case NoteSortingByNewest
     case TextRecognitionCloud
     case TextRecognitionCloudOption

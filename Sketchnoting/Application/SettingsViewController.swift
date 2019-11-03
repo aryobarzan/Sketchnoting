@@ -18,7 +18,7 @@ class SettingsViewController: UITableViewController {
         self.navigationController?.setNavigationBarHidden(false, animated: false)
         
         automaticAnnotationSwitch.setOn(SettingsManager.automaticAnnotation(), animated: false)
-        
+        pencilSideButtonSegmentedControl.selectedSegmentIndex = UserDefaults.settings.integer(forKey: SettingsKeys.PencilSideButtonDoubleTap.rawValue)
         switch SettingsManager.textRecognitionSetting() {
         case .OnDevice:
             textRecognitionSegmentedControl.selectedSegmentIndex = 0
@@ -40,23 +40,7 @@ class SettingsViewController: UITableViewController {
         UserDefaults.settings.set(sender.isOn, forKey: SettingsKeys.AutomaticAnnotation.rawValue)
     }
     @IBAction func pencilSideButtonSegmentedControlChanged(_ sender: UISegmentedControl) {
-        switch sender.selectedSegmentIndex {
-        case 0:
-            UserDefaults.settings.set(PencilSideButtonKeys.ManageDrawings, forKey: SettingsKeys.PencilSideButton.rawValue)
-            break
-        case 1:
-            UserDefaults.settings.set(PencilSideButtonKeys.ToggleEraserPencil, forKey: SettingsKeys.PencilSideButton.rawValue)
-            break
-        case 2:
-            UserDefaults.settings.set(PencilSideButtonKeys.Undo, forKey: SettingsKeys.PencilSideButton.rawValue)
-            break
-        case 3:
-            UserDefaults.settings.set(PencilSideButtonKeys.Redo, forKey: SettingsKeys.PencilSideButton.rawValue)
-            break
-        default:
-            UserDefaults.settings.set(PencilSideButtonKeys.ManageDrawings, forKey: SettingsKeys.PencilSideButton.rawValue)
-            break
-        }
+        UserDefaults.settings.set(sender.selectedSegmentIndex, forKey: SettingsKeys.PencilSideButtonDoubleTap.rawValue)
     }
     @IBAction func textRecognitionSegmentedControlChanged(_ sender: UISegmentedControl) {
         switch sender.selectedSegmentIndex {

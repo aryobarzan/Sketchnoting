@@ -265,6 +265,17 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
         self.resetHelpLines()
     }
     
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        var drawingViewBorderColor = UIColor.black.cgColor
+        if traitCollection.userInterfaceStyle == .dark {
+            drawingViewBorderColor = UIColor.white.cgColor
+        }
+        for drawingRegionView in drawingViews {
+            drawingRegionView.layer.borderColor = drawingViewBorderColor
+        }
+    }
+    
     private func resetHelpLines() {
         for helpLine in self.helpLinesHorizontal {
             helpLine.removeFromSuperview()
@@ -1337,7 +1348,7 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
         if let drawingRegionRects = sketchnote.drawingViewRects {
             for rect in drawingRegionRects {
                 let region = UIView(frame: rect)
-                region.layer.borderColor = UIColor.black.cgColor
+                region.layer.borderColor = UIColor.label.cgColor
                 region.layer.borderWidth = 1
                 drawingInsertionCanvas.addSubview(region)
                 let tapGesture = UITapGestureRecognizer(target: self, action: #selector(self.handleDrawingRegionTap(_:)))
