@@ -9,11 +9,11 @@
 import UIKit
 
 import PopMenu
-import SideMenu
 import BadgeHub
 import NVActivityIndicatorView
 import NotificationBannerSwift
 import DataCompression
+import ViewAnimator
 
 import MultipeerConnectivity
 import Vision
@@ -151,6 +151,12 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             }
             self.items = self.notes
             self.noteCollectionView.reloadData()
+            let animations = [AnimationType.from(direction: .bottom, offset: 200.0)]
+            self.noteCollectionView.performBatchUpdates({
+                UIView.animate(views: self.noteCollectionView.orderedVisibleCells,
+                animations: animations, completion: {
+                })
+            })
             log.info("Notes loaded.")
             self.noteLoadingIndicator.stopAnimating()
             self.noteLoadingIndicator.isHidden = true
@@ -176,7 +182,10 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         super.viewWillAppear(animated)
         self.navigationController?.setNavigationBarHidden(true, animated: true)
         self.setNeedsStatusBarAppearanceUpdate()
+        
+        
     }
+ 
     override var preferredStatusBarStyle : UIStatusBarStyle {
         return .lightContent
     }
@@ -219,15 +228,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             break
         case "NoteSharing":
             self.navigationController?.setNavigationBarHidden(false, animated: false)
-            break
-        case "SideMenu":
-            guard let sideMenuNavigationController = segue.destination as? UISideMenuNavigationController else {
-                print("Could not retrieve side menu navigation controller.")
-                return
-            }
-            sideMenuNavigationController.setNavigationBarHidden(true, animated: false)
-            SideMenuManager.default.leftMenuNavigationController = sideMenuNavigationController
-            SideMenuManager.default.addScreenEdgePanGesturesToPresent(toView: self.navigationController!.view, forMenu: .left)
             break
         default:
             print("Not creating or editing sketchnote.")
@@ -281,6 +281,13 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         }
        
         noteCollectionView.reloadData()
+        let animations = [AnimationType.from(direction: .bottom, offset: 200.0)]
+        noteCollectionView.performBatchUpdates({
+            UIView.animate(views: noteCollectionView.orderedVisibleCells,
+            animations: animations, completion: {
+            })
+        })
+        
     }
     
     @IBAction func noteListViewButtonTapped(_ sender: UIButton) {
@@ -296,6 +303,12 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         }
         self.noteCollectionView.reloadData()
         self.noteCollectionView.collectionViewLayout.invalidateLayout()
+        let animations = [AnimationType.from(direction: .left, offset: 200.0)]
+        noteCollectionView.performBatchUpdates({
+            UIView.animate(views: noteCollectionView.orderedVisibleCells,
+            animations: animations, completion: {
+            })
+        })
     }
     
     

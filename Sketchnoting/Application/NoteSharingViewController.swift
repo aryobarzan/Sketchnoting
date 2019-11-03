@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import LGButton
 import MultipeerConnectivity
 import PencilKit
 
@@ -15,8 +14,8 @@ import NotificationBannerSwift
 
 class NoteSharingViewController: UIViewController, MCSessionDelegate {
 
-    @IBOutlet weak var acceptNoteButton: LGButton!
-    @IBOutlet weak var declineNoteButton: LGButton!
+    @IBOutlet weak var acceptNoteButton: UIButton!
+    @IBOutlet weak var declineNoteButton: UIButton!
     @IBOutlet weak var noteImageView: UIImageView!
     @IBOutlet weak var sharedNoteLabel: UILabel!
     @IBOutlet weak var notePageControl: UIPageControl!
@@ -44,6 +43,9 @@ class NoteSharingViewController: UIViewController, MCSessionDelegate {
     // MARK: - Navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
     }
+    @IBAction func closeTapped(_ sender: UIBarButtonItem) {
+        dismiss(animated: true, completion: nil)
+    }
     
     // Mark: events
     @IBAction func noteSharingSwitchChanged(_ sender: UISwitch) {
@@ -56,7 +58,7 @@ class NoteSharingViewController: UIViewController, MCSessionDelegate {
             }
         }
     }
-    @IBAction func acceptNoteTapped(_ sender: LGButton) {
+    @IBAction func acceptTapped(_ sender: UIButton) {
         log.info("Accepted shared note")
         if selectedSketchnote != nil {
             selectedSketchnote!.clearTextData()
@@ -75,7 +77,8 @@ class NoteSharingViewController: UIViewController, MCSessionDelegate {
             self.updateViews()
         }
     }
-    @IBAction func declineNoteTapped(_ sender: LGButton) {
+    
+    @IBAction func declineTapped(_ sender: UIButton) {
         log.info("Rejected shared note")
         if selectedSketchnote != nil{
             if pendingSharedNotes.count > 0 {
@@ -92,6 +95,7 @@ class NoteSharingViewController: UIViewController, MCSessionDelegate {
             self.updateViews()
         }
     }
+   
     @IBAction func notePageControlChanged(_ sender: UIPageControl) {
     }
     
@@ -174,8 +178,8 @@ class NoteSharingViewController: UIViewController, MCSessionDelegate {
             noteImageView.image = note.image
             sharedNoteLabel.text = "\(note.sharedByDevice ?? "Unknown") has shared a note with you."
             
-            acceptNoteButton.isHidden = false
-            declineNoteButton.isHidden = false
+            acceptNoteButton.isEnabled = false
+            declineNoteButton.isEnabled = false
             
             notePageControl.numberOfPages = pendingSharedNotes.count
             notePageControl.currentPage = currentIndex
@@ -184,8 +188,8 @@ class NoteSharingViewController: UIViewController, MCSessionDelegate {
         }
         else {
             sharedNoteLabel.text = "There are no pending shared notes to view."
-            acceptNoteButton.isHidden = true
-            declineNoteButton.isHidden = true
+            acceptNoteButton.isEnabled = true
+            declineNoteButton.isEnabled = true
             selectedSketchnote = nil
             noteImageView.image = nil
         }

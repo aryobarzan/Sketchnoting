@@ -540,7 +540,7 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable, DocumentDelegate
     
     // MARK: PDF Generation
     
-    func createPDF() -> Data? {
+    func createPDFLegacy() -> Data? {
         if let image = self.image {
             let pdfMetaData = [
                 kCGPDFContextCreator: "Sketchnoting iOS App",
@@ -549,11 +549,32 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable, DocumentDelegate
             let format = UIGraphicsPDFRendererFormat()
             format.documentInfo = pdfMetaData as [String: Any]
             
-            let pageWidth = image.size.width
-            let pageHeight = image.size.height
+            
+            let pageWidth = canvasData.bounds.maxX
+            let pageHeight = canvasData.bounds.maxY + 100
             let pageRect = CGRect(x: 0, y: 0, width: pageWidth, height: pageHeight)
             
             let renderer = UIGraphicsPDFRenderer(bounds: pageRect, format: format)
+            
+            if image.size.height > pageHeight {
+                let data = renderer.pdfData { (context) in
+                    var h: CGFloat = 0
+                    var h2 = pageHeight
+                    while true {
+                        if let cropped = image.cropToRect(rect: CGRect(x: CGFloat(0), y: h, width: image.size.width, height: h2)) {
+                            context.beginPage()
+                            cropped.draw(at: CGPoint(x: 0, y: 0))
+                            h = h2
+                            h2 = h2 + h2
+                        }
+                        else {
+                            break
+                        }
+                        
+                    }
+                }
+                return data
+            }
             let data = renderer.pdfData { (context) in
                 context.beginPage()
                 image.draw(at: CGPoint(x: 0, y: 0))
@@ -561,6 +582,32 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable, DocumentDelegate
             return data
         }
         return nil
+    }
+    
+    func createPDF() -> Data? {
+        let drawing = canvasData!
+        
+        // Convert to PDF coordinates, with (0, 0) at the bottom left hand corner,
+        // making the height a bit bigger than the current drawing.
+        let pdfWidth = UIScreen.main.bounds.width
+        let pdfHeight = drawing.bounds.maxY + 100
+        
+        let bounds = CGRect(x: 0, y: 0, width: pdfWidth, height: pdfHeight)
+        let mutableData = NSMutableData()
+        UIGraphicsBeginPDFContextToData(mutableData, bounds, nil)
+        UIGraphicsBeginPDFPage()
+            
+        var yOrigin: CGFloat = 0
+        let imageHeight: CGFloat = 1024
+        while yOrigin < bounds.maxY {
+            let imgBounds = CGRect(x: 0, y: yOrigin, width: UIScreen.main.bounds.width, height: min(imageHeight, bounds.maxY - yOrigin))
+            let img = drawing.image(from: imgBounds, scale: 2)
+            img.draw(in: imgBounds)
+            yOrigin += imageHeight
+        }
+            
+        UIGraphicsEndPDFContext()
+        return mutableData as Data
     }
     
     // MARK: Comparable, equatable

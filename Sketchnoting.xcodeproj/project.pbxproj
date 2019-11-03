@@ -46,6 +46,7 @@
 		9FA6239C22E64EA2007ED794 /* TextData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA6239B22E64EA2007ED794 /* TextData.swift */; };
 		9FA6239E22E66D73007ED794 /* HandwritingRecognizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA6239D22E66D73007ED794 /* HandwritingRecognizer.swift */; };
 		9FA623A122E73DDA007ED794 /* NoteLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA623A022E73DDA007ED794 /* NoteLoader.swift */; };
+		9FAA827E236DD45200B2004F /* ViewAnimator in Frameworks */ = {isa = PBXBuildFile; productRef = 9FAA827D236DD45200B2004F /* ViewAnimator */; };
 		9FBF6AB422E9F391001FD730 /* VisionTextWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FBF6AB322E9F391001FD730 /* VisionTextWrapper.swift */; };
 		9FBF6AB622E9F3FE001FD730 /* VisionTextBlockWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FBF6AB522E9F3FE001FD730 /* VisionTextBlockWrapper.swift */; };
 		9FBF6AB822E9F428001FD730 /* VisionTextLineWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FBF6AB722E9F428001FD730 /* VisionTextLineWrapper.swift */; };
@@ -155,6 +156,7 @@
 				9F509144235BE29100853E84 /* DataCompression in Frameworks */,
 				9F10EC162347D64C005340AA /* Kingfisher in Frameworks */,
 				9FD29C392238571700CC969A /* Pods_Sketchnoting.framework in Frameworks */,
+				9FAA827E236DD45200B2004F /* ViewAnimator in Frameworks */,
 				9F2C00062351123700D53EE9 /* SwiftyJSON in Frameworks */,
 				9F10EC192347E4B4005340AA /* SwiftyBeaver in Frameworks */,
 			);
@@ -486,6 +488,7 @@
 				9F2C00052351123700D53EE9 /* SwiftyJSON */,
 				9F2C00082351126800D53EE9 /* Alamofire */,
 				9F509143235BE29100853E84 /* DataCompression */,
+				9FAA827D236DD45200B2004F /* ViewAnimator */,
 			);
 			productName = Sketchnoting;
 			productReference = 9FD29BA32220524D00CC969A /* Sketchnoting.app */;
@@ -522,6 +525,7 @@
 				9F2C00042351123700D53EE9 /* XCRemoteSwiftPackageReference "SwiftyJSON" */,
 				9F2C00072351126800D53EE9 /* XCRemoteSwiftPackageReference "Alamofire" */,
 				9F509142235BE29100853E84 /* XCRemoteSwiftPackageReference "DataCompression" */,
+				9FAA827C236DD45200B2004F /* XCRemoteSwiftPackageReference "ViewAnimator" */,
 			);
 			productRefGroup = 9FD29BA42220524D00CC969A /* Products */;
 			projectDirPath = "";
@@ -914,7 +918,7 @@
 			repositoryURL = "https://github.com/Alamofire/Alamofire.git";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = "5.0.0-rc.2";
+				minimumVersion = "5.0.0-rc.3";
 			};
 		};
 		9F509142235BE29100853E84 /* XCRemoteSwiftPackageReference "DataCompression" */ = {
@@ -923,6 +927,14 @@
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 3.6.0;
+			};
+		};
+		9FAA827C236DD45200B2004F /* XCRemoteSwiftPackageReference "ViewAnimator" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/marcosgriselli/ViewAnimator";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.7.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -952,6 +964,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 9F509142235BE29100853E84 /* XCRemoteSwiftPackageReference "DataCompression" */;
 			productName = DataCompression;
+		};
+		9FAA827D236DD45200B2004F /* ViewAnimator */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9FAA827C236DD45200B2004F /* XCRemoteSwiftPackageReference "ViewAnimator" */;
+			productName = ViewAnimator;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

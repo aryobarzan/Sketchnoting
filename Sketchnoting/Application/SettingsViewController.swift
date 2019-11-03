@@ -10,9 +10,9 @@ import UIKit
 
 class SettingsViewController: UITableViewController {
 
-    @IBOutlet weak var automaticAnnotationSwitch: UISwitch!
-    @IBOutlet weak var pencilSideButtonSegmentedControl: UISegmentedControl!
-    @IBOutlet weak var textRecognitionSegmentedControl: UISegmentedControl!
+    @IBOutlet var automaticAnnotationSwitch: UISwitch!
+    @IBOutlet var pencilSideButtonSegmentedControl: UISegmentedControl!
+    @IBOutlet var textRecognitionSegmentedControl: UISegmentedControl!
     override func viewDidLoad() {
         super.viewDidLoad()
         self.navigationController?.setNavigationBarHidden(false, animated: false)
@@ -30,9 +30,12 @@ class SettingsViewController: UITableViewController {
     }
     // MARK: - Navigation
 
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
     }
+    @IBAction func closeTapped(_ sender: UIBarButtonItem) {
+        dismiss(animated: true, completion: nil)
+    }
+    
     @IBAction func automaticAnnotationSwitchChanged(_ sender: UISwitch) {
         UserDefaults.settings.set(sender.isOn, forKey: SettingsKeys.AutomaticAnnotation.rawValue)
     }

@@ -101,6 +101,8 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
         spotlightHelper = SpotlightHelper()
         bioportalHelper = BioPortalHelper()
         tagmeHelper = TAGMEHelper()
+        
+        canvasView.bringSubviewToFront(drawingInsertionCanvas)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -120,6 +122,7 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
             else {
                 log.info("Loading canvas data for note.")
                 self.canvasView.drawing = self.sketchnote.canvasData
+                //updateContentSizeForDrawing()
             }
             if let documents = sketchnote.documents {
                 log.info("Reloading documents")
@@ -134,6 +137,23 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
         } else {
             sketchnote = Sketchnote(image: canvasView.drawing.image(from: canvasView.bounds, scale: 1.0), relatedDocuments: nil, drawings: nil)
         }
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        updateContentSizeForDrawing()
+    }
+    
+    private func updateContentSizeForDrawing() {
+        let drawing = canvasView.drawing
+        let contentHeight: CGFloat
+        
+        if !drawing.bounds.isNull {
+            contentHeight = max(canvasView.bounds.height, (drawing.bounds.maxY + 500) * canvasView.zoomScale)
+        } else {
+            contentHeight = canvasView.bounds.height
+        }
+        canvasView.contentSize = CGSize(width: canvasView.bounds.width * canvasView.zoomScale, height: contentHeight)
     }
     
     // This function is called when the user closes the page, i.e. stops editing the note, and the app returns to the home page.
@@ -161,7 +181,7 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
             self.toggleConceptHighlight(isHidden: true)
             self.processDrawingRecognition()
             traitCollection.performAsCurrent {
-                sketchnote.image = canvasView.drawing.image(from: canvasView.bounds, scale: 2.0)
+                sketchnote.image = canvasView.drawing.image(from: CGRect(x: canvasView.frame.minX, y: canvasView.frame.minY, width: canvasView.contentSize.width, height: canvasView.contentSize.height), scale: 1.0)
                 if traitCollection.userInterfaceStyle == .dark {
                     sketchnote.image = sketchnote.image?.invert() ?? sketchnote.image
                 }
@@ -195,7 +215,7 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
     private func processDrawingRecognition() {
         hideAllHelpLines()
         
-        let canvasImage = canvasView.drawing.image(from: canvasView.bounds, scale: 1.0)
+        let canvasImage = canvasView.drawing.image(from: CGRect(x: canvasView.frame.minX, y: canvasView.frame.minY, width: canvasView.contentSize.width, height: canvasView.contentSize.height), scale: 1.0)
         let mainImage = canvasImage.invertedImage() ?? canvasImage
         for region in self.drawingViews {
             let image = UIImage(cgImage: mainImage.cgImage!.cropping(to: region.frame)!)
@@ -1347,7 +1367,6 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
             drawingsButton.isEnabled = false
             topicsButton.isEnabled = false
             toggleDrawingRegions(isHidden: false, canInteract: true)
-            canvasView.isUserInteractionEnabled = false
             canvasView.resignFirstResponder()
             if topicsShown {
                 topicsShown = false
@@ -1365,7 +1384,6 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
             else {
                 toggleDrawingRegions(isHidden: true, canInteract: false)
             }
-            canvasView.isUserInteractionEnabled = true
             canvasView.becomeFirstResponder()
             manageDrawingsButton.tintColor = .white
         }

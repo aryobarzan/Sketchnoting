@@ -10,6 +10,20 @@ import UIKit
 import VideoToolbox
 
 extension UIImage {
+    
+    func cropToRect(rect: CGRect!) -> UIImage? {
+
+        let scaledRect = CGRect(x: rect.origin.x * self.scale, y: rect.origin.y * self.scale, width: rect.size.width * self.scale, height: rect.size.height * self.scale);
+
+
+        guard let imageRef: CGImage = self.cgImage?.cropping(to:scaledRect)
+        else {
+            return nil
+        }
+
+        let croppedImage: UIImage = UIImage(cgImage: imageRef, scale: self.scale, orientation: self.imageOrientation)
+        return croppedImage
+    }
 var toGrayscale: UIImage {
     guard let ciImage = CIImage(image: self, options: nil) else { return self }
     let paramsColor: [String: AnyObject] = [kCIInputBrightnessKey: NSNumber(value: 0.0), kCIInputContrastKey: NSNumber(value: 1.0), kCIInputSaturationKey: NSNumber(value: 0.0)]
