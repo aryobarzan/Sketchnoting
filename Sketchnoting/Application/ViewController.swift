@@ -237,9 +237,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     // This function is called when the user closes a note they were editing and the user returns to the homepage.
     // Upon return, the edited note is saved to disk.
     @IBAction func unwindToHome(sender: UIStoryboardSegue) {
-        if let sourceViewController = sender.source as? SketchNoteViewController, let note = sourceViewController.sketchnote {
-            note.save()
-            
+        if sender.source is SketchNoteViewController {
             self.updateDisplayedNotes()
         }
     }
@@ -559,26 +557,26 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     @IBAction func searchTypeButtonTapped(_ sender: UIButton) {
         let popMenu = PopMenuViewController(sourceView: sender, actions: [PopMenuAction](), appearance: nil)
         popMenu.appearance.popMenuBackgroundStyle = .blurred(.dark)
-        let allAction = PopMenuDefaultAction(title: "All", image: #imageLiteral(resourceName: "DetailsIcon"), didSelect: { action in
-            self.searchTypeButton.setImage(#imageLiteral(resourceName: "DetailsIcon"), for: .normal)
+        let allAction = PopMenuDefaultAction(title: "All", image: UIImage(systemName: "magnifyingglass.circle.fill"), didSelect: { action in
+            self.searchTypeButton.setImage(UIImage(systemName: "magnifyingglass.circle.fill"), for: .normal)
             self.searchType = .All
             
         })
         popMenu.addAction(allAction)
         let textAction = PopMenuDefaultAction(title: "Text", image: UIImage(systemName: "text.alignleft"), didSelect: { action in
-            self.searchTypeButton.setImage(#imageLiteral(resourceName: "CopyTextIcon"), for: .normal)
+            self.searchTypeButton.setImage(UIImage(systemName: "text.alignleft"), for: .normal)
             self.searchType = .Text
             
         })
         popMenu.addAction(textAction)
         let drawingAction = PopMenuDefaultAction(title: "Drawing", image: UIImage(systemName: "scribble"), didSelect: { action in
-            self.searchTypeButton.setImage(#imageLiteral(resourceName: "ImageIcon"), for: .normal)
+            self.searchTypeButton.setImage(UIImage(systemName: "scribble"), for: .normal)
             self.searchType = .Drawing
             
         })
         popMenu.addAction(drawingAction)
         let documentAction = PopMenuDefaultAction(title: "Document", image: UIImage(systemName: "doc"), didSelect: { action in
-            self.searchTypeButton.setImage(#imageLiteral(resourceName: "FileIcon"), for: .normal)
+            self.searchTypeButton.setImage(UIImage(systemName: "doc"), for: .normal)
             self.searchType = .Document
             
         })
@@ -712,28 +710,17 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     
     private func sendNoteInternal(note: Sketchnote) {
         if mcSession.connectedPeers.count > 0 {
-            dataToShare = [Data]()
-            let encoder = JSONEncoder()
-            if let encoded = try? encoder.encode(note) {
-                dataToShare.append(encoded)
-            }
-            else {
-                print("Encoding failed for note.")
-            }
-            dataToShare.append(note.canvasData.dataRepresentation())
-            do {
-                let dataEncoded = try? NSKeyedArchiver.archivedData(withRootObject: dataToShare, requiringSecureCoding: false)
-                if dataEncoded != nil {
-                    // The note to share is sent to each nearby device that was selected by the user.
-                    try mcSession.send(dataEncoded!, toPeers: mcSession.connectedPeers, with: .reliable)
+            if let noteData = note.packageNoteAsData() {
+                do {
+                    try mcSession.send(noteData, toPeers: mcSession.connectedPeers, with: .reliable)
+                } catch let error as NSError {
+                    let ac = UIAlertController(title: "Could not send the note", message: error.localizedDescription, preferredStyle: .alert)
+                    ac.addAction(UIAlertAction(title: "Close", style: .default))
+                    present(ac, animated: true)
                 }
-            } catch let error as NSError {
-                let ac = UIAlertController(title: "Could not send the note", message: error.localizedDescription, preferredStyle: .alert)
-                ac.addAction(UIAlertAction(title: "Close", style: .default))
-                present(ac, animated: true)
+                let banner = FloatingNotificationBanner(title: note.getTitle(), subtitle: "Note shared with the selected device(s).", style: .success)
+                banner.show()
             }
-            let banner = FloatingNotificationBanner(title: note.getTitle(), subtitle: "Note shared with the selected device(s).", style: .success)
-            banner.show()
         }
     }
     
@@ -749,33 +736,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         present(mcBrowser, animated: true)
         print("Joining sessions...")
     }
-    
-    // PDF Generation - The following functions are used for generating a pdf from either a single sketchnote or a note collection.
-    // This generated pdf can then be saved to the device's disk.
-    
-    
-    /*func generatePDF(noteCollectionView: NoteCollectionView) {
-        if noteCollectionView.noteCollection != nil && noteCollectionView.noteCollection!.notes.count > 0 {
-            do {
-                var pages = [UIImage]()
-                for note in noteCollectionView.noteCollection!.notes {
-                    if note.image != nil {
-                        pages.append(note.image!)
-                    }
-                }
-                if pages.count > 0 {
-                    let data = try PDFGenerator.generated(by: pages)
-                    let activityController = UIActivityViewController(activityItems: [data], applicationActivities: nil)
-                    self.present(activityController, animated: true, completion: nil)
-                    if let popOver = activityController.popoverPresentationController {
-                        popOver.sourceView = noteCollectionView.shareButton
-                    }
-                }
-            } catch (let error) {
-                print(error)
-            }
-        }
-    }*/
     
     // MARK: Note Collection View
     private enum NoteCollectionViewState : String {
@@ -897,28 +857,13 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
                 }
             break
         case .File:
-            var dataToShare = [Data]()
-            let encoder = JSONEncoder()
-            if let encoded = try? encoder.encode(note) {
-                dataToShare.append(encoded)
-            }
-            else {
-                print("Encoding failed for note.")
-            }
-            let drawingEncoder = PropertyListEncoder()
-            if let drawingEncoded = try? drawingEncoder.encode(note.canvasData) {
-                dataToShare.append(drawingEncoded)
-            }
-            
-            let dataEncoded = try? NSKeyedArchiver.archivedData(withRootObject: dataToShare, requiringSecureCoding: false)
-            let path = NSURL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("Sketchnote.sketchnote")!
-            try? dataEncoded!.write(to: path)
-            
-            
-            let activityController = UIActivityViewController(activityItems: [path], applicationActivities: nil)
-            self.present(activityController, animated: true, completion: nil)
-            if let popOver = activityController.popoverPresentationController {
-                popOver.sourceView = sender
+            let noteURL = NoteLoader.getSketchnotesDirectory().appendingPathComponent(note.id + ".sketchnote")
+            if FileManager.default.fileExists(atPath: noteURL.path) {
+                let activityController = UIActivityViewController(activityItems: [noteURL], applicationActivities: nil)
+                self.present(activityController, animated: true, completion: nil)
+                if let popOver = activityController.popoverPresentationController {
+                    popOver.sourceView = sender
+                }
             }
             break
         }
@@ -926,30 +871,22 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     }
     
     func importSketchnote(url: URL) {
-        do {
-            let data = try Data(contentsOf: url)
-            if let decodedDataArray = try? NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(data) as? [Data] {
-                if decodedDataArray.count >= 2 {
-                    let jsonDecoder = JSONDecoder()
-                    if let sketchnote = try? jsonDecoder.decode(Sketchnote.self, from: decodedDataArray[0]) {
-                        let drawingDecoder = PropertyListDecoder()
-                        if let drawingDataDecoded = try? drawingDecoder.decode(PKDrawing.self, from: decodedDataArray[1]) {
-                            sketchnote.canvasData = drawingDataDecoded
-                            sketchnote.textDataArray = [TextData]()
-                            sketchnote.save()
-                            if self.notes.contains(sketchnote) {
-                                log.info("Sketchnote already in application, updating its data.")
-                            }
-                            else {
-                                log.info("Importing new sketchnote.")
-                                self.notes.append(sketchnote)
-                            }
-                            self.updateDisplayedNotes()
-                        }
-                    }
-                }
+        if let imported = NoteLoader.importSketchnoteFile(url: url) {
+            imported.save()
+            if self.notes.contains(imported) {
+                log.info("Sketchnote already in application, updating its data.")
+                let alert = UIAlertController(title: "Note Exists", message: "You already have this note in your library: Its data has been updated.", preferredStyle: .alert)
+                           self.present(alert, animated: true, completion: nil)
             }
-        } catch {
+            else {
+                log.info("Importing new sketchnote.")
+                self.notes.append(imported)
+                let alert = UIAlertController(title: "Note Imported", message: "The new note has been added to your library.", preferredStyle: .alert)
+                           self.present(alert, animated: true, completion: nil)
+            }
+            self.updateDisplayedNotes()
+        }
+        else {
             let alert = UIAlertController(title: "Error", message: "Sorry, the sketchnote file could not be imported.", preferredStyle: .alert)
             self.present(alert, animated: true, completion: nil)
         }

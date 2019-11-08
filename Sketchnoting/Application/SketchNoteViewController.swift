@@ -17,7 +17,7 @@ import NotificationBannerSwift
 
 import PencilKit
 
-class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, UICollectionViewDataSource, UICollectionViewDelegate, DocumentVisitor, SketchnoteDelegate, PKCanvasViewDelegate, PKToolPickerObserver, UIScreenshotServiceDelegate {
+class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, UICollectionViewDataSource, UICollectionViewDelegate, DocumentVisitor, SketchnoteDelegate, PKCanvasViewDelegate, PKToolPickerObserver, UIScreenshotServiceDelegate, NoteOptionsDelegate {
     
     @IBOutlet var canvasView: PKCanvasView!
     
@@ -25,6 +25,7 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
     @IBOutlet var bookshelfButton: UIButton!
     @IBOutlet var drawingsButton: UIButton!
     @IBOutlet var manageDrawingsButton: UIButton!
+    @IBOutlet var optionsButton: UIButton!
     
     @IBOutlet var closeButton: UIButton!
     var topicsBadgeHub: BadgeHub!
@@ -110,9 +111,7 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
         
         setupConceptHighlights()
         setupDrawingRegions()
-        
-        self.recognizedTextLogView.text = self.sketchnote.getText(raw: true)
-        
+                
         // If the user has not created a new note, but is trying to edit an existing note, this existing note is reloaded.
         // This reload consists of redrawing the user's strokes for that note on the note's canvas on this page.
         if sketchnote != nil {
@@ -188,7 +187,22 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
             }
             sketchnote.setUpdateDate()
             self.sketchnote.canvasData = self.canvasView.drawing
+            sketchnote.save()
             log.info("Closing & saving note.")
+            break
+        case "NoteOptions":
+            if let destination = segue.destination as? NoteOptionsTableViewController {
+                destination.delegate = self
+            }
+            break
+        case "ViewNoteText":
+            if let destination = segue.destination as? UINavigationController {
+                if let destinationViewController = destination.topViewController as? NoteTextViewController {
+                    destinationViewController.note = sketchnote
+                }
+                
+            }
+            break
         default:
             print("Default segue case triggered.")
         }
@@ -488,35 +502,46 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
         topicsButton.setTitleColor(.white, for: .normal)
     }
     
-    @IBAction func moreButtonTapped(_ sender: UIButton) {
-        let alert = UIAlertController(title: self.sketchnote.getTitle(), message: "", preferredStyle: .alert)
-        if !SettingsManager.automaticAnnotation() {
-            alert.addAction(UIAlertAction(title: "Annotate", style: .default, handler: { action in
-                self.processHandwritingRecognition()
-            }))
-        }
-        alert.addAction(UIAlertAction(title: "Set Title", style: .default, handler: { action in
+    func noteOptionSelected(option: NoteOption) {
+        switch option {
+        case .Annotate:
+            self.processHandwritingRecognition()
+            break
+        case .SetTitle:
             let alertController = UIAlertController(title: "Title for this note", message: nil, preferredStyle: .alert)
-            
             let confirmAction = UIAlertAction(title: "Set", style: .default) { (_) in
-                
                 let title = alertController.textFields?[0].text
-                
                 self.sketchnote.setTitle(title: title ?? "Untitled")
-                
+                self.sketchnote.save()
             }
             let cancelAction = UIAlertAction(title: "Cancel", style: .cancel) { (_) in }
-            
             alertController.addTextField { (textField) in
                 textField.placeholder = "Enter Note Title"
             }
-            
             alertController.addAction(confirmAction)
             alertController.addAction(cancelAction)
-            
             self.present(alertController, animated: true, completion: nil)
-        }))
-        alert.addAction(UIAlertAction(title: "Share", style: .default, handler: { action in
+            break
+        case .ViewText:
+            self.performSegue(withIdentifier: "ViewNoteText", sender: self)
+            break
+        case .CopyText:
+            UIPasteboard.general.string = self.sketchnote.getText()
+            let banner = FloatingNotificationBanner(title: self.sketchnote.getTitle(), subtitle: "Copied text to clipboard.", style: .info)
+            banner.show()
+            break
+        case .ShareAsImage:
+            if sketchnote.image != nil {
+                if let jpegData = sketchnote.image!.jpegData(compressionQuality: 1) {
+                    let activityController = UIActivityViewController(activityItems: [jpegData], applicationActivities: nil)
+                        self.present(activityController, animated: true, completion: nil)
+                        if let popOver = activityController.popoverPresentationController {
+                            popOver.sourceView = optionsButton
+                        }
+                    }
+                }
+            break
+        case .ShareAsPDF:
             self.sketchnote.image = self.canvasView.drawing.image(from: self.canvasView.bounds, scale: 1.0)
             if self.sketchnote.image != nil {
                 var data = [Any]()
@@ -527,28 +552,30 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
                 let activityController = UIActivityViewController(activityItems: data, applicationActivities: nil)
                 self.present(activityController, animated: true, completion: nil)
                 if let popOver = activityController.popoverPresentationController {
-                    popOver.sourceView = self.canvasView
+                    popOver.sourceView = optionsButton
                 }
             }
-        }))
-        if !sketchnote.getText().isEmpty {
-            alert.addAction(UIAlertAction(title: "Copy Text", style: .default, handler: { action in
-                UIPasteboard.general.string = self.sketchnote.getText()
-                let banner = FloatingNotificationBanner(title: self.sketchnote.getTitle(), subtitle: "Copied text to clipboard.", style: .info)
-                banner.show()
-            }))
-        }
-        alert.addAction(UIAlertAction(title: "Reset Documents", style: .default, handler: { action in
+            break
+        case .ShareAsFile:
+            let noteURL = NoteLoader.getSketchnotesDirectory().appendingPathComponent(self.sketchnote.id + ".sketchnote")
+            if FileManager.default.fileExists(atPath: noteURL.path) {
+                let activityController = UIActivityViewController(activityItems: [noteURL], applicationActivities: nil)
+                self.present(activityController, animated: true, completion: nil)
+                if let popOver = activityController.popoverPresentationController {
+                    popOver.sourceView = optionsButton
+                }
+            }
+            break
+        case .ResetDocuments:
             self.sketchnote.documents = [Document]()
-            //self.items = [Document]()
             self.clearConceptHighlights()
             self.updateBookshelfState(state: .All)
             self.bookshelfFilter = .All
             self.filterDocumentsButton.setTitle("All", for: .normal)
             self.updateBookshelf()
             self.annotateText(text: self.sketchnote.getText())
-        }))
-        alert.addAction(UIAlertAction(title: "Reset Text Recognition", style: .default, handler: { action in
+            break
+        case .ResetTextRecognition:
             self.sketchnote.clearTextData()
             self.sketchnote.documents = [Document]()
             self.items = [Document]()
@@ -557,8 +584,8 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
             self.bookshelfFilter = .All
             self.filterDocumentsButton.setTitle("All", for: .normal)
             self.processHandwritingRecognition()
-        }))
-        alert.addAction(UIAlertAction(title: "Clear Note", style: .destructive, handler: { action in
+            break
+        case .ClearNote:
             for helpLine in self.helpLinesHorizontal {
                 helpLine.removeFromSuperview()
             }
@@ -580,9 +607,7 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
             }
             self.documentsCollectionView.reloadData()
             self.topicsBadgeHub.setCount(0)
-        }))
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
-        self.present(alert, animated: true)
+        }
     }
     
     private func undo() {
@@ -670,7 +695,6 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
                     self.annotateText(text: self.sketchnote.getText())
                     print(textData.spellchecked ?? "")
                     
-                    self.recognizedTextLogView.text = self.sketchnote.getText(raw: true)
                 }
             }
             else {
@@ -770,7 +794,7 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
             saveTimer = nil
             print("Save timer reset.")
         }
-        saveTimer = Timer.scheduledTimer(timeInterval: 2.0, target: self, selector: #selector(onSaveTimerFires), userInfo: nil, repeats: false)
+        saveTimer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(onSaveTimerFires), userInfo: nil, repeats: false)
         print("Save timer started.")
     }
     @objc func onSaveTimerFires()
@@ -1455,16 +1479,6 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
             popMenu.addAction(closeAction)
             self.present(popMenu, animated: true, completion: nil)
         }
-    }
-    
-    // MARK: Log view for text recognition
-    @IBOutlet weak var logView: UIView!
-    @IBOutlet weak var recognizedTextLogView: UITextView!
-    @IBAction func openLogView(_ sender: UIButton) {
-        logView.isHidden = false
-    }
-    @IBAction func closeLogView(_ sender: UIButton) {
-        logView.isHidden = true
     }
     
     // Mark: Canvas scroll

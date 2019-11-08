@@ -2,7 +2,7 @@
 //  SettingsViewController.swift
 //  Sketchnoting
 //
-//  Created by Kael on 21/08/2019.
+//  Created by Aryobarzan on 21/08/2019.
 //  Copyright © 2019 Aryobarzan. All rights reserved.
 //
 

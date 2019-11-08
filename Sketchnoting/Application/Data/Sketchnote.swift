@@ -31,7 +31,6 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable, DocumentDelegate
     var drawingViewRects: [CGRect]?
     var textDataArray: [TextData]!
     var tags: [Tag]!
-    
     var canvasData: PKDrawing!
     
     var sharedByDevice: String?
@@ -147,9 +146,6 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable, DocumentDelegate
         if tags == nil {
             tags = [Tag]()
         }
-        
-        self.loadCanvasData()
-        self.loadTextDataArray()
         log.info("Sketchnote " + self.id + " decoded.")
     }
     
@@ -164,79 +160,67 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable, DocumentDelegate
     }
     
     private let serializationQueue = DispatchQueue(label: "SerializationQueue", qos: .background)
-    
     public func save() {
         serializationQueue.async {
-            let encoder = JSONEncoder()
+            var data = [Data]()
             
-            if let encoded = try? encoder.encode(self) {
-                UserDefaults.sketchnotes.set(encoded, forKey: self.id)
-                log.info("Note \(self.id ?? "") saved.")
-                self.saveCanvasData()
-                self.saveTextDataArray()
+            // Encode metadata
+            let metaDataEncoder = JSONEncoder()
+            if let encodedMetaData = try? metaDataEncoder.encode(self) {
+                data.append(encodedMetaData)
+                log.info("Note \(self.id ?? "") meta data encoded.")
             }
             else {
                 log.error("Encoding failed for note " + self.id + ".")
             }
-        }
-    }
-    
-    private func saveCanvasData() {
-        let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
-        let documentsDirectory = paths.first!
-        let url = documentsDirectory.appendingPathComponent("NoteCanvasData-" + self.id + ".data")
-        do {
-            let encoder = PropertyListEncoder()
-            let data = try encoder.encode(self.canvasData)
-            try data.write(to: url)
-        } catch {
-            log.error("Could not save note canvas data for note " + self.id + ".")
-        }
-    }
-    
-    private func loadCanvasData() {
-        let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
-        let documentsDirectory = paths.first!
-        let url = documentsDirectory.appendingPathComponent("NoteCanvasData-" + self.id + ".data")
-        
-        serializationQueue.async {
-            if FileManager.default.fileExists(atPath: url.path) {
-                do {
-                    let decoder = PropertyListDecoder()
-                    let data = try Data(contentsOf: url)
-                    let drawing = try decoder.decode(PKDrawing.self, from: data)
-                    self.canvasData = drawing
-                } catch {
-                    log.error("Could not load note drawing data for note " + self.id + ".")
-                    self.canvasData = PKDrawing()
-                }
-            } else {
-                self.canvasData = PKDrawing()
+            
+            // Encode canvas data, i.e. the strokes
+            let canvasDataEncoder = PropertyListEncoder()
+            if let encodedCanvasData = try? canvasDataEncoder.encode(self.canvasData) {
+                data.append(encodedCanvasData)
             }
+            else {
+                log.error("Encoding failed for note canvas data " + self.id + ".")
+            }
+            
+            // Encode text recognition data
+            if let encodedTextDataArray = try? NSKeyedArchiver.archivedData(withRootObject: self.textDataArray as Any, requiringSecureCoding: false) {
+                data.append(encodedTextDataArray)
+                log.info("Note " + self.id + " text data array encoded.")
+            }
+            
+            let dataEncoded = try? NSKeyedArchiver.archivedData(withRootObject: data, requiringSecureCoding: false)
+            let sketchnotesDirectory = NoteLoader.getSketchnotesDirectory()
+            try? dataEncoded!.write(to: sketchnotesDirectory.appendingPathComponent(self.id + ".sketchnote"))
         }
     }
     
-    public func saveTextDataArray() {
-        let DocumentsDirectory = FileManager().urls(for: .documentDirectory, in: .userDomainMask).first!
-        let ArchiveURLPathArray = DocumentsDirectory.appendingPathComponent("NoteTextDataArray-" + self.id)
-        if let encoded = try? NSKeyedArchiver.archivedData(withRootObject: self.textDataArray as Any, requiringSecureCoding: false) {
-            try! encoded.write(to: ArchiveURLPathArray)
-            log.info("Note " + id + " text data array saved.")
+    public func packageNoteAsData() -> Data? {
+        var data = [Data]()
+        // Encode metadata
+        let metaDataEncoder = JSONEncoder()
+        if let encodedMetaData = try? metaDataEncoder.encode(self) {
+            data.append(encodedMetaData)
+            log.info("Note \(self.id ?? "") meta data encoded.")
         }
         else {
-            log.error("Failed to encode text data array for note " + id + ".")
+            log.error("Encoding failed for note " + self.id + ".")
         }
-    }
-    private func loadTextDataArray() {
-        let DocumentsDirectory = FileManager().urls(for: .documentDirectory, in: .userDomainMask).first!
-        let ArchiveURLPathArray = DocumentsDirectory.appendingPathComponent("NoteTextDataArray-" + self.id)
-        guard let codedData = try? Data(contentsOf: ArchiveURLPathArray) else { return }
-        guard let data = ((try? NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(codedData) as?
-            [TextData]) as [TextData]??) else {
-                log.error("Failed to load text data array for note " + id + ".")
-                return }
-        self.textDataArray = data
-        log.info("Text data array for note " + id + " loaded.")
+        // Encode canvas data, i.e. the strokes
+        let canvasDataEncoder = PropertyListEncoder()
+        if let encodedCanvasData = try? canvasDataEncoder.encode(self.canvasData) {
+            data.append(encodedCanvasData)
+        }
+        else {
+            log.error("Encoding failed for note canvas data " + self.id + ".")
+        }
+        // Encode text recognition data
+        if let encodedTextDataArray = try? NSKeyedArchiver.archivedData(withRootObject: self.textDataArray as Any, requiringSecureCoding: false) {
+            data.append(encodedTextDataArray)
+            log.info("Note " + self.id + " text data array encoded.")
+        }
+        let dataEncoded = try? NSKeyedArchiver.archivedData(withRootObject: data, requiringSecureCoding: false)
+        return dataEncoded
     }
     
     public func duplicate() -> Sketchnote {

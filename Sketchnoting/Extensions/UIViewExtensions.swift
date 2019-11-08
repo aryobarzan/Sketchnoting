@@ -15,13 +15,14 @@ extension UIView {
     }
     func asImage() -> UIImage {
         
-            UIGraphicsBeginImageContext(self.frame.size)
+            UIGraphicsBeginImageContext(self.bounds.size)
             self.layer.render(in:UIGraphicsGetCurrentContext()!)
             let image = UIGraphicsGetImageFromCurrentImageContext()
             UIGraphicsEndImageContext()
             return UIImage(cgImage: image!.cgImage!)
         
     }
+
     func addBlurBackground() {
         self.backgroundColor = .clear
         let blurEffect = UIBlurEffect(style: .dark)

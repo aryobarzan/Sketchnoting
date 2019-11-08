@@ -85,7 +85,7 @@ func resize(toWidth width: CGFloat) -> UIImage? {
             let context = CIContext(options: nil)
             let imageRef = context.createCGImage(filter.outputImage!, from: image.extent)
             if imageRef != nil {
-                var img = UIImage(cgImage: imageRef!)
+                let img = UIImage(cgImage: imageRef!)
                 inverted = true
                 return img
             }

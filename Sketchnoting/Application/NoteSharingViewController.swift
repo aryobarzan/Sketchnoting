@@ -2,7 +2,7 @@
 //  NoteSharingViewController.swift
 //  Sketchnoting
 //
-//  Created by Kael on 20/08/2019.
+//  Created by Aryobarzan on 20/08/2019.
 //  Copyright © 2019 Aryobarzan. All rights reserved.
 //
 
@@ -131,23 +131,18 @@ class NoteSharingViewController: UIViewController, MCSessionDelegate {
     }
     
     func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
-        guard let receivedData = ((try? NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(data) as?
-            [Data]) as [Data]??) else { return }
-        let decoder = JSONDecoder()
-        guard let received = try? decoder.decode(Sketchnote.self, from: receivedData![0]) else {
-            print("wrong data")
-            return
+        if let decodedNote = NoteLoader.decodeNoteFromData(data: data) {
+            decodedNote.sharedByDevice = peerID.displayName
+            DispatchQueue.main.async {
+                self.pendingSharedNotes.append(decodedNote)
+                let banner = FloatingNotificationBanner(title: "New Note", subtitle: "Device \(peerID.displayName) shared a note with you!", style: .info)
+                banner.show()
+                self.updateViews()
+                log.info("Decoded shared note.")
+            }
         }
-        received.sharedByDevice = peerID.displayName
-        guard let canvasData = try? PKDrawing(data: receivedData![1]) else {
-            return
-        }
-        received.canvasData = canvasData
-        DispatchQueue.main.async {
-            self.pendingSharedNotes.append(received)
-            let banner = FloatingNotificationBanner(title: "New Note", subtitle: "Device \(peerID.displayName) shared a note with you!", style: .info)
-            banner.show()
-            self.updateViews()
+        else {
+            log.error("Failed to decode note shared with you.")
         }
     }
     
@@ -178,8 +173,8 @@ class NoteSharingViewController: UIViewController, MCSessionDelegate {
             noteImageView.image = note.image
             sharedNoteLabel.text = "\(note.sharedByDevice ?? "Unknown") has shared a note with you."
             
-            acceptNoteButton.isEnabled = false
-            declineNoteButton.isEnabled = false
+            acceptNoteButton.isEnabled = true
+            declineNoteButton.isEnabled = true
             
             notePageControl.numberOfPages = pendingSharedNotes.count
             notePageControl.currentPage = currentIndex
@@ -188,8 +183,8 @@ class NoteSharingViewController: UIViewController, MCSessionDelegate {
         }
         else {
             sharedNoteLabel.text = "There are no pending shared notes to view."
-            acceptNoteButton.isEnabled = true
-            declineNoteButton.isEnabled = true
+            acceptNoteButton.isEnabled = false
+            declineNoteButton.isEnabled = false
             selectedSketchnote = nil
             noteImageView.image = nil
         }

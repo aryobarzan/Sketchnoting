@@ -10,11 +10,9 @@ import UIKit
 
 class NoteCollectionViewDetailCell: UICollectionViewCell {
     
-    @IBOutlet weak var imageView: UIImageView!
-    @IBOutlet weak var titlelabel: UILabel!
+    @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var creationLabel: UILabel!
     @IBOutlet weak var updatedLabel: UILabel!
-    @IBOutlet weak var documentsLabel: UILabel!
     @IBOutlet weak var tagsLabel: UILabel!
     @IBOutlet weak var editTitleButton: UIButton!
     @IBOutlet weak var editTagsButton: UIButton!
@@ -38,18 +36,9 @@ class NoteCollectionViewDetailCell: UICollectionViewCell {
     }
     
     func setNote(note: Sketchnote) {
-        self.layer.borderWidth = 1
-        self.layer.borderColor = UIColor.black.cgColor
-        self.layer.cornerRadius = 4
-        
         sketchnote = note
         
-        imageView.image = sketchnote.image
-        imageView.layer.masksToBounds = true
-        imageView.layer.borderColor = UIColor.black.cgColor
-        imageView.layer.borderWidth = 1
-        
-        titlelabel.text = note.getTitle()
+        titleLabel.text = note.getTitle()
         
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
@@ -80,14 +69,6 @@ class NoteCollectionViewDetailCell: UICollectionViewCell {
         else {
              self.tagsLabel.text = "No tags"
         }
-        
-        if sketchnote.documents.count > 0 {
-            self.documentsLabel.text = "\(sketchnote.documents.count) Documents"
-        }
-        else {
-            self.documentsLabel.text = ""
-        }
-
     }
     
     @IBAction func editTitleTapped(_ sender: UIButton) {
