@@ -1167,14 +1167,22 @@
                                                 </connections>
                                             </collectionView>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Documents" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Hw6-ha-FLR">
-                                                <rect key="frame" x="16" y="11" width="129.5" height="29"/>
-                                                <fontDescription key="fontDescription" type="boldSystem" pointSize="24"/>
+                                                <rect key="frame" x="34" y="8" width="101" height="24"/>
+                                                <fontDescription key="fontDescription" type="italicSystem" pointSize="20"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <nil key="highlightedColor"/>
                                                 <size key="shadowOffset" width="1" height="-1"/>
                                             </label>
+                                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="book.circle.fill" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="6TS-Z2-Ha8">
+                                                <rect key="frame" x="8" y="8.5" width="24" height="24"/>
+                                                <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="width" constant="24" id="FGh-80-BV0"/>
+                                                    <constraint firstAttribute="height" constant="25" id="cFi-pt-y98"/>
+                                                </constraints>
+                                            </imageView>
                                             <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="sjN-VI-3Ol">
-                                                <rect key="frame" x="24" y="52" width="336" height="924"/>
+                                                <rect key="frame" x="24" y="47" width="336" height="929"/>
                                                 <subviews>
                                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="OG5-Sa-qvK">
                                                         <rect key="frame" x="8" y="8" width="30" height="30"/>
@@ -1196,7 +1204,7 @@
                                                         <nil key="highlightedColor"/>
                                                     </label>
                                                     <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="IYX-uw-rqR">
-                                                        <rect key="frame" x="8" y="226" width="320" height="690"/>
+                                                        <rect key="frame" x="8" y="226" width="320" height="695"/>
                                                     </scrollView>
                                                     <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="qFs-Z8-K2D">
                                                         <rect key="frame" x="93" y="43" width="150" height="150"/>
@@ -1247,18 +1255,21 @@
                                                     <constraint firstAttribute="height" constant="260" id="naX-Zg-rah"/>
                                                 </constraints>
                                             </view>
-                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="leading" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="dT1-d9-SEx">
-                                                <rect key="frame" x="153" y="11" width="100" height="30"/>
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="trailing" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="dT1-d9-SEx">
+                                                <rect key="frame" x="336" y="11" width="24" height="24"/>
                                                 <constraints>
-                                                    <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="100" id="n08-ot-RJK"/>
+                                                    <constraint firstAttribute="height" constant="24" id="5dR-HN-UK4"/>
+                                                    <constraint firstAttribute="width" constant="24" id="AR7-xN-oXZ"/>
                                                 </constraints>
-                                                <state key="normal" title="All"/>
+                                                <state key="normal" image="slider.horizontal.3" catalog="system"/>
                                                 <connections>
-                                                    <action selector="filterDocumentsButtonTapped:" destination="lDo-DG-9fX" eventType="touchUpInside" id="Jj1-P0-AfQ"/>
+                                                    <segue destination="9N8-9s-Pfz" kind="popoverPresentation" identifier="BookshelfOptions" popoverAnchorView="dT1-d9-SEx" id="NLG-br-oX7">
+                                                        <popoverArrowDirection key="popoverArrowDirection" up="YES" down="YES" left="YES" right="YES"/>
+                                                    </segue>
                                                 </connections>
                                             </button>
                                             <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="0n7-8b-iL7" customClass="NVActivityIndicatorView" customModule="NVActivityIndicatorView">
-                                                <rect key="frame" x="256.5" y="15" width="25" height="25"/>
+                                                <rect key="frame" x="143" y="8" width="25" height="25"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="25" id="EVc-Or-Rpe"/>
                                                     <constraint firstAttribute="width" constant="25" id="YPJ-hO-pFV"/>
@@ -1270,9 +1281,12 @@
                                                     </userDefinedRuntimeAttribute>
                                                 </userDefinedRuntimeAttributes>
                                             </view>
-                                            <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="znP-Ip-v8c">
-                                                <rect key="frame" x="285" y="11" width="75" height="30"/>
-                                                <state key="normal" title="Clear Filter"/>
+                                            <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="znP-Ip-v8c">
+                                                <rect key="frame" x="8" y="36" width="86.5" height="17"/>
+                                                <fontDescription key="fontDescription" type="system" pointSize="13"/>
+                                                <state key="normal" title=" Clear Filter" image="xmark.circle.fill" catalog="system">
+                                                    <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="small"/>
+                                                </state>
                                                 <connections>
                                                     <action selector="clearTopicDocumentsTapped:" destination="lDo-DG-9fX" eventType="touchUpInside" id="vvQ-gw-JrW"/>
                                                 </connections>
@@ -1281,28 +1295,29 @@
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <gestureRecognizers/>
                                         <constraints>
-                                            <constraint firstItem="Hw6-ha-FLR" firstAttribute="leading" secondItem="oqt-gq-XGG" secondAttribute="leading" constant="16" id="0DC-g9-43i"/>
-                                            <constraint firstAttribute="trailing" secondItem="znP-Ip-v8c" secondAttribute="trailing" constant="8" id="0PB-hi-r6f"/>
-                                            <constraint firstItem="znP-Ip-v8c" firstAttribute="leading" secondItem="0n7-8b-iL7" secondAttribute="trailing" constant="3.5" id="3Zi-OP-YZe"/>
-                                            <constraint firstItem="Soc-lK-uIi" firstAttribute="top" secondItem="Hw6-ha-FLR" secondAttribute="bottom" constant="7" id="3hf-nw-9BD"/>
+                                            <constraint firstItem="6TS-Z2-Ha8" firstAttribute="top" secondItem="oqt-gq-XGG" secondAttribute="top" constant="8" id="2Dc-co-0V2"/>
+                                            <constraint firstItem="Soc-lK-uIi" firstAttribute="top" secondItem="Hw6-ha-FLR" secondAttribute="bottom" constant="15" id="3hf-nw-9BD"/>
                                             <constraint firstItem="Soc-lK-uIi" firstAttribute="leading" secondItem="O1Y-Db-0EN" secondAttribute="trailing" constant="12" id="8FP-Wx-niV"/>
-                                            <constraint firstItem="0n7-8b-iL7" firstAttribute="leading" secondItem="dT1-d9-SEx" secondAttribute="trailing" constant="3.5" id="9oA-z8-luY"/>
                                             <constraint firstAttribute="trailing" secondItem="Soc-lK-uIi" secondAttribute="trailing" constant="8" id="A0Z-SM-eyN"/>
+                                            <constraint firstItem="6TS-Z2-Ha8" firstAttribute="leading" secondItem="oqt-gq-XGG" secondAttribute="leading" constant="8" id="BZ3-an-gP8"/>
                                             <constraint firstAttribute="trailing" secondItem="sjN-VI-3Ol" secondAttribute="trailing" constant="8" id="Crh-dI-dhp"/>
-                                            <constraint firstItem="sjN-VI-3Ol" firstAttribute="top" secondItem="Hw6-ha-FLR" secondAttribute="bottom" constant="12" id="EHN-dl-bov"/>
+                                            <constraint firstItem="sjN-VI-3Ol" firstAttribute="top" secondItem="Hw6-ha-FLR" secondAttribute="bottom" constant="15" id="EHN-dl-bov"/>
                                             <constraint firstAttribute="trailing" secondItem="S7U-4b-lPQ" secondAttribute="trailing" id="GjG-Yp-cOP"/>
-                                            <constraint firstItem="0n7-8b-iL7" firstAttribute="top" secondItem="oqt-gq-XGG" secondAttribute="top" constant="15" id="HTJ-jb-Ajr"/>
+                                            <constraint firstItem="0n7-8b-iL7" firstAttribute="top" secondItem="oqt-gq-XGG" secondAttribute="top" constant="8" id="HTJ-jb-Ajr"/>
                                             <constraint firstItem="Soc-lK-uIi" firstAttribute="leading" secondItem="oqt-gq-XGG" secondAttribute="leading" constant="24" id="JS5-zj-oGt"/>
                                             <constraint firstAttribute="bottom" secondItem="S7U-4b-lPQ" secondAttribute="bottom" id="LYb-B1-Aex"/>
+                                            <constraint firstItem="Hw6-ha-FLR" firstAttribute="leading" secondItem="6TS-Z2-Ha8" secondAttribute="trailing" constant="2" id="M8i-B0-6ME"/>
                                             <constraint firstItem="S7U-4b-lPQ" firstAttribute="top" secondItem="oqt-gq-XGG" secondAttribute="top" id="NcC-Yp-TKK"/>
                                             <constraint firstItem="S7U-4b-lPQ" firstAttribute="leading" secondItem="oqt-gq-XGG" secondAttribute="leading" id="SOO-Qb-HVN"/>
-                                            <constraint firstItem="znP-Ip-v8c" firstAttribute="top" secondItem="oqt-gq-XGG" secondAttribute="top" constant="11" id="UYU-7T-VoZ"/>
-                                            <constraint firstItem="Hw6-ha-FLR" firstAttribute="top" secondItem="oqt-gq-XGG" secondAttribute="top" constant="11" id="WCT-N5-V3L"/>
+                                            <constraint firstItem="znP-Ip-v8c" firstAttribute="leading" secondItem="oqt-gq-XGG" secondAttribute="leading" constant="8" id="T6c-Ai-RxZ"/>
+                                            <constraint firstItem="Hw6-ha-FLR" firstAttribute="top" secondItem="oqt-gq-XGG" secondAttribute="top" constant="8" id="WCT-N5-V3L"/>
                                             <constraint firstAttribute="bottom" secondItem="Soc-lK-uIi" secondAttribute="bottom" constant="8" id="bXE-Ta-XiT"/>
-                                            <constraint firstItem="dT1-d9-SEx" firstAttribute="leading" secondItem="Hw6-ha-FLR" secondAttribute="trailing" constant="7.5" id="c0Z-5D-QnT"/>
                                             <constraint firstItem="dT1-d9-SEx" firstAttribute="top" secondItem="oqt-gq-XGG" secondAttribute="top" constant="11" id="iXr-bh-M02"/>
                                             <constraint firstItem="O1Y-Db-0EN" firstAttribute="centerY" secondItem="oqt-gq-XGG" secondAttribute="centerY" id="jnG-dj-x18"/>
+                                            <constraint firstItem="0n7-8b-iL7" firstAttribute="leading" secondItem="Hw6-ha-FLR" secondAttribute="trailing" constant="8" id="juS-1G-XSp"/>
+                                            <constraint firstAttribute="trailing" secondItem="dT1-d9-SEx" secondAttribute="trailing" constant="8" id="mc1-oD-cD6"/>
                                             <constraint firstItem="O1Y-Db-0EN" firstAttribute="leading" secondItem="oqt-gq-XGG" secondAttribute="leading" constant="5" id="oDF-Wx-AGK"/>
+                                            <constraint firstItem="znP-Ip-v8c" firstAttribute="top" secondItem="6TS-Z2-Ha8" secondAttribute="bottom" constant="3" id="pKt-Fe-v5W"/>
                                             <constraint firstAttribute="bottom" secondItem="sjN-VI-3Ol" secondAttribute="bottom" constant="8" id="pad-wm-aah"/>
                                             <constraint firstItem="sjN-VI-3Ol" firstAttribute="leading" secondItem="oqt-gq-XGG" secondAttribute="leading" constant="24" id="yPX-33-oa7"/>
                                         </constraints>
@@ -1354,6 +1369,7 @@
                         <outlet property="bookshelfButton" destination="Xyr-WH-2aV" id="PQY-oW-NNJ"/>
                         <outlet property="bookshelfLeftConstraint" destination="YAl-f6-SsH" id="pB3-3n-VxF"/>
                         <outlet property="bookshelfLeftDragView" destination="O1Y-Db-0EN" id="IYp-8e-St4"/>
+                        <outlet property="bookshelfOptionsButton" destination="dT1-d9-SEx" id="xI2-LF-7Yt"/>
                         <outlet property="bookshelfRightConstraint" destination="SiT-MD-RCf" id="kNS-8p-MJz"/>
                         <outlet property="bookshelfUpdateIndicator" destination="0n7-8b-iL7" id="K8h-t7-JrB"/>
                         <outlet property="canvasView" destination="iDb-Yw-oym" id="y4m-jE-WrP"/>
@@ -1368,7 +1384,6 @@
                         <outlet property="documentsCollectionView" destination="Soc-lK-uIi" id="lwd-l0-KxX"/>
                         <outlet property="drawingInsertionCanvas" destination="P5Z-5P-6jH" id="XXi-nc-F0V"/>
                         <outlet property="drawingsButton" destination="8pq-Hf-1xV" id="Tvc-eK-rQQ"/>
-                        <outlet property="filterDocumentsButton" destination="dT1-d9-SEx" id="xI2-LF-7Yt"/>
                         <outlet property="helpLinesButton" destination="X7t-cI-jkp" id="G8Z-xq-TYG"/>
                         <outlet property="manageDrawingsButton" destination="g83-cE-vKX" id="6Gn-jZ-s9L"/>
                         <outlet property="optionsButton" destination="hgu-d3-kvK" id="eHm-5U-EfK"/>
@@ -1395,7 +1410,7 @@
                     </connections>
                 </screenEdgePanGestureRecognizer>
             </objects>
-            <point key="canvasLocation" x="2004" y="1001"/>
+            <point key="canvasLocation" x="2003.90625" y="1000.7812499999999"/>
         </scene>
         <!--Note Options Table View Controller-->
         <scene sceneID="VRg-Rj-4AM">
@@ -1614,6 +1629,11 @@
                         <viewLayoutGuide key="safeArea" id="Yma-1T-HRR"/>
                     </view>
                     <navigationItem key="navigationItem" title="Note" id="loX-jj-3Tc">
+                        <barButtonItem key="leftBarButtonItem" title="Copy" id="9XN-MC-28S">
+                            <connections>
+                                <action selector="copyTapped:" destination="Zff-JM-hmJ" id="oPL-AT-Pj9"/>
+                            </connections>
+                        </barButtonItem>
                         <barButtonItem key="rightBarButtonItem" style="done" systemItem="done" id="WHS-fp-C2I">
                             <connections>
                                 <action selector="closeTapped:" destination="Zff-JM-hmJ" id="R5P-Bl-rWk"/>
@@ -1626,7 +1646,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="aJk-De-WiL" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="3403.90625" y="1633.59375"/>
+            <point key="canvasLocation" x="4169.53125" y="1633.59375"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="xdO-4n-2vR">
@@ -1683,6 +1703,167 @@
             </objects>
             <point key="canvasLocation" x="3491.40625" y="-850.1953125"/>
         </scene>
+        <!--Bookshelf Options Table View Controller-->
+        <scene sceneID="wyr-Sh-lOk">
+            <objects>
+                <tableViewController id="9N8-9s-Pfz" customClass="BookshelfOptionsTableViewController" customModule="Sketchnoting" customModuleProvider="target" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="b3a-gs-B4J">
+                        <rect key="frame" x="0.0" y="0.0" width="333" height="480"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <sections>
+                            <tableViewSection headerTitle="Filter" id="71E-eR-YaV">
+                                <cells>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" id="x9x-if-V83">
+                                        <rect key="frame" x="0.0" y="28" width="333" height="43.5"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="x9x-if-V83" id="62a-w5-wgs">
+                                            <rect key="frame" x="13" y="0.0" width="320" height="43.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <button opaque="NO" userInteractionEnabled="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="wz0-4W-FyW">
+                                                    <rect key="frame" x="16" y="6" width="30" height="30"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <state key="normal" title="All"/>
+                                                </button>
+                                                <imageView hidden="YES" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="checkmark.circle.fill" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="pkj-Ra-3Ct">
+                                                    <rect key="frame" x="280" y="8.5" width="24" height="24"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                </imageView>
+                                            </subviews>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" id="Zpd-d1-mIn">
+                                        <rect key="frame" x="0.0" y="71.5" width="333" height="43.5"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="Zpd-d1-mIn" id="gUg-Vl-IPn">
+                                            <rect key="frame" x="13" y="0.0" width="320" height="43.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <button opaque="NO" userInteractionEnabled="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="eLQ-Gt-7kX">
+                                                    <rect key="frame" x="20" y="7" width="50" height="30"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <state key="normal" title="TAGME"/>
+                                                </button>
+                                                <imageView hidden="YES" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="checkmark.circle.fill" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="Zmu-Zn-SHE">
+                                                    <rect key="frame" x="280" y="9.5" width="24" height="24"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                </imageView>
+                                            </subviews>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" id="rlC-Vo-oXA">
+                                        <rect key="frame" x="0.0" y="115" width="333" height="43.5"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="rlC-Vo-oXA" id="AwQ-g1-pOz">
+                                            <rect key="frame" x="13" y="0.0" width="320" height="43.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <button opaque="NO" userInteractionEnabled="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Q5v-L0-BL0">
+                                                    <rect key="frame" x="20" y="6" width="62" height="30"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <state key="normal" title="Spotlight"/>
+                                                </button>
+                                                <imageView hidden="YES" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="checkmark.circle.fill" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="geV-Zg-m54">
+                                                    <rect key="frame" x="280" y="8.5" width="24" height="24"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                </imageView>
+                                            </subviews>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" id="Rzd-Mj-VJO">
+                                        <rect key="frame" x="0.0" y="158.5" width="333" height="43.5"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="Rzd-Mj-VJO" id="1hm-96-L0u">
+                                            <rect key="frame" x="13" y="0.0" width="320" height="43.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <button opaque="NO" userInteractionEnabled="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="X8c-6H-rDy">
+                                                    <rect key="frame" x="20" y="6" width="63" height="30"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <state key="normal" title="BioPortal"/>
+                                                </button>
+                                                <imageView hidden="YES" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="checkmark.circle.fill" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="HnI-Hf-Fp5">
+                                                    <rect key="frame" x="280" y="8.5" width="24" height="24"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                </imageView>
+                                            </subviews>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" id="zMT-1g-cuZ">
+                                        <rect key="frame" x="0.0" y="202" width="333" height="43.5"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="zMT-1g-cuZ" id="ZgV-tf-1En">
+                                            <rect key="frame" x="13" y="0.0" width="320" height="43.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <button opaque="NO" userInteractionEnabled="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="WZc-pI-hHf">
+                                                    <rect key="frame" x="20" y="6" width="44" height="30"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <state key="normal" title="CHEBI"/>
+                                                </button>
+                                                <imageView hidden="YES" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="checkmark.circle.fill" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="m9p-t7-gco">
+                                                    <rect key="frame" x="280" y="8.5" width="24" height="24"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                </imageView>
+                                            </subviews>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                </cells>
+                            </tableViewSection>
+                            <tableViewSection headerTitle="Manage" id="T9t-bX-PGd">
+                                <cells>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" id="tDL-US-bx6">
+                                        <rect key="frame" x="0.0" y="301.5" width="333" height="43.5"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="tDL-US-bx6" id="KYN-L9-dUV">
+                                            <rect key="frame" x="13" y="0.0" width="320" height="43.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <button opaque="NO" userInteractionEnabled="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="8ey-w0-A9b">
+                                                    <rect key="frame" x="20" y="7" width="177" height="30"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <state key="normal" title="Reset Related Documents"/>
+                                                </button>
+                                            </subviews>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" id="h5H-9S-Dxh">
+                                        <rect key="frame" x="0.0" y="345" width="333" height="43.5"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="h5H-9S-Dxh" id="fPc-fi-lnu">
+                                            <rect key="frame" x="13" y="0.0" width="320" height="43.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <button opaque="NO" userInteractionEnabled="NO" contentMode="scaleToFill" fixedFrame="YES" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="dMP-tI-oTf">
+                                                    <rect key="frame" x="20" y="6" width="191" height="30"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <state key="normal" title="Manage Hidden Documents"/>
+                                                </button>
+                                            </subviews>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                </cells>
+                            </tableViewSection>
+                        </sections>
+                        <connections>
+                            <outlet property="dataSource" destination="9N8-9s-Pfz" id="aAS-ZC-BRZ"/>
+                            <outlet property="delegate" destination="9N8-9s-Pfz" id="3QL-Q4-rxg"/>
+                        </connections>
+                    </tableView>
+                    <navigationItem key="navigationItem" id="Zky-1q-9Nl"/>
+                    <connections>
+                        <outlet property="filterAllCheckmark" destination="pkj-Ra-3Ct" id="dd4-bP-AjO"/>
+                        <outlet property="filterBioPortalCheckmark" destination="HnI-Hf-Fp5" id="OzT-dl-8xi"/>
+                        <outlet property="filterCHEBICheckmark" destination="m9p-t7-gco" id="Gan-xD-mL2"/>
+                        <outlet property="filterSpotlightCheckmark" destination="geV-Zg-m54" id="JUQ-5t-wK7"/>
+                        <outlet property="filterTAGMECheckmark" destination="Zmu-Zn-SHE" id="msP-kr-rTm"/>
+                    </connections>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="iUS-h3-SUM" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2450" y="1704.4921875"/>
+        </scene>
         <!--Navigation Controller-->
         <scene sceneID="NFl-5D-b7N">
             <objects>
@@ -1699,13 +1880,14 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="QUW-cX-Me8" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2563" y="1738"/>
+            <point key="canvasLocation" x="3328.125" y="1737.890625"/>
         </scene>
     </scenes>
     <resources>
         <image name="arrow.left" catalog="system" width="64" height="48"/>
         <image name="arrow.up.arrow.down.circle" catalog="system" width="64" height="60"/>
         <image name="book.circle" catalog="system" width="64" height="60"/>
+        <image name="book.circle.fill" catalog="system" width="64" height="60"/>
         <image name="checkmark.circle.fill" catalog="system" width="64" height="60"/>
         <image name="doc.text.viewfinder" catalog="system" width="64" height="56"/>
         <image name="ellipsis.circle" catalog="system" width="64" height="60"/>
@@ -1719,6 +1901,7 @@
         <image name="pencil.slash" catalog="system" width="64" height="56"/>
         <image name="plus.circle.fill" catalog="system" width="64" height="60"/>
         <image name="scribble" catalog="system" width="64" height="54"/>
+        <image name="slider.horizontal.3" catalog="system" width="64" height="50"/>
         <image name="square" catalog="system" width="64" height="56"/>
         <image name="tag.fill" catalog="system" width="64" height="58"/>
         <image name="xmark.circle.fill" catalog="system" width="64" height="60"/>

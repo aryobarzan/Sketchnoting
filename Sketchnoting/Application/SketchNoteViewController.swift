@@ -17,7 +17,7 @@ import NotificationBannerSwift
 
 import PencilKit
 
-class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, UICollectionViewDataSource, UICollectionViewDelegate, DocumentVisitor, SketchnoteDelegate, PKCanvasViewDelegate, PKToolPickerObserver, UIScreenshotServiceDelegate, NoteOptionsDelegate {
+class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, UICollectionViewDataSource, UICollectionViewDelegate, DocumentVisitor, SketchnoteDelegate, PKCanvasViewDelegate, PKToolPickerObserver, UIScreenshotServiceDelegate, NoteOptionsDelegate, BookshelfOptionsDelegate {
     
     @IBOutlet var canvasView: PKCanvasView!
     
@@ -193,6 +193,12 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
         case "NoteOptions":
             if let destination = segue.destination as? NoteOptionsTableViewController {
                 destination.delegate = self
+            }
+            break
+        case "BookshelfOptions":
+            if let destination = segue.destination as? BookshelfOptionsTableViewController {
+                destination.delegate = self
+                destination.currentFilter = bookshelfFilter
             }
             break
         case "ViewNoteText":
@@ -567,13 +573,7 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
             }
             break
         case .ResetDocuments:
-            self.sketchnote.documents = [Document]()
-            self.clearConceptHighlights()
-            self.updateBookshelfState(state: .All)
-            self.bookshelfFilter = .All
-            self.filterDocumentsButton.setTitle("All", for: .normal)
-            self.updateBookshelf()
-            self.annotateText(text: self.sketchnote.getText())
+            self.resetDocuments()
             break
         case .ResetTextRecognition:
             self.sketchnote.clearTextData()
@@ -582,7 +582,6 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
             self.clearConceptHighlights()
             self.updateBookshelfState(state: .All)
             self.bookshelfFilter = .All
-            self.filterDocumentsButton.setTitle("All", for: .normal)
             self.processHandwritingRecognition()
             break
         case .ClearNote:
@@ -608,6 +607,15 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
             self.documentsCollectionView.reloadData()
             self.topicsBadgeHub.setCount(0)
         }
+    }
+    
+    private func resetDocuments() {
+        self.sketchnote.documents = [Document]()
+        self.clearConceptHighlights()
+        self.updateBookshelfState(state: .All)
+        self.bookshelfFilter = .All
+        self.updateBookshelf()
+        self.annotateText(text: self.sketchnote.getText())
     }
     
     private func undo() {
@@ -928,13 +936,7 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
         case Topic
     }
     private var bookshelfState = BookshelfState.All
-    private enum BookshelfFilter {
-        case All
-        case TAGME
-        case Spotlight
-        case BioPortal
-        case CHEBI
-    }
+    
     private var bookshelfFilter = BookshelfFilter.All
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -1309,62 +1311,35 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
     }
     
     // MARK: Collection view document filtering
-    @IBOutlet weak var filterDocumentsButton: UIButton!
-    @IBAction func filterDocumentsButtonTapped(_ sender: UIButton) {
-        let popMenu = PopMenuViewController(sourceView: sender, actions: [PopMenuAction](), appearance: nil)
-        popMenu.appearance.popMenuBackgroundStyle = .blurred(.dark)
-        
-        var allImage: UIImage? = nil
-        var spotlightImage: UIImage? = nil
-        var bioportalImage: UIImage? = nil
-        var chebiImage: UIImage? = nil
-        var tagmeImage: UIImage? = nil
-        switch self.bookshelfFilter {
-        case .All:
-            allImage = #imageLiteral(resourceName: "CheckmarkIcon")
-        case .TAGME:
-            tagmeImage = #imageLiteral(resourceName: "CheckmarkIcon")
-        case .Spotlight:
-            spotlightImage = #imageLiteral(resourceName: "CheckmarkIcon")
-        case .BioPortal:
-            bioportalImage = #imageLiteral(resourceName: "CheckmarkIcon")
-        case .CHEBI:
-            chebiImage = #imageLiteral(resourceName: "CheckmarkIcon")
-        }
-        
-        let allAction = PopMenuDefaultAction(title: "All", image: allImage, color: #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1), didSelect: { action in
+    @IBOutlet weak var bookshelfOptionsButton: UIButton!
+    
+    func bookshelfOptionSelected(option: BookshelfOption) {
+        switch option {
+        case .FilterAll:
             self.bookshelfFilter = .All
             self.updateBookshelf()
-            self.filterDocumentsButton.setTitle("All", for: .normal)
-            
-        })
-        let spotlightAction = PopMenuDefaultAction(title: "Spotlight", image: spotlightImage, color: #colorLiteral(red: 0.1764705926, green: 0.01176470611, blue: 0.5607843399, alpha: 1), didSelect: { action in
-            self.bookshelfFilter = .Spotlight
-            self.updateBookshelf()
-            self.filterDocumentsButton.setTitle("Spotlight", for: .normal)
-        })
-        let bioportalAction = PopMenuDefaultAction(title: "BioPortal", image: bioportalImage, color: #colorLiteral(red: 0.3411764801, green: 0.6235294342, blue: 0.1686274558, alpha: 1), didSelect: { action in
-            self.bookshelfFilter = .BioPortal
-            self.updateBookshelf()
-            self.filterDocumentsButton.setTitle("BioPortal", for: .normal)
-        })
-        let chebiAction = PopMenuDefaultAction(title: "CHEBI", image: chebiImage, color: #colorLiteral(red: 0.9529411793, green: 0.6862745285, blue: 0.1333333403, alpha: 1), didSelect: { action in
-            self.bookshelfFilter = .CHEBI
-            self.updateBookshelf()
-            self.filterDocumentsButton.setTitle("CHEBI", for: .normal)
-        })
-        let tagmeAction = PopMenuDefaultAction(title: "TAGME", image: tagmeImage, color: #colorLiteral(red: 0.1764705926, green: 0.4980392158, blue: 0.7568627596, alpha: 1), didSelect: { action in
+            break
+        case .FilterTAGME:
             self.bookshelfFilter = .TAGME
             self.updateBookshelf()
-            self.filterDocumentsButton.setTitle("TAGME", for: .normal)
-        })
-        
-        popMenu.addAction(allAction)
-        popMenu.addAction(tagmeAction)
-        popMenu.addAction(spotlightAction)
-        popMenu.addAction(bioportalAction)
-        popMenu.addAction(chebiAction)
-        self.present(popMenu, animated: true, completion: nil)
+            break
+        case .FilterSpotlight:
+            self.bookshelfFilter = .Spotlight
+            self.updateBookshelf()
+            break
+        case .FilterBioPortal:
+            self.bookshelfFilter = .BioPortal
+            self.updateBookshelf()
+            break
+        case .FilterCHEBI:
+            self.bookshelfFilter = .CHEBI
+            self.updateBookshelf()
+            break
+        case .ResetDocuments:
+            self.resetDocuments()
+            break
+       
+        }
     }
     
     //MARK: Drawing insertion mode
@@ -1587,4 +1562,12 @@ extension UICollectionView{
         newLayout.sectionInsetReference = oldLayout.sectionInsetReference
         collectionViewLayout = newLayout
     }
+}
+
+public enum BookshelfFilter {
+    case All
+    case TAGME
+    case Spotlight
+    case BioPortal
+    case CHEBI
 }

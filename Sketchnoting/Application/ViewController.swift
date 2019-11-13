@@ -337,10 +337,10 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         var newestFirstImage: UIImage? = nil
         var oldestFirstImage: UIImage? = nil
         if SettingsManager.noteSortingByNewest() {
-            newestFirstImage = #imageLiteral(resourceName: "CheckmarkIcon")
+            newestFirstImage = UIImage(systemName: "checkmark.circle.fill")
         }
         else {
-            oldestFirstImage = #imageLiteral(resourceName: "CheckmarkIcon")
+            oldestFirstImage = UIImage(systemName: "checkmark.circle.fill")
         }
         let newestFirstAction = PopMenuDefaultAction(title: "Newest First", image: newestFirstImage,  didSelect: { action in
             UserDefaults.settings.set(true, forKey: SettingsKeys.NoteSortingByNewest.rawValue)
