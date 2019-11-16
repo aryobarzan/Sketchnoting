@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="15701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15703"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" id="gTV-IL-0wX" customClass="SimilarNoteCollectionViewCell" customModule="Sketchnoting" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="334" height="208"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
+                <rect key="frame" x="0.0" y="0.0" width="334" height="208"/>
+                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                <subviews>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Qm4-yi-XYi">
+                        <rect key="frame" x="0.0" y="0.0" width="334" height="208"/>
+                        <subviews>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="jt0-ib-6qp">
+                                <rect key="frame" x="8" y="7" width="90" height="110"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="110" id="SeP-cW-6Q2"/>
+                                    <constraint firstAttribute="width" constant="90" id="rdl-ND-vaT"/>
+                                </constraints>
+                            </imageView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Note Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="eax-EF-gpl">
+                                <rect key="frame" x="106" y="7" width="220" height="27"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="27" id="Z7r-8b-zw5"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" style="UICTFontTextStyleTitle2"/>
+                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" text="Note text..." textAlignment="natural" selectable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Dzg-Ac-oUf">
+                                <rect key="frame" x="100" y="36" width="220" height="81"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" text="Documents: ..." textAlignment="natural" selectable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="oMi-8X-zgd">
+                                <rect key="frame" x="4" y="125" width="326" height="55"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="0.0" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6WZ-N0-p1j">
+                                <rect key="frame" x="8" y="184" width="175" height="16"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="175" id="P4L-Au-28K"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="italicSystem" pointSize="13"/>
+                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                        </subviews>
+                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="jt0-ib-6qp" firstAttribute="top" secondItem="Qm4-yi-XYi" secondAttribute="top" constant="7" id="2or-IG-Hks"/>
+                            <constraint firstItem="6WZ-N0-p1j" firstAttribute="top" secondItem="oMi-8X-zgd" secondAttribute="bottom" constant="4" id="367-vw-Kle"/>
+                            <constraint firstItem="Dzg-Ac-oUf" firstAttribute="top" secondItem="eax-EF-gpl" secondAttribute="bottom" constant="2" id="53q-Lo-NIP"/>
+                            <constraint firstItem="oMi-8X-zgd" firstAttribute="top" secondItem="Dzg-Ac-oUf" secondAttribute="bottom" constant="8" id="88y-4w-b4i"/>
+                            <constraint firstItem="oMi-8X-zgd" firstAttribute="leading" secondItem="Qm4-yi-XYi" secondAttribute="leading" constant="4" id="E5Y-R3-sLU"/>
+                            <constraint firstItem="eax-EF-gpl" firstAttribute="top" secondItem="Qm4-yi-XYi" secondAttribute="top" constant="7" id="IpO-Ah-APo"/>
+                            <constraint firstAttribute="height" constant="208" id="JEo-yA-RR1"/>
+                            <constraint firstAttribute="trailing" secondItem="Dzg-Ac-oUf" secondAttribute="trailing" constant="14" id="R7M-dh-7hf"/>
+                            <constraint firstItem="oMi-8X-zgd" firstAttribute="top" secondItem="jt0-ib-6qp" secondAttribute="bottom" constant="8" id="Tk6-f8-5Hi"/>
+                            <constraint firstItem="Dzg-Ac-oUf" firstAttribute="leading" secondItem="jt0-ib-6qp" secondAttribute="trailing" constant="2" id="XLv-jJ-FHF"/>
+                            <constraint firstAttribute="trailing" secondItem="eax-EF-gpl" secondAttribute="trailing" constant="8" id="ZcL-aR-zBX"/>
+                            <constraint firstItem="jt0-ib-6qp" firstAttribute="leading" secondItem="Qm4-yi-XYi" secondAttribute="leading" constant="8" id="aHD-UA-5Xu"/>
+                            <constraint firstItem="6WZ-N0-p1j" firstAttribute="leading" secondItem="Qm4-yi-XYi" secondAttribute="leading" constant="8" id="agF-tk-EeF"/>
+                            <constraint firstAttribute="width" constant="334" id="bjQ-W1-djV"/>
+                            <constraint firstItem="eax-EF-gpl" firstAttribute="leading" secondItem="jt0-ib-6qp" secondAttribute="trailing" constant="8" id="iSh-hO-uaP"/>
+                            <constraint firstAttribute="trailing" secondItem="oMi-8X-zgd" secondAttribute="trailing" constant="4" id="kRW-kh-Z08"/>
+                            <constraint firstAttribute="bottom" secondItem="6WZ-N0-p1j" secondAttribute="bottom" constant="8" id="p87-M5-xVr"/>
+                        </constraints>
+                    </view>
+                </subviews>
+            </view>
+            <constraints>
+                <constraint firstAttribute="trailing" secondItem="Qm4-yi-XYi" secondAttribute="trailing" id="FK4-Xp-3jY"/>
+                <constraint firstItem="Qm4-yi-XYi" firstAttribute="top" secondItem="gTV-IL-0wX" secondAttribute="top" id="TtA-kt-ILT"/>
+                <constraint firstItem="Qm4-yi-XYi" firstAttribute="leading" secondItem="gTV-IL-0wX" secondAttribute="leading" id="V1r-e9-17a"/>
+                <constraint firstAttribute="bottom" secondItem="Qm4-yi-XYi" secondAttribute="bottom" id="fPX-8S-eOw"/>
+            </constraints>
+            <viewLayoutGuide key="safeArea" id="ZTg-uK-7eu"/>
+            <size key="customSize" width="334" height="208"/>
+            <connections>
+                <outlet property="documentsTextView" destination="oMi-8X-zgd" id="Pus-Kq-Xes"/>
+                <outlet property="noteTextView" destination="Dzg-Ac-oUf" id="Omo-BW-nCy"/>
+                <outlet property="previewImageView" destination="jt0-ib-6qp" id="2pP-XZ-CaJ"/>
+                <outlet property="similarityRatingLabel" destination="6WZ-N0-p1j" id="eeM-Mi-l2h"/>
+                <outlet property="titleLabel" destination="eax-EF-gpl" id="iFt-KN-NhH"/>
+            </connections>
+            <point key="canvasLocation" x="337.68115942028987" y="181.47321428571428"/>
+        </collectionViewCell>
+    </objects>
+</document>

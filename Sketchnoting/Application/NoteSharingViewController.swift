@@ -61,7 +61,6 @@ class NoteSharingViewController: UIViewController, MCSessionDelegate {
     @IBAction func acceptTapped(_ sender: UIButton) {
         log.info("Accepted shared note")
         if selectedSketchnote != nil {
-            selectedSketchnote!.clearTextData()
             if pendingSharedNotes.count > 0 {
                 pendingSharedNotes.remove(at: currentIndex)
             }
@@ -170,7 +169,7 @@ class NoteSharingViewController: UIViewController, MCSessionDelegate {
         if pendingSharedNotes.count > 0 && currentIndex < pendingSharedNotes.count {
             let note = pendingSharedNotes[currentIndex]
             
-            noteImageView.image = note.image
+            noteImageView.image = note.getPreviewImage()
             sharedNoteLabel.text = "\(note.sharedByDevice ?? "Unknown") has shared a note with you."
             
             acceptNoteButton.isEnabled = true

@@ -53,18 +53,14 @@ class NoteLoader {
     
     public static func decodeNoteFromData(data: Data) -> Sketchnote? {
         if let decodedDataArray = try? NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(data) as? [Data] {
-            if decodedDataArray.count >= 3 {
+            if decodedDataArray.count >= 2 {
                 let jsonDecoder = JSONDecoder()
                 if let sketchnote = try? jsonDecoder.decode(Sketchnote.self, from: decodedDataArray[0]) {
-                    let drawingDecoder = PropertyListDecoder()
-                    if let drawingDataDecoded = try? drawingDecoder.decode(PKDrawing.self, from: decodedDataArray[1]) {
-                        sketchnote.canvasData = drawingDataDecoded
-                        if let textDataDecoded = ((try? NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(decodedDataArray[2]) as?
-                            [TextData]) as [TextData]??) {
-                            sketchnote.textDataArray = textDataDecoded ?? [TextData]()
+                    if let pagesDecoded = ((try? NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(decodedDataArray[1]) as?
+                            [NotePage]) as [NotePage]??) {
+                            sketchnote.pages = pagesDecoded ?? [NotePage]()
                             return sketchnote
                         }
-                    }
                 }
             }
         }

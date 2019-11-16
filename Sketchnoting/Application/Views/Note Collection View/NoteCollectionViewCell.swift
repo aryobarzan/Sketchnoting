@@ -29,7 +29,7 @@ class NoteCollectionViewCell: UICollectionViewCell {
         self.layer.cornerRadius = 4
         
         sketchnote = note
-        imageView.image = sketchnote.image
+        imageView.image = sketchnote.getPreviewImage()
         
         titleLabel.text = note.getTitle()
     }

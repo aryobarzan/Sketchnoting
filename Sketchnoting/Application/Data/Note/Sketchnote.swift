@@ -25,13 +25,10 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable, DocumentDelegate
     private var title: String!
     var creationDate: Date!
     var updateDate: Date?
-    var image: UIImage?
+    var pages: [NotePage]!
     var documents: [Document]!
-    var drawings: [String]? // recognized drawings' labels
-    var drawingViewRects: [CGRect]?
-    var textDataArray: [TextData]!
     var tags: [Tag]!
-    var canvasData: PKDrawing!
+    var activePageIndex = 0
     
     var sharedByDevice: String?
     
@@ -40,26 +37,23 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable, DocumentDelegate
         case title
         case creationDate
         case updateDate
-        case image
         case relatedDocuments = "relatedDocuments"
-        case drawings = "drawings"
-        case drawingViewRects = "drawingViewRects"
         case tags = "tags"
+        case activePageIndex
     }
     
     //MARK: Initialization
     
-    init?(image: UIImage?, relatedDocuments: [Document]?, drawings: [String]?) {
+    init?(relatedDocuments: [Document]?) {
         self.id = UUID().uuidString
         self.title = "Untitled"
         self.creationDate = Date.init(timeIntervalSinceNow: 0)
         self.documents = relatedDocuments ?? [Document]()
-        self.drawings = drawings ?? [String]()
-        self.image = image
-        self.textDataArray = [TextData]()
+        self.pages = [NotePage]()
         self.tags = [Tag]()
         
-        self.canvasData = PKDrawing()
+        let firstPage = NotePage()
+        self.pages.append(firstPage)
     }
     
     //MARK: Persistence
@@ -73,15 +67,8 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable, DocumentDelegate
             try container.encode(documents, forKey: .relatedDocuments)
         } catch {
         }
-                
-        try container.encode(drawings, forKey: .drawings)
-        try container.encode(drawingViewRects, forKey: .drawingViewRects)
-        if image != nil {
-            let imageData: Data = image!.pngData()!
-            let strBase64 = imageData.base64EncodedString(options: .lineLength64Characters)
-            try container.encode(strBase64, forKey: .image)
-        }
         try container.encode(tags, forKey: .tags)
+        try container.encode(activePageIndex, forKey: .activePageIndex)
     }
     
     required init(from decoder: Decoder) throws {
@@ -132,20 +119,11 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable, DocumentDelegate
         for doc in documents {
             doc.delegate = self
         }
-        
-        drawings = try? container.decode([String].self, forKey: .drawings)
-        drawingViewRects = try? container.decode([CGRect].self, forKey: .drawingViewRects)
-        do {
-            let strBase64: String = try container.decode(String.self, forKey: .image)
-            let dataDecoded: Data = Data(base64Encoded: strBase64, options: .ignoreUnknownCharacters)!
-            image = UIImage(data: dataDecoded)
-        } catch {
-        }
-        
         tags = try? container.decode([Tag].self, forKey: .tags)
         if tags == nil {
             tags = [Tag]()
         }
+        activePageIndex = try container.decode(Int.self, forKey: .activePageIndex)
         log.info("Sketchnote " + self.id + " decoded.")
     }
     
@@ -162,36 +140,9 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable, DocumentDelegate
     private let serializationQueue = DispatchQueue(label: "SerializationQueue", qos: .background)
     public func save() {
         serializationQueue.async {
-            var data = [Data]()
-            
-            // Encode metadata
-            let metaDataEncoder = JSONEncoder()
-            if let encodedMetaData = try? metaDataEncoder.encode(self) {
-                data.append(encodedMetaData)
-                log.info("Note \(self.id ?? "") meta data encoded.")
-            }
-            else {
-                log.error("Encoding failed for note " + self.id + ".")
-            }
-            
-            // Encode canvas data, i.e. the strokes
-            let canvasDataEncoder = PropertyListEncoder()
-            if let encodedCanvasData = try? canvasDataEncoder.encode(self.canvasData) {
-                data.append(encodedCanvasData)
-            }
-            else {
-                log.error("Encoding failed for note canvas data " + self.id + ".")
-            }
-            
-            // Encode text recognition data
-            if let encodedTextDataArray = try? NSKeyedArchiver.archivedData(withRootObject: self.textDataArray as Any, requiringSecureCoding: false) {
-                data.append(encodedTextDataArray)
-                log.info("Note " + self.id + " text data array encoded.")
-            }
-            
-            let dataEncoded = try? NSKeyedArchiver.archivedData(withRootObject: data, requiringSecureCoding: false)
+            let encodedData = self.packageNoteAsData()
             let sketchnotesDirectory = NoteLoader.getSketchnotesDirectory()
-            try? dataEncoded!.write(to: sketchnotesDirectory.appendingPathComponent(self.id + ".sketchnote"))
+            try? encodedData!.write(to: sketchnotesDirectory.appendingPathComponent(self.id + ".sketchnote"))
         }
     }
     
@@ -206,57 +157,34 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable, DocumentDelegate
         else {
             log.error("Encoding failed for note " + self.id + ".")
         }
-        // Encode canvas data, i.e. the strokes
-        let canvasDataEncoder = PropertyListEncoder()
-        if let encodedCanvasData = try? canvasDataEncoder.encode(self.canvasData) {
-            data.append(encodedCanvasData)
-        }
-        else {
-            log.error("Encoding failed for note canvas data " + self.id + ".")
-        }
-        // Encode text recognition data
-        if let encodedTextDataArray = try? NSKeyedArchiver.archivedData(withRootObject: self.textDataArray as Any, requiringSecureCoding: false) {
-            data.append(encodedTextDataArray)
-            log.info("Note " + self.id + " text data array encoded.")
+        // Encode note pages
+        if let encodedPages = try? NSKeyedArchiver.archivedData(withRootObject: self.pages as Any, requiringSecureCoding: false) {
+            data.append(encodedPages)
+            log.info("Note " + self.id + " pages encoded.")
         }
         let dataEncoded = try? NSKeyedArchiver.archivedData(withRootObject: data, requiringSecureCoding: false)
         return dataEncoded
     }
     
     public func duplicate() -> Sketchnote {
-        let image = self.image
         let documents = self.documents
-        let drawings = self.drawings
-        let duplicate = Sketchnote(image: image, relatedDocuments: documents, drawings: drawings)!
+        let duplicate = Sketchnote(relatedDocuments: documents)!
         duplicate.setTitle(title: self.getTitle() + " #2")
-        duplicate.canvasData = self.canvasData
-        duplicate.textDataArray = self.textDataArray
         duplicate.tags = self.tags
         duplicate.save()
         return duplicate
     }
     
     public func delete() {
-        clearTextData()
-        UserDefaults.sketchnotes.removeObject(forKey: id)
-    }
-    
-    public func clearTextData() {
-        do {
-            let DocumentsDirectory = FileManager().urls(for: .documentDirectory, in: .userDomainMask).first!
-            let ArchiveURLPathArray = DocumentsDirectory.appendingPathComponent("NoteTextDataArray-" + id)
-            try FileManager().removeItem(atPath: ArchiveURLPathArray.absoluteString)
-        } catch {
+        let noteURL = NoteLoader.getSketchnotesDirectory().appendingPathComponent(self.id + ".sketchnote")
+        if FileManager.default.fileExists(atPath: noteURL.path) {
+            try? FileManager.default.removeItem(atPath: noteURL.path)
         }
-        self.textDataArray = [TextData]()
     }
     
     //MARK: updating data
     public func clear() {
         documents = [Document]()
-        drawings = [String]()
-        canvasData = PKDrawing()
-        clearTextData()
     }
     
     func addDocument(document: Document) {
@@ -336,47 +264,7 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable, DocumentDelegate
         self.delegate?.sketchnoteDocumentHasChanged(sketchnote: self, document: document)
     }
 
-    // This function only stores a recognized drawing's label for a note. The drawing itself (i.e. an image) is not stored.
-    // Only the label is necessary, as it is used for search results.
-    func addDrawing(drawing: String) {
-        var exists = false
-        if drawings == nil {
-            drawings = [String]()
-        }
-        for d in drawings! {
-            if d == drawing.lowercased() {
-                exists = true
-                break
-            }
-        }
-        if !exists {
-            drawings!.append(drawing.lowercased())
-        }
-    }
     
-    func addDrawingViewRect(rect: CGRect) {
-        var exists = false
-        if drawingViewRects == nil {
-            drawingViewRects = [CGRect]()
-        }
-        for r in drawingViewRects! {
-            if r == rect {
-                exists = true
-                break
-            }
-        }
-        if !exists {
-            drawingViewRects!.append(rect)
-        }
-    }
-    
-    func removeDrawingViewRect(rect: CGRect) {
-        if drawingViewRects != nil {
-            if drawingViewRects!.contains(rect) {
-                drawingViewRects!.removeAll{$0 == rect}
-            }
-        }
-    }
     
     func setUpdateDate() {
         self.updateDate = Date.init(timeIntervalSinceNow: 0)
@@ -397,17 +285,8 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable, DocumentDelegate
     //MARK: recognized text
     public func getText(raw: Bool = false) -> String {
         var text: String = ""
-        if textDataArray != nil {
-            if !raw {
-                for textData in textDataArray {
-                    text = text + " " + textData.spellchecked
-                }
-            }
-            else {
-                for textData in textDataArray {
-                    text = text + " " + textData.original
-                }
-            }
+        for page in pages {
+            text = text + page.getText()
         }
         return text
     }
@@ -421,10 +300,20 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable, DocumentDelegate
         for filter in filters {
             switch filter.type {
             case .All:
-                if (self.title.lowercased().contains(filter.term) || self.getText().lowercased().contains(filter.term)) || (self.drawings?.contains(filter.term) ?? false) {
+                var isInText = false
+                if (self.title.lowercased().contains(filter.term) || self.getText().lowercased().contains(filter.term)) {
                     matches += 1
+                    isInText = true
                 }
-                else {
+                var isInDrawings = false
+                    for page in pages {
+                                       if page.drawingLabels?.contains(filter.term) ?? false {
+                                           matches += 1
+                                        isInDrawings = true
+                                           break
+                                       }
+                                   }
+                if !isInText && !isInDrawings {
                     currentSearchFilter = filter
                     if let documents = self.documents {
                         for doc in documents {
@@ -442,8 +331,11 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable, DocumentDelegate
                 }
                 break
             case .Drawing:
-                if self.drawings?.contains(filter.term) ?? false {
-                    matches += 1
+                for page in pages {
+                    if page.drawingLabels?.contains(filter.term) ?? false {
+                        matches += 1
+                        break
+                    }
                 }
                 break
             case .Document:
@@ -524,74 +416,86 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable, DocumentDelegate
     
     // MARK: PDF Generation
     
-    func createPDFLegacy() -> Data? {
-        if let image = self.image {
-            let pdfMetaData = [
-                kCGPDFContextCreator: "Sketchnoting iOS App",
-                kCGPDFContextAuthor: UIDevice.current.name
-            ]
-            let format = UIGraphicsPDFRendererFormat()
-            format.documentInfo = pdfMetaData as [String: Any]
-            
-            
-            let pageWidth = canvasData.bounds.maxX
-            let pageHeight = canvasData.bounds.maxY + 100
-            let pageRect = CGRect(x: 0, y: 0, width: pageWidth, height: pageHeight)
-            
-            let renderer = UIGraphicsPDFRenderer(bounds: pageRect, format: format)
-            
-            if image.size.height > pageHeight {
-                let data = renderer.pdfData { (context) in
-                    var h: CGFloat = 0
-                    var h2 = pageHeight
-                    while true {
-                        if let cropped = image.cropToRect(rect: CGRect(x: CGFloat(0), y: h, width: image.size.width, height: h2)) {
-                            context.beginPage()
-                            cropped.draw(at: CGPoint(x: 0, y: 0))
-                            h = h2
-                            h2 = h2 + h2
-                        }
-                        else {
-                            break
-                        }
+    func createPDF() -> Data? {
+        if let pages = pages {
+            if pages.count > 0 {
+                let pdfWidth = UIScreen.main.bounds.width
+                let pdfHeight = pages[0].canvasDrawing.bounds.maxY + 100
+                
+                let bounds = CGRect(x: 0, y: 0, width: pdfWidth, height: pdfHeight)
+                let mutableData = NSMutableData()
+                UIGraphicsBeginPDFContextToData(mutableData, bounds, nil)
+                for page in pages {
+                    UIGraphicsBeginPDFPage()
                         
+                    var yOrigin: CGFloat = 0
+                    let imageHeight: CGFloat = 1024
+                    while yOrigin < bounds.maxY {
+                        let imgBounds = CGRect(x: 0, y: yOrigin, width: UIScreen.main.bounds.width, height: min(imageHeight, bounds.maxY - yOrigin))
+                        let img = page.canvasDrawing.image(from: imgBounds, scale: 2)
+                        img.draw(in: imgBounds)
+                        yOrigin += imageHeight
                     }
                 }
-                return data
+                UIGraphicsEndPDFContext()
+                return mutableData as Data
             }
-            let data = renderer.pdfData { (context) in
-                context.beginPage()
-                image.draw(at: CGPoint(x: 0, y: 0))
-            }
-            return data
+            return nil
         }
         return nil
     }
     
-    func createPDF() -> Data? {
-        let drawing = canvasData!
-        
-        // Convert to PDF coordinates, with (0, 0) at the bottom left hand corner,
-        // making the height a bit bigger than the current drawing.
-        let pdfWidth = UIScreen.main.bounds.width
-        let pdfHeight = drawing.bounds.maxY + 100
-        
-        let bounds = CGRect(x: 0, y: 0, width: pdfWidth, height: pdfHeight)
-        let mutableData = NSMutableData()
-        UIGraphicsBeginPDFContextToData(mutableData, bounds, nil)
-        UIGraphicsBeginPDFPage()
-            
-        var yOrigin: CGFloat = 0
-        let imageHeight: CGFloat = 1024
-        while yOrigin < bounds.maxY {
-            let imgBounds = CGRect(x: 0, y: yOrigin, width: UIScreen.main.bounds.width, height: min(imageHeight, bounds.maxY - yOrigin))
-            let img = drawing.image(from: imgBounds, scale: 2)
-            img.draw(in: imgBounds)
-            yOrigin += imageHeight
+    // MARK: Page helper functions
+    
+    public func getCurrentPage() -> NotePage {
+        if activePageIndex >= pages.count {
+            activePageIndex = 0
         }
-            
-        UIGraphicsEndPDFContext()
-        return mutableData as Data
+        if pages.count == 0 {
+            pages.append(NotePage())
+        }
+        return pages[activePageIndex]
+    }
+    
+    public func getPreviewImage() -> UIImage? {
+        if let pages = pages {
+            if pages.count > 0 {
+                return pages[0].image
+            }
+            return nil
+        }
+        return nil
+    }
+    
+    public func hasNextPage() -> Bool {
+        return activePageIndex < pages.count - 1
+    }
+    
+    public func hasPreviousPage() -> Bool {
+        return activePageIndex > 0
+    }
+    
+    public func nextPage() {
+        if hasNextPage() {
+            activePageIndex += 1
+        }
+    }
+    
+    public func previousPage() {
+        if hasPreviousPage() {
+            activePageIndex -= 1
+        }
+    }
+    
+    public func deletePage(index: Int) {
+        if pages.count > 1 {
+            if index >= 0 && index < pages.count {
+                pages.remove(at: index)
+                if activePageIndex == index {
+                    activePageIndex -= 1
+                }
+            }
+        }
     }
     
     // MARK: Comparable, equatable
@@ -605,5 +509,22 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable, DocumentDelegate
     
     static func < (lhs: Sketchnote, rhs: Sketchnote) -> Bool {
         return lhs.creationDate < rhs.creationDate
+    }
+    
+    // MARK: Compare similarity of content
+    
+    public func similarTo(note: Sketchnote) -> Double {
+        var similarity = 0.0
+        if self.getTitle().lowercased() == note.getTitle().lowercased() {
+            similarity += 0.2
+        }
+        for document in documents {
+            for documentOther in note.documents {
+                if document == documentOther {
+                    similarity += 0.05
+                }
+            }
+        }
+        return similarity
     }
 }

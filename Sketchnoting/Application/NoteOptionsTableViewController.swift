@@ -11,10 +11,14 @@ import UIKit
 class NoteOptionsTableViewController: UITableViewController {
     
     var delegate: NoteOptionsDelegate?
+    var canDeletePage = false
 
+    
+    @IBOutlet var deletePageButton: UIButton!
     override func viewDidLoad() {
         super.viewDidLoad()
         self.clearsSelectionOnViewWillAppear = false
+        deletePageButton.isEnabled = canDeletePage
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -34,19 +38,17 @@ class NoteOptionsTableViewController: UITableViewController {
             else if indexPath.row == 2 {
                     option = .CopyText
             }
+            else if indexPath.row == 3 {
+                        option = .Share
+            }
+            else if indexPath.row == 4 {
+                    option = .ClearPage
+            }
+            else if indexPath.row == 5 {
+                    option = .DeletePage
+            }
         }
         else if indexPath.section == 2 {
-            if indexPath.row == 0 {
-                option = .ShareAsImage
-            }
-            else if indexPath.row == 1 {
-                option = .ShareAsPDF
-            }
-            else if indexPath.row == 2 {
-                option = .ShareAsFile
-            }
-        }
-        else if indexPath.section == 3 {
             if indexPath.row == 0 {
                 option = .ResetDocuments
             }
@@ -54,7 +56,7 @@ class NoteOptionsTableViewController: UITableViewController {
                 option = .ResetTextRecognition
             }
             else if indexPath.row == 2 {
-                option = .ClearNote
+                option = .DeleteNote
             }
         }
         dismiss(animated: true, completion: nil)
@@ -71,10 +73,10 @@ enum NoteOption {
     case SetTitle
     case ViewText
     case CopyText
-    case ShareAsImage
-    case ShareAsPDF
-    case ShareAsFile
+    case ClearPage
+    case DeletePage
+    case Share
     case ResetDocuments
     case ResetTextRecognition
-    case ClearNote
+    case DeleteNote
 }

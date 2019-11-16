@@ -229,17 +229,30 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         case "NoteSharing":
             self.navigationController?.setNavigationBarHidden(false, animated: false)
             break
+        case "ShareNote":
+            if let destination = segue.destination as? UINavigationController {
+                if let destinationViewController = destination.topViewController as? ShareNoteViewController {
+                    destinationViewController.note = shareNoteObject
+                }
+            }
+            break
         default:
             print("Not creating or editing sketchnote.")
         }
     }
     
-    // This function is called when the user closes a note they were editing and the user returns to the homepage.
-    // Upon return, the edited note is saved to disk.
     @IBAction func unwindToHome(sender: UIStoryboardSegue) {
         if sender.source is SketchNoteViewController {
+            let vc = sender.source as! SketchNoteViewController
+            if vc.isDeletingNote {
+                self.removeNoteFromCollectionView(note: vc.sketchnote)
+            }
             self.updateDisplayedNotes()
         }
+    }
+    
+    private func removeNoteFromCollectionView(note: Sketchnote) {
+        
     }
     
     // MARK: Note display management
@@ -322,7 +335,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
 
     @IBAction func newNoteButtonTapped(_ sender: UIButton) {
         clearSearch()
-        let newNote = Sketchnote(image: nil, relatedDocuments: nil, drawings: nil)!
+        let newNote = Sketchnote(relatedDocuments: nil)!
         newNote.save()
         self.notes.append(newNote)
         
@@ -364,6 +377,8 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             return self.makeNoteContextMenu(note: self.items[indexPath.row], point: point)
         })
     }
+    
+    var shareNoteObject : Sketchnote?
     private func makeNoteContextMenu(note: Sketchnote, point: CGPoint) -> UIMenu {
         // Create a UIAction for sharing
         let renameAction = UIAction(title: "Rename", image: UIImage(systemName: "text.cursor")) { action in
@@ -382,16 +397,10 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             banner.show()
         }
         
-        let shareAsImageAction = UIAction(title: "Image", image: UIImage(systemName: "photo")) { action in
-            self.shareNote(note: note, asType: .Image, sender: UIView(frame: CGRect(x: point.x, y: point.y, width: point.x, height: point.y)))
+        let shareAction = UIAction(title: "Share...", image: UIImage(systemName: "square.and.arrow.up")) { action in
+            self.shareNoteObject = note
+            self.shareNote(note: note, sender: UIView(frame: CGRect(x: point.x, y: point.y, width: point.x, height: point.y)))
         }
-        let shareAsPDFAction = UIAction(title: "PDF", image: UIImage(systemName: "doc.plaintext")) { action in
-            self.shareNote(note: note, asType: .PDF, sender: UIView(frame: CGRect(x: point.x, y: point.y, width: point.x, height: point.y)))
-        }
-        let shareAsFileAction = UIAction(title: "File", image: UIImage(systemName: "doc")) { action in
-            self.shareNote(note: note, asType: .File, sender: UIView(frame: CGRect(x: point.x, y: point.y, width: point.x, height: point.y)))
-        }
-        let shareAction = UIMenu(title: "Share as...", children: [shareAsImageAction, shareAsPDFAction, shareAsFileAction])
         
         let sendAction = UIAction(title: "Send", image: UIImage(systemName: "paperplane")) { action in
             self.sendNote(note: note)
@@ -827,47 +836,8 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
            self.showTagsPanel()
        }
 
-    private enum ShareNoteType: String {
-        case Image
-        case PDF
-        case File
-    }
-    private func shareNote(note: Sketchnote, asType: ShareNoteType, sender: UIView) {
-        switch asType {
-        case .Image:
-             if note.image != nil {
-                if let jpegData = note.image!.jpegData(compressionQuality: 1) {
-                    let activityController = UIActivityViewController(activityItems: [jpegData], applicationActivities: nil)
-                        self.present(activityController, animated: true, completion: nil)
-                        if let popOver = activityController.popoverPresentationController {
-                            popOver.sourceView = sender
-                        }
-                    }
-                }
-            break
-        case .PDF:
-            if note.image != nil {
-                if let pdf = note.createPDF() {
-                    let activityController = UIActivityViewController(activityItems: [pdf], applicationActivities: nil)
-                        self.present(activityController, animated: true, completion: nil)
-                        if let popOver = activityController.popoverPresentationController {
-                            popOver.sourceView = sender
-                        }
-                    }
-                }
-            break
-        case .File:
-            let noteURL = NoteLoader.getSketchnotesDirectory().appendingPathComponent(note.id + ".sketchnote")
-            if FileManager.default.fileExists(atPath: noteURL.path) {
-                let activityController = UIActivityViewController(activityItems: [noteURL], applicationActivities: nil)
-                self.present(activityController, animated: true, completion: nil)
-                if let popOver = activityController.popoverPresentationController {
-                    popOver.sourceView = sender
-                }
-            }
-            break
-        }
-        
+    private func shareNote(note: Sketchnote, sender: UIView) {
+        self.performSegue(withIdentifier: "ShareNote", sender: sender)
     }
     
     func importSketchnote(url: URL) {
@@ -1124,7 +1094,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     }
     
     func noteCollectionViewDetailCellShareTapped(sketchnote: Sketchnote, sender: UIButton, cell: NoteCollectionViewDetailCell) {
-        self.shareNote(note: sketchnote, asType: .PDF, sender: cell)
+        self.shareNote(note: sketchnote, sender: cell)
     }
     
     func noteCollectionViewDetailCellSendTapped(sketchnote: Sketchnote, sender: UIButton, cell: NoteCollectionViewDetailCell) {

@@ -26,6 +26,10 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
     @IBOutlet var drawingsButton: UIButton!
     @IBOutlet var manageDrawingsButton: UIButton!
     @IBOutlet var optionsButton: UIButton!
+    @IBOutlet var previousPageButton: UIButton!
+    @IBOutlet var nextPageButton: UIButton!
+    @IBOutlet var newPageButton: UIButton!
+    @IBOutlet var pageButton: UIButton!
     
     @IBOutlet var closeButton: UIButton!
     var topicsBadgeHub: BadgeHub!
@@ -33,10 +37,10 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
     @IBOutlet var bookshelf: UIView!
     @IBOutlet var activityIndicator: UIActivityIndicatorView!
     @IBOutlet var bookshelfUpdateIndicator: NVActivityIndicatorView!
+    @IBOutlet var documentsUnderlyingView: UIView!
     
     var sketchnote: Sketchnote!
     var new = false
-    var storedPathArray: NSMutableArray?
     
     var helpLinesHorizontal = [HoritonzalHelpLine]()
     var helpLinesVertical = [VerticalHelpLine]()
@@ -57,6 +61,8 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
     
     var conceptHighlights = [UIView : [Document]]()
     @IBOutlet weak var clearFilteredDocumentsButton: UIButton!
+    
+    var isDeletingNote = false
     
     // This function sets up the page and every element contained within it.
     override func viewDidLoad() {
@@ -104,6 +110,13 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
         tagmeHelper = TAGMEHelper()
         
         canvasView.bringSubviewToFront(drawingInsertionCanvas)
+        
+        relatedNotesCollectionView.register(UINib(nibName: "SimilarNoteCollectionViewCell", bundle: nil), forCellWithReuseIdentifier: reuseSimilarNoteIdentifier)
+        relatedNotesCollectionView.delegate = self
+        relatedNotesCollectionView.dataSource = self
+        relatedNotesButton.layer.borderColor = view.tintColor.cgColor
+        relatedNotesButton.layer.borderWidth = 1
+        relatedNotesButton.layer.cornerRadius = 5
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -116,12 +129,12 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
         // This reload consists of redrawing the user's strokes for that note on the note's canvas on this page.
         if sketchnote != nil {
             if new == true {
-                sketchnote?.image = canvasView.drawing.image(from: canvasView.bounds, scale: 1.0)
+                let img = canvasView.drawing.image(from: canvasView.bounds, scale: 1.0)
+                sketchnote.getCurrentPage().image = img
             }
             else {
                 log.info("Loading canvas data for note.")
-                self.canvasView.drawing = self.sketchnote.canvasData
-                //updateContentSizeForDrawing()
+                self.canvasView.drawing = sketchnote.getCurrentPage().canvasDrawing
             }
             if let documents = sketchnote.documents {
                 log.info("Reloading documents")
@@ -133,26 +146,9 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
                 self.items = [Document]()
             }
             // This is the case where the user has created a new note and is not editing an existing one.
-        } else {
-            sketchnote = Sketchnote(image: canvasView.drawing.image(from: canvasView.bounds, scale: 1.0), relatedDocuments: nil, drawings: nil)
         }
-    }
-    
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        updateContentSizeForDrawing()
-    }
-    
-    private func updateContentSizeForDrawing() {
-        let drawing = canvasView.drawing
-        let contentHeight: CGFloat
         
-        if !drawing.bounds.isNull {
-            contentHeight = max(canvasView.bounds.height, (drawing.bounds.maxY + 500) * canvasView.zoomScale)
-        } else {
-            contentHeight = canvasView.bounds.height
-        }
-        canvasView.contentSize = CGSize(width: canvasView.bounds.width * canvasView.zoomScale, height: contentHeight)
+        updatePaginationButtons()
     }
     
     // This function is called when the user closes the page, i.e. stops editing the note, and the app returns to the home page.
@@ -164,35 +160,41 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
             print("Placeholder")
             break
         case "CloseNote":
-            if textRecognitionTimer != nil {
-                textRecognitionTimer!.invalidate()
-            }
-            if saveTimer != nil {
-                saveTimer!.invalidate()
-            }
-            bookshelfUpdateTimer?.reset(nil)
-            for helpLine in self.helpLinesHorizontal {
-                helpLine.removeFromSuperview()
-            }
-            for helpLine in self.helpLinesVertical {
-                helpLine.removeFromSuperview()
-            }
-            self.toggleConceptHighlight(isHidden: true)
-            self.processDrawingRecognition()
-            traitCollection.performAsCurrent {
-                sketchnote.image = canvasView.drawing.image(from: CGRect(x: canvasView.frame.minX, y: canvasView.frame.minY, width: canvasView.contentSize.width, height: canvasView.contentSize.height), scale: 1.0)
-                if traitCollection.userInterfaceStyle == .dark {
-                    sketchnote.image = sketchnote.image?.invert() ?? sketchnote.image
+            if !isDeletingNote {
+                if textRecognitionTimer != nil {
+                    textRecognitionTimer!.invalidate()
                 }
+                if saveTimer != nil {
+                    saveTimer!.invalidate()
+                }
+                bookshelfUpdateTimer?.reset(nil)
+                for helpLine in self.helpLinesHorizontal {
+                    helpLine.removeFromSuperview()
+                }
+                for helpLine in self.helpLinesVertical {
+                    helpLine.removeFromSuperview()
+                }
+                self.toggleConceptHighlight(isHidden: true)
+                self.processDrawingRecognition()
+                traitCollection.performAsCurrent {
+                    sketchnote.getCurrentPage().image = canvasView.drawing.image(from: CGRect(x: canvasView.frame.minX, y: canvasView.frame.minY, width: canvasView.contentSize.width, height: canvasView.contentSize.height), scale: 1.0)
+                    if traitCollection.userInterfaceStyle == .dark {
+                        sketchnote.getCurrentPage().image = sketchnote.getCurrentPage().image!.invert()
+                    }
+                }
+                sketchnote.setUpdateDate()
+                self.sketchnote.getCurrentPage().canvasDrawing = self.canvasView.drawing
+                sketchnote.save()
+                log.info("Closing & saving note.")
             }
-            sketchnote.setUpdateDate()
-            self.sketchnote.canvasData = self.canvasView.drawing
-            sketchnote.save()
-            log.info("Closing & saving note.")
+            else {
+                log.info("Deleting note.")
+            }
             break
         case "NoteOptions":
             if let destination = segue.destination as? NoteOptionsTableViewController {
                 destination.delegate = self
+                destination.canDeletePage = (sketchnote.pages.count > 1)
             }
             break
         case "BookshelfOptions":
@@ -207,6 +209,13 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
                     destinationViewController.note = sketchnote
                 }
                 
+            }
+            break
+        case "ShareNote":
+            if let destination = segue.destination as? UINavigationController {
+                if let destinationViewController = destination.topViewController as? ShareNoteViewController {
+                    destinationViewController.note = sketchnote
+                }
             }
             break
         default:
@@ -336,7 +345,7 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
     private func setupConceptHighlights() {
         conceptHighlights = [UIView : [Document]]()
         if let documents = sketchnote.documents {
-            for textData in sketchnote.textDataArray {
+            for textData in sketchnote.getCurrentPage().textDataArray {
                 for document in documents {
                     var documentTitle = document.title.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
                     if let TAGMEdocument = document as? TAGMEDocument {
@@ -536,47 +545,23 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
             let banner = FloatingNotificationBanner(title: self.sketchnote.getTitle(), subtitle: "Copied text to clipboard.", style: .info)
             banner.show()
             break
-        case .ShareAsImage:
-            if sketchnote.image != nil {
-                if let jpegData = sketchnote.image!.jpegData(compressionQuality: 1) {
-                    let activityController = UIActivityViewController(activityItems: [jpegData], applicationActivities: nil)
-                        self.present(activityController, animated: true, completion: nil)
-                        if let popOver = activityController.popoverPresentationController {
-                            popOver.sourceView = optionsButton
-                        }
-                    }
-                }
+        case .ClearPage:
+            sketchnote.getCurrentPage().clear()
+            updatePage()
+            saveCurrentPage()
             break
-        case .ShareAsPDF:
-            self.sketchnote.image = self.canvasView.drawing.image(from: self.canvasView.bounds, scale: 1.0)
-            if self.sketchnote.image != nil {
-                var data = [Any]()
-                if let pdf = self.sketchnote.createPDF() {
-                    data.append(pdf)
-                }
-                
-                let activityController = UIActivityViewController(activityItems: data, applicationActivities: nil)
-                self.present(activityController, animated: true, completion: nil)
-                if let popOver = activityController.popoverPresentationController {
-                    popOver.sourceView = optionsButton
-                }
-            }
+        case .DeletePage:
+            self.sketchnote.deletePage(index: sketchnote.activePageIndex)
+            updatePage()
+            updatePaginationButtons()
             break
-        case .ShareAsFile:
-            let noteURL = NoteLoader.getSketchnotesDirectory().appendingPathComponent(self.sketchnote.id + ".sketchnote")
-            if FileManager.default.fileExists(atPath: noteURL.path) {
-                let activityController = UIActivityViewController(activityItems: [noteURL], applicationActivities: nil)
-                self.present(activityController, animated: true, completion: nil)
-                if let popOver = activityController.popoverPresentationController {
-                    popOver.sourceView = optionsButton
-                }
-            }
+        case .Share:
+            self.performSegue(withIdentifier: "ShareNote", sender: self)
             break
         case .ResetDocuments:
             self.resetDocuments()
             break
         case .ResetTextRecognition:
-            self.sketchnote.clearTextData()
             self.sketchnote.documents = [Document]()
             self.items = [Document]()
             self.clearConceptHighlights()
@@ -584,28 +569,10 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
             self.bookshelfFilter = .All
             self.processHandwritingRecognition()
             break
-        case .ClearNote:
-            for helpLine in self.helpLinesHorizontal {
-                helpLine.removeFromSuperview()
-            }
-            for helpLine in self.helpLinesVertical {
-                helpLine.removeFromSuperview()
-            }
-            self.canvasView.drawing = PKDrawing()
-            self.sketchnote.clear()
-            
-            self.resetHelpLines()
-            self.clearConceptHighlights()
-            self.topicsButton.tintColor = .white
-            self.topicsButton.setTitleColor(.white, for: .normal)
-            self.updateBookshelfState(state: .All)
-            self.bookshelfFilter = .All
-            self.items = self.sketchnote.documents
-            if self.bookshelfUpdateTimer != nil {
-                self.bookshelfUpdateTimer!.reset(nil)
-            }
-            self.documentsCollectionView.reloadData()
-            self.topicsBadgeHub.setCount(0)
+        case .DeleteNote:
+            self.isDeletingNote = true
+            sketchnote.delete()
+            self.performSegue(withIdentifier: "CloseNote", sender: self)
         }
     }
     
@@ -695,14 +662,13 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
     
     private func processHandwritingRecognition() {
         let image = self.generateHandwritingRecognitionImage()
-        self.sketchnote.clearTextData()
+        self.sketchnote.getCurrentPage().clearTextData()
         handwritingRecognizer.recognize(spellcheck: false, image: image) { (success, textData) in
             if success {
                 if let textData = textData {
-                    self.sketchnote.textDataArray.append(textData)
+                    self.sketchnote.getCurrentPage().textDataArray.append(textData)
                     self.annotateText(text: self.sketchnote.getText())
                     print(textData.spellchecked ?? "")
-                    
                 }
             }
             else {
@@ -810,7 +776,7 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
         saveTimer?.invalidate()
         saveTimer = nil
         print("Auto-saving sketchnote strokes and text data.")
-        self.sketchnote.canvasData = self.canvasView.drawing
+        self.sketchnote.getCurrentPage().canvasDrawing = self.canvasView.drawing
         self.sketchnote.save()
     }
     
@@ -828,7 +794,7 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
                 for (label, score) in top5 {
                     if score > 0.4 {
                         print("Adding drawing: " + label)
-                        self.sketchnote!.addDrawing(drawing: label)
+                        self.sketchnote!.getCurrentPage().addDrawing(drawing: label)
                     }
                 }
             }
@@ -927,6 +893,7 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
     @IBOutlet var documentsCollectionView: UICollectionView!
     
     let reuseIdentifier = "cell"
+    let reuseSimilarNoteIdentifier = "similarNoteCell"
     var items = [Document]()
     
     var selectedTopicDocuments: [Document]?
@@ -940,49 +907,74 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
     private var bookshelfFilter = BookshelfFilter.All
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return self.items.count
+        if collectionView == documentsCollectionView {
+            return self.items.count
+        }
+        else {
+            return self.relatedNotes.count
+        }
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath as IndexPath) as! DocumentUICollectionViewCell
-        
-        let document = self.items[indexPath.item]
-        cell.document = document
-        cell.titleLabel.text = document.title
-        cell.previewImage.image = document.previewImage
-        cell.previewImage.layer.masksToBounds = true
-        cell.previewImage.layer.cornerRadius = 90
-        
-        switch document.documentType {
+        if collectionView == documentsCollectionView {
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath as IndexPath) as! DocumentUICollectionViewCell
             
-        case .Spotlight:
-            cell.previewImage.layer.borderColor = #colorLiteral(red: 0.1764705926, green: 0.01176470611, blue: 0.5607843399, alpha: 1)
-            break
-        case .TAGME:
-            cell.previewImage.layer.borderColor = #colorLiteral(red: 0.1764705926, green: 0.4980392158, blue: 0.7568627596, alpha: 1)
-            break
-        case .BioPortal:
-            cell.previewImage.layer.borderColor = #colorLiteral(red: 0.3411764801, green: 0.6235294342, blue: 0.1686274558, alpha: 1)
-            break
-        case .Chemistry:
-            cell.previewImage.layer.borderColor = #colorLiteral(red: 0.9529411793, green: 0.6862745285, blue: 0.1333333403, alpha: 1)
-            break
-        case .Other:
-            cell.previewImage.layer.borderColor = #colorLiteral(red: 0.6000000238, green: 0.6000000238, blue: 0.6000000238, alpha: 1)
-            break
+            let document = self.items[indexPath.item]
+            cell.document = document
+            cell.titleLabel.text = document.title
+            cell.previewImage.image = document.previewImage
+            cell.previewImage.layer.masksToBounds = true
+            cell.previewImage.layer.cornerRadius = 90
+            
+            switch document.documentType {
+                
+            case .Spotlight:
+                cell.previewImage.layer.borderColor = #colorLiteral(red: 0.1764705926, green: 0.01176470611, blue: 0.5607843399, alpha: 1)
+                break
+            case .TAGME:
+                cell.previewImage.layer.borderColor = #colorLiteral(red: 0.1764705926, green: 0.4980392158, blue: 0.7568627596, alpha: 1)
+                break
+            case .BioPortal:
+                cell.previewImage.layer.borderColor = #colorLiteral(red: 0.3411764801, green: 0.6235294342, blue: 0.1686274558, alpha: 1)
+                break
+            case .Chemistry:
+                cell.previewImage.layer.borderColor = #colorLiteral(red: 0.9529411793, green: 0.6862745285, blue: 0.1333333403, alpha: 1)
+                break
+            case .Other:
+                cell.previewImage.layer.borderColor = #colorLiteral(red: 0.6000000238, green: 0.6000000238, blue: 0.6000000238, alpha: 1)
+                break
+            }
+            cell.previewImage.layer.borderWidth = 3
+            
+            cell.layer.cornerRadius = 2
+            
+            return cell
         }
-        cell.previewImage.layer.borderWidth = 3
-        
-        cell.layer.cornerRadius = 2
-        
-        return cell
+        else {
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseSimilarNoteIdentifier, for: indexPath as IndexPath) as! SimilarNoteCollectionViewCell
+            cell.setNote(note: self.relatedNotes[indexPath.item], similarityRating: self.sketchnote.similarTo(note: self.relatedNotes[indexPath.item]))
+            return cell
+        }
     }
     
     // MARK: - UICollectionViewDelegate protocol
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         // handle tap events
-        showDocumentDetail(document: self.items[indexPath.item])
+        if collectionView == documentsCollectionView {
+            showDocumentDetail(document: self.items[indexPath.item])
+        }
+    }
+    
+    func collectionView(_ collectionView: UICollectionView,
+                        layout collectionViewLayout: UICollectionViewLayout,
+                        sizeForItemAt indexPath: IndexPath) -> CGSize {
+        if collectionView == documentsCollectionView {
+            return CGSize(width: CGFloat(220), height: CGFloat(240))
+        }
+        else {
+            return CGSize(width: CGFloat(340), height: CGFloat(210))
+        }
     }
     
     private func updateBookshelf() {
@@ -1116,9 +1108,12 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
     }
     
     func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
-        return UIContextMenuConfiguration(identifier: nil, previewProvider: nil, actionProvider: { suggestedActions in
-            return self.makeDocumentContextMenu(document: self.items[indexPath.row])
-        })
+        if collectionView == documentsCollectionView {
+            return UIContextMenuConfiguration(identifier: nil, previewProvider: nil, actionProvider: { suggestedActions in
+                return self.makeDocumentContextMenu(document: self.items[indexPath.row])
+            })
+        }
+        return nil
     }
     private func makeDocumentContextMenu(document: Document) -> UIMenu {
         let hideAction = UIAction(title: "Hide", image: UIImage(systemName: "eye.slash")) { action in
@@ -1344,7 +1339,7 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
     
     //MARK: Drawing insertion mode
     private func setupDrawingRegions() {
-        if let drawingRegionRects = sketchnote.drawingViewRects {
+        if let drawingRegionRects = sketchnote.getCurrentPage().drawingViewRects {
             for rect in drawingRegionRects {
                 let region = UIView(frame: rect)
                 region.layer.borderColor = UIColor.label.cgColor
@@ -1421,7 +1416,7 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
             endPoint = tapPoint
             if let currentDrawingRegion = currentDrawingRegion {
                 if currentDrawingRegion.frame.width >= 150 {
-                    self.sketchnote.addDrawingViewRect(rect: currentDrawingRegion.frame)
+                    self.sketchnote.getCurrentPage().addDrawingViewRect(rect: currentDrawingRegion.frame)
                     self.drawingViews.append(currentDrawingRegion)
                     
                     let tapGesture = UITapGestureRecognizer(target: self, action: #selector(self.handleDrawingRegionTap(_:)))
@@ -1447,7 +1442,7 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
             let action = PopMenuDefaultAction(title: "Delete Drawing Region", didSelect: { action in
                 if let drawingRegion = sender.view {
                     drawingRegion.removeFromSuperview()
-                    self.sketchnote.removeDrawingViewRect(rect: drawingRegion.frame)
+                    self.sketchnote.getCurrentPage().removeDrawingViewRect(rect: drawingRegion.frame)
                 }
             })
             popMenu.addAction(action)
@@ -1456,20 +1451,112 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
         }
     }
     
-    // Mark: Canvas scroll
-    func canvasViewDrawingDidChange(_ canvasView: PKCanvasView) {
-        let drawing = canvasView.drawing
-        let contentHeight: CGFloat
-        
-        // Adjust the content size to always be bigger than the drawing height.
-        if !drawing.bounds.isNull {
-            contentHeight = max(canvasView.bounds.height, (drawing.bounds.maxY + 500))
-        } else {
-            contentHeight = canvasView.bounds.height
-        }
-        canvasView.contentSize = CGSize(width: canvasView.bounds.width, height: contentHeight)
-        self.resetHelpLines()
+    // Mark: Pagination
+    @IBAction func previousPageTapped(_ sender: UIButton) {
+        saveCurrentPage()
+        sketchnote.previousPage()
+        updatePage()
+        updatePaginationButtons()
     }
+    @IBAction func nextPageTapped(_ sender: UIButton) {
+        saveCurrentPage()
+        sketchnote.nextPage()
+        updatePage()
+        updatePaginationButtons()
+    }
+    @IBAction func pageButtonTapped(_ sender: UIButton) {
+        self.showInputDialog(title: "Go to page:", subtitle: nil, actionTitle: "Go", cancelTitle: "Cancel", inputPlaceholder: "Page Number", inputKeyboardType: .numberPad, cancelHandler: nil)
+            { (input:String?) in
+                if input != nil && Int(input!) != nil {
+                    if let pageNumber = Int(input!) {
+                        if (pageNumber - 1) >= 0 && (pageNumber - 1) < self.sketchnote.pages.count && (pageNumber - 1) != self.sketchnote.activePageIndex {
+                            self.saveCurrentPage()
+                            self.sketchnote.activePageIndex = (pageNumber - 1)
+                            self.updatePage()
+                            self.updatePaginationButtons()
+                        }
+                    }
+                }
+            }
+    }
+    @IBAction func newPageTapped(_ sender: UIButton) {
+        let newPage = NotePage()
+        sketchnote.pages.insert(newPage, at: sketchnote.activePageIndex + 1)
+        saveCurrentPage()
+        sketchnote.nextPage()
+        updatePage()
+        saveCurrentPage()
+        updatePaginationButtons()
+    }
+        
+    private func updatePaginationButtons() {
+        previousPageButton.isEnabled = sketchnote.hasPreviousPage()
+        nextPageButton.isEnabled = sketchnote.hasNextPage()
+        pageButton.setTitle("Page \(sketchnote.activePageIndex + 1)", for: .normal)
+    }
+    
+    private func updatePage() {
+        self.canvasView.drawing = sketchnote.getCurrentPage().canvasDrawing
+        clearConceptHighlights()
+        setupConceptHighlights()
+        drawingViews = [UIView]()
+        setupDrawingRegions()
+    }
+    
+    private func saveCurrentPage() {
+        if textRecognitionTimer != nil {
+            textRecognitionTimer!.invalidate()
+        }
+        if saveTimer != nil {
+            saveTimer!.invalidate()
+        }
+        bookshelfUpdateTimer?.reset(nil)
+        self.toggleConceptHighlight(isHidden: true)
+        self.processDrawingRecognition()
+        traitCollection.performAsCurrent {
+            sketchnote.getCurrentPage().image = canvasView.drawing.image(from: CGRect(x: canvasView.frame.minX, y: canvasView.frame.minY, width: canvasView.contentSize.width, height: canvasView.contentSize.height), scale: 1.0)
+            if traitCollection.userInterfaceStyle == .dark {
+                sketchnote.getCurrentPage().image = sketchnote.getCurrentPage().image!.invert()
+            }
+        }
+        sketchnote.setUpdateDate()
+        self.sketchnote.getCurrentPage().canvasDrawing = self.canvasView.drawing
+        sketchnote.save()
+        log.info("Saving note for current page.")
+    }
+    
+    // MARK : Related Notes collection view
+    @IBOutlet var relatedNotesView: UIView!
+    @IBOutlet var relatedNotesCollectionView: UICollectionView!
+    @IBOutlet var relatedNotesButton: UIButton!
+    var relatedNotes = [Sketchnote]()
+    @IBAction func documentsRelatedNotesSegmentChanged(_ sender: UISegmentedControl) {
+        if sender.selectedSegmentIndex == 0 {
+            relatedNotesView.isHidden = true
+            documentsUnderlyingView.isHidden = false
+        }
+        else {
+            documentsUnderlyingView.isHidden = true
+            relatedNotesView.isHidden = false
+        }
+    }
+    @IBAction func lookForRelatedNotesTapped(_ sender: UIButton) {
+        self.relatedNotes = [Sketchnote]()
+        var allNotes = NoteLoader.loadSketchnotes()
+        if allNotes != nil {
+            allNotes!.removeAll{$0 == sketchnote}
+            for note in allNotes! {
+                let similarity = sketchnote.similarTo(note: note)
+                print("CHECKING")
+                if similarity > 0.0 {
+                    print("HEY")
+                    relatedNotes.append(note)
+                }
+            }
+        }
+        relatedNotesCollectionView.reloadData()
+    }
+    
     
 }
 public class HoritonzalHelpLine: UIView  {
@@ -1523,28 +1610,7 @@ public class VerticalHelpLine: UIView  {
     }
 }
 
-extension String {
-    func groups(for regexPattern: String) -> [[String]] {
-        do {
-            let text = self
-            let regex = try NSRegularExpression(pattern: regexPattern)
-            let matches = regex.matches(in: text,
-                                        range: NSRange(text.startIndex..., in: text))
-            return matches.map { match in
-                return (0..<match.numberOfRanges).map {
-                    let rangeBounds = match.range(at: $0)
-                    guard let range = Range(rangeBounds, in: text) else {
-                        return ""
-                    }
-                    return String(text[range])
-                }
-            }
-        } catch let error {
-            print("invalid regex: \(error.localizedDescription)")
-            return []
-        }
-    }
-}
+
 extension UICollectionView{
     func refreshLayout() {
         let oldLayout = collectionViewLayout as! UICollectionViewFlowLayout
