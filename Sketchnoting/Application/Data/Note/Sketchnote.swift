@@ -530,7 +530,7 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable, DocumentDelegate
             self.setUpdateDate()
             self.save()
             
-            NotesManager.delete(note: self)
+            NotesManager.delete(note: note)
         }
     }
     
