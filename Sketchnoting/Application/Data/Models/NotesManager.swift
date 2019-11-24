@@ -9,8 +9,9 @@
 import UIKit
 import PencilKit
 
-class NoteLoader {
-    public static func loadSketchnotes() -> [Sketchnote]? {
+class NotesManager {
+    static var notes = loadSketchnotes() ?? [Sketchnote]()
+    private static func loadSketchnotes() -> [Sketchnote]? {
         var sketchnotes = [Sketchnote]()
         do {
             let fileURLs = try FileManager.default.contentsOfDirectory(at: getSketchnotesDirectory(), includingPropertiesForKeys: nil)
@@ -21,11 +22,11 @@ class NoteLoader {
                         sketchnotes.append(decodedNote)
                     }
                 } catch {
-                    print("Failed to read note.")
+                    log.error("Failed to load note.")
                 }
             }
         } catch {
-            print("Error while enumerating files \(getSketchnotesDirectory().path): \(error.localizedDescription)")
+            log.error("Error while enumerating files \(getSketchnotesDirectory().path): \(error.localizedDescription)")
         }
         
         if SettingsManager.noteSortingByNewest() {
@@ -82,5 +83,27 @@ class NoteLoader {
             NSLog("Unable to create directory \(error.debugDescription)")
         }
         return logsPath!
+    }
+    
+    public static func delete(note: Sketchnote) {
+        if self.notes.contains(note) {
+            self.notes.removeAll{$0 == note}
+            let noteURL = self.getSketchnotesDirectory().appendingPathComponent(note.id + ".sketchnote")
+            if FileManager.default.fileExists(atPath: noteURL.path) {
+                try? FileManager.default.removeItem(atPath: noteURL.path)
+            }
+            log.info("Deleted note.")
+        }
+        else {
+            log.error("Note does not exist: Cannot delete.")
+        }
+    }
+    
+    public static func add(note: Sketchnote) -> Bool {
+        if self.notes.contains(note) {
+            return false
+        }
+        self.notes.append(note)
+        return true
     }
 }

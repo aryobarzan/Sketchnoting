@@ -141,7 +141,7 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable, DocumentDelegate
     public func save() {
         serializationQueue.async {
             let encodedData = self.packageNoteAsData()
-            let sketchnotesDirectory = NoteLoader.getSketchnotesDirectory()
+            let sketchnotesDirectory = NotesManager.getSketchnotesDirectory()
             try? encodedData!.write(to: sketchnotesDirectory.appendingPathComponent(self.id + ".sketchnote"))
         }
     }
@@ -173,13 +173,6 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable, DocumentDelegate
         duplicate.tags = self.tags
         duplicate.save()
         return duplicate
-    }
-    
-    public func delete() {
-        let noteURL = NoteLoader.getSketchnotesDirectory().appendingPathComponent(self.id + ".sketchnote")
-        if FileManager.default.fileExists(atPath: noteURL.path) {
-            try? FileManager.default.removeItem(atPath: noteURL.path)
-        }
     }
     
     //MARK: updating data
@@ -526,5 +519,27 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable, DocumentDelegate
             }
         }
         return similarity
+    }
+    
+    public func mergeWith(note: Sketchnote) {
+        if note != self {
+            for page in note.pages {
+                self.pages.append(page)
+            }
+            self.mergeTagsWith(note: note)
+            self.setUpdateDate()
+            self.save()
+            
+            NotesManager.delete(note: self)
+        }
+    }
+    
+    public func mergeTagsWith(note: Sketchnote) {
+        for tag in note.tags {
+            if !self.tags.contains(tag) {
+                self.tags.append(tag)
+            }
+        }
+        self.save()
     }
 }

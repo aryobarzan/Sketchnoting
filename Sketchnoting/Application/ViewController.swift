@@ -68,9 +68,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     var searchFilters = [SearchFilter]()
     // Each search term is displayed as a button, which when tapped, removes the search term.
     var searchFilterViews = [SearchFilterView]()
-    
-    var notes: [Sketchnote]!
-    
+        
     // This properties are related to note-sharing.
     // Each device is given an ID (peerID).
     // If the user has enabled sharing for its own device, i.e. made their device visible to others, mcSession is instantiated and activated
@@ -143,13 +141,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         self.noteLoadingIndicator.startAnimating()
         self.newNoteButton.isEnabled = false
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            if let notes = NoteLoader.loadSketchnotes() {
-                self.notes = notes
-            }
-            else {
-                self.notes = [Sketchnote]()
-            }
-            self.items = self.notes
+            self.items = NotesManager.notes
             self.noteCollectionView.reloadData()
             let animations = [AnimationType.from(direction: .bottom, offset: 200.0)]
             self.noteCollectionView.performBatchUpdates({
@@ -197,13 +189,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     }
     
     private func loadData() {
-        if let notes = NoteLoader.loadSketchnotes() {
-            self.notes = notes
-        }
-        else {
-            self.notes = [Sketchnote]()
-        }
-        self.items = self.notes
         self.updateDisplayedNotes()
     }
     
@@ -244,20 +229,21 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     @IBAction func unwindToHome(sender: UIStoryboardSegue) {
         if sender.source is SketchNoteViewController {
             let vc = sender.source as! SketchNoteViewController
-            if vc.isDeletingNote {
-                self.removeNoteFromCollectionView(note: vc.sketchnote)
+            if vc.openNote != nil {
+                let note = vc.openNote!
+                if let segue = sender as? UIStoryboardSegueWithCompletion {
+                    segue.completion = {
+                        self.open(note: note)
+                    }
+                }
             }
             self.updateDisplayedNotes()
         }
     }
     
-    private func removeNoteFromCollectionView(note: Sketchnote) {
-        
-    }
-    
     // MARK: Note display management
     private func updateDisplayedNotes() {
-        self.items = notes ?? [Sketchnote]()
+        self.items = NotesManager.notes
         
         var filteredNotesToRemove = [Sketchnote]()
         if self.activeTags.count > 0 {
@@ -337,7 +323,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         clearSearch()
         let newNote = Sketchnote(relatedDocuments: nil)!
         newNote.save()
-        self.notes.append(newNote)
+        NotesManager.add(note: newNote)
         
         selectedSketchnote = newNote
         performSegue(withIdentifier: "NewSketchnote", sender: self)
@@ -388,7 +374,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             self.editNoteTags(sketchnote: note)
         }
         let duplicateAction = UIAction(title: "Duplicate", image: UIImage(systemName: "doc.on.doc")) { action in
-            self.notes.append(note.duplicate())
+            NotesManager.add(note: note.duplicate())
             self.updateDisplayedNotes()
         }
         let copyTextAction = UIAction(title: "Copy Text", image: UIImage(systemName: "doc.text")) { action in
@@ -493,7 +479,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             clearSearchButton.isHidden = false
             searchField.text = ""
         }
-        if self.notes.count == 0 || searchFilters.count == 0 {
+        if NotesManager.notes.count == 0 || searchFilters.count == 0 {
             self.clearSearch()
         }
         else {
@@ -788,9 +774,13 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        self.selectedSketchnote = self.items[indexPath.item]
+        self.open(note: self.items[indexPath.item])
+    }
+    
+    private func open(note: Sketchnote) {
+        self.selectedSketchnote = note
         self.performSegue(withIdentifier: "EditSketchnote", sender: self)
-        print("You selected note view cell #\(indexPath.item)!")
+        log.info("Opening note.")
     }
     
     private func editNoteTitle(note: Sketchnote) {
@@ -841,16 +831,16 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     }
     
     func importSketchnote(url: URL) {
-        if let imported = NoteLoader.importSketchnoteFile(url: url) {
+        if let imported = NotesManager.importSketchnoteFile(url: url) {
             imported.save()
-            if self.notes.contains(imported) {
+            if NotesManager.notes.contains(imported) {
                 log.info("Sketchnote already in application, updating its data.")
                 let alert = UIAlertController(title: "Note Exists", message: "You already have this note in your library: Its data has been updated.", preferredStyle: .alert)
                            self.present(alert, animated: true, completion: nil)
             }
             else {
                 log.info("Importing new sketchnote.")
-                self.notes.append(imported)
+                NotesManager.add(note: imported)
                 let alert = UIAlertController(title: "Note Imported", message: "The new note has been added to your library.", preferredStyle: .alert)
                            self.present(alert, animated: true, completion: nil)
             }
@@ -872,16 +862,15 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     private func deleteNote(note: Sketchnote) {
         let alert = UIAlertController(title: "Delete Note", message: "Are you sure you want to delete this note?", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Delete", style: .destructive, handler: { action in
-              self.notes.removeAll{$0 == note}
+              NotesManager.delete(note: note)
               self.items.removeAll{$0 == note}
-              note.delete()
+              NotesManager.delete(note: note)
               self.noteCollectionView.reloadData()
         }))
         alert.addAction(UIAlertAction(title: "Cancel", style: .default, handler: { action in
               log.info("Not deleting note.")
         }))
         self.present(alert, animated: true, completion: nil)
-        
     }
     
     // MARK: Tags

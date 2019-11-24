@@ -571,7 +571,7 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
             break
         case .DeleteNote:
             self.isDeletingNote = true
-            sketchnote.delete()
+            NotesManager.delete(note: sketchnote)
             self.performSegue(withIdentifier: "CloseNote", sender: self)
         }
     }
@@ -959,10 +959,31 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
     
     // MARK: - UICollectionViewDelegate protocol
     
+    var openNote : Sketchnote?
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         // handle tap events
         if collectionView == documentsCollectionView {
             showDocumentDetail(document: self.items[indexPath.item])
+        }
+        else if collectionView == relatedNotesCollectionView {
+            let note = self.relatedNotes[indexPath.item]
+            let alert = UIAlertController(title: "Open Note", message: "Close this note and open the note " + note.getTitle() + "?", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "Open", style: .default, handler: { action in
+                self.openNote = note
+                self.saveCurrentPage()
+                if self.textRecognitionTimer != nil {
+                    self.textRecognitionTimer!.invalidate()
+                }
+                if self.saveTimer != nil {
+                    self.saveTimer!.invalidate()
+                }
+                self.bookshelfUpdateTimer?.reset(nil)
+                self.performSegue(withIdentifier: "CloseNote", sender: self)
+            }))
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in
+                  log.info("Not opening note.")
+            }))
+            self.present(alert, animated: true, completion: nil)
         }
     }
     
@@ -1113,6 +1134,11 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
                 return self.makeDocumentContextMenu(document: self.items[indexPath.row])
             })
         }
+        else if collectionView == relatedNotesCollectionView {
+            return UIContextMenuConfiguration(identifier: nil, previewProvider: nil, actionProvider: { suggestedActions in
+                return self.makeRelatedNoteContextMenu(note: self.relatedNotes[indexPath.row])
+            })
+        }
         return nil
     }
     private func makeDocumentContextMenu(document: Document) -> UIMenu {
@@ -1132,6 +1158,23 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
             self.setupConceptHighlights()
         }
         return UIMenu(title: document.title, children: [hideAction])
+    }
+    private func makeRelatedNoteContextMenu(note: Sketchnote) -> UIMenu {
+        let mergeAction = UIAction(title: "Merge", image: UIImage(systemName: "arrow.merge")) { action in
+            let alert = UIAlertController(title: "Merge Note", message: "Are you sure you want to merge this note with the related note? This will delete the related note.", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "Merge", style: .destructive, handler: { action in
+                self.sketchnote.mergeWith(note: note)
+                log.info("Merged notes.")
+            }))
+            alert.addAction(UIAlertAction(title: "Cancel", style: .default, handler: { action in
+                  log.info("Not merging note.")
+            }))
+            self.present(alert, animated: true, completion: nil)
+        }
+        let mergeTagsAction = UIAction(title: "Merge Tags", image: UIImage(systemName: "tag.fill")) { action in
+            self.sketchnote.mergeTagsWith(note: note)
+        }
+        return UIMenu(title: note.getTitle(), children: [mergeAction, mergeTagsAction])
     }
     
     //MARK: Document Detail View
@@ -1542,16 +1585,12 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
     }
     @IBAction func lookForRelatedNotesTapped(_ sender: UIButton) {
         self.relatedNotes = [Sketchnote]()
-        var allNotes = NoteLoader.loadSketchnotes()
-        if allNotes != nil {
-            allNotes!.removeAll{$0 == sketchnote}
-            for note in allNotes! {
-                let similarity = sketchnote.similarTo(note: note)
-                print("CHECKING")
-                if similarity > 0.0 {
-                    print("HEY")
-                    relatedNotes.append(note)
-                }
+        var allNotes = NotesManager.notes
+        allNotes.removeAll{$0 == sketchnote}
+        for note in allNotes {
+            let similarity = sketchnote.similarTo(note: note)
+            if similarity > 0.0 {
+                relatedNotes.append(note)
             }
         }
         relatedNotesCollectionView.reloadData()

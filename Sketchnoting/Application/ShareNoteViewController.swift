@@ -68,7 +68,7 @@ class ShareNoteViewController: UIViewController {
             return
         }
         if asType == 0 {
-            let noteURL = NoteLoader.getSketchnotesDirectory().appendingPathComponent(note.id + ".sketchnote")
+            let noteURL = NotesManager.getSketchnotesDirectory().appendingPathComponent(note.id + ".sketchnote")
             if FileManager.default.fileExists(atPath: noteURL.path) {
                 let activityController = UIActivityViewController(activityItems: [noteURL], applicationActivities: nil)
                 self.present(activityController, animated: true, completion: nil)

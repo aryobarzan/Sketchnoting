@@ -130,7 +130,7 @@ class NoteSharingViewController: UIViewController, MCSessionDelegate {
     }
     
     func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
-        if let decodedNote = NoteLoader.decodeNoteFromData(data: data) {
+        if let decodedNote = NotesManager.decodeNoteFromData(data: data) {
             decodedNote.sharedByDevice = peerID.displayName
             DispatchQueue.main.async {
                 self.pendingSharedNotes.append(decodedNote)
