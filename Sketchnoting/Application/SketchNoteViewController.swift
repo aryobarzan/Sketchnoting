@@ -17,7 +17,9 @@ import NotificationBannerSwift
 
 import PencilKit
 
-class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, UICollectionViewDataSource, UICollectionViewDelegate, DocumentVisitor, SketchnoteDelegate, PKCanvasViewDelegate, PKToolPickerObserver, UIScreenshotServiceDelegate, NoteOptionsDelegate, BookshelfOptionsDelegate {
+class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, UICollectionViewDataSource, UICollectionViewDelegate, SketchnoteDelegate, PKCanvasViewDelegate, PKToolPickerObserver, UIScreenshotServiceDelegate, NoteOptionsDelegate, DocumentsViewControllerDelegate, BookshelfOptionsDelegate {
+    
+    private var documentsVC: DocumentsViewController!
     
     @IBOutlet var canvasView: PKCanvasView!
     
@@ -69,7 +71,18 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
         super.viewDidLoad()
         self.navigationController?.setNavigationBarHidden(true, animated: false)
         
-        self.setupDocumentDetailView()
+
+        let storyboard = UIStoryboard(name: "Main", bundle: Bundle.main)
+        self.documentsVC = storyboard.instantiateViewController(withIdentifier: "DocumentsViewController") as? DocumentsViewController
+        documentsVC.delegate = self
+        addChild(documentsVC)
+        documentsUnderlyingView.addSubview(documentsVC.view)
+        documentsVC.view.frame = documentsUnderlyingView.bounds
+        documentsVC.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        documentsVC.didMove(toParent: self)
+        documentsVC.collectionView.refreshLayout()
+        documentsVC.setNote(sketchnote: sketchnote)
+        
         self.bookshelfLeftDragView.curveTopCorners(size: 5)
         
         canvasView.drawing = PKDrawing()
@@ -136,15 +149,6 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
                 log.info("Loading canvas data for note.")
                 self.canvasView.drawing = sketchnote.getCurrentPage().canvasDrawing
             }
-            if let documents = sketchnote.documents {
-                log.info("Reloading documents")
-                self.items = documents
-                documentsCollectionView.reloadData()
-            }
-            else {
-                sketchnote.documents = [Document]()
-                self.items = [Document]()
-            }
             // This is the case where the user has created a new note and is not editing an existing one.
         }
         
@@ -167,7 +171,7 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
                 if saveTimer != nil {
                     saveTimer!.invalidate()
                 }
-                bookshelfUpdateTimer?.reset(nil)
+                documentsVC.bookshelfUpdateTimer?.reset(nil)
                 for helpLine in self.helpLinesHorizontal {
                     helpLine.removeFromSuperview()
                 }
@@ -200,7 +204,7 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
         case "BookshelfOptions":
             if let destination = segue.destination as? BookshelfOptionsTableViewController {
                 destination.delegate = self
-                destination.currentFilter = bookshelfFilter
+                destination.currentFilter = documentsVC.bookshelfFilter
             }
             break
         case "ViewNoteText":
@@ -240,7 +244,6 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
         }
     }
     
-    @IBOutlet weak var imageTestView: UIImageView!
     private func processDrawingRecognition() {
         hideAllHelpLines()
         
@@ -472,13 +475,13 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
     @objc func handleConceptHighlightTap(_ sender: UITapGestureRecognizer) {
         if let conceptHighlightView = sender.view {
             if let documents = self.conceptHighlights[conceptHighlightView] {
-                if self.bookshelfState == .Topic && self.selectedTopicDocuments != nil && self.selectedTopicDocuments! == documents {
-                    self.clearTopicDocuments()
+                if documentsVC.bookshelfState == .Topic && documentsVC.selectedTopicDocuments != nil && documentsVC.selectedTopicDocuments! == documents {
+                    documentsVC.clearTopicDocuments()
                 }
                 else {
-                    self.selectedTopicDocuments = documents
-                    self.updateBookshelfState(state: .Topic)
-                    self.showTopicDocuments(documents: documents)
+                    documentsVC.selectedTopicDocuments = documents
+                    documentsVC.updateBookshelfState(state: .Topic)
+                    documentsVC.showTopicDocuments(documents: documents)
                 }
                 if bookshelf.isHidden {
                     showBookshelf()
@@ -563,10 +566,10 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
             break
         case .ResetTextRecognition:
             self.sketchnote.documents = [Document]()
-            self.items = [Document]()
+            documentsVC.items = [Document]()
             self.clearConceptHighlights()
-            self.updateBookshelfState(state: .All)
-            self.bookshelfFilter = .All
+            documentsVC.updateBookshelfState(state: .All)
+            documentsVC.bookshelfFilter = .All
             self.processHandwritingRecognition()
             break
         case .DeleteNote:
@@ -574,15 +577,6 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
             NotesManager.delete(note: sketchnote)
             self.performSegue(withIdentifier: "CloseNote", sender: self)
         }
-    }
-    
-    private func resetDocuments() {
-        self.sketchnote.documents = [Document]()
-        self.clearConceptHighlights()
-        self.updateBookshelfState(state: .All)
-        self.bookshelfFilter = .All
-        self.updateBookshelf()
-        self.annotateText(text: self.sketchnote.getText())
     }
     
     private func undo() {
@@ -711,7 +705,7 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
         bookshelfButton.tintColor = self.view.tintColor
         self.bookshelf.isHidden = false
         if self.isBookshelfDraggedOut {
-            self.bookshelfLeftConstraint.constant -= 500
+            self.bookshelfLeftConstraint.constant = UIScreen.main.bounds.maxX - 400//500
             UIView.animate(withDuration: 0.25, delay: 0, options: UIView.AnimationOptions.curveEaseIn, animations: {
                 self.view.layoutIfNeeded()
             }, completion: { (ended) in
@@ -721,8 +715,8 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
     }
     
     private func closeBookshelf() {
-         bookshelfButton.tintColor = .white
-        bookshelfLeftConstraint.constant = UIScreen.main.bounds.width
+        bookshelfButton.tintColor = .white
+        bookshelfLeftConstraint.constant = UIScreen.main.bounds.maxX - 400//UIScreen.main.bounds.width
         self.isBookshelfDraggedOut = true
         UIView.animate(withDuration: 0.25, delay: 0, options: UIView.AnimationOptions.curveEaseIn, animations: {
             self.view.layoutIfNeeded()
@@ -848,12 +842,12 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
             let deltaX = currentTouchPoint.x - previousTouchPoint.x
             
             if resizeRect.leftTouch {
-                if (bookshelfLeftConstraint.constant + deltaX) >= 0 && UIScreen.main.bounds.maxX - currentTouchPoint.x >= 300 {
+                if (bookshelfLeftConstraint.constant + deltaX) >= 0 && UIScreen.main.bounds.maxX - currentTouchPoint.x >= 400 {
                     bookshelfLeftConstraint.constant += deltaX
                 }
                 
                 
-                if UIScreen.main.bounds.maxX - currentTouchPoint.x <= 300 {
+                if UIScreen.main.bounds.maxX - currentTouchPoint.x <= 400 {
                     bookshelf.alpha = 0.4
                 }
                 else {
@@ -873,7 +867,7 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
             let currentTouchPoint = touch.location(in: self.view)
             
             if resizeRect.leftTouch {
-                if UIScreen.main.bounds.maxX - currentTouchPoint.x <= 300 {
+                if UIScreen.main.bounds.maxX - currentTouchPoint.x <= 400 {
                     self.closeBookshelf()
                 }
             }
@@ -890,274 +884,80 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
     }
     
     // MARK: Documents Collection View
-    @IBOutlet var documentsCollectionView: UICollectionView!
-    
-    let reuseIdentifier = "cell"
     let reuseSimilarNoteIdentifier = "similarNoteCell"
-    var items = [Document]()
-    
-    var selectedTopicDocuments: [Document]?
-    
-    private enum BookshelfState {
-        case All
-        case Topic
-    }
-    private var bookshelfState = BookshelfState.All
-    
-    private var bookshelfFilter = BookshelfFilter.All
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        if collectionView == documentsCollectionView {
-            return self.items.count
-        }
-        else {
-            return self.relatedNotes.count
-        }
+        return self.relatedNotes.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        if collectionView == documentsCollectionView {
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath as IndexPath) as! DocumentUICollectionViewCell
-            
-            let document = self.items[indexPath.item]
-            cell.document = document
-            cell.titleLabel.text = document.title
-            cell.previewImage.image = document.previewImage
-            cell.previewImage.layer.masksToBounds = true
-            cell.previewImage.layer.cornerRadius = 90
-            
-            switch document.documentType {
-                
-            case .Spotlight:
-                cell.previewImage.layer.borderColor = #colorLiteral(red: 0.1764705926, green: 0.01176470611, blue: 0.5607843399, alpha: 1)
-                break
-            case .TAGME:
-                cell.previewImage.layer.borderColor = #colorLiteral(red: 0.1764705926, green: 0.4980392158, blue: 0.7568627596, alpha: 1)
-                break
-            case .BioPortal:
-                cell.previewImage.layer.borderColor = #colorLiteral(red: 0.3411764801, green: 0.6235294342, blue: 0.1686274558, alpha: 1)
-                break
-            case .Chemistry:
-                cell.previewImage.layer.borderColor = #colorLiteral(red: 0.9529411793, green: 0.6862745285, blue: 0.1333333403, alpha: 1)
-                break
-            case .Other:
-                cell.previewImage.layer.borderColor = #colorLiteral(red: 0.6000000238, green: 0.6000000238, blue: 0.6000000238, alpha: 1)
-                break
-            }
-            cell.previewImage.layer.borderWidth = 3
-            
-            cell.layer.cornerRadius = 2
-            
-            return cell
-        }
-        else {
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseSimilarNoteIdentifier, for: indexPath as IndexPath) as! SimilarNoteCollectionViewCell
-            cell.setNote(note: self.relatedNotes[indexPath.item], similarityRating: self.sketchnote.similarTo(note: self.relatedNotes[indexPath.item]))
-            return cell
-        }
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseSimilarNoteIdentifier, for: indexPath as IndexPath) as! SimilarNoteCollectionViewCell
+        cell.setNote(note: self.relatedNotes[indexPath.item], similarityRating: self.sketchnote.similarTo(note: self.relatedNotes[indexPath.item]))
+        return cell
     }
     
     // MARK: - UICollectionViewDelegate protocol
     
     var openNote : Sketchnote?
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        // handle tap events
-        if collectionView == documentsCollectionView {
-            showDocumentDetail(document: self.items[indexPath.item])
-        }
-        else if collectionView == relatedNotesCollectionView {
-            let note = self.relatedNotes[indexPath.item]
-            let alert = UIAlertController(title: "Open Note", message: "Close this note and open the note " + note.getTitle() + "?", preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: "Open", style: .default, handler: { action in
-                self.openNote = note
-                self.saveCurrentPage()
-                if self.textRecognitionTimer != nil {
-                    self.textRecognitionTimer!.invalidate()
-                }
-                if self.saveTimer != nil {
-                    self.saveTimer!.invalidate()
-                }
-                self.bookshelfUpdateTimer?.reset(nil)
-                self.performSegue(withIdentifier: "CloseNote", sender: self)
-            }))
-            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in
-                  log.info("Not opening note.")
-            }))
-            self.present(alert, animated: true, completion: nil)
-        }
+        let note = self.relatedNotes[indexPath.item]
+        let alert = UIAlertController(title: "Open Note", message: "Close this note and open the note " + note.getTitle() + "?", preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Open", style: .default, handler: { action in
+            self.openNote = note
+            self.saveCurrentPage()
+            if self.textRecognitionTimer != nil {
+                self.textRecognitionTimer!.invalidate()
+            }
+            if self.saveTimer != nil {
+                self.saveTimer!.invalidate()
+            }
+            self.documentsVC.bookshelfUpdateTimer?.reset(nil)
+            self.performSegue(withIdentifier: "CloseNote", sender: self)
+        }))
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in
+                log.info("Not opening note.")
+        }))
+        self.present(alert, animated: true, completion: nil)
     }
     
     func collectionView(_ collectionView: UICollectionView,
                         layout collectionViewLayout: UICollectionViewLayout,
                         sizeForItemAt indexPath: IndexPath) -> CGSize {
-        if collectionView == documentsCollectionView {
-            return CGSize(width: CGFloat(220), height: CGFloat(240))
-        }
-        else {
-            return CGSize(width: CGFloat(340), height: CGFloat(210))
-        }
+        return CGSize(width: CGFloat(340), height: CGFloat(210))
     }
     
     private func updateBookshelf() {
-        DispatchQueue.main.async {
-            if self.bookshelfState == .All {
-                print("Updating Bookshelf.")
-                self.clearFilteredDocumentsButton.isHidden = true
-                self.items = self.getFilteredDocuments(documents: self.sketchnote.documents)
-                self.documentsCollectionView.refreshLayout()
-                self.documentsCollectionView.reloadData()
-            }
-            else if self.bookshelfState == .Topic {
-                if self.selectedTopicDocuments != nil {
-                    self.clearFilteredDocumentsButton.isHidden = false
-                    self.items = self.getFilteredDocuments(documents: self.selectedTopicDocuments!)
-                    
-                }
-                else {
-                    self.items = [Document]()
-                }
-                self.documentsCollectionView.refreshLayout()
-                self.documentsCollectionView.reloadData()
-            }
-            
-            self.updateBookshelfState(state: self.bookshelfState)
-        }
+        documentsVC.updateBookshelf()
     }
     
     private func updateBookshelfState(state: BookshelfState) {
-        self.bookshelfState = state
-        switch self.bookshelfState {
-        case .All:
-            self.clearFilteredDocumentsButton.isHidden = true
-            self.selectedTopicDocuments = nil
-        case .Topic:
-            self.clearFilteredDocumentsButton.isHidden = false
-        }
+        documentsVC.updateBookshelfState(state: state)
     }
     
-    private func getFilteredDocuments(documents: [Document]) -> [Document] {
-        switch self.bookshelfFilter {
-        case .All:
-            return documents
-        case .TAGME:
-            return documents.filter{ $0.documentType == .TAGME }
-        case .Spotlight:
-            return documents.filter{ $0.documentType == .Spotlight }
-        case .BioPortal:
-            return documents.filter{ $0.documentType == .BioPortal }
-        case .CHEBI:
-            return documents.filter{ $0.documentType == .Chemistry }
-        }
-    }
-    
-    var bookshelfUpdateTimer: Repeater?
     private func startBookshelfUpdateTimer() {
-        DispatchQueue.main.async {
-            self.bookshelfUpdateIndicator.isHidden = false
-            if !self.bookshelfUpdateIndicator.isAnimating {
-                self.bookshelfUpdateIndicator.startAnimating()
-            }
-            if self.bookshelfUpdateTimer != nil {
-                log.info("Bookshelf Update Timer reset.")
-                self.bookshelfUpdateTimer!.reset(nil)
-            }
-            else {
-                log.info("Bookshelf Update Timer started.")
-                self.bookshelfUpdateTimer = Repeater.once(after: .seconds(2)) { timer in
-                    DispatchQueue.main.async {
-                        self.updateBookshelf()
-                        self.bookshelfUpdateIndicator.stopAnimating()
-                        self.bookshelfUpdateIndicator.isHidden = true
-                    }
-                    
-                }
-            }
-        }
+        documentsVC.startBookshelfUpdateTimer()
     }
     
     func sketchnoteHasNewDocument(sketchnote: Sketchnote, document: Document) { // Sketchnote delegate
-        DispatchQueue.main.async {
-            if self.bookshelfState == .All && self.documentTypeMatchesBookshelfFilter(type: document.documentType) {
-                CATransaction.begin()
-                CATransaction.setDisableActions(true)
-                self.items.append(document)
-                let indexPath = IndexPath(row: self.items.count - 1, section: 0)
-                self.documentsCollectionView.insertItems(at: [indexPath])
-                CATransaction.commit()
-                self.documentsCollectionView.scrollToItem(at: indexPath, at: .bottom , animated: true)
-            }
-            self.topicsBadgeHub.setCount(self.sketchnote.documents.count)
-        }
-    }
-    
-    private func documentTypeMatchesBookshelfFilter(type: DocumentType) -> Bool {
-        if self.bookshelfFilter == .All {
-            return true
-        }
-        switch type {
-        case .Spotlight:
-            if self.bookshelfFilter == .Spotlight {
-                return true
-            }
-        case .TAGME:
-            if self.bookshelfFilter == .TAGME {
-                return true
-            }
-        case .BioPortal:
-            if self.bookshelfFilter == .BioPortal {
-                return true
-            }
-        case .Chemistry:
-            if self.bookshelfFilter == .CHEBI {
-                return true
-            }
-        case .Other:
-            return true
-        }
-        return false
+        documentsVC.sketchnoteHasNewDocument(sketchnote: sketchnote, document: document)
     }
     
     func sketchnoteHasRemovedDocument(sketchnote: Sketchnote, document: Document) { // Sketchnote delegate
-        self.startBookshelfUpdateTimer()
+        documentsVC.sketchnoteDocumentHasChanged(sketchnote: sketchnote, document: document)
     }
     
     func sketchnoteDocumentHasChanged(sketchnote: Sketchnote, document: Document) { // Sketchnote delegate
-        self.startBookshelfUpdateTimer()
+        documentsVC.sketchnoteDocumentHasChanged(sketchnote: sketchnote, document: document)
     }
     
     func sketchnoteHasChanged(sketchnote: Sketchnote) { // Sketchnote delegate
     }
     
     func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
-        if collectionView == documentsCollectionView {
-            return UIContextMenuConfiguration(identifier: nil, previewProvider: nil, actionProvider: { suggestedActions in
-                return self.makeDocumentContextMenu(document: self.items[indexPath.row])
-            })
-        }
-        else if collectionView == relatedNotesCollectionView {
-            return UIContextMenuConfiguration(identifier: nil, previewProvider: nil, actionProvider: { suggestedActions in
-                return self.makeRelatedNoteContextMenu(note: self.relatedNotes[indexPath.row])
-            })
-        }
-        return nil
-    }
-    private func makeDocumentContextMenu(document: Document) -> UIMenu {
-        let hideAction = UIAction(title: "Hide", image: UIImage(systemName: "eye.slash")) { action in
-            self.sketchnote.removeDocument(document: document)
-            DocumentsManager.hide(document: document)
-            if self.bookshelfState == .Topic {
-                if self.selectedTopicDocuments != nil && self.selectedTopicDocuments!.contains(document) {
-                    self.selectedTopicDocuments!.removeAll{$0 == document}
-                }
-            }
-            self.updateBookshelf()
-            self.clearConceptHighlights()
-            if self.topicsShown {
-                self.topicsShown = false
-            }
-            self.setupConceptHighlights()
-        }
-        return UIMenu(title: document.title, children: [hideAction])
+        return UIContextMenuConfiguration(identifier: nil, previewProvider: nil, actionProvider: { suggestedActions in
+            return self.makeRelatedNoteContextMenu(note: self.relatedNotes[indexPath.row])
+        })
+
     }
     private func makeRelatedNoteContextMenu(note: Sketchnote) -> UIMenu {
         let mergeAction = UIAction(title: "Merge", image: UIImage(systemName: "arrow.merge")) { action in
@@ -1177,208 +977,12 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
         return UIMenu(title: note.getTitle(), children: [mergeAction, mergeTagsAction])
     }
     
-    //MARK: Document Detail View
-    
-    @IBOutlet var documentDetailView: UIView!
-    @IBOutlet var documentTitleLabel: UILabel!
-    @IBOutlet var documentDetailScrollView: UIScrollView!
-    var documentDetailStackView = UIStackView()
-    @IBOutlet weak var documentDetailTypeView: UIView!
-    @IBOutlet weak var documentDetailTypeLabel: UILabel!
-    @IBOutlet weak var documentDetailPreviewImageView: UIImageView!
-    
-    private func setupDocumentDetailView() {
-        documentDetailStackView.axis = .vertical
-        documentDetailStackView.distribution = .equalSpacing
-        documentDetailStackView.alignment = .fill
-        documentDetailStackView.spacing = 5
-        documentDetailScrollView.addSubview(documentDetailStackView)
-        documentDetailStackView.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            documentDetailStackView.topAnchor.constraint(equalTo: documentDetailScrollView.topAnchor),
-            documentDetailStackView.leadingAnchor.constraint(equalTo: documentDetailScrollView.leadingAnchor),
-            documentDetailStackView.trailingAnchor.constraint(equalTo: documentDetailScrollView.trailingAnchor),
-            documentDetailStackView.bottomAnchor.constraint(equalTo: documentDetailScrollView.bottomAnchor),
-            documentDetailStackView.widthAnchor.constraint(equalTo: documentDetailScrollView.widthAnchor)
-            ])
-        
-        documentDetailPreviewImageView.layer.masksToBounds = true
-        documentDetailPreviewImageView.layer.cornerRadius = 75
-        documentDetailPreviewImageView.layer.borderWidth = 1
-        documentDetailPreviewImageView.layer.borderColor = UIColor.black.cgColor
-        documentDetailTypeView.layer.masksToBounds = true
-        documentDetailTypeView.layer.cornerRadius = 15
-    }
-    
-    private func showDocumentDetail(document: Document) {
-        for view in documentDetailStackView.subviews {
-            view.removeFromSuperview()
-        }
-        
-        documentTitleLabel.text = document.title
-        documentDetailTypeLabel.text = "Document"
-        documentDetailPreviewImageView.image = nil
-        if let previewImage = document.previewImage {
-            documentDetailPreviewImageView.image = previewImage
-        }
-        document.accept(visitor: self)
-        
-        documentDetailView.isHidden = false
-        documentsCollectionView.isHidden = true
-    }
     private func showTopicDocuments(documents: [Document]) {
-        for view in documentDetailStackView.subviews {
-            view.removeFromSuperview()
-        }
-        documentDetailView.isHidden = true
-        documentsCollectionView.isHidden = false
-        self.items = getFilteredDocuments(documents: documents)
-        self.documentsCollectionView.refreshLayout()
-        self.documentsCollectionView.reloadData()
-        if bookshelfUpdateTimer != nil {
-            bookshelfUpdateTimer!.reset(nil)
-            //bookshelfUpdateTimer = nil
-        }
-        clearFilteredDocumentsButton.isHidden = false
-    }
-    @IBAction func clearTopicDocumentsTapped(_ sender: UIButton) {
-        self.clearTopicDocuments()
-    }
-    private func clearTopicDocuments() {
-        self.updateBookshelfState(state: .All)
-        self.updateBookshelf()
-    }
-    
-    func process(document: Document) {
-        if let description = document.description {
-            self.setDetailDescription(text: description)
-        }
-    }
-    
-    func process(document: SpotlightDocument) {
-        documentDetailTypeView.backgroundColor = #colorLiteral(red: 0.1764705926, green: 0.01176470611, blue: 0.5607843399, alpha: 1)
-        documentDetailTypeLabel.text = "Spotlight"
-        if let label = document.label {
-            documentTitleLabel.text = label
-        }
-        if let description = document.description {
-            self.setDetailDescription(text: description)
-        }
-        if let mapImage = document.mapImage {
-            let mapImageView = UIImageView(image: mapImage)
-            documentDetailStackView.addArrangedSubview(mapImageView)
-            
-            let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(mapImageTapped(tapGestureRecognizer:)))
-            mapImageView.isUserInteractionEnabled = true
-            mapImageView.addGestureRecognizer(tapGestureRecognizer)
-        }
-    }
-    
-    func process(document: TAGMEDocument) {
-        documentDetailTypeView.backgroundColor = #colorLiteral(red: 0.1764705926, green: 0.4980392158, blue: 0.7568627596, alpha: 1)
-        documentDetailTypeLabel.text = "TAGME"
-        documentTitleLabel.text = document.title
-        if let description = document.description {
-            self.setDetailDescription(text: description)
-        }
-        if let mapImage = document.mapImage {
-            let mapImageView = UIImageView(image: mapImage)
-            documentDetailStackView.addArrangedSubview(mapImageView)
-            
-            let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(mapImageTapped(tapGestureRecognizer:)))
-            mapImageView.isUserInteractionEnabled = true
-            mapImageView.addGestureRecognizer(tapGestureRecognizer)
-        }
-    }
-    
-    func process(document: BioPortalDocument) {
-        documentDetailTypeView.backgroundColor = #colorLiteral(red: 0.3411764801, green: 0.6235294342, blue: 0.1686274558, alpha: 1)
-        documentDetailTypeLabel.text = "BioPortal"
-        if let definition = document.definition {
-            self.setDetailDescription(text: definition)
-        }
-    }
-    
-    func process(document: CHEBIDocument) {
-        documentDetailTypeView.backgroundColor = #colorLiteral(red: 0.9529411793, green: 0.6862745285, blue: 0.1333333403, alpha: 1)
-        documentDetailTypeLabel.text = "CHEBI"
-        if let definition = document.definition {
-            self.setDetailDescription(text: definition)
-        }
-        if let moleculeImage = document.moleculeImage {
-            let mapImageView = UIImageView(image: moleculeImage)
-            documentDetailStackView.addArrangedSubview(mapImageView)
-            
-            let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(mapImageTapped(tapGestureRecognizer:)))
-            mapImageView.isUserInteractionEnabled = true
-            mapImageView.addGestureRecognizer(tapGestureRecognizer)
-        }
-    }
-    
-    private func setDetailDescription(text: String) {
-        let descriptionLabel = UILabel(frame: documentDetailStackView.frame)
-        descriptionLabel.text = text
-        descriptionLabel.numberOfLines = 50
-        descriptionLabel.textColor = .white
-        documentDetailStackView.addArrangedSubview(descriptionLabel)
-    }
-    
-    
-    @objc func mapImageTapped(tapGestureRecognizer: UITapGestureRecognizer)
-    {
-        let tappedImage = tapGestureRecognizer.view as! UIImageView
-        let newImageView = UIImageView(image: tappedImage.image)
-        newImageView.frame = UIScreen.main.bounds
-        newImageView.backgroundColor = .black
-        newImageView.contentMode = .scaleAspectFit
-        newImageView.isUserInteractionEnabled = true
-        let tap = UITapGestureRecognizer(target: self, action: #selector(dismissFullscreenMapImage))
-        newImageView.addGestureRecognizer(tap)
-        self.view.addSubview(newImageView)
-        self.navigationController?.isNavigationBarHidden = true
-        self.tabBarController?.tabBar.isHidden = true
-    }
-    @objc func dismissFullscreenMapImage(_ sender: UITapGestureRecognizer) {
-        self.navigationController?.isNavigationBarHidden = true
-        self.tabBarController?.tabBar.isHidden = true
-        sender.view?.removeFromSuperview()
-    }
-    @IBAction func documentDetailViewBrowseTapped(_ sender: UIButton) {
-        documentDetailView.isHidden = true
-        documentsCollectionView.isHidden = false
+        documentsVC.showTopicDocuments(documents: documents)
     }
     
     // MARK: Collection view document filtering
     @IBOutlet weak var bookshelfOptionsButton: UIButton!
-    
-    func bookshelfOptionSelected(option: BookshelfOption) {
-        switch option {
-        case .FilterAll:
-            self.bookshelfFilter = .All
-            self.updateBookshelf()
-            break
-        case .FilterTAGME:
-            self.bookshelfFilter = .TAGME
-            self.updateBookshelf()
-            break
-        case .FilterSpotlight:
-            self.bookshelfFilter = .Spotlight
-            self.updateBookshelf()
-            break
-        case .FilterBioPortal:
-            self.bookshelfFilter = .BioPortal
-            self.updateBookshelf()
-            break
-        case .FilterCHEBI:
-            self.bookshelfFilter = .CHEBI
-            self.updateBookshelf()
-            break
-        case .ResetDocuments:
-            self.resetDocuments()
-            break
-       
-        }
-    }
     
     //MARK: Drawing insertion mode
     private func setupDrawingRegions() {
@@ -1553,7 +1157,7 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
         if saveTimer != nil {
             saveTimer!.invalidate()
         }
-        bookshelfUpdateTimer?.reset(nil)
+        documentsVC.bookshelfUpdateTimer?.reset(nil)
         self.toggleConceptHighlight(isHidden: true)
         self.processDrawingRecognition()
         traitCollection.performAsCurrent {
@@ -1596,7 +1200,17 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
         relatedNotesCollectionView.reloadData()
     }
     
+    // MARK: Documents View Controller delegate
+    func resetDocuments() {
+        self.clearConceptHighlights()
+        self.annotateText(text: self.sketchnote.getText())
+    }
     
+    // MARK: Bookshelf Options Delegate
+    
+    func bookshelfOptionSelected(option: BookshelfOption) {
+        documentsVC.setFilter(option: option)
+    }
 }
 public class HoritonzalHelpLine: UIView  {
     
@@ -1667,12 +1281,4 @@ extension UICollectionView{
         newLayout.sectionInsetReference = oldLayout.sectionInsetReference
         collectionViewLayout = newLayout
     }
-}
-
-public enum BookshelfFilter {
-    case All
-    case TAGME
-    case Spotlight
-    case BioPortal
-    case CHEBI
 }

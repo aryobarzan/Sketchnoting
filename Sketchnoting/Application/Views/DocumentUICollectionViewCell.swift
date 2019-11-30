@@ -12,7 +12,6 @@ class DocumentUICollectionViewCell: UICollectionViewCell {
     
     var document: Document!
     
-    @IBOutlet var titleLabel: UILabel!
-    @IBOutlet var previewImage: UIImageView!
-    @IBOutlet var hideButton: UIButton!
+    @IBOutlet weak var titleLabel: UILabel!
+    @IBOutlet weak var previewImage: UIImageView!
 }

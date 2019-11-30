@@ -18,6 +18,10 @@
 		9F2C00092351126800D53EE9 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 9F2C00082351126800D53EE9 /* Alamofire */; };
 		9F509144235BE29100853E84 /* DataCompression in Frameworks */ = {isa = PBXBuildFile; productRef = 9F509143235BE29100853E84 /* DataCompression */; };
 		9F5D80F02332D32600552D58 /* SVGImageProcessorExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5D80EF2332D32600552D58 /* SVGImageProcessorExtension.swift */; };
+		9F5E89EC2391AF49002FA8B2 /* DocumentsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5E89EB2391AF49002FA8B2 /* DocumentsViewController.swift */; };
+		9F5E89EE2391B474002FA8B2 /* DocumentsCollectionReusableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5E89ED2391B474002FA8B2 /* DocumentsCollectionReusableView.swift */; };
+		9F5E89F02391CBA2002FA8B2 /* DocumentViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5E89EF2391CBA2002FA8B2 /* DocumentViewCell.swift */; };
+		9F5E89F42391CE84002FA8B2 /* DocumentDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5E89F32391CE84002FA8B2 /* DocumentDetailViewController.swift */; };
 		9F75E448230C368F00488BBD /* NoteSharingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F75E447230C368F00488BBD /* NoteSharingViewController.swift */; };
 		9F75E44C230C583200488BBD /* NoteCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F75E44A230C583200488BBD /* NoteCollectionViewCell.swift */; };
 		9F75E44D230C583200488BBD /* NoteCollectionViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9F75E44B230C583200488BBD /* NoteCollectionViewCell.xib */; };
@@ -95,6 +99,10 @@
 		9F5D80EF2332D32600552D58 /* SVGImageProcessorExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SVGImageProcessorExtension.swift; sourceTree = "<group>"; };
 		9F5D8B2B228B9D7000F56FEC /* CREDITS.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CREDITS.md; sourceTree = "<group>"; };
 		9F5D8B2C228B9EF800F56FEC /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		9F5E89EB2391AF49002FA8B2 /* DocumentsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentsViewController.swift; sourceTree = "<group>"; };
+		9F5E89ED2391B474002FA8B2 /* DocumentsCollectionReusableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentsCollectionReusableView.swift; sourceTree = "<group>"; };
+		9F5E89EF2391CBA2002FA8B2 /* DocumentViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentViewCell.swift; sourceTree = "<group>"; };
+		9F5E89F32391CE84002FA8B2 /* DocumentDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentDetailViewController.swift; sourceTree = "<group>"; };
 		9F75E447230C368F00488BBD /* NoteSharingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteSharingViewController.swift; sourceTree = "<group>"; };
 		9F75E44A230C583200488BBD /* NoteCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteCollectionViewCell.swift; sourceTree = "<group>"; };
 		9F75E44B230C583200488BBD /* NoteCollectionViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NoteCollectionViewCell.xib; sourceTree = "<group>"; };
@@ -218,6 +226,33 @@
 				9FFE07E9232A63BA00DBD0AC /* TagsManager.swift */,
 			);
 			path = Models;
+			sourceTree = "<group>";
+		};
+		9F5E89EA2391AF1B002FA8B2 /* View Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				9F5E89F22391CE6A002FA8B2 /* Document Detail */,
+				9F5E89F12391CE5A002FA8B2 /* Documents Bookshelf */,
+			);
+			path = "View Controllers";
+			sourceTree = "<group>";
+		};
+		9F5E89F12391CE5A002FA8B2 /* Documents Bookshelf */ = {
+			isa = PBXGroup;
+			children = (
+				9F5E89EB2391AF49002FA8B2 /* DocumentsViewController.swift */,
+				9F5E89ED2391B474002FA8B2 /* DocumentsCollectionReusableView.swift */,
+				9F5E89EF2391CBA2002FA8B2 /* DocumentViewCell.swift */,
+			);
+			path = "Documents Bookshelf";
+			sourceTree = "<group>";
+		};
+		9F5E89F22391CE6A002FA8B2 /* Document Detail */ = {
+			isa = PBXGroup;
+			children = (
+				9F5E89F32391CE84002FA8B2 /* DocumentDetailViewController.swift */,
+			);
+			path = "Document Detail";
 			sourceTree = "<group>";
 		};
 		9F75E449230C580300488BBD /* Note Collection View */ = {
@@ -451,6 +486,7 @@
 		9FD29C67224589BE00CC969A /* Application */ = {
 			isa = PBXGroup;
 			children = (
+				9F5E89EA2391AF1B002FA8B2 /* View Controllers */,
 				9F5010CA22491F8900425424 /* Views */,
 				9FD29C69224589FE00CC969A /* Helpers */,
 				9FD29C68224589DA00CC969A /* Data */,
@@ -675,12 +711,14 @@
 				9F75E47D231183E500488BBD /* ColorPickerViewDelegate.swift in Sources */,
 				9FA6239722DE3806007ED794 /* CHEBIDocument.swift in Sources */,
 				9FA623A122E73DDA007ED794 /* NotesManager.swift in Sources */,
+				9F5E89EC2391AF49002FA8B2 /* DocumentsViewController.swift in Sources */,
 				9FFB815D23765D5C00B5390C /* BookshelfOptionsTableViewController.swift in Sources */,
 				9FD29BA72220524D00CC969A /* AppDelegate.swift in Sources */,
 				9FD29C6422431BFA00CC969A /* DrawnImageClassifier.mlmodel in Sources */,
 				9FA6239C22E64EA2007ED794 /* TextData.swift in Sources */,
 				9FD29C342237FD2B00CC969A /* GMStepper.swift in Sources */,
 				9F92D10E231E95B400BC0E57 /* UICollectionViewExtensions.swift in Sources */,
+				9F5E89F42391CE84002FA8B2 /* DocumentDetailViewController.swift in Sources */,
 				9F92D112231E98C600BC0E57 /* DocumentsManager.swift in Sources */,
 				9FD29C56223C3C3900CC969A /* StringExtensions.swift in Sources */,
 				9F92D11C23217D0500BC0E57 /* SearchFilterView.swift in Sources */,
@@ -691,8 +729,10 @@
 				9FD29C472239588E00CC969A /* UIViewExtensions.swift in Sources */,
 				9FB9E501237F500B00279F3E /* ShareNoteViewController.swift in Sources */,
 				9FBF6AB822E9F428001FD730 /* VisionTextLineWrapper.swift in Sources */,
+				9F5E89EE2391B474002FA8B2 /* DocumentsCollectionReusableView.swift in Sources */,
 				9FB9E505237F640100279F3E /* SimilarNoteCollectionViewCell.swift in Sources */,
 				9FACBCB4237F1C37008E8DB3 /* NotePage.swift in Sources */,
+				9F5E89F02391CBA2002FA8B2 /* DocumentViewCell.swift in Sources */,
 				9F75E44F230D848200488BBD /* SettingsViewController.swift in Sources */,
 				9F75E484231419FA00488BBD /* TAGMEDocument.swift in Sources */,
 				9F92D11523202B9900BC0E57 /* KnowledgeGraphHelper.swift in Sources */,

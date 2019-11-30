@@ -61,8 +61,9 @@ class BookshelfOptionsTableViewController: UITableViewController {
                     option = .ResetDocuments
                 }
             }
-            dismiss(animated: true, completion: nil)
+            
             delegate?.bookshelfOptionSelected(option: option)
+        dismiss(animated: true, completion: nil)
         }
     }
 
