@@ -17,6 +17,7 @@ class DocumentDetailViewController: UIViewController, DocumentVisitor {
     @IBOutlet weak var contentTextView: UITextView!
     @IBOutlet weak var bottomImageView: UIImageView!
     @IBOutlet weak var backButton: UIButton!
+    @IBOutlet weak var backgroundBlurEffect: UIVisualEffectView!
     
     var document: Document!
     override func viewDidLoad() {
@@ -31,6 +32,8 @@ class DocumentDetailViewController: UIViewController, DocumentVisitor {
         previewImage.layer.borderColor = UIColor.black.cgColor
         typeBackView.layer.masksToBounds = true
         typeBackView.layer.cornerRadius = 15
+        backgroundBlurEffect.layer.masksToBounds = true
+        backgroundBlurEffect.layer.cornerRadius = 5
     }
     
     func setDocument(document: Document) {

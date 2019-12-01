@@ -30,6 +30,7 @@ class ShareNoteViewController: UIViewController {
         imageButton.layer.borderWidth = 1
         imageButton.layer.cornerRadius = 5
     }
+    
     @IBAction func typeSegmentedControlChanged(_ sender: UISegmentedControl) {
         if sender.selectedSegmentIndex == 0 { // Entire Note
             imageButton.isEnabled = false

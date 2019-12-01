@@ -14,6 +14,7 @@ import BadgeHub
 import NVActivityIndicatorView
 import Repeat
 import NotificationBannerSwift
+import ViewAnimator
 
 import PencilKit
 
@@ -38,7 +39,6 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
     
     @IBOutlet var bookshelf: UIView!
     @IBOutlet var activityIndicator: UIActivityIndicatorView!
-    @IBOutlet var bookshelfUpdateIndicator: NVActivityIndicatorView!
     @IBOutlet var documentsUnderlyingView: UIView!
     
     var sketchnote: Sketchnote!
@@ -46,12 +46,6 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
     
     var helpLinesHorizontal = [HoritonzalHelpLine]()
     var helpLinesVertical = [VerticalHelpLine]()
-    enum HelpLinesStatus {
-        case None
-        case Horizontal
-        case Grid
-    }
-    var helpLinesStatus : HelpLinesStatus = .None
     @IBOutlet weak var helpLinesButton: UIButton!
     
     var drawingViews = [UIView]()
@@ -62,7 +56,6 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
     var tagmeHelper: TAGMEHelper!
     
     var conceptHighlights = [UIView : [Document]]()
-    @IBOutlet weak var clearFilteredDocumentsButton: UIButton!
     
     var isDeletingNote = false
     
@@ -153,6 +146,9 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
         }
         
         updatePaginationButtons()
+        
+        self.refreshHelpLines()
+        self.refreshHelpLinesButton()
     }
     
     // This function is called when the user closes the page, i.e. stops editing the note, and the app returns to the home page.
@@ -178,7 +174,9 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
                 for helpLine in self.helpLinesVertical {
                     helpLine.removeFromSuperview()
                 }
-                self.toggleConceptHighlight(isHidden: true)
+                if topicsShown {
+                    toggleConceptHighlight()
+                }
                 self.processDrawingRecognition()
                 traitCollection.performAsCurrent {
                     sketchnote.getCurrentPage().image = canvasView.drawing.image(from: CGRect(x: canvasView.frame.minX, y: canvasView.frame.minY, width: canvasView.contentSize.width, height: canvasView.contentSize.height), scale: 1.0)
@@ -245,8 +243,6 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
     }
     
     private func processDrawingRecognition() {
-        hideAllHelpLines()
-        
         let canvasImage = canvasView.drawing.image(from: CGRect(x: canvasView.frame.minX, y: canvasView.frame.minY, width: canvasView.contentSize.width, height: canvasView.contentSize.height), scale: 1.0)
         let mainImage = canvasImage.invertedImage() ?? canvasImage
         for region in self.drawingViews {
@@ -267,34 +263,9 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
         }
     }
     
-    private func setupHelpLines() {
-        self.helpLinesHorizontal = [HoritonzalHelpLine]()
-        self.helpLinesVertical = [VerticalHelpLine]()
-        var height = CGFloat(40)
-        while (CGFloat(height) < self.canvasView.contentSize.height + 80) {
-            let line = HoritonzalHelpLine(frame: CGRect(x: 0, y: height, width: UIScreen.main.bounds.width, height: 1))
-            
-            line.isUserInteractionEnabled = false
-            line.isHidden = true
-            self.canvasView.addSubview(line)
-            self.helpLinesHorizontal.append(line)
-            height = height + 40
-        }
-        var width = CGFloat(40)
-        while (CGFloat(width) < UIScreen.main.bounds.width + 80) {
-            let line = VerticalHelpLine(frame: CGRect(x: width, y: 0, width: 1, height: self.canvasView.contentSize.height))
-            
-            line.isUserInteractionEnabled = false
-            line.isHidden = true
-            self.canvasView.addSubview(line)
-            self.helpLinesVertical.append(line)
-            width = width + 40
-        }
-    }
-    
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) { // Handle screen orientation change
         super.viewWillTransition(to: size, with: coordinator)
-        self.resetHelpLines()
+        self.refreshHelpLines()
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
@@ -308,15 +279,41 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
         }
     }
     
-    private func resetHelpLines() {
+    private func setupHelpLines() {
         for helpLine in self.helpLinesHorizontal {
             helpLine.removeFromSuperview()
         }
         for helpLine in self.helpLinesVertical {
             helpLine.removeFromSuperview()
         }
+        self.helpLinesHorizontal = [HoritonzalHelpLine]()
+        self.helpLinesVertical = [VerticalHelpLine]()
+        var height = CGFloat(20)
+        while (CGFloat(height) < self.canvasView.bounds.height + 80) {
+            let line = HoritonzalHelpLine(frame: CGRect(x: 0, y: height, width: UIScreen.main.bounds.width, height: 1))
+            
+            line.isUserInteractionEnabled = false
+            line.isHidden = true
+            self.canvasView.addSubview(line)
+            self.helpLinesHorizontal.append(line)
+            height = height + 20
+        }
+        var width = CGFloat(20)
+        while (CGFloat(width) < UIScreen.main.bounds.width + 80) {
+            let line = VerticalHelpLine(frame: CGRect(x: width, y: 0, width: 1, height: self.canvasView.bounds.height))
+            
+            line.isUserInteractionEnabled = false
+            line.isHidden = true
+            self.canvasView.addSubview(line)
+            self.helpLinesVertical.append(line)
+            width = width + 20
+        }
+    }
+    
+    private func refreshHelpLines() {
         self.setupHelpLines()
-        switch self.helpLinesStatus {
+        
+        switch self.sketchnote.helpLinesType! {
         case .None:
             for helpLine in self.helpLinesHorizontal {
                 helpLine.isHidden = true
@@ -341,6 +338,66 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
                 helpLine.isHidden = false
             }
             break
+        }
+        refreshHelpLinesButton()
+    }
+    
+    @IBAction func helpLinesButtonTapped(_ sender: UIButton) {
+        self.toggleHelpLinesType()
+    }
+    
+    private func toggleHelpLinesType() {
+        switch self.sketchnote.helpLinesType! {
+        case .None:
+            self.sketchnote.helpLinesType = .Horizontal
+            for line in helpLinesHorizontal {
+                line.isHidden = false
+            }
+            for line in helpLinesVertical {
+                line.isHidden = true
+            }
+            break
+        case .Horizontal:
+            self.sketchnote.helpLinesType = .Grid
+            for line in helpLinesHorizontal {
+                line.isHidden = false
+            }
+            for line in helpLinesVertical {
+                line.isHidden = false
+            }
+            break
+        case .Grid:
+            self.sketchnote.helpLinesType = .None
+            hideAllHelpLines()
+            break
+        }
+        refreshHelpLinesButton()
+        sketchnote.save()
+    }
+    
+    private func refreshHelpLinesButton() {
+        switch self.sketchnote.helpLinesType! {
+        case .None:
+            helpLinesButton.setImage(UIImage(systemName: "line.horizontal.3"), for: .normal)
+            helpLinesButton.tintColor = .white
+            break
+        case .Horizontal:
+            helpLinesButton.setImage(UIImage(systemName: "line.horizontal.3"), for: .normal)
+            helpLinesButton.tintColor = self.view.tintColor
+            break
+        case .Grid:
+            helpLinesButton.tintColor = self.view.tintColor
+            helpLinesButton.setImage(UIImage(systemName: "grid"), for: .normal)
+            break
+        }
+    }
+
+    private func hideAllHelpLines() {
+        for line in helpLinesHorizontal {
+            line.isHidden = true
+        }
+        for line in helpLinesVertical {
+            line.isHidden = true
         }
     }
     
@@ -490,14 +547,7 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
         }
     }
     
-    private func toggleConceptHighlight(isHidden: Bool) {
-        for (view, _) in self.conceptHighlights {
-            view.isHidden = isHidden
-        }
-    }
-    
-    var topicsShown = false
-    @IBAction func topicsTapped(_ sender: UIButton) {
+    private func toggleConceptHighlight() {
         topicsShown = !topicsShown
         if topicsShown {
             setupConceptHighlights()
@@ -508,7 +558,14 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
             topicsButton.tintColor = .white
             topicsButton.setTitleColor(.white, for: .normal)
         }
-        self.toggleConceptHighlight(isHidden: !topicsShown)
+        for (view, _) in self.conceptHighlights {
+            view.isHidden = !topicsShown
+        }
+    }
+    
+    var topicsShown = false
+    @IBAction func topicsTapped(_ sender: UIButton) {
+        self.toggleConceptHighlight()
     }
     
     private func clearConceptHighlights() {
@@ -608,49 +665,6 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
         }
     }
     
-    @IBAction func helpLinesButtonTapped(_ sender: UIButton) {
-        switch self.helpLinesStatus {
-        case .None:
-            self.helpLinesStatus = .Horizontal
-            helpLinesButton.setImage(UIImage(systemName: "line.horizontal.3"), for: .normal)
-            helpLinesButton.tintColor = self.view.tintColor
-            
-            for line in helpLinesHorizontal {
-                line.isHidden = false
-            }
-            for line in helpLinesVertical {
-                line.isHidden = true
-            }
-            break
-        case .Horizontal:
-            self.helpLinesStatus = .Grid
-            helpLinesButton.tintColor = self.view.tintColor
-            helpLinesButton.setImage(UIImage(systemName: "grid"), for: .normal)
-            for line in helpLinesHorizontal {
-                line.isHidden = false
-            }
-            for line in helpLinesVertical {
-                line.isHidden = false
-            }
-            break
-        case .Grid:
-            self.helpLinesStatus = .None
-            helpLinesButton.setImage(UIImage(systemName: "line.horizontal.3"), for: .normal)
-            helpLinesButton.tintColor = .white
-            hideAllHelpLines()
-            break
-        }
-    }
-
-    private func hideAllHelpLines() {
-        for line in helpLinesHorizontal {
-            line.isHidden = true
-        }
-        for line in helpLinesVertical {
-            line.isHidden = true
-        }
-    }
-    
     //MARK: Handwriting recognition process
     let handwritingRecognizer = HandwritingRecognizer()
     
@@ -693,6 +707,8 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
     
     
     @IBAction func bookshelfButtonTapped(_ sender: UIButton) {
+        let animation = AnimationType.rotate(angle: 360)
+        sender.animate(animations: [animation])
         if self.bookshelf.isHidden {
             showBookshelf()
         }
@@ -704,19 +720,13 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
     private func showBookshelf() {
         bookshelfButton.tintColor = self.view.tintColor
         self.bookshelf.isHidden = false
-        if self.isBookshelfDraggedOut {
-            self.bookshelfLeftConstraint.constant = UIScreen.main.bounds.maxX - 400//500
-            UIView.animate(withDuration: 0.25, delay: 0, options: UIView.AnimationOptions.curveEaseIn, animations: {
-                self.view.layoutIfNeeded()
-            }, completion: { (ended) in
-            })
-            self.isBookshelfDraggedOut = false
-        }
+        let animation = AnimationType.from(direction: .right, offset: 400.0)
+        bookshelf.animate(animations: [animation])
     }
     
     private func closeBookshelf() {
         bookshelfButton.tintColor = .white
-        bookshelfLeftConstraint.constant = UIScreen.main.bounds.maxX - 400//UIScreen.main.bounds.width
+        bookshelfLeftConstraint.constant = UIScreen.main.bounds.maxX - 400
         self.isBookshelfDraggedOut = true
         UIView.animate(withDuration: 0.25, delay: 0, options: UIView.AnimationOptions.curveEaseIn, animations: {
             self.view.layoutIfNeeded()
@@ -1148,8 +1158,12 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
         setupConceptHighlights()
         drawingViews = [UIView]()
         setupDrawingRegions()
+        if previousStateOfTopicsShown {
+            toggleConceptHighlight()
+        }
     }
     
+    var previousStateOfTopicsShown = false
     private func saveCurrentPage() {
         if textRecognitionTimer != nil {
             textRecognitionTimer!.invalidate()
@@ -1158,7 +1172,10 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
             saveTimer!.invalidate()
         }
         documentsVC.bookshelfUpdateTimer?.reset(nil)
-        self.toggleConceptHighlight(isHidden: true)
+        previousStateOfTopicsShown = topicsShown
+        if topicsShown {
+            self.toggleConceptHighlight()
+        }
         self.processDrawingRecognition()
         traitCollection.performAsCurrent {
             sketchnote.getCurrentPage().image = canvasView.drawing.image(from: CGRect(x: canvasView.frame.minX, y: canvasView.frame.minY, width: canvasView.contentSize.width, height: canvasView.contentSize.height), scale: 1.0)
@@ -1231,7 +1248,7 @@ public class HoritonzalHelpLine: UIView  {
     public override func draw(_ rect: CGRect) {
         guard let context = UIGraphicsGetCurrentContext() else { return }
         context.setLineWidth(2.0)
-        context.setStrokeColor(UIColor.label.cgColor)
+        context.setStrokeColor(#colorLiteral(red: 0.8374180198, green: 0.8374378085, blue: 0.8374271393, alpha: 1))
         context.move(to: CGPoint(x: 0, y: 0))
         context.addLine(to: CGPoint(x: self.frame.width, y: 0))
         context.strokePath()
@@ -1256,7 +1273,7 @@ public class VerticalHelpLine: UIView  {
     public override func draw(_ rect: CGRect) {
         guard let context = UIGraphicsGetCurrentContext() else { return }
         context.setLineWidth(2.0)
-        context.setStrokeColor(UIColor.label.cgColor)
+        context.setStrokeColor(#colorLiteral(red: 0.8374180198, green: 0.8374378085, blue: 0.8374271393, alpha: 1))
         context.move(to: CGPoint(x: 0, y: 0))
         context.addLine(to: CGPoint(x: 0, y: self.frame.height))
         context.strokePath()

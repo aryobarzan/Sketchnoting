@@ -24,7 +24,7 @@ struct SVGProcessor: ImageProcessor {
     let identifier = "my.app.svg"
     
     // Convert input data/image to target image and return it.
-    func process(item: ImageProcessItem, options: KingfisherParsedOptionsInfo) -> Image? {
+    func process(item: ImageProcessItem, options: KingfisherParsedOptionsInfo) -> KFCrossPlatformImage? {
         switch item {
         case .image(let image):
             //already an image
@@ -42,11 +42,11 @@ struct SVGProcessor: ImageProcessor {
 
 struct SVGCacheSerializer: CacheSerializer {
     
-    func data(with image: Image, original: Data?) -> Data? {
+    func data(with image: KFCrossPlatformImage, original: Data?) -> Data? {
         return original
     }
     
-    func image(with data: Data, options: KingfisherParsedOptionsInfo) -> Image? {
+    func image(with data: Data, options: KingfisherParsedOptionsInfo) -> KFCrossPlatformImage? {
         if let imageSVG : SVGKImage = SVGKImage(data: data) {
             return imageSVG.uiImage
         }

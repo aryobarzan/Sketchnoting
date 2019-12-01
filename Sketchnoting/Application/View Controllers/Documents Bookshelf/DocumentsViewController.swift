@@ -8,6 +8,7 @@
 
 import UIKit
 import Repeat
+import ViewAnimator
 
 private let reuseIdentifier = "cell"
 
@@ -119,6 +120,8 @@ class DocumentsViewController: UICollectionViewController{
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         documentDetailVC.setDocument(document: items[indexPath.item])
         documentDetailVC.view.isHidden = false
+        let animation = AnimationType.from(direction: .right, offset: 100.0)
+        documentDetailVC.view.animate(animations: [animation])
         
     }
     

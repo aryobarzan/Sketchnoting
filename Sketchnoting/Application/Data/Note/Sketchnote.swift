@@ -29,6 +29,7 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable, DocumentDelegate
     var documents: [Document]!
     var tags: [Tag]!
     var activePageIndex = 0
+    var helpLinesType: HelpLinesType!
     
     var sharedByDevice: String?
     
@@ -40,6 +41,7 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable, DocumentDelegate
         case relatedDocuments = "relatedDocuments"
         case tags = "tags"
         case activePageIndex
+        case helpLinesType = "helpLinesType"
     }
     
     //MARK: Initialization
@@ -51,6 +53,7 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable, DocumentDelegate
         self.documents = relatedDocuments ?? [Document]()
         self.pages = [NotePage]()
         self.tags = [Tag]()
+        self.helpLinesType = .None
         
         let firstPage = NotePage()
         self.pages.append(firstPage)
@@ -69,6 +72,7 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable, DocumentDelegate
         }
         try container.encode(tags, forKey: .tags)
         try container.encode(activePageIndex, forKey: .activePageIndex)
+        try container.encode(helpLinesType, forKey: .helpLinesType)
     }
     
     required init(from decoder: Decoder) throws {
@@ -124,6 +128,11 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable, DocumentDelegate
             tags = [Tag]()
         }
         activePageIndex = try container.decode(Int.self, forKey: .activePageIndex)
+        helpLinesType = try? container.decode(HelpLinesType.self, forKey: .helpLinesType)
+        if helpLinesType == nil {
+            helpLinesType = .None
+        }
+        
         log.info("Sketchnote " + self.id + " decoded.")
     }
     
@@ -541,5 +550,46 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable, DocumentDelegate
             }
         }
         self.save()
+    }
+}
+
+public enum HelpLinesType: Codable {
+    case None
+    case Horizontal
+    case Grid
+    
+    enum Key: CodingKey {
+        case rawValue
+    }
+    
+    enum CodingError: Error {
+        case unknownValue
+    }
+    
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: Key.self)
+        let rawValue = try container.decode(Int.self, forKey: .rawValue)
+        switch rawValue {
+        case 0:
+            self = .None
+        case 1:
+            self = .Horizontal
+        case 2:
+            self = .Grid
+        default:
+            throw CodingError.unknownValue
+        }
+    }
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: Key.self)
+        switch self {
+        case .None:
+            try container.encode(0, forKey: .rawValue)
+        case .Horizontal:
+            try container.encode(1, forKey: .rawValue)
+        case .Grid:
+            try container.encode(2, forKey: .rawValue)
+        }
     }
 }

@@ -39,7 +39,7 @@ class HandwritingRecognizer {
             self.textRecognizerCloud = vision.cloudTextRecognizer()
             textRecognizerCloud.process(visionImage) { result, error in
                 guard error == nil, let result = result else {
-                    log.error(error?.localizedDescription)
+                    log.error(error.debugDescription)
                     handleFinish(false, nil)
                     return
                 }
@@ -52,7 +52,7 @@ class HandwritingRecognizer {
             self.textRecognizerCloud = vision.cloudTextRecognizer(options: options)
             textRecognizerCloud.process(visionImage) { result, error in
                 guard error == nil, let result = result else {
-                    log.error(error?.localizedDescription)
+                    log.error(error.debugDescription)
                     handleFinish(false, nil)
                     return
                 }
