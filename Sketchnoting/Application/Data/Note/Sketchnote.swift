@@ -434,9 +434,11 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable, DocumentDelegate
                     let imageHeight: CGFloat = 1024
                     while yOrigin < bounds.maxY {
                         let imgBounds = CGRect(x: 0, y: yOrigin, width: UIScreen.main.bounds.width, height: min(imageHeight, bounds.maxY - yOrigin))
-                        let img = page.canvasDrawing.image(from: imgBounds, scale: 2)
-                        img.draw(in: imgBounds)
-                        yOrigin += imageHeight
+                        UITraitCollection(userInterfaceStyle: .light).performAsCurrent {
+                            let image = page.canvasDrawing.image(from: imgBounds, scale: 2)
+                            image.draw(in: imgBounds)
+                            yOrigin += imageHeight
+                        }
                     }
                 }
                 UIGraphicsEndPDFContext()

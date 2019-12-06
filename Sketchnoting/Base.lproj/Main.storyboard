@@ -1139,7 +1139,7 @@
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="tz5-2Q-OEW">
                                 <rect key="frame" x="0.0" y="40" width="768" height="984"/>
                                 <subviews>
-                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="iDb-Yw-oym" customClass="PKCanvasView">
+                                    <view opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="iDb-Yw-oym" customClass="PKCanvasView">
                                         <rect key="frame" x="0.0" y="0.0" width="768" height="984"/>
                                         <subviews>
                                             <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="P5Z-5P-6jH">
@@ -1151,7 +1151,7 @@
                                                 </connections>
                                             </view>
                                         </subviews>
-                                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <constraints>
                                             <constraint firstItem="P5Z-5P-6jH" firstAttribute="height" secondItem="iDb-Yw-oym" secondAttribute="height" id="4QA-50-9jI"/>
                                             <constraint firstItem="P5Z-5P-6jH" firstAttribute="width" secondItem="iDb-Yw-oym" secondAttribute="width" id="PCl-t3-lg0"/>

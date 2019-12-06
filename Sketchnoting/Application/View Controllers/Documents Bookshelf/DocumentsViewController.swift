@@ -221,11 +221,7 @@ class DocumentsViewController: UICollectionViewController{
                 }
             }
             self.updateBookshelf()
-            //self.clearConceptHighlights()
-            //if self.topicsShown {
-            //    self.topicsShown = false
-            //}
-            //self.setupConceptHighlights()
+            self.delegate?.updateTopicsCount()
         }
         return UIMenu(title: document.title, children: [hideAction])
     }
@@ -256,7 +252,7 @@ class DocumentsViewController: UICollectionViewController{
                 CATransaction.commit()
                 self.collectionView.scrollToItem(at: indexPath, at: .bottom , animated: true)
             }
-            //self.topicsBadgeHub.setCount(self.sketchnote.documents.count)
+            self.delegate?.updateTopicsCount()
         }
     }
     
@@ -355,4 +351,5 @@ public enum BookshelfState {
 
 protocol DocumentsViewControllerDelegate  {
     func resetDocuments()
+    func updateTopicsCount()
 }

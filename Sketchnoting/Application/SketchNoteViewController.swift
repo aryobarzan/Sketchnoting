@@ -123,6 +123,9 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
         relatedNotesButton.layer.borderColor = view.tintColor.cgColor
         relatedNotesButton.layer.borderWidth = 1
         relatedNotesButton.layer.cornerRadius = 5
+        
+        self.oldDocuments = sketchnote.documents
+        self.canvasView.overrideUserInterfaceStyle = .light
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -295,6 +298,7 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
             line.isUserInteractionEnabled = false
             line.isHidden = true
             self.canvasView.addSubview(line)
+            self.canvasView.sendSubviewToBack(line)
             self.helpLinesHorizontal.append(line)
             height = height + 20
         }
@@ -305,6 +309,7 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
             line.isUserInteractionEnabled = false
             line.isHidden = true
             self.canvasView.addSubview(line)
+            self.canvasView.sendSubviewToBack(line)
             self.helpLinesVertical.append(line)
             width = width + 20
         }
@@ -1221,6 +1226,14 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
     func resetDocuments() {
         self.clearConceptHighlights()
         self.annotateText(text: self.sketchnote.getText())
+    }
+    var oldDocuments: [Document]!
+    func updateTopicsCount() {
+        self.topicsBadgeHub.setCount(sketchnote.documents.count)
+        let differences = zip(oldDocuments, sketchnote.documents).map {$0.0 == $0.1}
+        if differences.count > 0 {
+            setupConceptHighlights()
+        }
     }
     
     // MARK: Bookshelf Options Delegate
