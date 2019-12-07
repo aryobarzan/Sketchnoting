@@ -120,9 +120,6 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
         relatedNotesCollectionView.register(UINib(nibName: "SimilarNoteCollectionViewCell", bundle: nil), forCellWithReuseIdentifier: reuseSimilarNoteIdentifier)
         relatedNotesCollectionView.delegate = self
         relatedNotesCollectionView.dataSource = self
-        relatedNotesButton.layer.borderColor = view.tintColor.cgColor
-        relatedNotesButton.layer.borderWidth = 1
-        relatedNotesButton.layer.cornerRadius = 5
         
         self.oldDocuments = sketchnote.documents
         self.canvasView.overrideUserInterfaceStyle = .light
@@ -1199,6 +1196,8 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
     @IBOutlet var relatedNotesCollectionView: UICollectionView!
     @IBOutlet var relatedNotesButton: UIButton!
     var relatedNotes = [Sketchnote]()
+    
+    var similarityThreshold = 0.0
     @IBAction func documentsRelatedNotesSegmentChanged(_ sender: UISegmentedControl) {
         if sender.selectedSegmentIndex == 0 {
             relatedNotesView.isHidden = true
@@ -1207,19 +1206,35 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
         else {
             documentsUnderlyingView.isHidden = true
             relatedNotesView.isHidden = false
+            if relatedNotes.count == 0 {
+                refreshRelatedNotes()
+            }
         }
     }
     @IBAction func lookForRelatedNotesTapped(_ sender: UIButton) {
+        refreshRelatedNotes()
+    }
+    
+    private func refreshRelatedNotes() {
         self.relatedNotes = [Sketchnote]()
         var allNotes = NotesManager.notes
         allNotes.removeAll{$0 == sketchnote}
         for note in allNotes {
             let similarity = sketchnote.similarTo(note: note)
-            if similarity > 0.0 {
+            if similarity > similarityThreshold {
                 relatedNotes.append(note)
             }
         }
         relatedNotesCollectionView.reloadData()
+    }
+    @IBAction func similaritySegmentChanged(_ sender: UISegmentedControl) {
+        if sender.selectedSegmentIndex == 0 {
+            similarityThreshold = 0.0
+        }
+        else {
+            similarityThreshold = 10.0
+        }
+        refreshRelatedNotes()
     }
     
     // MARK: Documents View Controller delegate
@@ -1242,6 +1257,12 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
         documentsVC.setFilter(option: option)
     }
 }
+
+
+
+
+
+
 public class HoritonzalHelpLine: UIView  {
     
     public init() {
@@ -1290,25 +1311,5 @@ public class VerticalHelpLine: UIView  {
         context.move(to: CGPoint(x: 0, y: 0))
         context.addLine(to: CGPoint(x: 0, y: self.frame.height))
         context.strokePath()
-    }
-}
-
-
-extension UICollectionView{
-    func refreshLayout() {
-        let oldLayout = collectionViewLayout as! UICollectionViewFlowLayout
-        let newLayout = UICollectionViewFlowLayout()
-        newLayout.estimatedItemSize = oldLayout.estimatedItemSize
-        newLayout.footerReferenceSize = oldLayout.footerReferenceSize
-        newLayout.headerReferenceSize = oldLayout.headerReferenceSize
-        newLayout.itemSize = oldLayout.itemSize
-        newLayout.minimumInteritemSpacing = oldLayout.minimumInteritemSpacing
-        newLayout.minimumLineSpacing = oldLayout.minimumLineSpacing
-        newLayout.scrollDirection = oldLayout.scrollDirection
-        newLayout.sectionFootersPinToVisibleBounds = oldLayout.sectionFootersPinToVisibleBounds
-        newLayout.sectionHeadersPinToVisibleBounds = oldLayout.sectionHeadersPinToVisibleBounds
-        newLayout.sectionInset = oldLayout.sectionInset
-        newLayout.sectionInsetReference = oldLayout.sectionInsetReference
-        collectionViewLayout = newLayout
     }
 }

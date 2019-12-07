@@ -523,14 +523,49 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable, DocumentDelegate
             similarity += 0.2
         }
         for document in documents {
-            for documentOther in note.documents {
-                if document == documentOther {
-                    similarity += 0.05
+            for other in note.documents {
+                if document.title.lowercased() == other.title.lowercased() {
+                    similarity += 5
+                }
+                /*if let description = document.description, let otherDescription = other.description {
+                    let distance = description.levenshtein(otherDescription)
+                    if distance == 0 {
+                        similarity += 5
+                    }
+                    else {
+                        similarity += Double(5 * (1 / distance))
+                    }
+                }*/
+                if document.documentType == other.documentType {
+                    similarity += 0.5
+                    switch document.documentType {
+                    case .Spotlight:
+                        let d1 = document as! SpotlightDocument
+                        let d2 = other as! SpotlightDocument
+                        if let types = d1.types, let otherTypes = d2.types {
+                            let commonTypes = SketchnotingUtilities.commonElements(types, otherTypes)
+                            similarity += Double(3 * commonTypes.count)
+                        }
+                    case .TAGME:
+                        let d1 = document as! TAGMEDocument
+                        let d2 = other as! TAGMEDocument
+                        if let categories = d1.categories, let otherCategories = d2.categories {
+                            let commonCategories = SketchnotingUtilities.commonElements(categories, otherCategories)
+                            similarity += Double(3 * commonCategories.count)
+                        }
+                    case .BioPortal:
+                        break
+                    case .Chemistry:
+                        break
+                    case .Other:
+                        break
+                    }
                 }
             }
         }
         return similarity
     }
+    
     
     public func mergeWith(note: Sketchnote) {
         if note != self {

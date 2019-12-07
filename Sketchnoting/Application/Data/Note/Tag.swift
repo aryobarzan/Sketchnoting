@@ -8,7 +8,7 @@
 
 import UIKit
 
-struct Tag: Equatable, Codable {
+public struct Tag: Equatable, Codable {
     
     var title: String!
     var color: UIColor!
@@ -25,14 +25,14 @@ struct Tag: Equatable, Codable {
         self.color = color
     }
     
-    static func == (lhs: Tag, rhs: Tag) -> Bool {
+    public static func == (lhs: Tag, rhs: Tag) -> Bool {
         if lhs.title == rhs.title {
             return true
         }
         return false
     }
     
-    init(from decoder: Decoder) throws {
+    public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         
         title = try? container.decode(String.self, forKey: .title)
@@ -46,7 +46,7 @@ struct Tag: Equatable, Codable {
         color = UIColor(red: redValue ?? 0.0, green: greenValue ?? 0.0, blue: blueValue ?? 0.0, alpha: 1.0)
     }
     
-    func encode(to encoder: Encoder) throws {
+    public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(title, forKey: .title)
         try container.encode(color.redValue, forKey: .colorRed)

@@ -24,9 +24,9 @@ class NoteCollectionViewCell: UICollectionViewCell {
     }
     
     func setNote(note: Sketchnote) {
-        self.layer.borderWidth = 1
-        self.layer.borderColor = UIColor.black.cgColor
-        self.layer.cornerRadius = 4
+        self.imageView.layer.borderWidth = 1
+        self.imageView.layer.borderColor = UIColor.black.cgColor
+        self.imageView.layer.cornerRadius = 6
         
         sketchnote = note
         imageView.image = sketchnote.getPreviewImage()

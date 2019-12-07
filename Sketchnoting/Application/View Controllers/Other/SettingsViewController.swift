@@ -8,6 +8,8 @@
 
 import UIKit
 
+import NotificationBannerSwift
+
 class SettingsViewController: UITableViewController {
 
     @IBOutlet var automaticAnnotationSwitch: UISwitch!
@@ -59,6 +61,13 @@ class SettingsViewController: UITableViewController {
             UserDefaults.settings.set(false, forKey: SettingsKeys.TextRecognitionCloud.rawValue)
             break
         }
+    }
+    @IBAction func backupNotesTapped(_ sender: UIButton) {
+    }
+    @IBAction func clearDataTapped(_ sender: UIButton) {
+        NotesManager.clearData()
+        let banner = FloatingNotificationBanner(title: "Data Cleared", subtitle: "All notes and document resources are on your device have been wiped.", style: .info)
+        banner.show()
     }
 }
 

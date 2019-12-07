@@ -10,7 +10,6 @@ target 'Sketchnoting' do
   pod 'NewPopMenu'
   pod 'NotificationBannerSwift'
   pod 'BadgeHub'
-  pod 'M13Checkbox', '~> 3.4.0'
   pod 'NVActivityIndicatorView'
   pod 'PocketSVG', '~> 2.0'
   pod 'SVGKit'

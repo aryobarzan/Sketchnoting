@@ -24,7 +24,9 @@ import PencilKit
 // It also contains note collection views, which in turn contain sketchnote views.
 
 //This controller handles all interactions of the user on the home page, including creating new note collections and new notes, searching, sharing notes, and generating pdfs from notes.
-class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextFieldDelegate, MCSessionDelegate, MCBrowserViewControllerDelegate, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, NoteCollectionViewDetailCellDelegate, UITableViewDataSource, UITableViewDelegate, TagTableViewCellDelegate, ColorPickerViewDelegate, ColorPickerViewDelegateFlowLayout, UIApplicationDelegate {
+class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextFieldDelegate, MCSessionDelegate, MCBrowserViewControllerDelegate, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, NoteCollectionViewDetailCellDelegate, UIApplicationDelegate, UIPopoverPresentationControllerDelegate {
+    
+    private var selectedNoteForTagEditing: Sketchnote?
     
     @IBOutlet var newNoteButton: UIButton!
     @IBOutlet var noteLoadingIndicator: NVActivityIndicatorView!
@@ -37,7 +39,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     @IBOutlet var searchPanelButton: UIButton!
     @IBOutlet var clearSearchButton: UIButton!
     @IBOutlet var noteListViewButton: UIButton!
-    @IBOutlet var filtersButton: UIButton!
+    @IBOutlet weak var filtersButton: UIButton!
     
     @IBOutlet var searchPanel: UIView!
     @IBOutlet var noteSortingButton: UIButton!
@@ -50,13 +52,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     @IBOutlet var drawingSearchButton: UIButton!
     @IBOutlet var drawingSearchCanvas: PKCanvasView!
     @IBOutlet var blurView: UIVisualEffectView!
-    
-    @IBOutlet weak var tagsPanel: UIView!
-    @IBOutlet weak var tagsTableView: UITableView!
-    @IBOutlet weak var newTagTextField: UITextField!
-    @IBOutlet weak var newTagColorPickerView: ColorPickerView!
-    @IBOutlet weak var tagsPanelTitleLabel: UILabel!
-    @IBOutlet weak var newTagButton: UIButton!
     
     var activeFiltersBadge: BadgeHub!
     var activeSearchFiltersBadge: BadgeHub!
@@ -98,18 +93,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         activeSearchFiltersBadge = BadgeHub(view: searchPanelButton)
         activeFiltersBadge.scaleCircleSize(by: 0.45)
         activeSearchFiltersBadge.scaleCircleSize(by: 0.45)
-        
-        // Tags table view setup
-        tagsPanel.alpha = 0.0
-        tagsPanel.layer.masksToBounds = true
-        tagsPanel.layer.cornerRadius = 5
-        tagsTableView.delegate = self
-        tagsTableView.dataSource = self
-        newTagColorPickerView.delegate = self
-        newTagColorPickerView.layoutDelegate = self
-        newTagColorPickerView.isSelectedColorTappable = false
-        newTagColorPickerView.colors = [#colorLiteral(red: 0, green: 0, blue: 0, alpha: 1), #colorLiteral(red: 0.1215686277, green: 0.01176470611, blue: 0.4235294163, alpha: 1), #colorLiteral(red: 0.2196078449, green: 0.007843137719, blue: 0.8549019694, alpha: 1), #colorLiteral(red: 0.5568627715, green: 0.3529411852, blue: 0.9686274529, alpha: 1), #colorLiteral(red: 0.2392156869, green: 0.6745098233, blue: 0.9686274529, alpha: 1), #colorLiteral(red: 0.1411764771, green: 0.3960784376, blue: 0.5647059083, alpha: 1), #colorLiteral(red: 0.1294117719, green: 0.2156862766, blue: 0.06666667014, alpha: 1), #colorLiteral(red: 0.3411764801, green: 0.6235294342, blue: 0.1686274558, alpha: 1), #colorLiteral(red: 0.721568644, green: 0.8862745166, blue: 0.5921568871, alpha: 1), #colorLiteral(red: 0.9764705896, green: 0.850980401, blue: 0.5490196347, alpha: 1), #colorLiteral(red: 0.9529411793, green: 0.6862745285, blue: 0.1333333403, alpha: 1), #colorLiteral(red: 0.3098039329, green: 0.2039215714, blue: 0.03921568766, alpha: 1), #colorLiteral(red: 0.3176470697, green: 0.07450980693, blue: 0.02745098062, alpha: 1), #colorLiteral(red: 0.7450980544, green: 0.1568627506, blue: 0.07450980693, alpha: 1), #colorLiteral(red: 0.9372549057, green: 0.3490196168, blue: 0.1921568662, alpha: 1), #colorLiteral(red: 0.9568627477, green: 0.6588235497, blue: 0.5450980663, alpha: 1), #colorLiteral(red: 0.8549019694, green: 0.250980407, blue: 0.4784313738, alpha: 1), #colorLiteral(red: 0.5725490451, green: 0, blue: 0.2313725501, alpha: 1), #colorLiteral(red: 0.1921568662, green: 0.007843137719, blue: 0.09019608051, alpha: 1)]
-        newTagColorPickerView.preselectedIndex = 0
         
         // The note-sharing related variables are instantiated
         peerID = MCPeerID(displayName: UIDevice.current.name)
@@ -174,8 +157,12 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         super.viewWillAppear(animated)
         self.navigationController?.setNavigationBarHidden(true, animated: true)
         self.setNeedsStatusBarAppearanceUpdate()
-        
-        
+    }
+    
+    func popoverPresentationControllerDidDismissPopover(_ popoverPresentationController: UIPopoverPresentationController) {
+        self.updateDisplayedNotes()
+        self.selectedNoteForTagEditing = nil
+        activeFiltersBadge.setCount(TagsManager.filterTags.count)
     }
  
     override var preferredStatusBarStyle : UIStatusBarStyle {
@@ -192,8 +179,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         self.updateDisplayedNotes()
     }
     
-    // This function handles the cases where the user either creates a new note or wants to edit an existing note.
-    // In both cases, the SketchNoteViewController page is loaded and displayed to the user and the note's information is passed on to that page.
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         super.prepare(for: segue, sender: sender)
         switch(segue.identifier ?? "") {
@@ -221,6 +206,20 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
                 }
             }
             break
+        case "ManageTags":
+            let destinationNavi = segue.destination as! UINavigationController
+            destinationNavi.popoverPresentationController?.delegate = self
+            if let destination = destinationNavi.topViewController as? TagsViewController {
+                destination.isFiltering = true
+            }
+            break
+        case "EditNoteTags":
+            let destinationNavi = segue.destination as! UINavigationController
+            destinationNavi.popoverPresentationController?.delegate = self
+            if let destination = destinationNavi.topViewController as? TagsViewController {
+                destination.note = selectedNoteForTagEditing
+            }
+            break
         default:
             print("Not creating or editing sketchnote.")
         }
@@ -246,9 +245,9 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         self.items = NotesManager.notes
         
         var filteredNotesToRemove = [Sketchnote]()
-        if self.activeTags.count > 0 {
+        if TagsManager.filterTags.count > 0 {
             for note in self.items {
-                for tag in activeTags {
+                for tag in TagsManager.filterTags {
                     if !note.tags.contains(tag) {
                         filteredNotesToRemove.append(note)
                         break
@@ -377,7 +376,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             NotesManager.add(note: note.duplicate())
             self.updateDisplayedNotes()
         }
-        let copyTextAction = UIAction(title: "Copy Text", image: UIImage(systemName: "doc.text")) { action in
+        let copyTextAction = UIAction(title: "Copy Text", image: UIImage(systemName: "text.quote")) { action in
             UIPasteboard.general.string = note.getText()
             let banner = FloatingNotificationBanner(title: note.getTitle(), subtitle: "Copied text to clipboard.", style: .info)
             banner.show()
@@ -391,7 +390,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         let sendAction = UIAction(title: "Send", image: UIImage(systemName: "paperplane")) { action in
             self.sendNote(note: note)
         }
-        let deleteAction = UIAction(title: "Delete", image: UIImage(systemName: "trash")) { action in
+        let deleteAction = UIAction(title: "Delete", image: UIImage(systemName: "xmark.circle.fill")) { action in
             self.deleteNote(note: note)
         }
         // Create and return a UIMenu with the share action
@@ -597,9 +596,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             if !drawingSearchPanel.isHidden {
                  self.closeDrawingSearchPanel()
             }
-            else {
-                self.closeTagsPanel()
-            }
         }
     }
     @IBAction func clearDrawingSearchTapped(_ sender: UIButton) {
@@ -766,7 +762,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
                         sizeForItemAt indexPath: IndexPath) -> CGSize {
         switch self.noteCollectionViewState {
         case .Grid:
-            return CGSize(width: CGFloat(200), height: CGFloat(270))
+            return CGSize(width: CGFloat(200), height: CGFloat(300))
         case .Detail:
             return CGSize(width: collectionView.bounds.size.width - CGFloat(10), height: CGFloat(105))
         }
@@ -809,21 +805,20 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     }
     
     private func editNoteTags(sketchnote: Sketchnote) {
-           var looseTagsToRemove = [Tag]()
-           for tag in sketchnote.tags {
-               if !TagsManager.tags.contains(tag) {
-                   looseTagsToRemove.append(tag)
-               }
-           }
-           if looseTagsToRemove.count > 0 {
-               for t in looseTagsToRemove {
-                   sketchnote.tags.removeAll{$0 == t}
-               }
-               sketchnote.save()
-           }
-           self.selectedNoteForTagEditing = sketchnote
-           self.tagsPanelState = .EditNote
-           self.showTagsPanel()
+        var looseTagsToRemove = [Tag]()
+        for tag in sketchnote.tags {
+            if !TagsManager.tags.contains(tag) {
+                looseTagsToRemove.append(tag)
+            }
+        }
+        if looseTagsToRemove.count > 0 {
+            for t in looseTagsToRemove {
+                sketchnote.tags.removeAll{$0 == t}
+            }
+            sketchnote.save()
+        }
+        self.selectedNoteForTagEditing = sketchnote
+        self.performSegue(withIdentifier: "EditNoteTags", sender: self)
        }
 
     private func shareNote(note: Sketchnote, sender: UIView) {
@@ -872,206 +867,8 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         }))
         self.present(alert, animated: true, completion: nil)
     }
+
     
-    // MARK: Tags
-    var activeTags = [Tag]() // For filtering notes
-    
-    private var tagsPanelState = TagsPanelState.EditTags
-    private enum TagsPanelState: String {
-        case EditTags
-        case EditNote
-        case NewNote
-        case FilterNotes
-    }
-    private var selectedNoteForTagEditing: Sketchnote?
-    
-    private func updateTagsPanel() {
-        switch self.tagsPanelState {
-        case .EditTags:
-            self.tagsPanelTitleLabel.text = "Manage Tags"
-            break
-        case .EditNote:
-            self.tagsPanelTitleLabel.text = "Edit Note Tags"
-            break
-        case .NewNote:
-            self.tagsPanelTitleLabel.text = "New Note With Tags"
-            break
-        case .FilterNotes:
-            self.tagsPanelTitleLabel.text = "Filter Notes By Tags"
-            break
-        }
-        if self.tagsPanelState == .EditTags {
-            self.tagsTableView.allowsSelection = false
-            self.tagsTableView.allowsMultipleSelection = false
-        }
-        else {
-            self.tagsTableView.allowsSelection = true
-            self.tagsTableView.allowsMultipleSelection = true
-        }
-        tagsTableView.reloadData()
-    }
-    
-    @IBAction func tagsButtonTapped(_ sender: UIButton) {
-        self.tagsPanelState = .EditTags
-        showTagsPanel()
-    }
-    
-    private func showTagsPanel() {
-        self.updateTagsPanel()
-        
-        if self.tagsPanelState == .FilterNotes {
-            newTagTextField.isEnabled = false
-            newTagButton.isEnabled = false
-            newTagColorPickerView.isUserInteractionEnabled = false
-        }
-        else {
-            newTagTextField.isEnabled = true
-            newTagButton.isEnabled = true
-            newTagColorPickerView.isUserInteractionEnabled = true
-        }
-        
-        self.view.layoutIfNeeded()
-        UIView.animate(withDuration: 0.25, delay: 0.0, options: UIView.AnimationOptions.curveEaseIn, animations: {
-            self.tagsPanel.alpha = 1.0
-            self.blurView.alpha = 1.0
-            self.blurView.isHidden = false
-            self.tagsPanel.isHidden = false
-            self.view.layoutIfNeeded()
-        }, completion: nil)
-    }
-    
-    private func closeTagsPanel() {
-        self.view.layoutIfNeeded()
-        UIView.animate(withDuration: 0.25, delay: 0.0, options: UIView.AnimationOptions.curveEaseOut, animations: {
-            self.tagsPanel.alpha = 0.0
-            self.blurView.alpha = 0.0
-        }, completion: { completed in
-            self.blurView.isHidden = true
-            self.tagsPanel.isHidden = true
-            self.view.layoutIfNeeded()
-        })
-        if self.tagsPanelState == .EditNote && selectedNoteForTagEditing != nil {
-            selectedNoteForTagEditing!.save()
-        }
-        else if self.tagsPanelState == .FilterNotes {
-            self.activeTags = self.getSelectedTags()
-            
-            self.updateDisplayedNotes()
-            
-            activeFiltersBadge.setCount(self.activeTags.count)
-        }
-    }
-    @IBAction func newTagTapped(_ sender: UIButton) {
-        if let title = newTagTextField.text {
-            let trimmed = title.trimmingCharacters(in: .whitespacesAndNewlines)
-            if !trimmed.isEmpty {
-                let newTag = Tag(title: trimmed, color: newTagColorPickerView.colors[newTagColorPickerView.indexOfSelectedColor ?? 0])
-                TagsManager.add(tag: newTag)
-                tagsTableView.reloadData()
-                
-                newTagTextField.text = ""
-            }
-        }
-    }
-    
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return TagsManager.tags.count
-    }
-    
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tagsTableView.dequeueReusableCell(withIdentifier: "TagTableViewCell", for: indexPath) as! TagTableViewCell
-        
-        let tag = TagsManager.tags[indexPath.row]
-        cell.setTag(tag: tag)
-        cell.delegate = self
-        
-        cell.deleteButton.isHidden = false
-        if self.tagsPanelState == .FilterNotes {
-            cell.deleteButton.isHidden = true
-        }
-        
-        return cell
-    }
-    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        if let cell = cell as? TagTableViewCell {
-            if self.tagsPanelState == .EditNote && selectedNoteForTagEditing != nil {
-                for t in selectedNoteForTagEditing!.tags {
-                    if cell.noteTag == t {
-                        tableView.selectRow(at: indexPath, animated: false, scrollPosition: .none)
-                        break
-                    }
-                }
-            }
-            else if self.tagsPanelState == .FilterNotes {
-                for t in activeTags {
-                    if cell.noteTag == t {
-                        tableView.selectRow(at: indexPath, animated: false, scrollPosition: .none)
-                        break
-                    }
-                }
-            }
-        }
-    }
-    
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-       self.updateTagSelections()
-    }
-    func tableView(_ tableView: UITableView, didDeselectRowAt indexPath: IndexPath) {
-        self.updateTagSelections()
-    }
-    private func updateTagSelections() {
-        if self.tagsPanelState == .EditNote && selectedNoteForTagEditing != nil {
-            var selectedTags = [Tag]()
-            if let indexPathsForSelectedRows = tagsTableView.indexPathsForSelectedRows {
-                for i in indexPathsForSelectedRows {
-                    if i.row < TagsManager.tags.count {
-                        let tag = TagsManager.tags[i.row]
-                        selectedTags.append(tag)
-                    }
-                }
-            }
-            selectedNoteForTagEditing!.tags = selectedTags
-        }
-    }
-    
-    private func getSelectedTags() -> [Tag] {
-        var selectedTags = [Tag]()
-        if let indexPathsForSelectedRows = tagsTableView.indexPathsForSelectedRows {
-            for i in indexPathsForSelectedRows {
-                if i.row < TagsManager.tags.count {
-                    let tag = TagsManager.tags[i.row]
-                    selectedTags.append(tag)
-                }
-            }
-        }
-        return selectedTags
-    }
-    
-    func deleteTagTapped(tag: Tag, sender: TagTableViewCell) {
-        TagsManager.delete(tag: tag)
-        tagsTableView.reloadData()
-        self.updateTagSelections()
-    }
-    @IBAction func filterNotesByTagsButtonTapped(_ sender: UIButton) {
-        self.tagsPanelState = .FilterNotes
-        showTagsPanel()
-    }
-    
-    func colorPickerView(_ colorPickerView: ColorPickerView, didSelectItemAt indexPath: IndexPath) {
-    }
-    
-    func colorPickerView(_ colorPickerView: ColorPickerView, didDeselectItemAt indexPath: IndexPath) {
-    }
-    
-    func colorPickerView(_ colorPickerView: ColorPickerView, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: 25, height: 25)
-    }
-    func colorPickerView(_ colorPickerView: ColorPickerView, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
-        return CGFloat(3)
-    }
-    func colorPickerView(_ colorPickerView: ColorPickerView, insetForSectionAt section: Int) -> UIEdgeInsets {
-        return UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
-    }
     
     // MARK: Note Collection View DETAIL cell delegate
     func noteCollectionViewDetailCellEditTitleTapped(sketchnote: Sketchnote, sender: UIButton, cell: NoteCollectionViewDetailCell) {

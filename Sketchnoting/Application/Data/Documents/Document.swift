@@ -21,6 +21,10 @@ protocol DocumentVisitor {
     func process(document: TAGMEDocument)
 }
 
+protocol DocumentDelegate {
+    func documentHasChanged(document: Document)
+}
+
 enum DocumentType: String, Codable {
     case Spotlight
     case TAGME
@@ -30,12 +34,6 @@ enum DocumentType: String, Codable {
 }
 
 class Document: Codable, Visitable, Equatable {
-    static func == (lhs: Document, rhs: Document) -> Bool {
-        if lhs.title == rhs.title && lhs.documentType == rhs.documentType {
-            return true
-        }
-        return false
-    }
     
     var title: String
     var description: String?
@@ -188,8 +186,11 @@ class Document: Codable, Visitable, Equatable {
         loadPreviewImage()
         delegate?.documentHasChanged(document: self)
     }
-}
-
-protocol DocumentDelegate {
-    func documentHasChanged(document: Document)
+    
+    static func == (lhs: Document, rhs: Document) -> Bool {
+        if lhs.title == rhs.title && lhs.documentType == rhs.documentType {
+            return true
+        }
+        return false
+    }
 }

@@ -10,6 +10,7 @@ import UIKit
 
 class TagsManager {
     static var tags: [Tag] = getTags()
+    static var filterTags = [Tag]()
     public static func getTags() -> [Tag] {
         let decoder = JSONDecoder()
         

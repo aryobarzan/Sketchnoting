@@ -9,6 +9,8 @@
 import UIKit
 import PencilKit
 
+import Kingfisher
+
 class NotesManager {
     static var notes = loadSketchnotes() ?? [Sketchnote]()
     private static func loadSketchnotes() -> [Sketchnote]? {
@@ -97,6 +99,21 @@ class NotesManager {
         else {
             log.error("Note does not exist: Cannot delete.")
         }
+    }
+    
+    public static func clearData() {
+        for note in self.notes {
+            let noteURL = self.getSketchnotesDirectory().appendingPathComponent(note.id + ".sketchnote")
+            if FileManager.default.fileExists(atPath: noteURL.path) {
+                try? FileManager.default.removeItem(atPath: noteURL.path)
+            }
+            log.info("Deleted note.")
+        }
+        self.notes = [Sketchnote]()
+        log.info("All notes cleared.")
+        
+        let cache = ImageCache.default
+        cache.clearDiskCache{ log.info("KingFisher image cache cleared.") }
     }
     
     public static func add(note: Sketchnote) -> Bool {

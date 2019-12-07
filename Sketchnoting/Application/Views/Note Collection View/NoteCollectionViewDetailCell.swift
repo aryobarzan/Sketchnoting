@@ -61,13 +61,13 @@ class NoteCollectionViewDetailCell: UICollectionViewCell {
         }
         
         if sketchnote.tags.count > 0 {
-            self.tagsLabel.text = "Tags: "
+            self.tagsLabel.text = ""
             for tag in sketchnote.tags {
                 self.tagsLabel.text = self.tagsLabel.text! + tag.title + " · "
             }
         }
         else {
-             self.tagsLabel.text = "No tags"
+             self.tagsLabel.text = ""
         }
     }
     

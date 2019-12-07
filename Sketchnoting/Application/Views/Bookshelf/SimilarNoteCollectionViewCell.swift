@@ -33,13 +33,20 @@ class SimilarNoteCollectionViewCell: UICollectionViewCell {
         similarityRatingLabel.text = "Similarity Rating: \(similarityRating)"
         
         var documentsText = "Documents: "
-        for document in note.documents {
-            documentsText += document.title + " | "
+        for i in 0...note.documents.count-1 {
+            if i == note.documents.count-1 {
+                documentsText += note.documents[i].title
+            }
+            else {
+                documentsText += note.documents[i].title + " · "
+            }
         }
         documentsTextView.text = documentsText
         
         self.layer.borderWidth = 1
         self.layer.borderColor = UIColor.white.cgColor
         self.layer.cornerRadius = 4
+        
+        self.previewImageView.layer.cornerRadius = 2
     }
 }
