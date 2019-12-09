@@ -22,6 +22,7 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
     
     private var documentsVC: DocumentsViewController!
     
+    @IBOutlet var backdropView: UIView!
     @IBOutlet var canvasView: PKCanvasView!
     
     @IBOutlet var topicsButton: UIButton!
@@ -122,7 +123,6 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
         relatedNotesCollectionView.dataSource = self
         
         self.oldDocuments = sketchnote.documents
-        self.canvasView.overrideUserInterfaceStyle = .light
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -294,19 +294,17 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
             
             line.isUserInteractionEnabled = false
             line.isHidden = true
-            self.canvasView.addSubview(line)
-            self.canvasView.sendSubviewToBack(line)
+            self.backdropView.addSubview(line)
             self.helpLinesHorizontal.append(line)
             height = height + 20
         }
         var width = CGFloat(20)
         while (CGFloat(width) < UIScreen.main.bounds.width + 80) {
             let line = VerticalHelpLine(frame: CGRect(x: width, y: 0, width: 1, height: self.canvasView.bounds.height))
-            
+    
             line.isUserInteractionEnabled = false
             line.isHidden = true
-            self.canvasView.addSubview(line)
-            self.canvasView.sendSubviewToBack(line)
+            self.backdropView.addSubview(line)
             self.helpLinesVertical.append(line)
             width = width + 20
         }
@@ -1265,6 +1263,7 @@ class SketchNoteViewController: UIViewController, UIPencilInteractionDelegate, U
 
 public class HoritonzalHelpLine: UIView  {
     
+    
     public init() {
         super.init(frame: CGRect(x: 0, y: 0, width: 320, height: 480))
         backgroundColor = .clear
@@ -1283,13 +1282,16 @@ public class HoritonzalHelpLine: UIView  {
         guard let context = UIGraphicsGetCurrentContext() else { return }
         context.setLineWidth(2.0)
         context.setStrokeColor(#colorLiteral(red: 0.8374180198, green: 0.8374378085, blue: 0.8374271393, alpha: 1))
+        if UITraitCollection.current.userInterfaceStyle == .dark {
+            context.setStrokeColor(#colorLiteral(red: 0.5704585314, green: 0.5704723597, blue: 0.5704649091, alpha: 1))
+        }
         context.move(to: CGPoint(x: 0, y: 0))
         context.addLine(to: CGPoint(x: self.frame.width, y: 0))
         context.strokePath()
     }
 }
 public class VerticalHelpLine: UIView  {
-    
+        
     public init() {
         super.init(frame: CGRect(x: 0, y: 0, width: 320, height: 480))
         backgroundColor = .clear
@@ -1308,6 +1310,9 @@ public class VerticalHelpLine: UIView  {
         guard let context = UIGraphicsGetCurrentContext() else { return }
         context.setLineWidth(2.0)
         context.setStrokeColor(#colorLiteral(red: 0.8374180198, green: 0.8374378085, blue: 0.8374271393, alpha: 1))
+        if UITraitCollection.current.userInterfaceStyle == .dark {
+            context.setStrokeColor(#colorLiteral(red: 0.5704585314, green: 0.5704723597, blue: 0.5704649091, alpha: 1))
+        }
         context.move(to: CGPoint(x: 0, y: 0))
         context.addLine(to: CGPoint(x: 0, y: self.frame.height))
         context.strokePath()
