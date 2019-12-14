@@ -1224,10 +1224,14 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         var allNotes = NotesManager.notes
         allNotes.removeAll{$0 == NotesManager.activeNote!}
         var highSimilarityCount = 0
+        var anySimilarityCount = 0
         for note in allNotes {
             let similarity = NotesManager.activeNote!.similarTo(note: note)
             if similarity > similarityThreshold {
                 relatedNotes.append(note)
+            }
+            if similarity > 0.0 {
+                anySimilarityCount += 1
             }
             if similarity > highSimilarity {
                 highSimilarityCount += 1
@@ -1236,7 +1240,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         relatedNotesCollectionView.reloadData()
         
         bookshelfSegmentedControl.setTitle("Related Notes (\(relatedNotes.count))", forSegmentAt: 1)
-        relatedNotesSegmentedControl.setTitle("Any (\(allNotes.count-1))", forSegmentAt: 0)
+        relatedNotesSegmentedControl.setTitle("Any (\(anySimilarityCount))", forSegmentAt: 0)
         relatedNotesSegmentedControl.setTitle("High Similarity (\(highSimilarityCount))", forSegmentAt: 1)
     }
     @IBAction func similaritySegmentChanged(_ sender: UISegmentedControl) {
@@ -1263,6 +1267,8 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         }
         
         bookshelfSegmentedControl.setTitle("Documents (\(NotesManager.activeNote!.documents.count))", forSegmentAt: 0)
+        bookshelfSegmentedControl.setTitle("Documents (\(25))", forSegmentAt: 0)
+
     }
     
     // MARK: Bookshelf Options Delegate
@@ -1274,6 +1280,9 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     // Note Pages Bottom Sheet
     
     @IBAction func pageBrowserTapped(_ sender: UIButton) {
+        showNotePagesBottomSheet()
+    }
+    private func showNotePagesBottomSheet() {
         let storyboard = UIStoryboard(name: "Main", bundle: Bundle.main)
         let notePagesViewController = storyboard.instantiateViewController(withIdentifier: "NotePagesViewController") as! NotePagesViewController
         notePagesViewController.delegate = self
@@ -1297,6 +1306,9 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         if sender.state == .ended {
             nextPage()
         }
+    }
+    @IBAction func canvasUpSwiped(_ sender: UISwipeGestureRecognizer) {
+        showNotePagesBottomSheet()
     }
 }
 

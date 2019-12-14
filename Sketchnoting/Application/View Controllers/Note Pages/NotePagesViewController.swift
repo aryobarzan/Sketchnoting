@@ -35,13 +35,13 @@ class NotePagesViewController: UIViewController, UICollectionViewDelegate, UICol
         let page = NotesManager.activeNote!.pages[indexPath.item]
         cell.imageView.image = page.image
         cell.pageIndexLabel.text = "\(indexPath.item)"
-        cell.layer.cornerRadius = 4
-        cell.layer.borderWidth = 2
+        cell.imageView.layer.cornerRadius = 4
+        cell.imageView.layer.borderWidth = 2
         if page == NotesManager.activeNote!.getCurrentPage() {
-            cell.layer.borderColor = UIColor.systemBlue.cgColor
+            cell.imageView.layer.borderColor = UIColor.systemBlue.cgColor
         }
         else {
-            cell.layer.borderColor = UIColor.white.cgColor
+            cell.imageView.layer.borderColor = UIColor.clear.cgColor
         }
         return cell
     }
