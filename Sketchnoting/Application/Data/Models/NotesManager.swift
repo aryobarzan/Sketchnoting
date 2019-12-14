@@ -13,6 +13,7 @@ import Kingfisher
 
 class NotesManager {
     static var notes = loadSketchnotes() ?? [Sketchnote]()
+    static var activeNote: Sketchnote?
     private static func loadSketchnotes() -> [Sketchnote]? {
         var sketchnotes = [Sketchnote]()
         do {

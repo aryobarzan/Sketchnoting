@@ -55,9 +55,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     
     var activeFiltersBadge: BadgeHub!
     var activeSearchFiltersBadge: BadgeHub!
-    // When the user taps a sketchnote to open it for editing, the app stores it in this property to remember which note is currently being edited.
-    var selectedSketchnote: Sketchnote?
-    // The view that is displayed as a pop-up for the user to draw a shape which is used for searching.
     
     // Each search term entered is stored.
     var searchFilters = [SearchFilter]()
@@ -183,18 +180,10 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         super.prepare(for: segue, sender: sender)
         switch(segue.identifier ?? "") {
         case "NewSketchnote":
-            guard let sketchnoteViewController = segue.destination as? SketchNoteViewController else {
-                fatalError("Unexpected destination")
-            }
-            sketchnoteViewController.new = true
-            sketchnoteViewController.sketchnote = selectedSketchnote
+            log.info("New note.")
             break
         case "EditSketchnote":
-            guard let sketchnoteViewController = segue.destination as? SketchNoteViewController else {
-                fatalError("Unexpected destination")
-            }
-            sketchnoteViewController.new = false
-            sketchnoteViewController.sketchnote = selectedSketchnote
+            log.info("Editing note.")
             break
         case "NoteSharing":
             self.navigationController?.setNavigationBarHidden(false, animated: false)
@@ -226,8 +215,8 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     }
     
     @IBAction func unwindToHome(sender: UIStoryboardSegue) {
-        if sender.source is SketchNoteViewController {
-            let vc = sender.source as! SketchNoteViewController
+        if sender.source is NoteViewController {
+            let vc = sender.source as! NoteViewController
             if vc.openNote != nil {
                 let note = vc.openNote!
                 if let segue = sender as? UIStoryboardSegueWithCompletion {
@@ -323,8 +312,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         let newNote = Sketchnote(relatedDocuments: nil)!
         newNote.save()
         NotesManager.add(note: newNote)
-        
-        selectedSketchnote = newNote
+        NotesManager.activeNote = newNote
         performSegue(withIdentifier: "NewSketchnote", sender: self)
     }
     
@@ -774,7 +762,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     }
     
     private func open(note: Sketchnote) {
-        self.selectedSketchnote = note
+        NotesManager.activeNote = note
         self.performSegue(withIdentifier: "EditSketchnote", sender: self)
         log.info("Opening note.")
     }

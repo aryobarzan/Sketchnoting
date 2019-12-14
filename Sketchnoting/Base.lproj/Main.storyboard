@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="15505" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="IOd-hj-hEE">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="15702" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="IOd-hj-hEE">
     <device id="ipad9_7" orientation="portrait" layout="fullscreen" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15510"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15704"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="collection view cell content view" minToolsVersion="11.0"/>
@@ -976,10 +976,10 @@
             </objects>
             <point key="canvasLocation" x="1373.4375" y="1690.4296875"/>
         </scene>
-        <!--Sketch Note View Controller-->
+        <!--Note View Controller-->
         <scene sceneID="f33-KU-ssY">
             <objects>
-                <viewController id="lDo-DG-9fX" customClass="SketchNoteViewController" customModule="Sketchnoting" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="lDo-DG-9fX" customClass="NoteViewController" customModule="Sketchnoting" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="e9U-eQ-c5r">
                         <rect key="frame" x="0.0" y="0.0" width="768" height="1024"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -1267,14 +1267,14 @@
                                                 <blurEffect style="systemChromeMaterialDark"/>
                                             </visualEffectView>
                                             <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" apportionsSegmentWidthsByContent="YES" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="iBa-4h-Hud">
-                                                <rect key="frame" x="89" y="8" width="190" height="32"/>
+                                                <rect key="frame" x="71.5" y="8" width="225" height="32"/>
                                                 <constraints>
-                                                    <constraint firstAttribute="width" constant="190" id="7Ul-qY-dVC"/>
+                                                    <constraint firstAttribute="width" constant="225" id="7Ul-qY-dVC"/>
                                                     <constraint firstAttribute="height" constant="31" id="HqR-UW-cfS"/>
                                                 </constraints>
                                                 <segments>
-                                                    <segment title="Documents"/>
-                                                    <segment title="Related Notes"/>
+                                                    <segment title="Documents" width="105"/>
+                                                    <segment title="Related Notes" width="120"/>
                                                 </segments>
                                                 <connections>
                                                     <action selector="documentsRelatedNotesSegmentChanged:" destination="lDo-DG-9fX" eventType="valueChanged" id="T9K-Oy-E1X"/>
@@ -1339,14 +1339,14 @@
                                                         <cells/>
                                                     </collectionView>
                                                     <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" apportionsSegmentWidthsByContent="YES" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="soP-Re-QWR">
-                                                        <rect key="frame" x="8" y="3" width="160" height="32"/>
+                                                        <rect key="frame" x="8" y="3" width="230" height="32"/>
                                                         <constraints>
                                                             <constraint firstAttribute="height" constant="31" id="C45-S4-7Pb"/>
-                                                            <constraint firstAttribute="width" constant="160" id="umG-qi-Sl1"/>
+                                                            <constraint firstAttribute="width" constant="230" id="umG-qi-Sl1"/>
                                                         </constraints>
                                                         <segments>
-                                                            <segment title="Any"/>
-                                                            <segment title="High Similarity"/>
+                                                            <segment title="Any" width="79.5"/>
+                                                            <segment title="High Similarity" width="150"/>
                                                         </segments>
                                                         <connections>
                                                             <action selector="similaritySegmentChanged:" destination="lDo-DG-9fX" eventType="valueChanged" id="0pf-Pt-me5"/>
@@ -1445,6 +1445,7 @@
                         <outlet property="bookshelfLeftDragView" destination="O1Y-Db-0EN" id="IYp-8e-St4"/>
                         <outlet property="bookshelfOptionsButton" destination="dT1-d9-SEx" id="xI2-LF-7Yt"/>
                         <outlet property="bookshelfRightConstraint" destination="SiT-MD-RCf" id="kNS-8p-MJz"/>
+                        <outlet property="bookshelfSegmentedControl" destination="iBa-4h-Hud" id="aOb-gE-mYX"/>
                         <outlet property="canvasView" destination="iDb-Yw-oym" id="y4m-jE-WrP"/>
                         <outlet property="closeButton" destination="YQI-WO-Gvp" id="6So-lp-acO"/>
                         <outlet property="documentsUnderlyingView" destination="e9c-2t-gvA" id="Ur2-b5-yN7"/>
@@ -1459,6 +1460,7 @@
                         <outlet property="previousPageButton" destination="jEA-WA-cjb" id="1TU-s6-01d"/>
                         <outlet property="relatedNotesButton" destination="u9I-hG-Uoe" id="Ar6-eC-5ue"/>
                         <outlet property="relatedNotesCollectionView" destination="EUr-m2-zMG" id="PMK-XR-oTn"/>
+                        <outlet property="relatedNotesSegmentedControl" destination="soP-Re-QWR" id="rc9-5o-V5T"/>
                         <outlet property="relatedNotesView" destination="RU1-z1-xzW" id="VBJ-hs-SQg"/>
                         <outlet property="rightScreenSidePanGesture" destination="HlQ-MV-mPk" id="cIj-Nz-M2F"/>
                         <outlet property="topicsButton" destination="RnC-a4-JG6" id="Mbd-F4-fiv"/>
