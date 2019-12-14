@@ -15,10 +15,11 @@ import NVActivityIndicatorView
 import Repeat
 import NotificationBannerSwift
 import ViewAnimator
+import MaterialComponents.MaterialBottomSheet
 
 import PencilKit
 
-class NoteViewController: UIViewController, UIPencilInteractionDelegate, UICollectionViewDataSource, UICollectionViewDelegate, SketchnoteDelegate, PKCanvasViewDelegate, PKToolPickerObserver, UIScreenshotServiceDelegate, NoteOptionsDelegate, DocumentsViewControllerDelegate, BookshelfOptionsDelegate {
+class NoteViewController: UIViewController, UIPencilInteractionDelegate, UICollectionViewDataSource, UICollectionViewDelegate, SketchnoteDelegate, PKCanvasViewDelegate, PKToolPickerObserver, UIScreenshotServiceDelegate, NoteOptionsDelegate, DocumentsViewControllerDelegate, BookshelfOptionsDelegate, NotePagesDelegate {
     
     private var documentsVC: DocumentsViewController!
     
@@ -1107,17 +1108,27 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     
     // Mark: Pagination
     @IBAction func previousPageTapped(_ sender: UIButton) {
+        previousPage()
+    }
+    
+    @IBAction func nextPageTapped(_ sender: UIButton) {
+        nextPage()
+    }
+    
+    func previousPage() {
         saveCurrentPage()
         NotesManager.activeNote!.previousPage()
         updatePage()
         updatePaginationButtons()
     }
-    @IBAction func nextPageTapped(_ sender: UIButton) {
+    func nextPage() {
         saveCurrentPage()
         NotesManager.activeNote!.nextPage()
         updatePage()
         updatePaginationButtons()
     }
+    
+    
     @IBAction func pageButtonTapped(_ sender: UIButton) {
         self.showInputDialog(title: "Go to page:", subtitle: nil, actionTitle: "Go", cancelTitle: "Cancel", inputPlaceholder: "Page Number", inputKeyboardType: .numberPad, cancelHandler: nil)
             { (input:String?) in
@@ -1258,6 +1269,34 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     
     func bookshelfOptionSelected(option: BookshelfOption) {
         documentsVC.setFilter(option: option)
+    }
+    
+    // Note Pages Bottom Sheet
+    
+    @IBAction func pageBrowserTapped(_ sender: UIButton) {
+        let storyboard = UIStoryboard(name: "Main", bundle: Bundle.main)
+        let notePagesViewController = storyboard.instantiateViewController(withIdentifier: "NotePagesViewController") as! NotePagesViewController
+        notePagesViewController.delegate = self
+        let bottomNotePagesSheet = MDCBottomSheetController(contentViewController: notePagesViewController)
+        self.present(bottomNotePagesSheet, animated: true, completion: nil)
+    }
+    func notePageSelected(index: Int) {
+        if NotesManager.activeNote!.activePageIndex != index {
+            self.saveCurrentPage()
+            NotesManager.activeNote!.activePageIndex = index
+            self.updatePage()
+            self.updatePaginationButtons()
+        }
+    }
+    @IBAction func canvasRightSwiped(_ sender: UISwipeGestureRecognizer) {
+        if sender.state == .ended {
+            previousPage()
+        }
+    }
+    @IBAction func canvasLeftSwiped(_ sender: UISwipeGestureRecognizer) {
+        if sender.state == .ended {
+            nextPage()
+        }
     }
 }
 
