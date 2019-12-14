@@ -1265,10 +1265,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         if differences.count > 0 {
             setupConceptHighlights()
         }
-        
         bookshelfSegmentedControl.setTitle("Documents (\(NotesManager.activeNote!.documents.count))", forSegmentAt: 0)
-        bookshelfSegmentedControl.setTitle("Documents (\(25))", forSegmentAt: 0)
-
     }
     
     // MARK: Bookshelf Options Delegate
