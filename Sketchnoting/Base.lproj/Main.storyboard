@@ -557,7 +557,7 @@
                                 <rect key="frame" x="0.0" y="169" width="768" height="855"/>
                                 <subviews>
                                     <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="khA-pa-wBN">
-                                        <rect key="frame" x="0.0" y="35" width="768" height="820"/>
+                                        <rect key="frame" x="0.0" y="60" width="768" height="795"/>
                                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                                         <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="5" minimumInteritemSpacing="5" id="TAb-Qi-OQa">
                                             <size key="itemSize" width="220" height="320"/>
@@ -633,19 +633,43 @@
                                             </segue>
                                         </connections>
                                     </button>
+                                    <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Showing notes similar to: ..." textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="YYc-gA-00h">
+                                        <rect key="frame" x="8" y="38" width="188" height="21"/>
+                                        <fontDescription key="fontDescription" type="italicSystem" pointSize="15"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Zrv-fS-6w6">
+                                        <rect key="frame" x="164" y="2" width="164" height="32"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="32" id="dhF-oX-2vy"/>
+                                        </constraints>
+                                        <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                        <state key="normal" title=" Clear Similar Notes" image="xmark.circle.fill" catalog="system">
+                                            <color key="titleColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="clearSimilarNotesTapped:" destination="BYZ-38-t0r" eventType="touchUpInside" id="42F-3B-CNq"/>
+                                        </connections>
+                                    </button>
                                 </subviews>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                                 <constraints>
+                                    <constraint firstItem="Zrv-fS-6w6" firstAttribute="leading" secondItem="QAN-3k-yxQ" secondAttribute="trailing" constant="8" id="0LB-2g-BtZ"/>
+                                    <constraint firstItem="YYc-gA-00h" firstAttribute="leading" secondItem="hut-mJ-mJj" secondAttribute="leading" constant="8" id="1Qx-MN-ydV"/>
                                     <constraint firstItem="sHd-m9-c4G" firstAttribute="centerX" secondItem="hut-mJ-mJj" secondAttribute="centerX" id="2iA-iP-5h0"/>
+                                    <constraint firstItem="Zrv-fS-6w6" firstAttribute="top" secondItem="hut-mJ-mJj" secondAttribute="top" constant="2" id="6U1-Sg-etO"/>
                                     <constraint firstItem="vgL-tn-nRc" firstAttribute="top" secondItem="hut-mJ-mJj" secondAttribute="top" constant="5" id="CUe-JV-3Kx"/>
                                     <constraint firstAttribute="trailing" secondItem="khA-pa-wBN" secondAttribute="trailing" id="D8W-Hb-YF9"/>
-                                    <constraint firstItem="khA-pa-wBN" firstAttribute="top" secondItem="IRa-tg-YTc" secondAttribute="bottom" constant="5" id="ETC-GU-g5G"/>
+                                    <constraint firstItem="khA-pa-wBN" firstAttribute="top" secondItem="IRa-tg-YTc" secondAttribute="bottom" constant="30" id="ETC-GU-g5G"/>
                                     <constraint firstAttribute="bottom" secondItem="khA-pa-wBN" secondAttribute="bottom" id="Hrv-Xf-kaF"/>
+                                    <constraint firstItem="khA-pa-wBN" firstAttribute="top" secondItem="YYc-gA-00h" secondAttribute="bottom" constant="1" id="alV-ls-XBv"/>
                                     <constraint firstItem="QAN-3k-yxQ" firstAttribute="leading" secondItem="IRa-tg-YTc" secondAttribute="trailing" constant="8" id="bjc-oT-WOl"/>
                                     <constraint firstItem="QAN-3k-yxQ" firstAttribute="top" secondItem="hut-mJ-mJj" secondAttribute="top" constant="1" id="d4x-E6-vbk"/>
                                     <constraint firstItem="IRa-tg-YTc" firstAttribute="leading" secondItem="hut-mJ-mJj" secondAttribute="leading" constant="8" id="gCO-xa-ccc"/>
                                     <constraint firstItem="sHd-m9-c4G" firstAttribute="centerY" secondItem="hut-mJ-mJj" secondAttribute="centerY" id="hGF-da-dfx"/>
                                     <constraint firstAttribute="trailing" secondItem="vgL-tn-nRc" secondAttribute="trailing" constant="8" id="hPl-4B-cfM"/>
+                                    <constraint firstItem="YYc-gA-00h" firstAttribute="top" secondItem="QAN-3k-yxQ" secondAttribute="bottom" constant="5" id="hkm-rF-UgS"/>
                                     <constraint firstItem="khA-pa-wBN" firstAttribute="leading" secondItem="hut-mJ-mJj" secondAttribute="leading" id="rrk-Ek-z9e"/>
                                     <constraint firstItem="IRa-tg-YTc" firstAttribute="top" secondItem="hut-mJ-mJj" secondAttribute="top" constant="5" id="zxs-4P-mxB"/>
                                 </constraints>
@@ -748,6 +772,7 @@
                         <outlet property="blurView" destination="aXb-h3-W9j" id="dBQ-Lc-PfZ"/>
                         <outlet property="clearDrawingSearchButton" destination="6Wt-af-Kj1" id="cyq-to-a0N"/>
                         <outlet property="clearSearchButton" destination="x1a-V1-8A0" id="UuT-m2-ZQ0"/>
+                        <outlet property="clearSimilarNotesButton" destination="Zrv-fS-6w6" id="MAH-7D-eSP"/>
                         <outlet property="drawingSearchButton" destination="2hk-aW-cpA" id="HAC-RX-6HZ"/>
                         <outlet property="drawingSearchCanvas" destination="l9j-vR-p5a" id="QnX-BW-Ouc"/>
                         <outlet property="drawingSearchPanel" destination="6gt-6K-gVF" id="w6m-Ke-2QR"/>
@@ -765,6 +790,7 @@
                         <outlet property="searchPanelButton" destination="O1R-Oi-t5l" id="z6H-rB-Lvx"/>
                         <outlet property="searchPanelHeightConstraint" destination="w0E-Qx-Z5u" id="5g0-gH-C9Y"/>
                         <outlet property="searchTypeButton" destination="bVz-Ca-BYK" id="Lgp-KX-mcV"/>
+                        <outlet property="similarNotesTitleLabel" destination="YYc-gA-00h" id="Kb8-Kf-NBF"/>
                         <segue destination="lDo-DG-9fX" kind="show" identifier="NewSketchnote" id="ct4-u7-KZY"/>
                         <segue destination="lDo-DG-9fX" kind="show" identifier="EditSketchnote" id="lta-QB-BHq"/>
                         <segue destination="riE-Ei-xpK" kind="presentation" identifier="ShareNote" id="58e-4d-iJp"/>
@@ -1270,6 +1296,7 @@
                                             <outletCollection property="gestureRecognizers" destination="vxn-hO-PS4" appends="YES" id="HBc-r0-0Rg"/>
                                             <outletCollection property="gestureRecognizers" destination="4NQ-Bq-QzN" appends="YES" id="U2T-6T-Ra0"/>
                                             <outletCollection property="gestureRecognizers" destination="aPW-Rp-zPL" appends="YES" id="VqR-M7-un5"/>
+                                            <outletCollection property="gestureRecognizers" destination="jCy-Yh-cxE" appends="YES" id="dug-Xa-sRa"/>
                                         </connections>
                                     </view>
                                     <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="oqt-gq-XGG">
@@ -1464,6 +1491,7 @@
                         <outlet property="bookshelfRightConstraint" destination="SiT-MD-RCf" id="kNS-8p-MJz"/>
                         <outlet property="bookshelfSegmentedControl" destination="iBa-4h-Hud" id="aOb-gE-mYX"/>
                         <outlet property="canvasView" destination="iDb-Yw-oym" id="y4m-jE-WrP"/>
+                        <outlet property="canvasViewLongPressGesture" destination="jCy-Yh-cxE" id="3tq-99-1FT"/>
                         <outlet property="closeButton" destination="YQI-WO-Gvp" id="6So-lp-acO"/>
                         <outlet property="documentsUnderlyingView" destination="e9c-2t-gvA" id="Ur2-b5-yN7"/>
                         <outlet property="drawingInsertionCanvas" destination="P5Z-5P-6jH" id="XXi-nc-F0V"/>
@@ -1517,6 +1545,11 @@
                         <action selector="canvasUpSwiped:" destination="lDo-DG-9fX" id="XO4-6v-wLi"/>
                     </connections>
                 </swipeGestureRecognizer>
+                <pongPressGestureRecognizer allowableMovement="10" minimumPressDuration="0.5" id="jCy-Yh-cxE">
+                    <connections>
+                        <action selector="canvasViewLongPressed:" destination="lDo-DG-9fX" id="7Xj-hL-8GS"/>
+                    </connections>
+                </pongPressGestureRecognizer>
             </objects>
             <point key="canvasLocation" x="2003.90625" y="1000.7812499999999"/>
         </scene>
@@ -1999,8 +2032,14 @@
                         <rect key="frame" x="0.0" y="0.0" width="768" height="1024"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Note Pages" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5NX-rX-sqc">
+                                <rect key="frame" x="339.5" y="25" width="89" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="SCj-TA-b7V">
-                                <rect key="frame" x="20" y="20" width="728" height="984"/>
+                                <rect key="frame" x="20" y="60" width="728" height="944"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                                 <collectionViewFlowLayout key="collectionViewLayout" automaticEstimatedItemSize="YES" minimumLineSpacing="10" minimumInteritemSpacing="20" id="3Tv-Ff-E7c">
                                     <size key="itemSize" width="180" height="265"/>
@@ -2049,8 +2088,10 @@
                         </subviews>
                         <constraints>
                             <constraint firstItem="LSc-VW-p0l" firstAttribute="trailing" secondItem="SCj-TA-b7V" secondAttribute="trailing" constant="20" id="5Lb-Kc-uvW"/>
+                            <constraint firstItem="5NX-rX-sqc" firstAttribute="centerX" secondItem="fe8-qe-me4" secondAttribute="centerX" id="E4q-wR-YOQ"/>
                             <constraint firstItem="LSc-VW-p0l" firstAttribute="bottom" secondItem="SCj-TA-b7V" secondAttribute="bottom" constant="20" id="GZe-6A-HVK"/>
-                            <constraint firstItem="SCj-TA-b7V" firstAttribute="top" secondItem="LSc-VW-p0l" secondAttribute="top" constant="20" id="Q5s-uR-J2P"/>
+                            <constraint firstItem="SCj-TA-b7V" firstAttribute="top" secondItem="LSc-VW-p0l" secondAttribute="top" constant="60" id="Q5s-uR-J2P"/>
+                            <constraint firstItem="5NX-rX-sqc" firstAttribute="top" secondItem="LSc-VW-p0l" secondAttribute="top" constant="25" id="gql-XQ-tTz"/>
                             <constraint firstItem="SCj-TA-b7V" firstAttribute="leading" secondItem="LSc-VW-p0l" secondAttribute="leading" constant="20" id="oYE-YL-MZJ"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="LSc-VW-p0l"/>
@@ -2574,7 +2615,7 @@
     </resources>
     <inferredMetricsTieBreakers>
         <segue reference="yvs-ei-HRy"/>
-        <segue reference="OAt-q3-0jJ"/>
+        <segue reference="58e-4d-iJp"/>
         <segue reference="ct4-u7-KZY"/>
     </inferredMetricsTieBreakers>
 </document>

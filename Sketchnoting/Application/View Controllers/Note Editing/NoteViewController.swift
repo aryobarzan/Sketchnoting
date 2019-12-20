@@ -16,6 +16,7 @@ import Repeat
 import NotificationBannerSwift
 import ViewAnimator
 import MaterialComponents.MaterialBottomSheet
+import MaterialComponents.MaterialFeatureHighlight
 
 import PencilKit
 
@@ -50,6 +51,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     @IBOutlet weak var bookshelfSegmentedControl: UISegmentedControl!
     @IBOutlet weak var relatedNotesSegmentedControl: UISegmentedControl!
     
+    @IBOutlet var canvasViewLongPressGesture: UILongPressGestureRecognizer!
     var drawingViews = [UIView]()
     var drawingViewsShown = false
     
@@ -90,6 +92,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             toolPicker.addObserver(self)
             canvasView.becomeFirstResponder()
         }
+        canvasViewLongPressGesture.allowedTouchTypes = [0]
         
         //Drawing Recognition - This loads the labels for the drawing recognition's CoreML model.
         if let path = Bundle.main.path(forResource: "labels", ofType: "txt") {
@@ -573,6 +576,27 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         self.conceptHighlights = [UIView : [Document]]()
         topicsButton.tintColor = .white
         topicsButton.setTitleColor(.white, for: .normal)
+    }
+    
+    @IBAction func canvasViewLongPressed(_ sender: UILongPressGestureRecognizer) {
+        if sender.state == .began {
+            for (view, doc) in conceptHighlights {
+                if view.frame.contains(sender.location(in: canvasView)) {
+                    log.info("Highlighting concept")
+                    let highlightController = MDCFeatureHighlightViewController(highlightedView: view,
+                                                                                completion: nil)
+                    highlightController.titleText = doc[0].title
+                    var body = doc[0].description
+                    if doc[0].description != nil && doc[0].description!.count > 500 {
+                        body = String(doc[0].description!.prefix(500))
+                    }
+                    highlightController.bodyText = body
+                    highlightController.outerHighlightColor =
+                      UIColor.blue.withAlphaComponent(kMDCFeatureHighlightOuterHighlightAlpha)
+                    present(highlightController, animated: true, completion:nil)
+                }
+            }
+        }
     }
     
     func noteOptionSelected(option: NoteOption) {
@@ -1286,6 +1310,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         let bottomNotePagesSheet = MDCBottomSheetController(contentViewController: notePagesViewController)
         self.present(bottomNotePagesSheet, animated: true, completion: nil)
     }
+
     func notePageSelected(index: Int) {
         if NotesManager.activeNote!.activePageIndex != index {
             self.saveCurrentPage()
@@ -1293,6 +1318,9 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             self.updatePage()
             self.updatePaginationButtons()
         }
+    }
+    func notePagesReordered() {
+        self.updatePaginationButtons()
     }
     @IBAction func canvasRightSwiped(_ sender: UISwipeGestureRecognizer) {
         if sender.state == .ended {

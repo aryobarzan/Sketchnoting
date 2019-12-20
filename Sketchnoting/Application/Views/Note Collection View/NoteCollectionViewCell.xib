@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="15505" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="15702" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15510"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15704"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -23,6 +23,26 @@
                                 <rect key="frame" x="0.0" y="0.0" width="200" height="270"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </imageView>
+                            <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="L5c-lS-R7Y" customClass="UICircularProgressRing" customModule="UICircularProgressRing">
+                                <rect key="frame" x="167" y="8" width="25" height="25"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="25" id="60W-aT-c5m"/>
+                                    <constraint firstAttribute="height" constant="25" id="e4h-pr-dwF"/>
+                                </constraints>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="outerRingWidth">
+                                        <real key="value" value="1"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="boolean" keyPath="shouldShowValueText" value="NO"/>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="innerRingColor">
+                                        <color key="value" systemColor="systemPurpleColor" red="0.68627450980000004" green="0.32156862749999998" blue="0.87058823529999996" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="innerRingWidth">
+                                        <real key="value" value="2"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </view>
                         </subviews>
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
@@ -30,6 +50,8 @@
                             <constraint firstAttribute="height" constant="300" id="FJ6-Uk-jv2"/>
                             <constraint firstAttribute="width" constant="200" id="Xca-ae-8vc"/>
                             <constraint firstItem="V13-sv-1Ta" firstAttribute="leading" secondItem="RM6-OH-sTu" secondAttribute="leading" id="ayg-PS-InK"/>
+                            <constraint firstItem="L5c-lS-R7Y" firstAttribute="top" secondItem="RM6-OH-sTu" secondAttribute="top" constant="8" id="ivH-G7-gHt"/>
+                            <constraint firstAttribute="trailing" secondItem="L5c-lS-R7Y" secondAttribute="trailing" constant="8" id="vN7-ER-kXi"/>
                             <constraint firstItem="V13-sv-1Ta" firstAttribute="top" secondItem="RM6-OH-sTu" secondAttribute="top" id="zTd-9V-vEA"/>
                         </constraints>
                     </view>
@@ -69,6 +91,7 @@
             <size key="customSize" width="220" height="320"/>
             <connections>
                 <outlet property="imageView" destination="V13-sv-1Ta" id="Gn7-Pi-pdf"/>
+                <outlet property="similarityWeightProgressRing" destination="L5c-lS-R7Y" id="rmW-8b-cCd"/>
                 <outlet property="titleBackgroundView" destination="lwh-05-4wr" id="d9V-Ps-H1c"/>
                 <outlet property="titleLabel" destination="afa-LH-hYC" id="o9d-Ae-bBp"/>
             </connections>

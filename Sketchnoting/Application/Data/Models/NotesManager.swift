@@ -31,7 +31,6 @@ class NotesManager {
         } catch {
             log.error("Error while enumerating files \(getSketchnotesDirectory().path): \(error.localizedDescription)")
         }
-        
         if SettingsManager.noteSortingByNewest() {
             log.info("Sorting notes by newest first.")
             return sketchnotes.sorted(by: { (note0: Sketchnote, note1: Sketchnote) -> Bool in

@@ -22,6 +22,8 @@
 		9F5E89EE2391B474002FA8B2 /* DocumentsCollectionReusableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5E89ED2391B474002FA8B2 /* DocumentsCollectionReusableView.swift */; };
 		9F5E89F02391CBA2002FA8B2 /* DocumentViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5E89EF2391CBA2002FA8B2 /* DocumentViewCell.swift */; };
 		9F5E89F42391CE84002FA8B2 /* DocumentDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5E89F32391CE84002FA8B2 /* DocumentDetailViewController.swift */; };
+		9F5F340423AC64C900EB2804 /* SwiftGraph in Frameworks */ = {isa = PBXBuildFile; productRef = 9F5F340323AC64C900EB2804 /* SwiftGraph */; };
+		9F5F340623AC64E400EB2804 /* Knowledge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5F340523AC64E400EB2804 /* Knowledge.swift */; };
 		9F75E448230C368F00488BBD /* NoteSharingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F75E447230C368F00488BBD /* NoteSharingViewController.swift */; };
 		9F75E44C230C583200488BBD /* NoteCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F75E44A230C583200488BBD /* NoteCollectionViewCell.swift */; };
 		9F75E44D230C583200488BBD /* NoteCollectionViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9F75E44B230C583200488BBD /* NoteCollectionViewCell.xib */; };
@@ -101,6 +103,7 @@
 		9F5E89ED2391B474002FA8B2 /* DocumentsCollectionReusableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentsCollectionReusableView.swift; sourceTree = "<group>"; };
 		9F5E89EF2391CBA2002FA8B2 /* DocumentViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentViewCell.swift; sourceTree = "<group>"; };
 		9F5E89F32391CE84002FA8B2 /* DocumentDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentDetailViewController.swift; sourceTree = "<group>"; };
+		9F5F340523AC64E400EB2804 /* Knowledge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Knowledge.swift; sourceTree = "<group>"; };
 		9F75E447230C368F00488BBD /* NoteSharingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteSharingViewController.swift; sourceTree = "<group>"; };
 		9F75E44A230C583200488BBD /* NoteCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteCollectionViewCell.swift; sourceTree = "<group>"; };
 		9F75E44B230C583200488BBD /* NoteCollectionViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NoteCollectionViewCell.xib; sourceTree = "<group>"; };
@@ -169,6 +172,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				9F2C00092351126800D53EE9 /* Alamofire in Frameworks */,
+				9F5F340423AC64C900EB2804 /* SwiftGraph in Frameworks */,
 				9F509144235BE29100853E84 /* DataCompression in Frameworks */,
 				9F10EC162347D64C005340AA /* Kingfisher in Frameworks */,
 				9FD29C392238571700CC969A /* Pods_Sketchnoting.framework in Frameworks */,
@@ -216,6 +220,7 @@
 				9FA623A022E73DDA007ED794 /* NotesManager.swift */,
 				9F92D111231E98C600BC0E57 /* DocumentsManager.swift */,
 				9FFE07E9232A63BA00DBD0AC /* TagsManager.swift */,
+				9F5F340523AC64E400EB2804 /* Knowledge.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -553,6 +558,7 @@
 				9F2C00082351126800D53EE9 /* Alamofire */,
 				9F509143235BE29100853E84 /* DataCompression */,
 				9FAA827D236DD45200B2004F /* ViewAnimator */,
+				9F5F340323AC64C900EB2804 /* SwiftGraph */,
 			);
 			productName = Sketchnoting;
 			productReference = 9FD29BA32220524D00CC969A /* Sketchnoting.app */;
@@ -590,6 +596,7 @@
 				9F2C00072351126800D53EE9 /* XCRemoteSwiftPackageReference "Alamofire" */,
 				9F509142235BE29100853E84 /* XCRemoteSwiftPackageReference "DataCompression" */,
 				9FAA827C236DD45200B2004F /* XCRemoteSwiftPackageReference "ViewAnimator" */,
+				9F5F340223AC64C900EB2804 /* XCRemoteSwiftPackageReference "SwiftGraph" */,
 			);
 			productRefGroup = 9FD29BA42220524D00CC969A /* Products */;
 			projectDirPath = "";
@@ -737,6 +744,7 @@
 				9F8551B123A539D9006EB0B1 /* NotePageCollectionViewCell.swift in Sources */,
 				9FBF6ABA22E9F439001FD730 /* VisionTextElementWrapper.swift in Sources */,
 				9FD29BC72224B58600CC969A /* Document.swift in Sources */,
+				9F5F340623AC64E400EB2804 /* Knowledge.swift in Sources */,
 				9FBF6AB622E9F3FE001FD730 /* VisionTextBlockWrapper.swift in Sources */,
 				9FA6239E22E66D73007ED794 /* HandwritingRecognizer.swift in Sources */,
 				9FD29BCB2224B89800CC969A /* Sketchnote.swift in Sources */,
@@ -1003,6 +1011,14 @@
 				minimumVersion = 3.6.0;
 			};
 		};
+		9F5F340223AC64C900EB2804 /* XCRemoteSwiftPackageReference "SwiftGraph" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/davecom/SwiftGraph";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.0.0;
+			};
+		};
 		9FAA827C236DD45200B2004F /* XCRemoteSwiftPackageReference "ViewAnimator" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/marcosgriselli/ViewAnimator";
@@ -1038,6 +1054,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 9F509142235BE29100853E84 /* XCRemoteSwiftPackageReference "DataCompression" */;
 			productName = DataCompression;
+		};
+		9F5F340323AC64C900EB2804 /* SwiftGraph */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9F5F340223AC64C900EB2804 /* XCRemoteSwiftPackageReference "SwiftGraph" */;
+			productName = SwiftGraph;
 		};
 		9FAA827D236DD45200B2004F /* ViewAnimator */ = {
 			isa = XCSwiftPackageProductDependency;

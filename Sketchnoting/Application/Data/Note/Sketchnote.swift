@@ -17,7 +17,7 @@ protocol SketchnoteDelegate {
     func sketchnoteHasChanged(sketchnote: Sketchnote)
 }
 
-class Sketchnote: Note, Equatable, DocumentVisitor, Comparable, DocumentDelegate {
+class Sketchnote: Note, Equatable, DocumentVisitor, Comparable, DocumentDelegate, Hashable {
     
     var delegate: SketchnoteDelegate?
     
@@ -265,8 +265,6 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable, DocumentDelegate
     func documentHasChanged(document: Document) {
         self.delegate?.sketchnoteDocumentHasChanged(sketchnote: self, document: document)
     }
-
-    
     
     func setUpdateDate() {
         self.updateDate = Date.init(timeIntervalSinceNow: 0)
@@ -502,7 +500,15 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable, DocumentDelegate
         }
     }
     
-    // MARK: Comparable, equatable
+    func removePage(at indexPath: IndexPath) {
+      pages.remove(at: indexPath.row)
+    }
+      
+    func insertPage(_ notePage: NotePage, at indexPath: IndexPath) {
+      pages.insert(notePage, at: indexPath.row)
+    }
+    
+    // MARK: Comparable, equatable, hashable
 
     static func == (lhs: Sketchnote, rhs: Sketchnote) -> Bool {
         if lhs.id == rhs.id {
@@ -514,6 +520,11 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable, DocumentDelegate
     static func < (lhs: Sketchnote, rhs: Sketchnote) -> Bool {
         return lhs.creationDate < rhs.creationDate
     }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
+
     
     // MARK: Compare similarity of content
     

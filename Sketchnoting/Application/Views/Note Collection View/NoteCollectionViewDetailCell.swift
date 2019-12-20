@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import UICircularProgressRing
 
 class NoteCollectionViewDetailCell: UICollectionViewCell {
     
@@ -20,6 +21,7 @@ class NoteCollectionViewDetailCell: UICollectionViewCell {
     @IBOutlet weak var sendButton: UIButton!
     @IBOutlet weak var copyTextButton: UIButton!
     @IBOutlet weak var deleteButton: UIButton!
+    @IBOutlet weak var similarityWeightProgressRing: UICircularProgressRing!
     
     var delegate : NoteCollectionViewDetailCellDelegate!
     
@@ -69,6 +71,14 @@ class NoteCollectionViewDetailCell: UICollectionViewCell {
         else {
              self.tagsLabel.text = ""
         }
+        
+        similarityWeightProgressRing.isHidden = true
+    }
+    
+    func showSimilarityRing(weight: Double, max: Double) {
+        similarityWeightProgressRing.maxValue = CGFloat(max)
+        similarityWeightProgressRing.value = CGFloat(weight)
+        similarityWeightProgressRing.isHidden = false
     }
     
     @IBAction func editTitleTapped(_ sender: UIButton) {

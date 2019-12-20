@@ -14,6 +14,7 @@ import NVActivityIndicatorView
 import NotificationBannerSwift
 import DataCompression
 import ViewAnimator
+import SwiftGraph
 
 import MultipeerConnectivity
 import Vision
@@ -52,6 +53,10 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     @IBOutlet var drawingSearchButton: UIButton!
     @IBOutlet var drawingSearchCanvas: PKCanvasView!
     @IBOutlet var blurView: UIVisualEffectView!
+    
+    
+    @IBOutlet weak var clearSimilarNotesButton: UIButton!
+    @IBOutlet weak var similarNotesTitleLabel: UILabel!
     
     var activeFiltersBadge: BadgeHub!
     var activeSearchFiltersBadge: BadgeHub!
@@ -103,10 +108,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         
         drawingSearchPanel.layer.masksToBounds = true
         drawingSearchPanel.layer.cornerRadius = 5
-        
-        drawingSearchCanvas.overrideUserInterfaceStyle = .light
-        drawingSearchCanvas.backgroundColor = .white
-        drawingSearchCanvas.isOpaque = false
         drawingSearchCanvas.tool = PKInkingTool(.pen, color: .black, width: 75)
         self.drawingSearchPanel.alpha = 0.0
         
@@ -148,6 +149,8 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         }
         let notificationCentre = NotificationCenter.default
         notificationCentre.addObserver(self, selector: #selector(self.notifiedImportSketchnote(_:)), name: NSNotification.Name(rawValue: "ImportSketchnote"), object: nil)
+        
+        Knowledge.refreshSimilarNotesGraph()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -157,7 +160,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     }
     
     func popoverPresentationControllerDidDismissPopover(_ popoverPresentationController: UIPopoverPresentationController) {
-        self.updateDisplayedNotes()
+        self.updateDisplayedNotes(false)
         self.selectedNoteForTagEditing = nil
         activeFiltersBadge.setCount(TagsManager.filterTags.count)
     }
@@ -173,7 +176,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     }
     
     private func loadData() {
-        self.updateDisplayedNotes()
+        self.updateDisplayedNotes(false)
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -225,13 +228,18 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
                     }
                 }
             }
-            self.updateDisplayedNotes()
+            self.updateDisplayedNotes(false)
         }
     }
     
     // MARK: Note display management
-    private func updateDisplayedNotes() {
+    private func updateDisplayedNotes(_ animated: Bool) {
         self.items = NotesManager.notes
+        if let noteForSimilarityFilter = noteForSimilarityFilter, let similarNotes = similarNotes {
+            self.items = [Sketchnote]()
+            self.items.append(noteForSimilarityFilter)
+            self.items.append(contentsOf: Array(similarNotes.keys))
+        }
         
         var filteredNotesToRemove = [Sketchnote]()
         if TagsManager.filterTags.count > 0 {
@@ -266,13 +274,14 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         }
        
         noteCollectionView.reloadData()
-        let animations = [AnimationType.from(direction: .bottom, offset: 200.0)]
-        noteCollectionView.performBatchUpdates({
-            UIView.animate(views: noteCollectionView.orderedVisibleCells,
-            animations: animations, completion: {
+        if animated {
+            let animations = [AnimationType.from(direction: .bottom, offset: 200.0)]
+            noteCollectionView.performBatchUpdates({
+                UIView.animate(views: noteCollectionView.orderedVisibleCells,
+                animations: animations, completion: {
+                })
             })
-        })
-        
+        }
     }
     
     @IBAction func noteListViewButtonTapped(_ sender: UIButton) {
@@ -311,7 +320,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         clearSearch()
         let newNote = Sketchnote(relatedDocuments: nil)!
         newNote.save()
-        NotesManager.add(note: newNote)
+        _ = NotesManager.add(note: newNote)
         NotesManager.activeNote = newNote
         performSegue(withIdentifier: "NewSketchnote", sender: self)
     }
@@ -330,13 +339,13 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         }
         let newestFirstAction = PopMenuDefaultAction(title: "Newest First", image: newestFirstImage,  didSelect: { action in
             UserDefaults.settings.set(true, forKey: SettingsKeys.NoteSortingByNewest.rawValue)
-            self.updateDisplayedNotes()
+            self.updateDisplayedNotes(false)
             
         })
         popMenu.addAction(newestFirstAction)
         let oldestFirstAction = PopMenuDefaultAction(title: "Oldest First", image: oldestFirstImage, didSelect: { action in
             UserDefaults.settings.set(false, forKey: SettingsKeys.NoteSortingByNewest.rawValue)
-            self.updateDisplayedNotes()
+            self.updateDisplayedNotes(false)
         })
         popMenu.addAction(oldestFirstAction)
         
@@ -360,9 +369,12 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         let tagsAction = UIAction(title: "Manage Tags", image: UIImage(systemName: "tag.fill")) { action in
             self.editNoteTags(sketchnote: note)
         }
+        let similarNotesAction = UIAction(title: "Similar Notes", image: UIImage(systemName: "link")) { action in
+            self.filterSimilarNotesFor(note)
+        }
         let duplicateAction = UIAction(title: "Duplicate", image: UIImage(systemName: "doc.on.doc")) { action in
-            NotesManager.add(note: note.duplicate())
-            self.updateDisplayedNotes()
+            _ = NotesManager.add(note: note.duplicate())
+            self.updateDisplayedNotes(false)
         }
         let copyTextAction = UIAction(title: "Copy Text", image: UIImage(systemName: "text.quote")) { action in
             UIPasteboard.general.string = note.getText()
@@ -382,7 +394,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             self.deleteNote(note: note)
         }
         // Create and return a UIMenu with the share action
-        return UIMenu(title: note.getTitle(), children: [renameAction, tagsAction, duplicateAction, copyTextAction, shareAction, sendAction, deleteAction])
+        return UIMenu(title: note.getTitle(), children: [renameAction, tagsAction, similarNotesAction, duplicateAction, copyTextAction, shareAction, sendAction, deleteAction])
     }
     
     // MARK: Search
@@ -472,7 +484,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         else {
             clearSearchButton.isHidden = false
             self.expandSearchFiltersPanel()
-            self.updateDisplayedNotes()
+            self.updateDisplayedNotes(false)
         }
         
         activeSearchFiltersBadge.setCount(self.searchFilters.count)
@@ -533,7 +545,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         
         activeSearchFiltersBadge.setCount(0)
         
-        self.updateDisplayedNotes()
+        self.updateDisplayedNotes(false)
         self.collapseSearchFiltersPanel()
     }
     @IBAction func searchTypeButtonTapped(_ sender: UIButton) {
@@ -590,21 +602,20 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         drawingSearchCanvas.drawing = PKDrawing()
     }
     @IBAction func drawingSearchTapped(_ sender: UIButton) {
-        var image = drawingSearchCanvas.asImage()
-        image = image.invertedImage() ?? image
-        let croppedCGImage:CGImage = (image.cgImage)!
-        let croppedImage = UIImage(cgImage: croppedCGImage)
-        let resized = croppedImage.resize(newSize: CGSize(width: 28, height: 28))
-        
-        guard let pixelBuffer = resized.grayScalePixelBuffer() else {
-            print("couldn't create pixel buffer")
-            return
-        }
-        do {
-            currentPrediction = try drawnImageClassifier.prediction(image: pixelBuffer)
-        }
-        catch {
-            print("error making prediction: \(error)")
+        UITraitCollection(userInterfaceStyle: .dark).performAsCurrent {
+            let image = drawingSearchCanvas.drawing.image(from: drawingSearchCanvas.drawing.bounds, scale: 2)
+            let resized = image.resize(newSize: CGSize(width: 28, height: 28))
+            
+            guard let pixelBuffer = resized.grayScalePixelBuffer() else {
+                log.error("Failed to create pixel buffer.")
+                return
+            }
+            do {
+                currentPrediction = try drawnImageClassifier.prediction(image: pixelBuffer)
+            }
+            catch {
+                log.error("Prediction failed: \(error)")
+            }
         }
     }
 
@@ -736,11 +747,21 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         case .Grid:
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath as IndexPath) as! NoteCollectionViewCell
             cell.setNote(note: self.items[indexPath.item])
+            if noteForSimilarityFilter != nil && similarNotes != nil && similarityMax != nil {
+                if self.items[indexPath.item] != noteForSimilarityFilter! {
+                    cell.showSimilarityRing(weight: similarNotes![self.items[indexPath.item]]!, max: similarityMax!)
+                }
+            }
             return cell
         case .Detail:
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifierDetailCell, for: indexPath as IndexPath) as! NoteCollectionViewDetailCell
             cell.setNote(note: self.items[indexPath.item])
             cell.delegate = self
+            if noteForSimilarityFilter != nil && similarNotes != nil && similarityMax != nil {
+                if self.items[indexPath.item] != noteForSimilarityFilter! {
+                    cell.showSimilarityRing(weight: similarNotes![self.items[indexPath.item]]!, max: similarityMax!)
+                }
+            }
             return cell
         }
     }
@@ -776,7 +797,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             
             note.setTitle(title: title ?? "Untitled")
             note.save()
-            self.updateDisplayedNotes()
+            self.updateDisplayedNotes(false)
         }
         let cancelAction = UIAlertAction(title: "Cancel", style: .cancel) { (_) in }
         
@@ -790,6 +811,39 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         alertController.addAction(confirmAction)
         alertController.addAction(cancelAction)
         self.present(alertController, animated: true, completion: nil)
+    }
+    
+    var noteForSimilarityFilter: Sketchnote?
+    var similarNotes: [Sketchnote : Double]?
+    var similarityMax: Double?
+    private func filterSimilarNotesFor(_ note: Sketchnote) {
+        similarNotes = Knowledge.getNotesSimilarTo(note)
+        if similarNotes != nil {
+            noteForSimilarityFilter = note
+            similarityMax = Array(similarNotes!.values).max()!
+            self.updateDisplayedNotes(false)
+            
+            
+            clearSimilarNotesButton.isHidden = false
+            similarNotesTitleLabel.text = "Showing similar notes for: " + note.getTitle()
+            similarNotesTitleLabel.isHidden = false
+        }
+        else {
+            let banner = FloatingNotificationBanner(title: note.getTitle(), subtitle: "No similar notes could be found.", style: .info)
+            banner.show()
+        }
+    }
+    @IBAction func clearSimilarNotesTapped(_ sender: UIButton) {
+        clearSimilarNotes()
+    }
+    
+    private func clearSimilarNotes() {
+        noteForSimilarityFilter = nil
+        similarNotes = nil
+        similarityMax = nil
+        self.updateDisplayedNotes(false)
+        clearSimilarNotesButton.isHidden = true
+        similarNotesTitleLabel.isHidden = true
     }
     
     private func editNoteTags(sketchnote: Sketchnote) {
@@ -823,11 +877,11 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             }
             else {
                 log.info("Importing new sketchnote.")
-                NotesManager.add(note: imported)
+                _ = NotesManager.add(note: imported)
                 let alert = UIAlertController(title: "Note Imported", message: "The new note has been added to your library.", preferredStyle: .alert)
                            self.present(alert, animated: true, completion: nil)
             }
-            self.updateDisplayedNotes()
+            self.updateDisplayedNotes(false)
         }
         else {
             let alert = UIAlertController(title: "Error", message: "Sorry, the sketchnote file could not be imported.", preferredStyle: .alert)

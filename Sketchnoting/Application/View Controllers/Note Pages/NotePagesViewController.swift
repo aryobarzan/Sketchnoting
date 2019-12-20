@@ -8,7 +8,7 @@
 
 import UIKit
 
-class NotePagesViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+class NotePagesViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UICollectionViewDragDelegate, UICollectionViewDropDelegate {
 
     @IBOutlet weak var collectionView: UICollectionView!
     var delegate: NotePagesDelegate?
@@ -18,7 +18,9 @@ class NotePagesViewController: UIViewController, UICollectionViewDelegate, UICol
 
         collectionView.delegate = self
         collectionView.dataSource = self
-        // Do any additional setup after loading the view.
+        collectionView.dragDelegate = self
+        collectionView.dropDelegate = self
+        collectionView.dragInteractionEnabled = true
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -57,9 +59,66 @@ class NotePagesViewController: UIViewController, UICollectionViewDelegate, UICol
                         sizeForItemAt indexPath: IndexPath) -> CGSize {
         return CGSize(width: CGFloat(180), height: CGFloat(265))
     }
+    
+    // Drag and drop delegates for re-ordering
+    func collectionView(_ collectionView: UICollectionView, itemsForBeginning session: UIDragSession, at indexPath: IndexPath) -> [UIDragItem] {
+        let item = NotesManager.activeNote!.pages[indexPath.row]
+        let itemProvider = NSItemProvider(object: item.getText() as NSString)
+        let dragItem = UIDragItem(itemProvider: itemProvider)
+        return [dragItem]
+    }
+    
+    func collectionView(_ collectionView: UICollectionView,
+                        canHandle session: UIDropSession) -> Bool {
+      return true
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, performDropWith coordinator: UICollectionViewDropCoordinator) {
+        guard let destinationIndexPath = coordinator.destinationIndexPath else {
+          return
+        }
+        
+        coordinator.items.forEach { dropItem in
+          guard let sourceIndexPath = dropItem.sourceIndexPath else {
+            return
+          }
+
+          collectionView.performBatchUpdates({
+            let page = NotesManager.activeNote!.pages[sourceIndexPath.item]
+            if NotesManager.activeNote!.activePageIndex == sourceIndexPath.item {
+                NotesManager.activeNote!.activePageIndex = destinationIndexPath.item
+            }
+            NotesManager.activeNote!.removePage(at: sourceIndexPath)
+            NotesManager.activeNote!.insertPage(page, at: destinationIndexPath)
+            collectionView.deleteItems(at: [sourceIndexPath])
+            collectionView.insertItems(at: [destinationIndexPath])
+            NotesManager.activeNote!.save()
+          }, completion: { _ in
+            coordinator.drop(dropItem.dragItem,
+                              toItemAt: destinationIndexPath)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                collectionView.reloadData()
+                self.delegate?.notePagesReordered()
+            }
+          })
+        }
+    }
+    
+    func collectionView(
+      _ collectionView: UICollectionView,
+      dropSessionDidUpdate session: UIDropSession,
+      withDestinationIndexPath destinationIndexPath: IndexPath?)
+      -> UICollectionViewDropProposal {
+      return UICollectionViewDropProposal(
+        operation: .move,
+        intent: .insertAtDestinationIndexPath)
+    }
+    
+    
 
 }
 
 protocol NotePagesDelegate {
     func notePageSelected(index: Int)
+    func notePagesReordered()
 }
