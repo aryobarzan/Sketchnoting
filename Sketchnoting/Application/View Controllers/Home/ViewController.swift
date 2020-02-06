@@ -9,7 +9,6 @@
 import UIKit
 
 import PopMenu
-import BadgeHub
 import NVActivityIndicatorView
 import NotificationBannerSwift
 import DataCompression
@@ -19,13 +18,15 @@ import SwiftGraph
 import MultipeerConnectivity
 import Vision
 import PencilKit
+import MobileCoreServices
+
 
 // This is the controller for the app's home page view.
 // It contains the search bar and all the buttons related to it.
 // It also contains note collection views, which in turn contain sketchnote views.
 
 //This controller handles all interactions of the user on the home page, including creating new note collections and new notes, searching, sharing notes, and generating pdfs from notes.
-class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextFieldDelegate, MCSessionDelegate, MCBrowserViewControllerDelegate, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, NoteCollectionViewDetailCellDelegate, UIApplicationDelegate, UIPopoverPresentationControllerDelegate {
+class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextFieldDelegate, MCSessionDelegate, MCBrowserViewControllerDelegate, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, NoteCollectionViewDetailCellDelegate, UIApplicationDelegate, UIPopoverPresentationControllerDelegate, UIDocumentPickerDelegate {
     
     private var selectedNoteForTagEditing: Sketchnote?
     
@@ -41,6 +42,8 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     @IBOutlet var clearSearchButton: UIButton!
     @IBOutlet var noteListViewButton: UIButton!
     @IBOutlet weak var filtersButton: UIButton!
+    @IBOutlet weak var receivedNotesButton: UIButton!
+    var receivedNotesBadge: BadgeHub!
     
     @IBOutlet var searchPanel: UIView!
     @IBOutlet var noteSortingButton: UIButton!
@@ -96,6 +99,9 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         activeFiltersBadge.scaleCircleSize(by: 0.45)
         activeSearchFiltersBadge.scaleCircleSize(by: 0.45)
         
+        receivedNotesBadge = BadgeHub(view: receivedNotesButton)
+        receivedNotesBadge.scaleCircleSize(by: 0.45)
+        
         // The note-sharing related variables are instantiated
         peerID = MCPeerID(displayName: UIDevice.current.name)
         mcSession = MCSession(peer: peerID, securityIdentity: nil, encryptionPreference: .required)
@@ -144,11 +150,13 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
                 let labelNames = data.components(separatedBy: .newlines).filter { $0.count > 0 }
                 self.labelNames.append(contentsOf: labelNames)
             } catch {
-                print("error loading labels: \(error)")
+                log.error("Failed to load labels for drawing recognition model: \(error)")
             }
         }
         let notificationCentre = NotificationCenter.default
-        notificationCentre.addObserver(self, selector: #selector(self.notifiedImportSketchnote(_:)), name: NSNotification.Name(rawValue: "ImportSketchnote"), object: nil)
+        notificationCentre.addObserver(self, selector: #selector(self.notifiedImportSketchnote(_:)), name: NSNotification.Name(rawValue: Notifications.NOTIFICATION_IMPORT_NOTE), object: nil)
+        notificationCentre.addObserver(self, selector: #selector(self.notifiedReceiveSketchnote(_:)), name: NSNotification.Name(rawValue: Notifications.NOTIFICATION_RECEIVE_NOTE), object: nil)
+        notificationCentre.addObserver(self, selector: #selector(self.notifiedDeviceVisibility(_:)), name: NSNotification.Name(rawValue: Notifications.NOTIFICATION_DEVICE_VISIBILITY), object: nil)
         
         Knowledge.refreshSimilarNotesGraph()
     }
@@ -157,22 +165,41 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         super.viewWillAppear(animated)
         self.navigationController?.setNavigationBarHidden(true, animated: true)
         self.setNeedsStatusBarAppearanceUpdate()
+        
+        self.updateReceivedNotesButton()
     }
     
     func popoverPresentationControllerDidDismissPopover(_ popoverPresentationController: UIPopoverPresentationController) {
         self.updateDisplayedNotes(false)
         self.selectedNoteForTagEditing = nil
-        activeFiltersBadge.setCount(TagsManager.filterTags.count)
+        activeFiltersBadge.setCount(TagsManager.filterTags.count)        
     }
  
     override var preferredStatusBarStyle : UIStatusBarStyle {
         return .lightContent
     }
     
+    // Respond to NotificationCenter events
     @objc func notifiedImportSketchnote(_ noti : Notification)  {
         let importURL = (noti.userInfo as? [String : URL])!["importURL"]!
         print(importURL)
         self.importSketchnote(url: importURL)
+    }
+    @objc func notifiedReceiveSketchnote(_ noti : Notification)  {
+        updateReceivedNotesButton()
+    }
+    @objc func notifiedDeviceVisibility(_ noti : Notification)  {
+        updateReceivedNotesButton()
+    }
+    
+    private func updateReceivedNotesButton() {
+        if NotesManager.receivedNotesController.mcAdvertiserAssistant != nil {
+            receivedNotesButton.tintColor = UIColor.systemBlue
+        }
+        else {
+            receivedNotesButton.tintColor = UIColor.white
+        }
+        receivedNotesBadge.setCount(NotesManager.receivedNotesController.receivedNotes.count)
     }
     
     private func loadData() {
@@ -199,21 +226,25 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             }
             break
         case "ManageTags":
-            let destinationNavi = segue.destination as! UINavigationController
-            destinationNavi.popoverPresentationController?.delegate = self
-            if let destination = destinationNavi.topViewController as? TagsViewController {
+            let destinationNC = segue.destination as! UINavigationController
+            destinationNC.popoverPresentationController?.delegate = self
+            destinationNC.popoverPresentationController?.sourceView = filtersButton
+            if let destination = destinationNC.topViewController as? TagsViewController {
                 destination.isFiltering = true
             }
             break
         case "EditNoteTags":
-            let destinationNavi = segue.destination as! UINavigationController
-            destinationNavi.popoverPresentationController?.delegate = self
-            if let destination = destinationNavi.topViewController as? TagsViewController {
+            let destinationNC = segue.destination as! UINavigationController
+            destinationNC.popoverPresentationController?.delegate = self
+            if let cell = self.selectedCellForTagEditing {
+                destinationNC.popoverPresentationController?.sourceView = cell
+            }
+            if let destination = destinationNC.topViewController as? TagsViewController {
                 destination.note = selectedNoteForTagEditing
             }
             break
         default:
-            print("Not creating or editing sketchnote.")
+            log.info("Unaccounted-for segue.")
         }
     }
     
@@ -230,6 +261,24 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             }
             self.updateDisplayedNotes(false)
         }
+    }
+    
+    func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
+        if urls.count > 0 {
+            importSketchnote(url: urls[0])
+        }
+    }
+    
+    private func displayDocumentPicker() {
+        let types: [String] = ["com.sketchnote"]
+        let documentPicker = UIDocumentPickerViewController(documentTypes: types, in: .import)
+        documentPicker.delegate = self
+        documentPicker.modalPresentationStyle = .formSheet
+        self.present(documentPicker, animated: true, completion: nil)
+    }
+    
+    @IBAction func importDocumentTapped(_ sender: UIButton) {
+        displayDocumentPicker()
     }
     
     // MARK: Note display management
@@ -356,18 +405,18 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         return UIContextMenuConfiguration(identifier: nil, previewProvider: nil, actionProvider: { suggestedActions in
 
             // "puppers" is the array backing the collection view
-            return self.makeNoteContextMenu(note: self.items[indexPath.row], point: point)
+            return self.makeNoteContextMenu(note: self.items[indexPath.row], point: point, cellIndexPath: indexPath)
         })
     }
     
     var shareNoteObject : Sketchnote?
-    private func makeNoteContextMenu(note: Sketchnote, point: CGPoint) -> UIMenu {
+    private func makeNoteContextMenu(note: Sketchnote, point: CGPoint, cellIndexPath: IndexPath) -> UIMenu {
         // Create a UIAction for sharing
         let renameAction = UIAction(title: "Rename", image: UIImage(systemName: "text.cursor")) { action in
             self.editNoteTitle(note: note)
         }
         let tagsAction = UIAction(title: "Manage Tags", image: UIImage(systemName: "tag.fill")) { action in
-            self.editNoteTags(sketchnote: note)
+            self.editNoteTags(sketchnote: note, cell: self.noteCollectionView.cellForItem(at: cellIndexPath))
         }
         let similarNotesAction = UIAction(title: "Similar Notes", image: UIImage(systemName: "link")) { action in
             self.filterSimilarNotesFor(note)
@@ -846,7 +895,8 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         similarNotesTitleLabel.isHidden = true
     }
     
-    private func editNoteTags(sketchnote: Sketchnote) {
+    var selectedCellForTagEditing: UICollectionViewCell?
+    private func editNoteTags(sketchnote: Sketchnote, cell: UICollectionViewCell?) {
         var looseTagsToRemove = [Tag]()
         for tag in sketchnote.tags {
             if !TagsManager.tags.contains(tag) {
@@ -860,6 +910,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             sketchnote.save()
         }
         self.selectedNoteForTagEditing = sketchnote
+        self.selectedCellForTagEditing = cell
         self.performSegue(withIdentifier: "EditNoteTags", sender: self)
        }
 
@@ -871,21 +922,22 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         if let imported = NotesManager.importSketchnoteFile(url: url) {
             imported.save()
             if NotesManager.notes.contains(imported) {
-                log.info("Sketchnote already in application, updating its data.")
-                let alert = UIAlertController(title: "Note Exists", message: "You already have this note in your library: Its data has been updated.", preferredStyle: .alert)
-                           self.present(alert, animated: true, completion: nil)
+                log.info("Sketchnote already in your library, updating its data.")
+                let banner = FloatingNotificationBanner(title: imported.getTitle(), subtitle: "This imported note is already in your library. It has been updated.", style: .info)
+                banner.show()
             }
             else {
                 log.info("Importing new sketchnote.")
                 _ = NotesManager.add(note: imported)
-                let alert = UIAlertController(title: "Note Imported", message: "The new note has been added to your library.", preferredStyle: .alert)
-                           self.present(alert, animated: true, completion: nil)
+                let banner = FloatingNotificationBanner(title: imported.getTitle(), subtitle: "Note imported and added to your library.", style: .info)
+                banner.show()
             }
             self.updateDisplayedNotes(false)
         }
         else {
-            let alert = UIAlertController(title: "Error", message: "Sorry, the sketchnote file could not be imported.", preferredStyle: .alert)
-            self.present(alert, animated: true, completion: nil)
+            log.error("Note could not be imported.")
+            let banner = FloatingNotificationBanner(title: "Error", subtitle: "The note could not be imported. It may be corrupted.", style: .warning)
+            banner.show()
         }
     }
     
@@ -899,7 +951,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     private func deleteNote(note: Sketchnote) {
         let alert = UIAlertController(title: "Delete Note", message: "Are you sure you want to delete this note?", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Delete", style: .destructive, handler: { action in
-              NotesManager.delete(note: note)
               self.items.removeAll{$0 == note}
               NotesManager.delete(note: note)
               self.noteCollectionView.reloadData()
@@ -918,7 +969,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     }
     
     func noteCollectionViewDetailCellTagTapped(sketchnote: Sketchnote, sender: UIButton, cell: NoteCollectionViewDetailCell) {
-        self.editNoteTags(sketchnote: sketchnote)
+        self.editNoteTags(sketchnote: sketchnote, cell: cell)
     }
     
     func noteCollectionViewDetailCellShareTapped(sketchnote: Sketchnote, sender: UIButton, cell: NoteCollectionViewDetailCell) {

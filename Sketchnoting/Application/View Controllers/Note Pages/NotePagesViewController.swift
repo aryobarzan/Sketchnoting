@@ -36,7 +36,7 @@ class NotePagesViewController: UIViewController, UICollectionViewDelegate, UICol
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "NotePageCell", for: indexPath as IndexPath) as! NotePageCollectionViewCell
         let page = NotesManager.activeNote!.pages[indexPath.item]
         cell.imageView.image = page.image
-        cell.pageIndexLabel.text = "\(indexPath.item)"
+        cell.pageIndexLabel.text = "\(indexPath.item + 1)"
         cell.imageView.layer.cornerRadius = 4
         cell.imageView.layer.borderWidth = 2
         if page == NotesManager.activeNote!.getCurrentPage() {

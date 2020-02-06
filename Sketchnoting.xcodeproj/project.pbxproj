@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		9F00428923E9FB2600961636 /* BadgeHub.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F00428823E9FB2600961636 /* BadgeHub.swift */; };
 		9F05B5A1232BE4EC00983AF2 /* NoteCollectionViewDetailCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9F05B59F232BE4EC00983AF2 /* NoteCollectionViewDetailCell.xib */; };
 		9F05B5A3232BF0C800983AF2 /* NoteCollectionViewDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F05B5A2232BF0C800983AF2 /* NoteCollectionViewDetailCell.swift */; };
 		9F0FC54923760E7600070FA0 /* NoteOptionsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0FC54823760E7600070FA0 /* NoteOptionsTableViewController.swift */; };
@@ -14,6 +15,11 @@
 		9F10EC192347E4B4005340AA /* SwiftyBeaver in Frameworks */ = {isa = PBXBuildFile; productRef = 9F10EC182347E4B4005340AA /* SwiftyBeaver */; };
 		9F2C00062351123700D53EE9 /* SwiftyJSON in Frameworks */ = {isa = PBXBuildFile; productRef = 9F2C00052351123700D53EE9 /* SwiftyJSON */; };
 		9F2C00092351126800D53EE9 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 9F2C00082351126800D53EE9 /* Alamofire */; };
+		9F4B38BD23EA3D8500F87B61 /* ReceivedNoteCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F4B38BC23EA3D8500F87B61 /* ReceivedNoteCollectionViewCell.swift */; };
+		9F4B38BF23EA3EE200F87B61 /* ReceivedNotesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F4B38BE23EA3EE200F87B61 /* ReceivedNotesViewController.swift */; };
+		9F4B38C123EA41C900F87B61 /* ReceivedNotesController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F4B38C023EA41C900F87B61 /* ReceivedNotesController.swift */; };
+		9F4B38C323EB1E6D00F87B61 /* Notifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F4B38C223EB1E6D00F87B61 /* Notifications.swift */; };
+		9F4B38C523EC76F400F87B61 /* DocumentPreviewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F4B38C423EC76F400F87B61 /* DocumentPreviewViewController.swift */; };
 		9F4D2336239C1FDB0078B364 /* UIColorExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F4D2335239C1FDB0078B364 /* UIColorExtensions.swift */; };
 		9F4D2338239C22FD0078B364 /* OtherExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F4D2337239C22FD0078B364 /* OtherExtensions.swift */; };
 		9F509144235BE29100853E84 /* DataCompression in Frameworks */ = {isa = PBXBuildFile; productRef = 9F509143235BE29100853E84 /* DataCompression */; };
@@ -71,7 +77,6 @@
 		9FD29BC522249D9500CC969A /* Note.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29BC422249D9500CC969A /* Note.swift */; };
 		9FD29BC72224B58600CC969A /* Document.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29BC62224B58600CC969A /* Document.swift */; };
 		9FD29BCB2224B89800CC969A /* Sketchnote.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29BCA2224B89800CC969A /* Sketchnote.swift */; };
-		9FD29C392238571700CC969A /* Pods_Sketchnoting.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9DC8B7BD96FB5DF71C8C0CA0 /* Pods_Sketchnoting.framework */; };
 		9FD29C442239525A00CC969A /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 9FD29C432239525900CC969A /* GoogleService-Info.plist */; };
 		9FD29C472239588E00CC969A /* UIViewExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29C462239588E00CC969A /* UIViewExtensions.swift */; };
 		9FD29C4E223998BC00CC969A /* UIViewControllerExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29C4D223998BC00CC969A /* UIViewControllerExtensions.swift */; };
@@ -84,16 +89,36 @@
 		9FFE07E6232A5FE500DBD0AC /* TagTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FFE07E5232A5FE500DBD0AC /* TagTableViewCell.swift */; };
 		9FFE07E8232A622A00DBD0AC /* Tag.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FFE07E7232A622A00DBD0AC /* Tag.swift */; };
 		9FFE07EA232A63BA00DBD0AC /* TagsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FFE07E9232A63BA00DBD0AC /* TagsManager.swift */; };
+		D2A21B26513E1A7C02F6BD40 /* libPods-Sketchnoting.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2DBAD86A2FDA51F4DEA66F8A /* libPods-Sketchnoting.a */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		9F44580223EA00100057776C /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
-		3866EAD96654DEBC2DCDFB3E /* Pods-Sketchnoting.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Sketchnoting.release.xcconfig"; path = "Target Support Files/Pods-Sketchnoting/Pods-Sketchnoting.release.xcconfig"; sourceTree = "<group>"; };
-		8703F8178351837A9DB23A40 /* Pods-Sketchnoting.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Sketchnoting.debug.xcconfig"; path = "Target Support Files/Pods-Sketchnoting/Pods-Sketchnoting.debug.xcconfig"; sourceTree = "<group>"; };
-		9DC8B7BD96FB5DF71C8C0CA0 /* Pods_Sketchnoting.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Sketchnoting.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		2DBAD86A2FDA51F4DEA66F8A /* libPods-Sketchnoting.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Sketchnoting.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		6DBA3B8B1161909D0B9A8C86 /* Pods_Sketchnoting.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Sketchnoting.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		775C24EF4DB826D48E4192A6 /* Pods-Sketchnoting.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Sketchnoting.release.xcconfig"; path = "Target Support Files/Pods-Sketchnoting/Pods-Sketchnoting.release.xcconfig"; sourceTree = "<group>"; };
+		9F00428823E9FB2600961636 /* BadgeHub.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BadgeHub.swift; sourceTree = "<group>"; };
 		9F05B59F232BE4EC00983AF2 /* NoteCollectionViewDetailCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NoteCollectionViewDetailCell.xib; sourceTree = "<group>"; };
 		9F05B5A2232BF0C800983AF2 /* NoteCollectionViewDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteCollectionViewDetailCell.swift; sourceTree = "<group>"; };
 		9F05BC7E23761C4A00D49A88 /* NoteTextViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteTextViewController.swift; sourceTree = "<group>"; };
 		9F0FC54823760E7600070FA0 /* NoteOptionsTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteOptionsTableViewController.swift; sourceTree = "<group>"; };
+		9F4B38BC23EA3D8500F87B61 /* ReceivedNoteCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceivedNoteCollectionViewCell.swift; sourceTree = "<group>"; };
+		9F4B38BE23EA3EE200F87B61 /* ReceivedNotesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceivedNotesViewController.swift; sourceTree = "<group>"; };
+		9F4B38C023EA41C900F87B61 /* ReceivedNotesController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceivedNotesController.swift; sourceTree = "<group>"; };
+		9F4B38C223EB1E6D00F87B61 /* Notifications.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notifications.swift; sourceTree = "<group>"; };
+		9F4B38C423EC76F400F87B61 /* DocumentPreviewViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentPreviewViewController.swift; sourceTree = "<group>"; };
 		9F4D2335239C1FDB0078B364 /* UIColorExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIColorExtensions.swift; sourceTree = "<group>"; };
 		9F4D2337239C22FD0078B364 /* OtherExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OtherExtensions.swift; sourceTree = "<group>"; };
 		9F5D80EF2332D32600552D58 /* SVGImageProcessorExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SVGImageProcessorExtension.swift; sourceTree = "<group>"; };
@@ -139,6 +164,7 @@
 		9FBF6AB522E9F3FE001FD730 /* VisionTextBlockWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisionTextBlockWrapper.swift; sourceTree = "<group>"; };
 		9FBF6AB722E9F428001FD730 /* VisionTextLineWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisionTextLineWrapper.swift; sourceTree = "<group>"; };
 		9FBF6AB922E9F439001FD730 /* VisionTextElementWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisionTextElementWrapper.swift; sourceTree = "<group>"; };
+		9FCD3D5C23EA0A59005CB98D /* CocoaLumberjack.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = CocoaLumberjack.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		9FD1ADF223A52F7C0013C68E /* NotePagesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotePagesViewController.swift; sourceTree = "<group>"; };
 		9FD29BA32220524D00CC969A /* Sketchnoting.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Sketchnoting.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9FD29BA62220524D00CC969A /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -160,10 +186,10 @@
 		9FD29C6322431BFA00CC969A /* DrawnImageClassifier.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = DrawnImageClassifier.mlmodel; sourceTree = "<group>"; };
 		9FD29C6522431C0000CC969A /* labels.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = labels.txt; sourceTree = "<group>"; };
 		9FFB815C23765D5C00B5390C /* BookshelfOptionsTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookshelfOptionsTableViewController.swift; sourceTree = "<group>"; };
-		9FFD413E2333C017005C9952 /* SVGKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = SVGKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		9FFE07E5232A5FE500DBD0AC /* TagTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagTableViewCell.swift; sourceTree = "<group>"; };
 		9FFE07E7232A622A00DBD0AC /* Tag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tag.swift; sourceTree = "<group>"; };
 		9FFE07E9232A63BA00DBD0AC /* TagsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagsManager.swift; sourceTree = "<group>"; };
+		E0C0F2F2CA423E7E8B0DC8D5 /* Pods-Sketchnoting.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Sketchnoting.debug.xcconfig"; path = "Target Support Files/Pods-Sketchnoting/Pods-Sketchnoting.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -175,10 +201,10 @@
 				9F5F340423AC64C900EB2804 /* SwiftGraph in Frameworks */,
 				9F509144235BE29100853E84 /* DataCompression in Frameworks */,
 				9F10EC162347D64C005340AA /* Kingfisher in Frameworks */,
-				9FD29C392238571700CC969A /* Pods_Sketchnoting.framework in Frameworks */,
 				9FAA827E236DD45200B2004F /* ViewAnimator in Frameworks */,
 				9F2C00062351123700D53EE9 /* SwiftyJSON in Frameworks */,
 				9F10EC192347E4B4005340AA /* SwiftyBeaver in Frameworks */,
+				D2A21B26513E1A7C02F6BD40 /* libPods-Sketchnoting.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -188,8 +214,8 @@
 		04894B1DC0E872292CA59A2C /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				8703F8178351837A9DB23A40 /* Pods-Sketchnoting.debug.xcconfig */,
-				3866EAD96654DEBC2DCDFB3E /* Pods-Sketchnoting.release.xcconfig */,
+				E0C0F2F2CA423E7E8B0DC8D5 /* Pods-Sketchnoting.debug.xcconfig */,
+				775C24EF4DB826D48E4192A6 /* Pods-Sketchnoting.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -197,10 +223,19 @@
 		124769D1803E7C4AE8A1F382 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				9FFD413E2333C017005C9952 /* SVGKit.framework */,
-				9DC8B7BD96FB5DF71C8C0CA0 /* Pods_Sketchnoting.framework */,
+				9FCD3D5C23EA0A59005CB98D /* CocoaLumberjack.framework */,
+				2DBAD86A2FDA51F4DEA66F8A /* libPods-Sketchnoting.a */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		9F4B38BB23EA3D5700F87B61 /* Note Sharing */ = {
+			isa = PBXGroup;
+			children = (
+				9F4B38BE23EA3EE200F87B61 /* ReceivedNotesViewController.swift */,
+				9F4B38BC23EA3D8500F87B61 /* ReceivedNoteCollectionViewCell.swift */,
+			);
+			path = "Note Sharing";
 			sourceTree = "<group>";
 		};
 		9F5010CA22491F8900425424 /* Views */ = {
@@ -233,6 +268,7 @@
 				9F5E89F12391CE5A002FA8B2 /* Documents Bookshelf */,
 				9F5E89F22391CE6A002FA8B2 /* Document Detail */,
 				9FA8BFFE239B18A800BAA42B /* Tags */,
+				9F4B38BB23EA3D5700F87B61 /* Note Sharing */,
 				9F8551AF23A539AE006EB0B1 /* Note Pages */,
 				9F7BAFF6239C1D640045CD12 /* Other */,
 			);
@@ -254,6 +290,7 @@
 			isa = PBXGroup;
 			children = (
 				9F5E89F32391CE84002FA8B2 /* DocumentDetailViewController.swift */,
+				9F4B38C423EC76F400F87B61 /* DocumentPreviewViewController.swift */,
 			);
 			path = "Document Detail";
 			sourceTree = "<group>";
@@ -428,6 +465,14 @@
 			path = "Handwriting Recognition";
 			sourceTree = "<group>";
 		};
+		9FC9047923EA1A0B006D1E11 /* Recovered References */ = {
+			isa = PBXGroup;
+			children = (
+				6DBA3B8B1161909D0B9A8C86 /* Pods_Sketchnoting.framework */,
+			);
+			name = "Recovered References";
+			sourceTree = "<group>";
+		};
 		9FD29B9A2220524D00CC969A = {
 			isa = PBXGroup;
 			children = (
@@ -435,6 +480,7 @@
 				9FD29BA42220524D00CC969A /* Products */,
 				124769D1803E7C4AE8A1F382 /* Frameworks */,
 				04894B1DC0E872292CA59A2C /* Pods */,
+				9FC9047923EA1A0B006D1E11 /* Recovered References */,
 			);
 			sourceTree = "<group>";
 		};
@@ -476,6 +522,7 @@
 				9F942505238A341E006B0E81 /* UIStoryboardSegueWithCompletion.swift */,
 				9F4D2335239C1FDB0078B364 /* UIColorExtensions.swift */,
 				9F4D2337239C22FD0078B364 /* OtherExtensions.swift */,
+				9F00428823E9FB2600961636 /* BadgeHub.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -520,6 +567,8 @@
 				9FA6238922D371F1007ED794 /* Semantic Annotation */,
 				9FA6238722CEA7FE007ED794 /* MapHelper.swift */,
 				9F75E450230D8AE100488BBD /* SettingsManager.swift */,
+				9F4B38C023EA41C900F87B61 /* ReceivedNotesController.swift */,
+				9F4B38C223EB1E6D00F87B61 /* Notifications.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -539,12 +588,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 9FD29BB52220525000CC969A /* Build configuration list for PBXNativeTarget "Sketchnoting" */;
 			buildPhases = (
-				76AF5EC1F5285F1B32A711B9 /* [CP] Check Pods Manifest.lock */,
+				40F992550C2704BABEE7F4F7 /* [CP] Check Pods Manifest.lock */,
 				9FD29B9F2220524D00CC969A /* Sources */,
 				9FD29BA02220524D00CC969A /* Frameworks */,
 				9FD29BA12220524D00CC969A /* Resources */,
-				1B37628CDE3140951BF90E39 /* [CP] Embed Pods Frameworks */,
-				7BA25DAC743874BAA4E9C5AC /* [CP] Copy Pods Resources */,
+				9F44580223EA00100057776C /* Embed Frameworks */,
+				B260094388E7056BD35F7EBB /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -597,6 +646,7 @@
 				9F509142235BE29100853E84 /* XCRemoteSwiftPackageReference "DataCompression" */,
 				9FAA827C236DD45200B2004F /* XCRemoteSwiftPackageReference "ViewAnimator" */,
 				9F5F340223AC64C900EB2804 /* XCRemoteSwiftPackageReference "SwiftGraph" */,
+				9FCD3D5723EA08A1005CB98D /* XCRemoteSwiftPackageReference "CocoaLumberjack" */,
 			);
 			productRefGroup = 9FD29BA42220524D00CC969A /* Products */;
 			projectDirPath = "";
@@ -627,24 +677,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		1B37628CDE3140951BF90E39 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-Sketchnoting/Pods-Sketchnoting-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-Sketchnoting/Pods-Sketchnoting-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Sketchnoting/Pods-Sketchnoting-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		76AF5EC1F5285F1B32A711B9 /* [CP] Check Pods Manifest.lock */ = {
+		40F992550C2704BABEE7F4F7 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -666,7 +699,7 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		7BA25DAC743874BAA4E9C5AC /* [CP] Copy Pods Resources */ = {
+		B260094388E7056BD35F7EBB /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -695,12 +728,16 @@
 				9FAD28F623A52AC700F2203E /* NoteTextViewController.swift in Sources */,
 				9FA8C002239B21D500BAA42B /* TagsCreationViewController.swift in Sources */,
 				9F942506238A341E006B0E81 /* UIStoryboardSegueWithCompletion.swift in Sources */,
+				9F4B38C323EB1E6D00F87B61 /* Notifications.swift in Sources */,
 				9F75E451230D8AE100488BBD /* SettingsManager.swift in Sources */,
 				9F75E482231410A100488BBD /* TAGMEHelper.swift in Sources */,
 				9FA6238B22D37213007ED794 /* BioPortalHelper.swift in Sources */,
 				9FA6239322DE30AC007ED794 /* SpotlightDocument.swift in Sources */,
 				9FD29C58223C3CF700CC969A /* UIImageExtensions.swift in Sources */,
+				9F00428923E9FB2600961636 /* BadgeHub.swift in Sources */,
+				9F4B38C523EC76F400F87B61 /* DocumentPreviewViewController.swift in Sources */,
 				9FA6238822CEA7FE007ED794 /* MapHelper.swift in Sources */,
+				9F4B38C123EA41C900F87B61 /* ReceivedNotesController.swift in Sources */,
 				9F05B5A3232BF0C800983AF2 /* NoteCollectionViewDetailCell.swift in Sources */,
 				9F92D110231E97DF00BC0E57 /* UserDefaultsExtensions.swift in Sources */,
 				9F92D11F23217FFF00BC0E57 /* SearchFilter.swift in Sources */,
@@ -724,6 +761,7 @@
 				9F92D11C23217D0500BC0E57 /* SearchFilterView.swift in Sources */,
 				9F0FC54923760E7600070FA0 /* NoteOptionsTableViewController.swift in Sources */,
 				9FFE07EA232A63BA00DBD0AC /* TagsManager.swift in Sources */,
+				9F4B38BF23EA3EE200F87B61 /* ReceivedNotesViewController.swift in Sources */,
 				9FD29C4E223998BC00CC969A /* UIViewControllerExtensions.swift in Sources */,
 				9FD29C472239588E00CC969A /* UIViewExtensions.swift in Sources */,
 				9FA8C000239B18BA00BAA42B /* TagsViewController.swift in Sources */,
@@ -746,6 +784,7 @@
 				9FD29BC72224B58600CC969A /* Document.swift in Sources */,
 				9F5F340623AC64E400EB2804 /* Knowledge.swift in Sources */,
 				9FBF6AB622E9F3FE001FD730 /* VisionTextBlockWrapper.swift in Sources */,
+				9F4B38BD23EA3D8500F87B61 /* ReceivedNoteCollectionViewCell.swift in Sources */,
 				9FA6239E22E66D73007ED794 /* HandwritingRecognizer.swift in Sources */,
 				9FD29BCB2224B89800CC969A /* Sketchnote.swift in Sources */,
 				9FA6238D22D38AEE007ED794 /* SpotlightHelper.swift in Sources */,
@@ -893,7 +932,7 @@
 		};
 		9FD29BB62220525000CC969A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 8703F8178351837A9DB23A40 /* Pods-Sketchnoting.debug.xcconfig */;
+			baseConfigurationReference = E0C0F2F2CA423E7E8B0DC8D5 /* Pods-Sketchnoting.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
@@ -921,7 +960,7 @@
 		};
 		9FD29BB72220525000CC969A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 3866EAD96654DEBC2DCDFB3E /* Pods-Sketchnoting.release.xcconfig */;
+			baseConfigurationReference = 775C24EF4DB826D48E4192A6 /* Pods-Sketchnoting.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
@@ -1025,6 +1064,14 @@
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 2.7.0;
+			};
+		};
+		9FCD3D5723EA08A1005CB98D /* XCRemoteSwiftPackageReference "CocoaLumberjack" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/CocoaLumberjack/CocoaLumberjack";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.6.1;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */

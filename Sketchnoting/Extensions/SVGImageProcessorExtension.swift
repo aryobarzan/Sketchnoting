@@ -35,7 +35,6 @@ struct SVGProcessor: ImageProcessor {
                 return imageSVG.uiImage
             }
             return nil
-            //return generateSVGImage(data: data, size: imgSize) ?? DefaultImageProcessor().process(item: item, options: options)
         }
     }
 }
@@ -51,7 +50,6 @@ struct SVGCacheSerializer: CacheSerializer {
             return imageSVG.uiImage
         }
         return nil
-        //return generateSVGImage(data: data) ?? image(with: data, options: options)
     }
 }
 

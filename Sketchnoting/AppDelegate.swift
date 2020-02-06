@@ -12,6 +12,7 @@ import Alamofire
 import SwiftyBeaver
 let log = SwiftyBeaver.self
 import Kingfisher
+import MultipeerConnectivity
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -40,6 +41,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             UserDefaults.settings.set(true, forKey: SettingsKeys.TextRecognitionCloud.rawValue)
             UserDefaults.settings.set(true, forKey: SettingsKeys.TextRecognitionCloudOption.rawValue)
         }
+        
         return true
     }
 
@@ -60,10 +62,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationDidBecomeActive(_ application: UIApplication) {
         // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
         if importURL != nil {
-            let notificationCentre = NotificationCenter.default
-            var info = [String : URL]()
-            info["importURL"] = importURL
-            notificationCentre.post(name: NSNotification.Name(rawValue: "ImportSketchnote"), object: self, userInfo: info)
+            Notifications.announce(importedNoteURL: importURL)
             importURL = nil
         }
     }
@@ -78,7 +77,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         importURL = url
         return true
     }
-
 
 }
 

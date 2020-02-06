@@ -10,13 +10,11 @@ import UIKit
 
 import Firebase
 import PopMenu
-import BadgeHub
 import NVActivityIndicatorView
 import Repeat
 import NotificationBannerSwift
 import ViewAnimator
 import MaterialComponents.MaterialBottomSheet
-import MaterialComponents.MaterialFeatureHighlight
 
 import PencilKit
 
@@ -127,6 +125,8 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         relatedNotesCollectionView.dataSource = self
         
         self.oldDocuments = NotesManager.activeNote!.documents
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(self.notifiedReceiveSketchnote(_:)), name: NSNotification.Name(rawValue: Notifications.NOTIFICATION_RECEIVE_NOTE), object: nil)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -150,6 +150,12 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         
         self.refreshRelatedNotes()
         self.updateTopicsCount()
+    }
+    
+    // Notification Center events
+    @objc func notifiedReceiveSketchnote(_ noti : Notification)  {
+        let banner = FloatingNotificationBanner(title: "A user has shared a note with you", subtitle: "You can view it on the home page.", style: .info)
+        banner.show()
     }
     
     // This function is called when the user closes the page, i.e. stops editing the note, and the app returns to the home page.
@@ -583,17 +589,16 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             for (view, doc) in conceptHighlights {
                 if view.frame.contains(sender.location(in: canvasView)) {
                     log.info("Highlighting concept")
-                    let highlightController = MDCFeatureHighlightViewController(highlightedView: view,
-                                                                                completion: nil)
-                    highlightController.titleText = doc[0].title
-                    var body = doc[0].description
-                    if doc[0].description != nil && doc[0].description!.count > 500 {
-                        body = String(doc[0].description!.prefix(500))
+                    let documentPreviewVC = UIStoryboard(name: "Main", bundle: Bundle.main).instantiateViewController(withIdentifier: "DocumentPreviewViewController") as? DocumentPreviewViewController
+                    if let documentPreviewVC = documentPreviewVC {
+                        documentPreviewVC.modalPresentationStyle = .popover
+                        documentPreviewVC.popoverPresentationController?.sourceView = view
+                        present(documentPreviewVC, animated: true, completion:nil)
+                        documentPreviewVC.imageView.image = doc[0].previewImage
+                        documentPreviewVC.titleLabel.text = doc[0].title
+                        documentPreviewVC.bodyTextView.text = doc[0].description
+
                     }
-                    highlightController.bodyText = body
-                    highlightController.outerHighlightColor =
-                      UIColor.blue.withAlphaComponent(kMDCFeatureHighlightOuterHighlightAlpha)
-                    present(highlightController, animated: true, completion:nil)
                 }
             }
         }
@@ -1140,12 +1145,41 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     }
     
     func previousPage() {
+        if NotesManager.activeNote!.hasPreviousPage() {
+            UIView.animate(withDuration: 1.0, animations: {
+                let animation = CATransition()
+                animation.duration = 1.2
+                animation.startProgress = 0.0
+                animation.endProgress = 1.0
+                animation.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeOut)
+                animation.type = CATransitionType(rawValue: "pageCurl")
+                animation.subtype = CATransitionSubtype(rawValue: "fromLeft")
+                animation.isRemovedOnCompletion = false
+                animation.fillMode = CAMediaTimingFillMode(rawValue: "extended")
+                self.canvasView.layer.add(animation, forKey: "pageFlipAnimation")
+            })
+        }
         saveCurrentPage()
         NotesManager.activeNote!.previousPage()
         updatePage()
         updatePaginationButtons()
     }
     func nextPage() {
+        if NotesManager.activeNote!.hasNextPage() {
+            UIView.animate(withDuration: 1.0, animations: {
+                let animation = CATransition()
+                animation.duration = 1.2
+                animation.startProgress = 0.0
+                animation.endProgress = 1.0
+                animation.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeOut)
+                animation.type = CATransitionType(rawValue: "pageCurl")
+                animation.subtype = CATransitionSubtype(rawValue: "fromRight")
+                animation.isRemovedOnCompletion = false
+                animation.fillMode = CAMediaTimingFillMode(rawValue: "extended")
+                self.canvasView.layer.add(animation, forKey: "pageFlipAnimation")
+                //self.animatedUIView.addSubview(tempUIView)
+            })
+        }
         saveCurrentPage()
         NotesManager.activeNote!.nextPage()
         updatePage()
