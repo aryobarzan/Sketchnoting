@@ -29,17 +29,19 @@ class NotePagesViewController: UIViewController, UICollectionViewDelegate, UICol
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return NotesManager.activeNote!.pages.count
+        return SKFileManager.activeNote!.pages.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "NotePageCell", for: indexPath as IndexPath) as! NotePageCollectionViewCell
-        let page = NotesManager.activeNote!.pages[indexPath.item]
-        cell.imageView.image = page.image
+        let page = SKFileManager.activeNote!.pages[indexPath.item]
+        page.getAsImage() { image in
+            cell.imageView.image = image
+        }
         cell.pageIndexLabel.text = "\(indexPath.item + 1)"
         cell.imageView.layer.cornerRadius = 4
         cell.imageView.layer.borderWidth = 2
-        if page == NotesManager.activeNote!.getCurrentPage() {
+        if indexPath.item == SKFileManager.activeNote!.activePageIndex {
             cell.imageView.layer.borderColor = UIColor.systemBlue.cgColor
         }
         else {
@@ -62,7 +64,7 @@ class NotePagesViewController: UIViewController, UICollectionViewDelegate, UICol
     
     // Drag and drop delegates for re-ordering
     func collectionView(_ collectionView: UICollectionView, itemsForBeginning session: UIDragSession, at indexPath: IndexPath) -> [UIDragItem] {
-        let item = NotesManager.activeNote!.pages[indexPath.row]
+        let item = SKFileManager.activeNote!.pages[indexPath.row]
         let itemProvider = NSItemProvider(object: item.getText() as NSString)
         let dragItem = UIDragItem(itemProvider: itemProvider)
         return [dragItem]
@@ -84,15 +86,15 @@ class NotePagesViewController: UIViewController, UICollectionViewDelegate, UICol
           }
 
           collectionView.performBatchUpdates({
-            let page = NotesManager.activeNote!.pages[sourceIndexPath.item]
-            if NotesManager.activeNote!.activePageIndex == sourceIndexPath.item {
-                NotesManager.activeNote!.activePageIndex = destinationIndexPath.item
+            let page = SKFileManager.activeNote!.pages[sourceIndexPath.item]
+            if SKFileManager.activeNote!.activePageIndex == sourceIndexPath.item {
+                SKFileManager.activeNote!.activePageIndex = destinationIndexPath.item
             }
-            NotesManager.activeNote!.removePage(at: sourceIndexPath)
-            NotesManager.activeNote!.insertPage(page, at: destinationIndexPath)
+            SKFileManager.activeNote!.removePage(at: sourceIndexPath)
+            SKFileManager.activeNote!.insertPage(page, at: destinationIndexPath)
             collectionView.deleteItems(at: [sourceIndexPath])
             collectionView.insertItems(at: [destinationIndexPath])
-            NotesManager.activeNote!.save()
+            SKFileManager.save(file: SKFileManager.activeNote!)
           }, completion: { _ in
             coordinator.drop(dropItem.dragItem,
                               toItemAt: destinationIndexPath)

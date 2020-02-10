@@ -28,7 +28,7 @@ import MobileCoreServices
 //This controller handles all interactions of the user on the home page, including creating new note collections and new notes, searching, sharing notes, and generating pdfs from notes.
 class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextFieldDelegate, MCSessionDelegate, MCBrowserViewControllerDelegate, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, NoteCollectionViewDetailCellDelegate, UIApplicationDelegate, UIPopoverPresentationControllerDelegate, UIDocumentPickerDelegate {
     
-    private var selectedNoteForTagEditing: Sketchnote?
+    private var selectedNoteForTagEditing: NoteX?
     
     @IBOutlet var newNoteButton: UIButton!
     @IBOutlet var noteLoadingIndicator: NVActivityIndicatorView!
@@ -78,12 +78,12 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     var mcAdvertiserAssistant: MCAdvertiserAssistant!
     
     // The note the user has selected to send to other devices is stored here.
-    var sketchnoteToShare: Sketchnote?
+    var sketchnoteToShare: NoteX?
     // The two above variables are added to this following array and this array is sent to the receiving device(s)
     var dataToShare = [Data]()
     
     // Similarly, a received note from some other device is stored here.
-    var receivedSketchnote: Sketchnote?
+    var receivedSketchnote: NoteX?
     // The strokes linked to that received note are stored here.
     var receivedPathArray: NSMutableArray?
     
@@ -128,7 +128,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         self.noteLoadingIndicator.startAnimating()
         self.newNoteButton.isEnabled = false
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            self.items = NotesManager.notes
+            self.items = SKFileManager.getCurrentFiles()
             self.noteCollectionView.reloadData()
             let animations = [AnimationType.from(direction: .bottom, offset: 200.0)]
             self.noteCollectionView.performBatchUpdates({
@@ -136,7 +136,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
                 animations: animations, completion: {
                 })
             })
-            log.info("Notes loaded.")
+            log.info("Files loaded.")
             self.noteLoadingIndicator.stopAnimating()
             self.noteLoadingIndicator.isHidden = true
             self.newNoteButton.isEnabled = true
@@ -158,7 +158,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         notificationCentre.addObserver(self, selector: #selector(self.notifiedReceiveSketchnote(_:)), name: NSNotification.Name(rawValue: Notifications.NOTIFICATION_RECEIVE_NOTE), object: nil)
         notificationCentre.addObserver(self, selector: #selector(self.notifiedDeviceVisibility(_:)), name: NSNotification.Name(rawValue: Notifications.NOTIFICATION_DEVICE_VISIBILITY), object: nil)
         
-        Knowledge.refreshSimilarNotesGraph()
+        //Knowledge.refreshSimilarNotesGraph()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -183,7 +183,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     @objc func notifiedImportSketchnote(_ noti : Notification)  {
         let importURL = (noti.userInfo as? [String : URL])!["importURL"]!
         print(importURL)
-        self.importSketchnote(url: importURL)
+        self.imoortNote(url: importURL)
     }
     @objc func notifiedReceiveSketchnote(_ noti : Notification)  {
         updateReceivedNotesButton()
@@ -193,13 +193,13 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     }
     
     private func updateReceivedNotesButton() {
-        if NotesManager.receivedNotesController.mcAdvertiserAssistant != nil {
+        if SKFileManager.receivedNotesController.mcAdvertiserAssistant != nil {
             receivedNotesButton.tintColor = UIColor.systemBlue
         }
         else {
             receivedNotesButton.tintColor = UIColor.white
         }
-        receivedNotesBadge.setCount(NotesManager.receivedNotesController.receivedNotes.count)
+        receivedNotesBadge.setCount(SKFileManager.receivedNotesController.receivedNotes.count)
     }
     
     private func loadData() {
@@ -265,7 +265,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     
     func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
         if urls.count > 0 {
-            importSketchnote(url: urls[0])
+            imoortNote(url: urls[0])
         }
     }
     
@@ -283,14 +283,14 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     
     // MARK: Note display management
     private func updateDisplayedNotes(_ animated: Bool) {
-        self.items = NotesManager.notes
+        self.items = SKFileManager.getCurrentFiles()
         if let noteForSimilarityFilter = noteForSimilarityFilter, let similarNotes = similarNotes {
-            self.items = [Sketchnote]()
+            self.items = [File]()
             self.items.append(noteForSimilarityFilter)
             self.items.append(contentsOf: Array(similarNotes.keys))
         }
         
-        var filteredNotesToRemove = [Sketchnote]()
+        /*var filteredNotesToRemove = [NoteX]()
         if TagsManager.filterTags.count > 0 {
             for note in self.items {
                 for tag in TagsManager.filterTags {
@@ -301,21 +301,23 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
                 }
             }
             self.items = self.items.filter { !filteredNotesToRemove.contains($0) }
-        }
+        }*/
         
         if searchFilters.count > 0 {
-            var searchedNotesToRemove = [Sketchnote]()
-            for note in self.items {
-                if !note.applySearchFilters(filters: searchFilters) {
-                    searchedNotesToRemove.append(note)
+            var searchedNotesToRemove = [File]()
+            for file in self.items {
+                if let n = file as? NoteX {
+                    if !n.applySearchFilters(filters: searchFilters) {
+                        searchedNotesToRemove.append(file)
+                    }
                 }
             }
             self.items = self.items.filter { !searchedNotesToRemove.contains($0) }
         }
         
         if SettingsManager.noteSortingByNewest() {
-            self.items = self.items.sorted(by: { (note0: Sketchnote, note1: Sketchnote) -> Bool in
-                return note0 > note1
+            self.items = self.items.sorted(by: { (file0: File, file1: File) -> Bool in
+                return file0 > file1
             })
         }
         else {
@@ -367,10 +369,9 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
 
     @IBAction func newNoteButtonTapped(_ sender: UIButton) {
         clearSearch()
-        let newNote = Sketchnote(relatedDocuments: nil)!
-        newNote.save()
-        _ = NotesManager.add(note: newNote)
-        NotesManager.activeNote = newNote
+        let newNote = NoteX(name: "Untitled", parent: SKFileManager.currentFolder?.id, documents: nil)
+        _ = SKFileManager.add(note: newNote)
+        SKFileManager.activeNote = newNote
         performSegue(withIdentifier: "NewSketchnote", sender: self)
     }
     
@@ -405,45 +406,52 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         return UIContextMenuConfiguration(identifier: nil, previewProvider: nil, actionProvider: { suggestedActions in
 
             // "puppers" is the array backing the collection view
-            return self.makeNoteContextMenu(note: self.items[indexPath.row], point: point, cellIndexPath: indexPath)
+            return self.makeNoteContextMenu(file: self.items[indexPath.row], point: point, cellIndexPath: indexPath)
         })
     }
     
-    var shareNoteObject : Sketchnote?
-    private func makeNoteContextMenu(note: Sketchnote, point: CGPoint, cellIndexPath: IndexPath) -> UIMenu {
-        // Create a UIAction for sharing
+    var shareNoteObject: NoteX?
+    private func makeNoteContextMenu(file: File, point: CGPoint, cellIndexPath: IndexPath) -> UIMenu {
+        var menuElements = [UIMenuElement]()
         let renameAction = UIAction(title: "Rename", image: UIImage(systemName: "text.cursor")) { action in
-            self.editNoteTitle(note: note)
+            self.renameFile(file: file)
         }
-        let tagsAction = UIAction(title: "Manage Tags", image: UIImage(systemName: "tag.fill")) { action in
-            self.editNoteTags(sketchnote: note, cell: self.noteCollectionView.cellForItem(at: cellIndexPath))
-        }
-        let similarNotesAction = UIAction(title: "Similar Notes", image: UIImage(systemName: "link")) { action in
-            self.filterSimilarNotesFor(note)
-        }
-        let duplicateAction = UIAction(title: "Duplicate", image: UIImage(systemName: "doc.on.doc")) { action in
-            _ = NotesManager.add(note: note.duplicate())
-            self.updateDisplayedNotes(false)
-        }
-        let copyTextAction = UIAction(title: "Copy Text", image: UIImage(systemName: "text.quote")) { action in
-            UIPasteboard.general.string = note.getText()
-            let banner = FloatingNotificationBanner(title: note.getTitle(), subtitle: "Copied text to clipboard.", style: .info)
-            banner.show()
-        }
-        
-        let shareAction = UIAction(title: "Share...", image: UIImage(systemName: "square.and.arrow.up")) { action in
-            self.shareNoteObject = note
-            self.shareNote(note: note, sender: UIView(frame: CGRect(x: point.x, y: point.y, width: point.x, height: point.y)))
-        }
-        
-        let sendAction = UIAction(title: "Send", image: UIImage(systemName: "paperplane")) { action in
-            self.sendNote(note: note)
+        menuElements.append(renameAction)
+        if let note = file as? NoteX {
+            let tagsAction = UIAction(title: "Manage Tags", image: UIImage(systemName: "tag.fill")) { action in
+                self.editNoteTags(note: note, cell: self.noteCollectionView.cellForItem(at: cellIndexPath))
+            }
+            menuElements.append(tagsAction)
+            let similarNotesAction = UIAction(title: "Similar Notes", image: UIImage(systemName: "link")) { action in
+                self.filterSimilarNotesFor(note)
+            }
+            menuElements.append(similarNotesAction)
+            let duplicateAction = UIAction(title: "Duplicate", image: UIImage(systemName: "doc.on.doc")) { action in
+                _ = SKFileManager.add(note: note.duplicate())
+                self.updateDisplayedNotes(false)
+            }
+            menuElements.append(duplicateAction)
+            let copyTextAction = UIAction(title: "Copy Text", image: UIImage(systemName: "text.quote")) { action in
+                UIPasteboard.general.string = note.getText()
+                let banner = FloatingNotificationBanner(title: note.getName(), subtitle: "Copied text to clipboard.", style: .info)
+                banner.show()
+            }
+            menuElements.append(copyTextAction)
+            let shareAction = UIAction(title: "Share...", image: UIImage(systemName: "square.and.arrow.up")) { action in
+                self.shareNoteObject = note
+                self.shareNote(note: note, sender: UIView(frame: CGRect(x: point.x, y: point.y, width: point.x, height: point.y)))
+            }
+            menuElements.append(shareAction)
+            let sendAction = UIAction(title: "Send", image: UIImage(systemName: "paperplane")) { action in
+                self.sendNote(note: note)
+            }
+            menuElements.append(sendAction)
         }
         let deleteAction = UIAction(title: "Delete", image: UIImage(systemName: "xmark.circle.fill")) { action in
-            self.deleteNote(note: note)
+            self.deleteFile(file: file)
         }
-        // Create and return a UIMenu with the share action
-        return UIMenu(title: note.getTitle(), children: [renameAction, tagsAction, similarNotesAction, duplicateAction, copyTextAction, shareAction, sendAction, deleteAction])
+        menuElements.append(deleteAction)
+        return UIMenu(title: file.getName(), children: menuElements)
     }
     
     // MARK: Search
@@ -527,7 +535,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             clearSearchButton.isHidden = false
             searchField.text = ""
         }
-        if NotesManager.notes.count == 0 || searchFilters.count == 0 {
+        if SKFileManager.notes.count == 0 || searchFilters.count == 0 {
             self.clearSearch()
         }
         else {
@@ -747,9 +755,9 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         }
     }
     
-    private func sendNoteInternal(note: Sketchnote) {
+    private func sendNoteInternal(note: NoteX) {
         if mcSession.connectedPeers.count > 0 {
-            if let noteData = note.packageNoteAsData() {
+            if let noteData = note.encodeFileAsData() {
                 do {
                     try mcSession.send(noteData, toPeers: mcSession.connectedPeers, with: .reliable)
                 } catch let error as NSError {
@@ -757,7 +765,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
                     ac.addAction(UIAlertAction(title: "Close", style: .default))
                     present(ac, animated: true)
                 }
-                let banner = FloatingNotificationBanner(title: note.getTitle(), subtitle: "Note shared with the selected device(s).", style: .success)
+                let banner = FloatingNotificationBanner(title: note.getName(), subtitle: "Note shared with the selected device(s).", style: .success)
                 banner.show()
             }
         }
@@ -786,7 +794,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     @IBOutlet weak var noteCollectionView: UICollectionView!
     let reuseIdentifier = "NoteCollectionViewCell" // also enter this string as the cell identifier in the storyboard
     let reuseIdentifierDetailCell = "NoteCollectionViewDetailCell"
-    var items = [Sketchnote]()
+    var items = [File]()
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return items.count
     }
@@ -795,22 +803,22 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         switch self.noteCollectionViewState {
         case .Grid:
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath as IndexPath) as! NoteCollectionViewCell
-            cell.setNote(note: self.items[indexPath.item])
-            if noteForSimilarityFilter != nil && similarNotes != nil && similarityMax != nil {
+            cell.setFile(file: self.items[indexPath.item])
+            /*if noteForSimilarityFilter != nil && similarNotes != nil && similarityMax != nil {
                 if self.items[indexPath.item] != noteForSimilarityFilter! {
                     cell.showSimilarityRing(weight: similarNotes![self.items[indexPath.item]]!, max: similarityMax!)
                 }
-            }
+            }*/
             return cell
         case .Detail:
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifierDetailCell, for: indexPath as IndexPath) as! NoteCollectionViewDetailCell
-            cell.setNote(note: self.items[indexPath.item])
+            cell.setFile(file: self.items[indexPath.item])
             cell.delegate = self
-            if noteForSimilarityFilter != nil && similarNotes != nil && similarityMax != nil {
+            /*if noteForSimilarityFilter != nil && similarNotes != nil && similarityMax != nil {
                 if self.items[indexPath.item] != noteForSimilarityFilter! {
                     cell.showSimilarityRing(weight: similarNotes![self.items[indexPath.item]]!, max: similarityMax!)
                 }
-            }
+            }*/
             return cell
         }
     }
@@ -828,45 +836,50 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        self.open(note: self.items[indexPath.item])
+        let file = self.items[indexPath.item]
+        if let note = file as? NoteX {
+            self.open(note: note)
+        }
+        else if let folder = file as? Folder {
+            // TODO
+        }
     }
     
-    private func open(note: Sketchnote) {
-        NotesManager.activeNote = note
+    private func open(note: NoteX) {
+        SKFileManager.activeNote = note
         self.performSegue(withIdentifier: "EditSketchnote", sender: self)
         log.info("Opening note.")
     }
     
-    private func editNoteTitle(note: Sketchnote) {
-        let alertController = UIAlertController(title: "Title for this note", message: nil, preferredStyle: .alert)
+    private func renameFile(file: File) {
+        let alertController = UIAlertController(title: "Rename file", message: nil, preferredStyle: .alert)
         
         let confirmAction = UIAlertAction(title: "Set", style: .default) { (_) in
             
-            let title = alertController.textFields?[0].text
+            let name = alertController.textFields?[0].text
             
-            note.setTitle(title: title ?? "Untitled")
-            note.save()
+            file.setName(name: name ?? "Untitled")
+            SKFileManager.save(file: file)
             self.updateDisplayedNotes(false)
         }
         let cancelAction = UIAlertAction(title: "Cancel", style: .cancel) { (_) in }
         
         alertController.addTextField { (textField) in
             textField.placeholder = "Enter Note Title"
-            if !note.getTitle().isEmpty && note.getTitle() != "Untitled" {
-                textField.text = note.getTitle()
+            if !file.getName().isEmpty && file.getName() != "Untitled" {
+                textField.text = file.getName()
             }
         }
-        
         alertController.addAction(confirmAction)
         alertController.addAction(cancelAction)
         self.present(alertController, animated: true, completion: nil)
     }
     
-    var noteForSimilarityFilter: Sketchnote?
-    var similarNotes: [Sketchnote : Double]?
+    var noteForSimilarityFilter: NoteX?
+    var similarNotes: [NoteX : Double]?
     var similarityMax: Double?
-    private func filterSimilarNotesFor(_ note: Sketchnote) {
-        similarNotes = Knowledge.getNotesSimilarTo(note)
+    private func filterSimilarNotesFor(_ note: NoteX) {
+        /*similarNotes = Knowledge.getNotesSimilarTo(note)
         if similarNotes != nil {
             noteForSimilarityFilter = note
             similarityMax = Array(similarNotes!.values).max()!
@@ -880,7 +893,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         else {
             let banner = FloatingNotificationBanner(title: note.getTitle(), subtitle: "No similar notes could be found.", style: .info)
             banner.show()
-        }
+        }*/
     }
     @IBAction func clearSimilarNotesTapped(_ sender: UIButton) {
         clearSimilarNotes()
@@ -896,40 +909,41 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     }
     
     var selectedCellForTagEditing: UICollectionViewCell?
-    private func editNoteTags(sketchnote: Sketchnote, cell: UICollectionViewCell?) {
+    private func editNoteTags(note: NoteX, cell: UICollectionViewCell?) {
         var looseTagsToRemove = [Tag]()
-        for tag in sketchnote.tags {
+        for tag in note.tags {
             if !TagsManager.tags.contains(tag) {
                 looseTagsToRemove.append(tag)
             }
         }
         if looseTagsToRemove.count > 0 {
             for t in looseTagsToRemove {
-                sketchnote.tags.removeAll{$0 == t}
+                note.tags.removeAll{$0 == t}
             }
-            sketchnote.save()
+            SKFileManager.save(file: note)
         }
-        self.selectedNoteForTagEditing = sketchnote
+        self.selectedNoteForTagEditing = note
         self.selectedCellForTagEditing = cell
         self.performSegue(withIdentifier: "EditNoteTags", sender: self)
        }
 
-    private func shareNote(note: Sketchnote, sender: UIView) {
+    private func shareNote(note: NoteX, sender: UIView) {
         self.performSegue(withIdentifier: "ShareNote", sender: sender)
     }
     
-    func importSketchnote(url: URL) {
-        if let imported = NotesManager.importSketchnoteFile(url: url) {
-            imported.save()
-            if NotesManager.notes.contains(imported) {
+    // TO UPDATE
+    func imoortNote(url: URL) {
+        if let imported = SKFileManager.importNoteFile(url: url) {
+            if SKFileManager.notes.contains(imported) {
                 log.info("Sketchnote already in your library, updating its data.")
-                let banner = FloatingNotificationBanner(title: imported.getTitle(), subtitle: "This imported note is already in your library. It has been updated.", style: .info)
+                let banner = FloatingNotificationBanner(title: imported.getName(), subtitle: "This imported note is already in your library. It has been updated.", style: .info)
                 banner.show()
+                SKFileManager.save(file: imported)
             }
             else {
                 log.info("Importing new sketchnote.")
-                _ = NotesManager.add(note: imported)
-                let banner = FloatingNotificationBanner(title: imported.getTitle(), subtitle: "Note imported and added to your library.", style: .info)
+                _ = SKFileManager.add(note: imported)
+                let banner = FloatingNotificationBanner(title: imported.getName(), subtitle: "Note imported and added to your library.", style: .info)
                 banner.show()
             }
             self.updateDisplayedNotes(false)
@@ -941,18 +955,18 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         }
     }
     
-    private func sendNote(note: Sketchnote) {
+    private func sendNote(note: NoteX) {
         self.sketchnoteToShare = note
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             self.joinSession()
         }
     }
     
-    private func deleteNote(note: Sketchnote) {
-        let alert = UIAlertController(title: "Delete Note", message: "Are you sure you want to delete this note?", preferredStyle: .alert)
+    private func deleteFile(file: File) {
+        let alert = UIAlertController(title: "Delete File", message: "Are you sure you want to delete this file?", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Delete", style: .destructive, handler: { action in
-              self.items.removeAll{$0 == note}
-              NotesManager.delete(note: note)
+              self.items.removeAll{$0 == file}
+              SKFileManager.delete(file: file)
               self.noteCollectionView.reloadData()
         }))
         alert.addAction(UIAlertAction(title: "Cancel", style: .default, handler: { action in
@@ -962,30 +976,29 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     }
 
     
-    
     // MARK: Note Collection View DETAIL cell delegate
-    func noteCollectionViewDetailCellEditTitleTapped(sketchnote: Sketchnote, sender: UIButton, cell: NoteCollectionViewDetailCell) {
-        self.editNoteTitle(note: sketchnote)
+    func noteCollectionViewDetailCellRenameTapped(file: File, sender: UIButton, cell: NoteCollectionViewDetailCell) {
+        self.renameFile(file: file)
     }
     
-    func noteCollectionViewDetailCellTagTapped(sketchnote: Sketchnote, sender: UIButton, cell: NoteCollectionViewDetailCell) {
-        self.editNoteTags(sketchnote: sketchnote, cell: cell)
+    func noteCollectionViewDetailCellTagTapped(note: NoteX, sender: UIButton, cell: NoteCollectionViewDetailCell) {
+        self.editNoteTags(note: note, cell: cell)
     }
     
-    func noteCollectionViewDetailCellShareTapped(sketchnote: Sketchnote, sender: UIButton, cell: NoteCollectionViewDetailCell) {
-        self.shareNote(note: sketchnote, sender: cell)
+    func noteCollectionViewDetailCellShareTapped(note: NoteX, sender: UIButton, cell: NoteCollectionViewDetailCell) {
+        self.shareNote(note: note, sender: cell)
     }
     
-    func noteCollectionViewDetailCellSendTapped(sketchnote: Sketchnote, sender: UIButton, cell: NoteCollectionViewDetailCell) {
-        self.sendNote(note: sketchnote)
+    func noteCollectionViewDetailCellSendTapped(note: NoteX, sender: UIButton, cell: NoteCollectionViewDetailCell) {
+        self.sendNote(note: note)
     }
     
-    func noteCollectionViewDetailCellCopyTextTapped(sketchnote: Sketchnote, sender: UIButton, cell: NoteCollectionViewDetailCell) {
-        UIPasteboard.general.string = sketchnote.getText()
+    func noteCollectionViewDetailCellCopyTextTapped(note: NoteX, sender: UIButton, cell: NoteCollectionViewDetailCell) {
+        UIPasteboard.general.string = note.getText()
     }
     
-    func noteCollectionViewDetailCellDeleteTapped(sketchnote: Sketchnote, sender: UIButton, cell: NoteCollectionViewDetailCell) {
-        self.deleteNote(note: sketchnote)
+    func noteCollectionViewDetailCellDeleteTapped(file: File, sender: UIButton, cell: NoteCollectionViewDetailCell) {
+        self.deleteFile(file: file)
     }
 
 }

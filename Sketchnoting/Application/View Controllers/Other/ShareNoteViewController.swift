@@ -16,10 +16,9 @@ class ShareNoteViewController: UIViewController {
     @IBOutlet var pdfButton: UIButton!
     @IBOutlet var imageButton: UIButton!
     
-    var note: Sketchnote!
+    var note: NoteX!
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         fileButton.layer.borderColor = view.tintColor.cgColor
         fileButton.layer.borderWidth = 1
         fileButton.layer.cornerRadius = 5
@@ -69,7 +68,7 @@ class ShareNoteViewController: UIViewController {
             return
         }
         if asType == 0 {
-            let noteURL = NotesManager.getSketchnotesDirectory().appendingPathComponent(note.id + ".sketchnote")
+            let noteURL = SKFileManager.getNotesDirectory().appendingPathComponent(note.id + ".sketchnote")
             if FileManager.default.fileExists(atPath: noteURL.path) {
                 let activityController = UIActivityViewController(activityItems: [noteURL], applicationActivities: nil)
                 self.present(activityController, animated: true, completion: nil)
@@ -93,16 +92,16 @@ class ShareNoteViewController: UIViewController {
         }
         else {
             let page = note.pages[Int(pageNumberField.text!)! - 1]
-            if page.image != nil {
-            if let jpegData = page.image!.jpegData(compressionQuality: 1) {
-                let activityController = UIActivityViewController(activityItems: [jpegData], applicationActivities: nil)
-                    self.present(activityController, animated: true, completion: nil)
-                    if let popOver = activityController.popoverPresentationController {
-                        popOver.sourceView = imageButton
+            page.getAsImage() { image in
+                if let jpegData = image.jpegData(compressionQuality: 1) {
+                    let activityController = UIActivityViewController(activityItems: [jpegData], applicationActivities: nil)
+                        self.present(activityController, animated: true, completion: nil)
+                        if let popOver = activityController.popoverPresentationController {
+                            popOver.sourceView = self.imageButton
+                        }
                     }
                 }
             }
-        }
     }
     @IBAction func doneTapped(_ sender: UIBarButtonItem) {
         self.dismiss(animated: true, completion: nil)

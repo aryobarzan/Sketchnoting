@@ -15,7 +15,7 @@ private let reuseIdentifier = "cell"
 class DocumentsViewController: UICollectionViewController{
     
     var items : [Document]!
-    var sketchnote: Sketchnote!
+    var note: NoteX!
     
     private var header: DocumentsCollectionReusableView?
         
@@ -45,9 +45,9 @@ class DocumentsViewController: UICollectionViewController{
         documentDetailVC.view.isHidden = true
    }
     
-    public func setNote(sketchnote: Sketchnote) {
-        self.sketchnote = sketchnote
-        self.items = sketchnote.documents
+    public func setNote(note: NoteX) {
+        self.note = note
+        self.items = note.documents
         self.updateBookshelf()
     }
     
@@ -136,7 +136,7 @@ class DocumentsViewController: UICollectionViewController{
             if self.bookshelfState == .All {
                 print("Updating Bookshelf.")
                 self.header?.clearFilterButton.isHidden = true
-                self.items = self.getFilteredDocuments(documents: self.sketchnote.documents)
+                self.items = self.getFilteredDocuments(documents: self.note.documents)
                 
                 self.collectionView.reloadData()
             }
@@ -213,7 +213,7 @@ class DocumentsViewController: UICollectionViewController{
     }
     private func makeDocumentContextMenu(document: Document) -> UIMenu {
         let hideAction = UIAction(title: "Hide", image: UIImage(systemName: "eye.slash")) { action in
-            self.sketchnote.removeDocument(document: document)
+            self.note.removeDocument(document: document)
             DocumentsManager.hide(document: document)
             if self.bookshelfState == .Topic {
                 if self.selectedTopicDocuments != nil && self.selectedTopicDocuments!.contains(document) {
@@ -241,7 +241,7 @@ class DocumentsViewController: UICollectionViewController{
         self.updateBookshelf()
     }
     
-    func sketchnoteHasNewDocument(sketchnote: Sketchnote, document: Document) { // Sketchnote delegate
+    func noteHasNewDocument(note: NoteX, document: Document) { // Sketchnote delegate
         DispatchQueue.main.async {
             if self.bookshelfState == .All && self.documentTypeMatchesBookshelfFilter(type: document.documentType) {
                 CATransaction.begin()
@@ -283,15 +283,15 @@ class DocumentsViewController: UICollectionViewController{
         return false
     }
     
-    func sketchnoteHasRemovedDocument(sketchnote: Sketchnote, document: Document) { // Sketchnote delegate
+    func noteHasRemovedDocument(note: NoteX, document: Document) { // Sketchnote delegate
         self.startBookshelfUpdateTimer()
     }
     
-    func sketchnoteDocumentHasChanged(sketchnote: Sketchnote, document: Document) { // Sketchnote delegate
+    func noteDocumentHasChanged(note: NoteX, document: Document) { // Sketchnote delegate
         self.startBookshelfUpdateTimer()
     }
     
-    func sketchnoteHasChanged(sketchnote: Sketchnote) { // Sketchnote delegate
+    func noteHasChanged(note: NoteX) { // Sketchnote delegate
     }
     
     func setFilter(option: BookshelfOption) {
@@ -323,7 +323,7 @@ class DocumentsViewController: UICollectionViewController{
     }
     
     private func resetDocuments() {
-        self.sketchnote.documents = [Document]()
+        self.note.documents = [Document]()
         self.updateBookshelfState(state: .All)
         self.bookshelfFilter = .All
         self.updateBookshelf()

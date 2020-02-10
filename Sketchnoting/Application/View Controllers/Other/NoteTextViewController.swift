@@ -13,12 +13,12 @@ class NoteTextViewController: UIViewController {
 
     
     @IBOutlet var textView: UITextView!
-    var note: Sketchnote?
+    var note: NoteX?
     override func viewDidLoad() {
         super.viewDidLoad()
 
         if let note = note {
-            self.title = note.getTitle()
+            self.title = note.getName()
             textView.text = note.getText()
         }
     }
@@ -26,7 +26,7 @@ class NoteTextViewController: UIViewController {
     @IBAction func copyTapped(_ sender: UIBarButtonItem) {
         if let note = note {
             UIPasteboard.general.string = note.getText()
-            let banner = FloatingNotificationBanner(title: note.getTitle(), subtitle: "Copied text to clipboard.", style: .info)
+            let banner = FloatingNotificationBanner(title: note.getName(), subtitle: "Copied text to clipboard.", style: .info)
             banner.show()
         }
     }

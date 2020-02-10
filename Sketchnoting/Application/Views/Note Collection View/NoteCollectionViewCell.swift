@@ -15,7 +15,7 @@ class NoteCollectionViewCell: UICollectionViewCell {
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var similarityWeightProgressRing: UICircularProgressRing!
     
-    var sketchnote: Sketchnote!
+    var file: File?
         
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -25,16 +25,16 @@ class NoteCollectionViewCell: UICollectionViewCell {
         super.init(coder: aDecoder)
     }
     
-    func setNote(note: Sketchnote) {
+    func setFile(file: File) {
         self.imageView.layer.borderWidth = 1
         self.imageView.layer.borderColor = UIColor.black.cgColor
         self.imageView.layer.cornerRadius = 6
         
-        sketchnote = note
-        imageView.image = sketchnote.getPreviewImage()
-        
-        titleLabel.text = note.getTitle()
-        
+        self.file = file
+        file.getPreviewImage() { image in
+            self.imageView.image = image
+        }
+        titleLabel.text = file.getName()
         similarityWeightProgressRing.isHidden = true
     }
     

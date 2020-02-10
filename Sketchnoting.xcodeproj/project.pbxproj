@@ -30,6 +30,14 @@
 		9F5E89F42391CE84002FA8B2 /* DocumentDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5E89F32391CE84002FA8B2 /* DocumentDetailViewController.swift */; };
 		9F5F340423AC64C900EB2804 /* SwiftGraph in Frameworks */ = {isa = PBXBuildFile; productRef = 9F5F340323AC64C900EB2804 /* SwiftGraph */; };
 		9F5F340623AC64E400EB2804 /* Knowledge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5F340523AC64E400EB2804 /* Knowledge.swift */; };
+		9F65983323EDCEA300CDBE0C /* NoteXPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F65983223EDCEA300CDBE0C /* NoteXPage.swift */; };
+		9F65983523EDD09F00CDBE0C /* NoteText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F65983423EDD09F00CDBE0C /* NoteText.swift */; };
+		9F65983723EDD15C00CDBE0C /* NoteTextElement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F65983623EDD15C00CDBE0C /* NoteTextElement.swift */; };
+		9F65983923EDD23500CDBE0C /* NoteTextLine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F65983823EDD23500CDBE0C /* NoteTextLine.swift */; };
+		9F65983B23EDD29300CDBE0C /* NoteTextBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F65983A23EDD29300CDBE0C /* NoteTextBlock.swift */; };
+		9F65983D23EDD2FA00CDBE0C /* NoteTextComplete.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F65983C23EDD2FA00CDBE0C /* NoteTextComplete.swift */; };
+		9F65983F23EDD80B00CDBE0C /* HelpLinesType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F65983E23EDD80B00CDBE0C /* HelpLinesType.swift */; };
+		9F65984123EE1EE900CDBE0C /* SKFileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F65984023EE1EE900CDBE0C /* SKFileManager.swift */; };
 		9F75E448230C368F00488BBD /* NoteSharingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F75E447230C368F00488BBD /* NoteSharingViewController.swift */; };
 		9F75E44C230C583200488BBD /* NoteCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F75E44A230C583200488BBD /* NoteCollectionViewCell.swift */; };
 		9F75E44D230C583200488BBD /* NoteCollectionViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9F75E44B230C583200488BBD /* NoteCollectionViewCell.xib */; };
@@ -54,11 +62,9 @@
 		9FA6239722DE3806007ED794 /* CHEBIDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA6239622DE3806007ED794 /* CHEBIDocument.swift */; };
 		9FA6239C22E64EA2007ED794 /* TextData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA6239B22E64EA2007ED794 /* TextData.swift */; };
 		9FA6239E22E66D73007ED794 /* HandwritingRecognizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA6239D22E66D73007ED794 /* HandwritingRecognizer.swift */; };
-		9FA623A122E73DDA007ED794 /* NotesManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA623A022E73DDA007ED794 /* NotesManager.swift */; };
 		9FA8C000239B18BA00BAA42B /* TagsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA8BFFF239B18BA00BAA42B /* TagsViewController.swift */; };
 		9FA8C002239B21D500BAA42B /* TagsCreationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA8C001239B21D500BAA42B /* TagsCreationViewController.swift */; };
 		9FAA827E236DD45200B2004F /* ViewAnimator in Frameworks */ = {isa = PBXBuildFile; productRef = 9FAA827D236DD45200B2004F /* ViewAnimator */; };
-		9FACBCB4237F1C37008E8DB3 /* NotePage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FACBCB3237F1C37008E8DB3 /* NotePage.swift */; };
 		9FAD28F623A52AC700F2203E /* NoteTextViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F05BC7E23761C4A00D49A88 /* NoteTextViewController.swift */; };
 		9FB9E501237F500B00279F3E /* ShareNoteViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB9E500237F500B00279F3E /* ShareNoteViewController.swift */; };
 		9FB9E505237F640100279F3E /* SimilarNoteCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB9E503237F640100279F3E /* SimilarNoteCollectionViewCell.swift */; };
@@ -67,6 +73,9 @@
 		9FBF6AB622E9F3FE001FD730 /* VisionTextBlockWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FBF6AB522E9F3FE001FD730 /* VisionTextBlockWrapper.swift */; };
 		9FBF6AB822E9F428001FD730 /* VisionTextLineWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FBF6AB722E9F428001FD730 /* VisionTextLineWrapper.swift */; };
 		9FBF6ABA22E9F439001FD730 /* VisionTextElementWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FBF6AB922E9F439001FD730 /* VisionTextElementWrapper.swift */; };
+		9FC02C1C23EDB6290051C576 /* File.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FC02C1B23EDB6290051C576 /* File.swift */; };
+		9FC02C1E23EDB6400051C576 /* NoteX.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FC02C1D23EDB6400051C576 /* NoteX.swift */; };
+		9FC02C2023EDB6520051C576 /* Folder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FC02C1F23EDB6520051C576 /* Folder.swift */; };
 		9FD1ADF123A52C090013C68E /* NoteViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29C182236DCFC00CC969A /* NoteViewController.swift */; };
 		9FD1ADF323A52F7C0013C68E /* NotePagesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD1ADF223A52F7C0013C68E /* NotePagesViewController.swift */; };
 		9FD29BA72220524D00CC969A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29BA62220524D00CC969A /* AppDelegate.swift */; };
@@ -74,9 +83,7 @@
 		9FD29BAC2220524D00CC969A /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9FD29BAA2220524D00CC969A /* Main.storyboard */; };
 		9FD29BAE2220525000CC969A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9FD29BAD2220525000CC969A /* Assets.xcassets */; };
 		9FD29BB12220525000CC969A /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9FD29BAF2220525000CC969A /* LaunchScreen.storyboard */; };
-		9FD29BC522249D9500CC969A /* Note.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29BC422249D9500CC969A /* Note.swift */; };
 		9FD29BC72224B58600CC969A /* Document.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29BC62224B58600CC969A /* Document.swift */; };
-		9FD29BCB2224B89800CC969A /* Sketchnote.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29BCA2224B89800CC969A /* Sketchnote.swift */; };
 		9FD29C442239525A00CC969A /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 9FD29C432239525900CC969A /* GoogleService-Info.plist */; };
 		9FD29C472239588E00CC969A /* UIViewExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29C462239588E00CC969A /* UIViewExtensions.swift */; };
 		9FD29C4E223998BC00CC969A /* UIViewControllerExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29C4D223998BC00CC969A /* UIViewControllerExtensions.swift */; };
@@ -129,6 +136,14 @@
 		9F5E89EF2391CBA2002FA8B2 /* DocumentViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentViewCell.swift; sourceTree = "<group>"; };
 		9F5E89F32391CE84002FA8B2 /* DocumentDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentDetailViewController.swift; sourceTree = "<group>"; };
 		9F5F340523AC64E400EB2804 /* Knowledge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Knowledge.swift; sourceTree = "<group>"; };
+		9F65983223EDCEA300CDBE0C /* NoteXPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteXPage.swift; sourceTree = "<group>"; };
+		9F65983423EDD09F00CDBE0C /* NoteText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteText.swift; sourceTree = "<group>"; };
+		9F65983623EDD15C00CDBE0C /* NoteTextElement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteTextElement.swift; sourceTree = "<group>"; };
+		9F65983823EDD23500CDBE0C /* NoteTextLine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteTextLine.swift; sourceTree = "<group>"; };
+		9F65983A23EDD29300CDBE0C /* NoteTextBlock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteTextBlock.swift; sourceTree = "<group>"; };
+		9F65983C23EDD2FA00CDBE0C /* NoteTextComplete.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteTextComplete.swift; sourceTree = "<group>"; };
+		9F65983E23EDD80B00CDBE0C /* HelpLinesType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpLinesType.swift; sourceTree = "<group>"; };
+		9F65984023EE1EE900CDBE0C /* SKFileManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SKFileManager.swift; sourceTree = "<group>"; };
 		9F75E447230C368F00488BBD /* NoteSharingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteSharingViewController.swift; sourceTree = "<group>"; };
 		9F75E44A230C583200488BBD /* NoteCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteCollectionViewCell.swift; sourceTree = "<group>"; };
 		9F75E44B230C583200488BBD /* NoteCollectionViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NoteCollectionViewCell.xib; sourceTree = "<group>"; };
@@ -153,10 +168,8 @@
 		9FA6239622DE3806007ED794 /* CHEBIDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CHEBIDocument.swift; sourceTree = "<group>"; };
 		9FA6239B22E64EA2007ED794 /* TextData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextData.swift; sourceTree = "<group>"; };
 		9FA6239D22E66D73007ED794 /* HandwritingRecognizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandwritingRecognizer.swift; sourceTree = "<group>"; };
-		9FA623A022E73DDA007ED794 /* NotesManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotesManager.swift; sourceTree = "<group>"; };
 		9FA8BFFF239B18BA00BAA42B /* TagsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagsViewController.swift; sourceTree = "<group>"; };
 		9FA8C001239B21D500BAA42B /* TagsCreationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagsCreationViewController.swift; sourceTree = "<group>"; };
-		9FACBCB3237F1C37008E8DB3 /* NotePage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotePage.swift; sourceTree = "<group>"; };
 		9FB9E500237F500B00279F3E /* ShareNoteViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareNoteViewController.swift; sourceTree = "<group>"; };
 		9FB9E503237F640100279F3E /* SimilarNoteCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimilarNoteCollectionViewCell.swift; sourceTree = "<group>"; };
 		9FB9E504237F640100279F3E /* SimilarNoteCollectionViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SimilarNoteCollectionViewCell.xib; sourceTree = "<group>"; };
@@ -164,6 +177,9 @@
 		9FBF6AB522E9F3FE001FD730 /* VisionTextBlockWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisionTextBlockWrapper.swift; sourceTree = "<group>"; };
 		9FBF6AB722E9F428001FD730 /* VisionTextLineWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisionTextLineWrapper.swift; sourceTree = "<group>"; };
 		9FBF6AB922E9F439001FD730 /* VisionTextElementWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisionTextElementWrapper.swift; sourceTree = "<group>"; };
+		9FC02C1B23EDB6290051C576 /* File.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = File.swift; sourceTree = "<group>"; };
+		9FC02C1D23EDB6400051C576 /* NoteX.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteX.swift; sourceTree = "<group>"; };
+		9FC02C1F23EDB6520051C576 /* Folder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Folder.swift; sourceTree = "<group>"; };
 		9FCD3D5C23EA0A59005CB98D /* CocoaLumberjack.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = CocoaLumberjack.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		9FD1ADF223A52F7C0013C68E /* NotePagesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotePagesViewController.swift; sourceTree = "<group>"; };
 		9FD29BA32220524D00CC969A /* Sketchnoting.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Sketchnoting.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -173,9 +189,7 @@
 		9FD29BAD2220525000CC969A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		9FD29BB02220525000CC969A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		9FD29BB22220525000CC969A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		9FD29BC422249D9500CC969A /* Note.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Note.swift; sourceTree = "<group>"; };
 		9FD29BC62224B58600CC969A /* Document.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Document.swift; sourceTree = "<group>"; };
-		9FD29BCA2224B89800CC969A /* Sketchnote.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sketchnote.swift; sourceTree = "<group>"; };
 		9FD29C182236DCFC00CC969A /* NoteViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteViewController.swift; sourceTree = "<group>"; };
 		9FD29C432239525900CC969A /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		9FD29C462239588E00CC969A /* UIViewExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIViewExtensions.swift; sourceTree = "<group>"; };
@@ -252,7 +266,6 @@
 		9F5D0FC6229CBC2A00BCA451 /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				9FA623A022E73DDA007ED794 /* NotesManager.swift */,
 				9F92D111231E98C600BC0E57 /* DocumentsManager.swift */,
 				9FFE07E9232A63BA00DBD0AC /* TagsManager.swift */,
 				9F5F340523AC64E400EB2804 /* Knowledge.swift */,
@@ -436,10 +449,9 @@
 		9FACBCB5237F1F90008E8DB3 /* Note */ = {
 			isa = PBXGroup;
 			children = (
-				9FD29BC422249D9500CC969A /* Note.swift */,
-				9FD29BCA2224B89800CC969A /* Sketchnote.swift */,
-				9FACBCB3237F1C37008E8DB3 /* NotePage.swift */,
+				9FC02C1A23EDB60A0051C576 /* New */,
 				9FFE07E7232A622A00DBD0AC /* Tag.swift */,
+				9F65983E23EDD80B00CDBE0C /* HelpLinesType.swift */,
 			);
 			path = Note;
 			sourceTree = "<group>";
@@ -463,6 +475,23 @@
 				9FBF6AB922E9F439001FD730 /* VisionTextElementWrapper.swift */,
 			);
 			path = "Handwriting Recognition";
+			sourceTree = "<group>";
+		};
+		9FC02C1A23EDB60A0051C576 /* New */ = {
+			isa = PBXGroup;
+			children = (
+				9FC02C1B23EDB6290051C576 /* File.swift */,
+				9FC02C1D23EDB6400051C576 /* NoteX.swift */,
+				9FC02C1F23EDB6520051C576 /* Folder.swift */,
+				9F65983223EDCEA300CDBE0C /* NoteXPage.swift */,
+				9F65983423EDD09F00CDBE0C /* NoteText.swift */,
+				9F65983C23EDD2FA00CDBE0C /* NoteTextComplete.swift */,
+				9F65983A23EDD29300CDBE0C /* NoteTextBlock.swift */,
+				9F65983823EDD23500CDBE0C /* NoteTextLine.swift */,
+				9F65983623EDD15C00CDBE0C /* NoteTextElement.swift */,
+				9F65984023EE1EE900CDBE0C /* SKFileManager.swift */,
+			);
+			path = New;
 			sourceTree = "<group>";
 		};
 		9FC9047923EA1A0B006D1E11 /* Recovered References */ = {
@@ -735,7 +764,9 @@
 				9FA6239322DE30AC007ED794 /* SpotlightDocument.swift in Sources */,
 				9FD29C58223C3CF700CC969A /* UIImageExtensions.swift in Sources */,
 				9F00428923E9FB2600961636 /* BadgeHub.swift in Sources */,
+				9F65983B23EDD29300CDBE0C /* NoteTextBlock.swift in Sources */,
 				9F4B38C523EC76F400F87B61 /* DocumentPreviewViewController.swift in Sources */,
+				9F65983723EDD15C00CDBE0C /* NoteTextElement.swift in Sources */,
 				9FA6238822CEA7FE007ED794 /* MapHelper.swift in Sources */,
 				9F4B38C123EA41C900F87B61 /* ReceivedNotesController.swift in Sources */,
 				9F05B5A3232BF0C800983AF2 /* NoteCollectionViewDetailCell.swift in Sources */,
@@ -743,21 +774,25 @@
 				9F92D11F23217FFF00BC0E57 /* SearchFilter.swift in Sources */,
 				9FA6239522DE3741007ED794 /* BioPortalDocument.swift in Sources */,
 				9FFE07E6232A5FE500DBD0AC /* TagTableViewCell.swift in Sources */,
+				9FC02C2023EDB6520051C576 /* Folder.swift in Sources */,
 				9F5D80F02332D32600552D58 /* SVGImageProcessorExtension.swift in Sources */,
 				9F4D2336239C1FDB0078B364 /* UIColorExtensions.swift in Sources */,
+				9F65983923EDD23500CDBE0C /* NoteTextLine.swift in Sources */,
 				9FD29BA92220524D00CC969A /* ViewController.swift in Sources */,
 				9FA6239722DE3806007ED794 /* CHEBIDocument.swift in Sources */,
 				9F4D2338239C22FD0078B364 /* OtherExtensions.swift in Sources */,
-				9FA623A122E73DDA007ED794 /* NotesManager.swift in Sources */,
 				9F5E89EC2391AF49002FA8B2 /* DocumentsViewController.swift in Sources */,
 				9FFB815D23765D5C00B5390C /* BookshelfOptionsTableViewController.swift in Sources */,
 				9FD29BA72220524D00CC969A /* AppDelegate.swift in Sources */,
 				9FD29C6422431BFA00CC969A /* DrawnImageClassifier.mlmodel in Sources */,
 				9FA6239C22E64EA2007ED794 /* TextData.swift in Sources */,
+				9FC02C1C23EDB6290051C576 /* File.swift in Sources */,
 				9F92D10E231E95B400BC0E57 /* UICollectionViewExtensions.swift in Sources */,
 				9F5E89F42391CE84002FA8B2 /* DocumentDetailViewController.swift in Sources */,
 				9F92D112231E98C600BC0E57 /* DocumentsManager.swift in Sources */,
 				9FD29C56223C3C3900CC969A /* StringExtensions.swift in Sources */,
+				9F65983F23EDD80B00CDBE0C /* HelpLinesType.swift in Sources */,
+				9F65983D23EDD2FA00CDBE0C /* NoteTextComplete.swift in Sources */,
 				9F92D11C23217D0500BC0E57 /* SearchFilterView.swift in Sources */,
 				9F0FC54923760E7600070FA0 /* NoteOptionsTableViewController.swift in Sources */,
 				9FFE07EA232A63BA00DBD0AC /* TagsManager.swift in Sources */,
@@ -769,7 +804,6 @@
 				9FBF6AB822E9F428001FD730 /* VisionTextLineWrapper.swift in Sources */,
 				9F5E89EE2391B474002FA8B2 /* DocumentsCollectionReusableView.swift in Sources */,
 				9FB9E505237F640100279F3E /* SimilarNoteCollectionViewCell.swift in Sources */,
-				9FACBCB4237F1C37008E8DB3 /* NotePage.swift in Sources */,
 				9F5E89F02391CBA2002FA8B2 /* DocumentViewCell.swift in Sources */,
 				9F75E44F230D848200488BBD /* SettingsViewController.swift in Sources */,
 				9F75E484231419FA00488BBD /* TAGMEDocument.swift in Sources */,
@@ -777,16 +811,18 @@
 				9F75E44C230C583200488BBD /* NoteCollectionViewCell.swift in Sources */,
 				9F75E448230C368F00488BBD /* NoteSharingViewController.swift in Sources */,
 				9FBF6AB422E9F391001FD730 /* VisionTextWrapper.swift in Sources */,
+				9FC02C1E23EDB6400051C576 /* NoteX.swift in Sources */,
 				9FD29C54223C3B6F00CC969A /* OCRHelper.swift in Sources */,
-				9FD29BC522249D9500CC969A /* Note.swift in Sources */,
 				9F8551B123A539D9006EB0B1 /* NotePageCollectionViewCell.swift in Sources */,
 				9FBF6ABA22E9F439001FD730 /* VisionTextElementWrapper.swift in Sources */,
 				9FD29BC72224B58600CC969A /* Document.swift in Sources */,
 				9F5F340623AC64E400EB2804 /* Knowledge.swift in Sources */,
 				9FBF6AB622E9F3FE001FD730 /* VisionTextBlockWrapper.swift in Sources */,
 				9F4B38BD23EA3D8500F87B61 /* ReceivedNoteCollectionViewCell.swift in Sources */,
+				9F65983323EDCEA300CDBE0C /* NoteXPage.swift in Sources */,
 				9FA6239E22E66D73007ED794 /* HandwritingRecognizer.swift in Sources */,
-				9FD29BCB2224B89800CC969A /* Sketchnote.swift in Sources */,
+				9F65983523EDD09F00CDBE0C /* NoteText.swift in Sources */,
+				9F65984123EE1EE900CDBE0C /* SKFileManager.swift in Sources */,
 				9FA6238D22D38AEE007ED794 /* SpotlightHelper.swift in Sources */,
 				9FFE07E8232A622A00DBD0AC /* Tag.swift in Sources */,
 			);

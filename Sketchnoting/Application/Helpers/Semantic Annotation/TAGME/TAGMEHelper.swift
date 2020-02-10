@@ -12,7 +12,7 @@ import SwiftyJSON
 
 class TAGMEHelper {
     
-    func fetch(text: String, note: Sketchnote) {
+    func fetch(text: String, note: NoteX) {
         let chunks = text.split(by: 6000)
         
         for chunk in chunks {

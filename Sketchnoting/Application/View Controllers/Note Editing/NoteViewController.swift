@@ -18,7 +18,7 @@ import MaterialComponents.MaterialBottomSheet
 
 import PencilKit
 
-class NoteViewController: UIViewController, UIPencilInteractionDelegate, UICollectionViewDataSource, UICollectionViewDelegate, SketchnoteDelegate, PKCanvasViewDelegate, PKToolPickerObserver, UIScreenshotServiceDelegate, NoteOptionsDelegate, DocumentsViewControllerDelegate, BookshelfOptionsDelegate, NotePagesDelegate {
+class NoteViewController: UIViewController, UIPencilInteractionDelegate, UICollectionViewDataSource, UICollectionViewDelegate, NoteXDelegate, PKCanvasViewDelegate, PKToolPickerObserver, UIScreenshotServiceDelegate, NoteOptionsDelegate, DocumentsViewControllerDelegate, BookshelfOptionsDelegate, NotePagesDelegate {
     
     private var documentsVC: DocumentsViewController!
     
@@ -76,7 +76,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         documentsVC.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         documentsVC.didMove(toParent: self)
         documentsVC.collectionView.refreshLayout()
-        documentsVC.setNote(sketchnote: NotesManager.activeNote!)
+        documentsVC.setNote(note: SKFileManager.activeNote!)
         
         self.bookshelfLeftDragView.curveTopCorners(size: 5)
         
@@ -99,7 +99,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                 let labelNames = data.components(separatedBy: .newlines).filter { $0.count > 0 }
                 self.labelNames.append(contentsOf: labelNames)
             } catch {
-                print("error loading labels: \(error)")
+                log.error("Could not load labels for drawing recognition model: \(error)")
             }
         }
         
@@ -108,7 +108,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         self.topicsBadgeHub = BadgeHub(view: topicsButton)
         self.topicsBadgeHub.scaleCircleSize(by: 0.55)
         self.topicsBadgeHub.moveCircleBy(x: 4, y: -6)
-        self.topicsBadgeHub.setCount(NotesManager.activeNote!.documents.count)
+        self.topicsBadgeHub.setCount(SKFileManager.activeNote!.documents.count)
         
         let interaction = UIPencilInteraction()
         interaction.delegate = self
@@ -124,25 +124,18 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         relatedNotesCollectionView.delegate = self
         relatedNotesCollectionView.dataSource = self
         
-        self.oldDocuments = NotesManager.activeNote!.documents
+        self.oldDocuments = SKFileManager.activeNote!.documents
         
         NotificationCenter.default.addObserver(self, selector: #selector(self.notifiedReceiveSketchnote(_:)), name: NSNotification.Name(rawValue: Notifications.NOTIFICATION_RECEIVE_NOTE), object: nil)
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        NotesManager.activeNote!.delegate = self
+        SKFileManager.activeNote!.delegate = self
         
         setupConceptHighlights()
         setupDrawingRegions()
           
-        if NotesManager.activeNote!.getCurrentPage().image == nil {
-            let img = canvasView.drawing.image(from: canvasView.bounds, scale: 1.0)
-            NotesManager.activeNote!.getCurrentPage().image = img
-        }
-        else {
-            log.info("Loading canvas data for note.")
-            self.canvasView.drawing = NotesManager.activeNote!.getCurrentPage().canvasDrawing
-        }
+        self.canvasView.drawing = SKFileManager.activeNote!.getCurrentPage().canvasDrawing
         updatePaginationButtons()
         
         self.refreshHelpLines()
@@ -185,15 +178,9 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                     toggleConceptHighlight()
                 }
                 self.processDrawingRecognition()
-                traitCollection.performAsCurrent {
-                    NotesManager.activeNote!.getCurrentPage().image = canvasView.drawing.image(from: CGRect(x: canvasView.frame.minX, y: canvasView.frame.minY, width: canvasView.contentSize.width, height: canvasView.contentSize.height), scale: 1.0)
-                    if traitCollection.userInterfaceStyle == .dark {
-                        NotesManager.activeNote!.getCurrentPage().image = NotesManager.activeNote!.getCurrentPage().image!.invert()
-                    }
-                }
-                NotesManager.activeNote!.setUpdateDate()
-                NotesManager.activeNote!.getCurrentPage().canvasDrawing = self.canvasView.drawing
-                NotesManager.activeNote!.save()
+                SKFileManager.activeNote!.setUpdateDate()
+                SKFileManager.activeNote!.getCurrentPage().canvasDrawing = self.canvasView.drawing
+                SKFileManager.save(file: SKFileManager.activeNote!)
                 log.info("Closing & saving note.")
             }
             else {
@@ -203,7 +190,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         case "NoteOptions":
             if let destination = segue.destination as? NoteOptionsTableViewController {
                 destination.delegate = self
-                destination.canDeletePage = (NotesManager.activeNote!.pages.count > 1)
+                destination.canDeletePage = (SKFileManager.activeNote!.pages.count > 1)
             }
             break
         case "BookshelfOptions":
@@ -215,7 +202,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         case "ViewNoteText":
             if let destination = segue.destination as? UINavigationController {
                 if let destinationViewController = destination.topViewController as? NoteTextViewController {
-                    destinationViewController.note = NotesManager.activeNote!
+                    destinationViewController.note = SKFileManager.activeNote!
                 }
                 
             }
@@ -223,7 +210,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         case "ShareNote":
             if let destination = segue.destination as? UINavigationController {
                 if let destinationViewController = destination.topViewController as? ShareNoteViewController {
-                    destinationViewController.note = NotesManager.activeNote!
+                    destinationViewController.note = SKFileManager.activeNote!
                 }
             }
             break
@@ -320,7 +307,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     private func refreshHelpLines() {
         self.setupHelpLines()
         
-        switch NotesManager.activeNote!.helpLinesType! {
+        switch SKFileManager.activeNote!.helpLinesType {
         case .None:
             for helpLine in self.helpLinesHorizontal {
                 helpLine.isHidden = true
@@ -354,9 +341,9 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     }
     
     private func toggleHelpLinesType() {
-        switch NotesManager.activeNote!.helpLinesType! {
+        switch SKFileManager.activeNote!.helpLinesType {
         case .None:
-            NotesManager.activeNote!.helpLinesType = .Horizontal
+            SKFileManager.activeNote!.helpLinesType = .Horizontal
             for line in helpLinesHorizontal {
                 line.isHidden = false
             }
@@ -365,7 +352,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             }
             break
         case .Horizontal:
-            NotesManager.activeNote!.helpLinesType = .Grid
+            SKFileManager.activeNote!.helpLinesType = .Grid
             for line in helpLinesHorizontal {
                 line.isHidden = false
             }
@@ -374,16 +361,16 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             }
             break
         case .Grid:
-            NotesManager.activeNote!.helpLinesType = .None
+            SKFileManager.activeNote!.helpLinesType = .None
             hideAllHelpLines()
             break
         }
         refreshHelpLinesButton()
-        NotesManager.activeNote!.save()
+        SKFileManager.save(file: SKFileManager.activeNote!)
     }
     
     private func refreshHelpLinesButton() {
-        switch NotesManager.activeNote!.helpLinesType! {
+        switch SKFileManager.activeNote!.helpLinesType {
         case .None:
             helpLinesButton.setImage(UIImage(systemName: "line.horizontal.3"), for: .normal)
             helpLinesButton.tintColor = .white
@@ -411,76 +398,75 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     // MARK: Highlighting recognized concepts/topics on the canvas
     private func setupConceptHighlights() {
         conceptHighlights = [UIView : [Document]]()
-        if let documents = NotesManager.activeNote!.documents {
-            for textData in NotesManager.activeNote!.getCurrentPage().textDataArray {
-                for document in documents {
-                    var documentTitle = document.title.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-                    if let TAGMEdocument = document as? TAGMEDocument {
-                        if let spot = TAGMEdocument.spot {
-                            documentTitle = spot.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-                        }
+        let documents = SKFileManager.activeNote!.documents
+        for textData in SKFileManager.activeNote!.getCurrentPage().noteTextArray {
+            for document in documents {
+                var documentTitle = document.title.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+                if let TAGMEdocument = document as? TAGMEDocument {
+                    if let spot = TAGMEdocument.spot {
+                        documentTitle = spot.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
                     }
-                    if textData.original.trimmingCharacters(in: .whitespacesAndNewlines).lowercased().contains(documentTitle) {
-                        for block in textData.visionTextWrapper.blocks {
-                            for line in block.lines {
-                                for element in line.elements {
-                                    let elementText = element.text.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-                                    if elementText == documentTitle {
-                                        let scaledFrame = createScaledFrame(featureFrame: element.frame, imageSize: canvasView.frame.size)
-                                        let conceptHighlightView = UIView(frame: scaledFrame)
-                                        conceptHighlightView.layer.borderWidth = 2
-                                        conceptHighlightView.layer.borderColor = #colorLiteral(red: 0.3333333333, green: 0.4588235294, blue: 0.7568627451, alpha: 1).cgColor
-                                        if conceptHighlightExists(new: conceptHighlightView.frame) != nil {
-                                            let existingView = conceptHighlightExists(new: conceptHighlightView.frame)!
-                                            var newDocs = self.conceptHighlights[existingView]!
-                                            newDocs.append(document)
-                                            self.conceptHighlights[existingView] = newDocs
-                                        }
-                                        else {
-                                            self.conceptHighlights[conceptHighlightView] = [Document]()
-                                            var newDocs = self.conceptHighlights[conceptHighlightView]!
-                                            newDocs.append(document)
-                                            self.conceptHighlights[conceptHighlightView] = newDocs
-                                            self.canvasView.addSubview(conceptHighlightView)
-                                            conceptHighlightView.isHidden = true
-                                            conceptHighlightView.isUserInteractionEnabled = true
-                                            let tapGesture = UITapGestureRecognizer(target: self, action: #selector(self.handleConceptHighlightTap(_:)))
-                                            conceptHighlightView.addGestureRecognizer(tapGesture)
-                                        }
+                }
+                if textData.text.trimmingCharacters(in: .whitespacesAndNewlines).lowercased().contains(documentTitle) {
+                    for block in textData.blocks {
+                        for line in block.lines {
+                            for element in line.elements {
+                                let elementText = element.text.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+                                if elementText == documentTitle {
+                                    let scaledFrame = createScaledFrame(featureFrame: element.frame, imageSize: canvasView.frame.size)
+                                    let conceptHighlightView = UIView(frame: scaledFrame)
+                                    conceptHighlightView.layer.borderWidth = 2
+                                    conceptHighlightView.layer.borderColor = #colorLiteral(red: 0.3333333333, green: 0.4588235294, blue: 0.7568627451, alpha: 1).cgColor
+                                    if conceptHighlightExists(new: conceptHighlightView.frame) != nil {
+                                        let existingView = conceptHighlightExists(new: conceptHighlightView.frame)!
+                                        var newDocs = self.conceptHighlights[existingView]!
+                                        newDocs.append(document)
+                                        self.conceptHighlights[existingView] = newDocs
+                                    }
+                                    else {
+                                        self.conceptHighlights[conceptHighlightView] = [Document]()
+                                        var newDocs = self.conceptHighlights[conceptHighlightView]!
+                                        newDocs.append(document)
+                                        self.conceptHighlights[conceptHighlightView] = newDocs
+                                        self.canvasView.addSubview(conceptHighlightView)
+                                        conceptHighlightView.isHidden = true
+                                        conceptHighlightView.isUserInteractionEnabled = true
+                                        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(self.handleConceptHighlightTap(_:)))
+                                        conceptHighlightView.addGestureRecognizer(tapGesture)
                                     }
                                 }
-                                for index in 0..<line.elements.count {
-                                    var elementText = line.elements[index].text.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-                                    var width = line.elements[index].frame.width
-                                    if index < line.elements.count-1 {
-                                        for j in index+1..<line.elements.count {
-                                            elementText = elementText + " " + line.elements[j].text.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-                                            width = width + line.elements[j].frame.width
-                                            if elementText == documentTitle {
-                                                let scaledFrame = createScaledFrame(featureFrame: CGRect(x: line.elements[index].frame.minX, y: line.elements[index].frame.minY, width: width, height: line.elements[index].frame.height), imageSize: canvasView.frame.size)
-                                                let conceptHighlightView = UIView(frame: scaledFrame)
-                                                conceptHighlightView.layer.borderWidth = 2
-                                                conceptHighlightView.layer.borderColor = #colorLiteral(red: 0.3333333333, green: 0.4588235294, blue: 0.7568627451, alpha: 1).cgColor
-                                                
-                                                if conceptHighlightExists(new: conceptHighlightView.frame) != nil {
-                                                    let existingView = conceptHighlightExists(new: conceptHighlightView.frame)!
-                                                    var newDocs = self.conceptHighlights[existingView]!
-                                                    newDocs.append(document)
-                                                    self.conceptHighlights[existingView] = newDocs
-                                                }
-                                                else {
-                                                    self.conceptHighlights[conceptHighlightView] = [Document]()
-                                                    var newDocs = self.conceptHighlights[conceptHighlightView]!
-                                                    newDocs.append(document)
-                                                    self.conceptHighlights[conceptHighlightView] = newDocs
-                                                    self.canvasView.addSubview(conceptHighlightView)
-                                                    conceptHighlightView.isHidden = true
-                                                    conceptHighlightView.isUserInteractionEnabled = true
-                                                    let tapGesture = UITapGestureRecognizer(target: self, action: #selector(self.handleConceptHighlightTap(_:)))
-                                                    conceptHighlightView.addGestureRecognizer(tapGesture)
-                                                }
-                                                break
+                            }
+                            for index in 0..<line.elements.count {
+                                var elementText = line.elements[index].text.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+                                var width = line.elements[index].frame.width
+                                if index < line.elements.count-1 {
+                                    for j in index+1..<line.elements.count {
+                                        elementText = elementText + " " + line.elements[j].text.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+                                        width = width + line.elements[j].frame.width
+                                        if elementText == documentTitle {
+                                            let scaledFrame = createScaledFrame(featureFrame: CGRect(x: line.elements[index].frame.minX, y: line.elements[index].frame.minY, width: width, height: line.elements[index].frame.height), imageSize: canvasView.frame.size)
+                                            let conceptHighlightView = UIView(frame: scaledFrame)
+                                            conceptHighlightView.layer.borderWidth = 2
+                                            conceptHighlightView.layer.borderColor = #colorLiteral(red: 0.3333333333, green: 0.4588235294, blue: 0.7568627451, alpha: 1).cgColor
+                                            
+                                            if conceptHighlightExists(new: conceptHighlightView.frame) != nil {
+                                                let existingView = conceptHighlightExists(new: conceptHighlightView.frame)!
+                                                var newDocs = self.conceptHighlights[existingView]!
+                                                newDocs.append(document)
+                                                self.conceptHighlights[existingView] = newDocs
                                             }
+                                            else {
+                                                self.conceptHighlights[conceptHighlightView] = [Document]()
+                                                var newDocs = self.conceptHighlights[conceptHighlightView]!
+                                                newDocs.append(document)
+                                                self.conceptHighlights[conceptHighlightView] = newDocs
+                                                self.canvasView.addSubview(conceptHighlightView)
+                                                conceptHighlightView.isHidden = true
+                                                conceptHighlightView.isUserInteractionEnabled = true
+                                                let tapGesture = UITapGestureRecognizer(target: self, action: #selector(self.handleConceptHighlightTap(_:)))
+                                                conceptHighlightView.addGestureRecognizer(tapGesture)
+                                            }
+                                            break
                                         }
                                     }
                                 }
@@ -503,11 +489,9 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     private func createScaledFrame(featureFrame: CGRect, imageSize: CGSize) -> CGRect {
             let viewSize = canvasView.frame.size
             
-            // 2
             let resolutionView = viewSize.width / viewSize.height
             let resolutionImage = imageSize.width / imageSize.height
             
-            // 3
             var scale: CGFloat
             if resolutionView > resolutionImage {
                 scale = viewSize.height / imageSize.height
@@ -515,21 +499,17 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                 scale = viewSize.width / imageSize.width
             }
             
-            // 4
             let featureWidthScaled = featureFrame.size.width * scale
             let featureHeightScaled = featureFrame.size.height * scale
             
-            // 5
             let imageWidthScaled = imageSize.width * scale
             let imageHeightScaled = imageSize.height * scale
             let imagePointXScaled = (viewSize.width - imageWidthScaled) / 2
             let imagePointYScaled = (viewSize.height - imageHeightScaled) / 2
             
-            // 6
             let featurePointXScaled = imagePointXScaled + featureFrame.origin.x * scale
             let featurePointYScaled = imagePointYScaled + featureFrame.origin.y * scale
             
-            // 7
             return CGRect(x: featurePointXScaled,
                           y: featurePointYScaled,
                           width: featureWidthScaled,
@@ -610,15 +590,15 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             self.processHandwritingRecognition()
             break
         case .SetTitle:
-            let alertController = UIAlertController(title: "Title for this note", message: nil, preferredStyle: .alert)
+            let alertController = UIAlertController(title: "Rename Note", message: nil, preferredStyle: .alert)
             let confirmAction = UIAlertAction(title: "Set", style: .default) { (_) in
-                let title = alertController.textFields?[0].text
-                NotesManager.activeNote!.setTitle(title: title ?? "Untitled")
-                NotesManager.activeNote!.save()
+                let name = alertController.textFields?[0].text
+                SKFileManager.activeNote!.setName(name: name ?? "Untitled")
+                SKFileManager.save(file: SKFileManager.activeNote!)
             }
             let cancelAction = UIAlertAction(title: "Cancel", style: .cancel) { (_) in }
             alertController.addTextField { (textField) in
-                textField.placeholder = "Enter Note Title"
+                textField.placeholder = "Enter Note Name"
             }
             alertController.addAction(confirmAction)
             alertController.addAction(cancelAction)
@@ -628,17 +608,17 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             self.performSegue(withIdentifier: "ViewNoteText", sender: self)
             break
         case .CopyText:
-            UIPasteboard.general.string = NotesManager.activeNote!.getText()
-            let banner = FloatingNotificationBanner(title: NotesManager.activeNote!.getTitle(), subtitle: "Copied text to clipboard.", style: .info)
+            UIPasteboard.general.string = SKFileManager.activeNote!.getText()
+            let banner = FloatingNotificationBanner(title: SKFileManager.activeNote!.getName(), subtitle: "Copied text to clipboard.", style: .info)
             banner.show()
             break
         case .ClearPage:
-            NotesManager.activeNote!.getCurrentPage().clear()
+            SKFileManager.activeNote!.getCurrentPage().clear()
             updatePage()
             saveCurrentPage()
             break
         case .DeletePage:
-            NotesManager.activeNote!.deletePage(index: NotesManager.activeNote!.activePageIndex)
+            SKFileManager.activeNote!.deletePage(index: SKFileManager.activeNote!.activePageIndex)
             updatePage()
             updatePaginationButtons()
             break
@@ -649,7 +629,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             self.resetDocuments()
             break
         case .ResetTextRecognition:
-            NotesManager.activeNote!.documents = [Document]()
+            SKFileManager.activeNote!.documents = [Document]()
             documentsVC.items = [Document]()
             self.clearConceptHighlights()
             documentsVC.updateBookshelfState(state: .All)
@@ -658,7 +638,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             break
         case .DeleteNote:
             self.isDeletingNote = true
-            NotesManager.delete(note: NotesManager.activeNote!)
+            SKFileManager.delete(file: SKFileManager.activeNote!)
             self.performSegue(withIdentifier: "CloseNote", sender: self)
         }
     }
@@ -697,18 +677,18 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     
     private func processHandwritingRecognition() {
         let image = self.generateHandwritingRecognitionImage()
-        NotesManager.activeNote!.getCurrentPage().clearTextData()
-        handwritingRecognizer.recognize(spellcheck: false, image: image) { (success, textData) in
+        handwritingRecognizer.recognize(spellcheck: false, image: image) { (success, noteText) in
             if success {
-                if let textData = textData {
-                    NotesManager.activeNote!.getCurrentPage().textDataArray.append(textData)
-                    self.annotateText(text: NotesManager.activeNote!.getText())
-                    print(textData.spellchecked ?? "")
+                SKFileManager.activeNote!.getCurrentPage().clearTextData()
+                if let noteText = noteText {
+                    SKFileManager.activeNote!.getCurrentPage().noteTextArray.append(noteText)
+                    self.annotateText(text: SKFileManager.activeNote!.getText())
+                    log.info(noteText.spellchecked)
                 }
             }
             else {
                 self.activityIndicator.stopAnimating()
-                print("Handwriting recognition returned no result.")
+                log.error("Handwriting recognition returned no result.")
             }
         }
     }
@@ -726,9 +706,9 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         self.clearConceptHighlights()
         
         DispatchQueue.global(qos: .background).async {
-            self.tagmeHelper.fetch(text: text, note: NotesManager.activeNote!)
-            self.bioportalHelper.fetch(text: text, note: NotesManager.activeNote!)
-            self.bioportalHelper.fetchCHEBI(text: text, note: NotesManager.activeNote!)
+            self.tagmeHelper.fetch(text: text, note: SKFileManager.activeNote!)
+            self.bioportalHelper.fetch(text: text, note: SKFileManager.activeNote!)
+            self.bioportalHelper.fetchCHEBI(text: text, note: SKFileManager.activeNote!)
         }
     }
     
@@ -797,18 +777,18 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         if saveTimer != nil {
             saveTimer!.invalidate()
             saveTimer = nil
-            print("Save timer reset.")
+            log.info("Save timer reset.")
         }
         saveTimer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(onSaveTimerFires), userInfo: nil, repeats: false)
-        print("Save timer started.")
+        log.info("Save timer started.")
     }
     @objc func onSaveTimerFires()
     {
         saveTimer?.invalidate()
         saveTimer = nil
-        print("Auto-saving sketchnote strokes and text data.")
-        NotesManager.activeNote!.getCurrentPage().canvasDrawing = self.canvasView.drawing
-        NotesManager.activeNote!.save()
+        log.info("Auto-saving sketchnote strokes and text data.")
+        SKFileManager.activeNote!.getCurrentPage().canvasDrawing = self.canvasView.drawing
+        SKFileManager.save(file: SKFileManager.activeNote!)
     }
     
     // Drawing recognition
@@ -820,17 +800,17 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             if let currentPrediction = currentPrediction {
                 let sorted = currentPrediction.category_softmax_scores.sorted { $0.value > $1.value }
                 let top5 = sorted.prefix(5)
-                print(top5.map { $0.key + "(" + String($0.value) + ")"}.joined(separator: ", "))
+                log.info(top5.map { $0.key + "(" + String($0.value) + ")"}.joined(separator: ", "))
                 
                 for (label, score) in top5 {
                     if score > 0.4 {
-                        print("Adding drawing: " + label)
-                        NotesManager.activeNote!.getCurrentPage().addDrawing(drawing: label)
+                        log.info("Adding recognized drawing's label: " + label)
+                        SKFileManager.activeNote!.getCurrentPage().addDrawing(drawing: label)
                     }
                 }
             }
             else {
-                print("Waiting for drawing")
+                log.info("Waiting for drawing")
             }
         }
     }
@@ -929,16 +909,16 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseSimilarNoteIdentifier, for: indexPath as IndexPath) as! SimilarNoteCollectionViewCell
-        cell.setNote(note: self.relatedNotes[indexPath.item], similarityRating: NotesManager.activeNote!.similarTo(note: self.relatedNotes[indexPath.item]))
+        /*cell.setNote(note: self.relatedNotes[indexPath.item], similarityRating: SKFileManager.activeNote!.similarTo(note: self.relatedNotes[indexPath.item]))*/
         return cell
     }
     
     // MARK: - UICollectionViewDelegate protocol
     
-    var openNote : Sketchnote?
+    var openNote : NoteX?
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let note = self.relatedNotes[indexPath.item]
-        let alert = UIAlertController(title: "Open Note", message: "Close this note and open the note " + note.getTitle() + "?", preferredStyle: .alert)
+        let alert = UIAlertController(title: "Open Note", message: "Close this note and open the note " + note.getName() + "?", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Open", style: .default, handler: { action in
             self.openNote = note
             self.saveCurrentPage()
@@ -975,32 +955,33 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         documentsVC.startBookshelfUpdateTimer()
     }
     
-    func sketchnoteHasNewDocument(sketchnote: Sketchnote, document: Document) { // Sketchnote delegate
-        documentsVC.sketchnoteHasNewDocument(sketchnote: sketchnote, document: document)
+    // MARK: NoteXDelegate
+    func noteHasNewDocument(note: NoteX, document: Document) {
+        documentsVC.noteHasNewDocument(note: note, document: document)
     }
-    
-    func sketchnoteHasRemovedDocument(sketchnote: Sketchnote, document: Document) { // Sketchnote delegate
-        documentsVC.sketchnoteDocumentHasChanged(sketchnote: sketchnote, document: document)
+    func noteHasRemovedDocument(note: NoteX, document: Document) {
+        documentsVC.noteDocumentHasChanged(note: note, document: document)
     }
-    
-    func sketchnoteDocumentHasChanged(sketchnote: Sketchnote, document: Document) { // Sketchnote delegate
-        documentsVC.sketchnoteDocumentHasChanged(sketchnote: sketchnote, document: document)
+    func noteDocumentHasChanged(note: NoteX, document: Document) {
+        documentsVC.noteDocumentHasChanged(note: note, document: document)
     }
-    
-    func sketchnoteHasChanged(sketchnote: Sketchnote) { // Sketchnote delegate
+    func noteHasChanged(note: NoteX) {
     }
     
     func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
         return UIContextMenuConfiguration(identifier: nil, previewProvider: nil, actionProvider: { suggestedActions in
             return self.makeRelatedNoteContextMenu(note: self.relatedNotes[indexPath.row])
         })
-
     }
-    private func makeRelatedNoteContextMenu(note: Sketchnote) -> UIMenu {
+    private func makeRelatedNoteContextMenu(note: NoteX) -> UIMenu {
         let mergeAction = UIAction(title: "Merge", image: UIImage(systemName: "arrow.merge")) { action in
             let alert = UIAlertController(title: "Merge Note", message: "Are you sure you want to merge this note with the related note? This will delete the related note.", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "Merge", style: .destructive, handler: { action in
-                NotesManager.activeNote!.mergeWith(note: note)
+                SKFileManager.activeNote!.mergeWith(note: note)
+                SKFileManager.save(file: SKFileManager.activeNote!)
+                if SKFileManager.activeNote! != note {
+                    SKFileManager.delete(file: note)
+                }
                 log.info("Merged notes.")
             }))
             alert.addAction(UIAlertAction(title: "Cancel", style: .default, handler: { action in
@@ -1009,9 +990,10 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             self.present(alert, animated: true, completion: nil)
         }
         let mergeTagsAction = UIAction(title: "Merge Tags", image: UIImage(systemName: "tag.fill")) { action in
-            NotesManager.activeNote!.mergeTagsWith(note: note)
+            SKFileManager.activeNote!.mergeTagsWith(note: note)
+            SKFileManager.save(file: SKFileManager.activeNote!)
         }
-        return UIMenu(title: note.getTitle(), children: [mergeAction, mergeTagsAction])
+        return UIMenu(title: note.getName(), children: [mergeAction, mergeTagsAction])
     }
     
     private func showTopicDocuments(documents: [Document]) {
@@ -1023,17 +1005,16 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     
     //MARK: Drawing insertion mode
     private func setupDrawingRegions() {
-        if let drawingRegionRects = NotesManager.activeNote!.getCurrentPage().drawingViewRects {
-            for rect in drawingRegionRects {
-                let region = UIView(frame: rect)
-                region.layer.borderColor = UIColor.label.cgColor
-                region.layer.borderWidth = 1
-                drawingInsertionCanvas.addSubview(region)
-                let tapGesture = UITapGestureRecognizer(target: self, action: #selector(self.handleDrawingRegionTap(_:)))
-                region.addGestureRecognizer(tapGesture)
-                region.isUserInteractionEnabled = true
-                drawingViews.append(region)
-            }
+        let drawingRegionRects = SKFileManager.activeNote!.getCurrentPage().drawingViewRects
+        for rect in drawingRegionRects {
+            let region = UIView(frame: rect)
+            region.layer.borderColor = UIColor.label.cgColor
+            region.layer.borderWidth = 1
+            drawingInsertionCanvas.addSubview(region)
+            let tapGesture = UITapGestureRecognizer(target: self, action: #selector(self.handleDrawingRegionTap(_:)))
+            region.addGestureRecognizer(tapGesture)
+            region.isUserInteractionEnabled = true
+            drawingViews.append(region)
         }
     }
     private func toggleDrawingRegions(isHidden: Bool, canInteract: Bool) {
@@ -1100,7 +1081,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             endPoint = tapPoint
             if let currentDrawingRegion = currentDrawingRegion {
                 if currentDrawingRegion.frame.width >= 150 {
-                    NotesManager.activeNote!.getCurrentPage().addDrawingViewRect(rect: currentDrawingRegion.frame)
+                    SKFileManager.activeNote!.getCurrentPage().addDrawingViewRect(rect: currentDrawingRegion.frame)
                     self.drawingViews.append(currentDrawingRegion)
                     
                     let tapGesture = UITapGestureRecognizer(target: self, action: #selector(self.handleDrawingRegionTap(_:)))
@@ -1126,7 +1107,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             let action = PopMenuDefaultAction(title: "Delete Drawing Region", didSelect: { action in
                 if let drawingRegion = sender.view {
                     drawingRegion.removeFromSuperview()
-                    NotesManager.activeNote!.getCurrentPage().removeDrawingViewRect(rect: drawingRegion.frame)
+                    SKFileManager.activeNote!.getCurrentPage().removeDrawingViewRect(rect: drawingRegion.frame)
                 }
             })
             popMenu.addAction(action)
@@ -1145,7 +1126,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     }
     
     func previousPage() {
-        if NotesManager.activeNote!.hasPreviousPage() {
+        if SKFileManager.activeNote!.hasPreviousPage() {
             UIView.animate(withDuration: 1.0, animations: {
                 let animation = CATransition()
                 animation.duration = 1.2
@@ -1160,12 +1141,12 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             })
         }
         saveCurrentPage()
-        NotesManager.activeNote!.previousPage()
+        SKFileManager.activeNote!.previousPage()
         updatePage()
         updatePaginationButtons()
     }
     func nextPage() {
-        if NotesManager.activeNote!.hasNextPage() {
+        if SKFileManager.activeNote!.hasNextPage() {
             UIView.animate(withDuration: 1.0, animations: {
                 let animation = CATransition()
                 animation.duration = 1.2
@@ -1181,7 +1162,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             })
         }
         saveCurrentPage()
-        NotesManager.activeNote!.nextPage()
+        SKFileManager.activeNote!.nextPage()
         updatePage()
         updatePaginationButtons()
     }
@@ -1192,9 +1173,9 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             { (input:String?) in
                 if input != nil && Int(input!) != nil {
                     if let pageNumber = Int(input!) {
-                        if (pageNumber - 1) >= 0 && (pageNumber - 1) < NotesManager.activeNote!.pages.count && (pageNumber - 1) != NotesManager.activeNote!.activePageIndex {
+                        if (pageNumber - 1) >= 0 && (pageNumber - 1) < SKFileManager.activeNote!.pages.count && (pageNumber - 1) != SKFileManager.activeNote!.activePageIndex {
                             self.saveCurrentPage()
-                            NotesManager.activeNote!.activePageIndex = (pageNumber - 1)
+                            SKFileManager.activeNote!.activePageIndex = (pageNumber - 1)
                             self.updatePage()
                             self.updatePaginationButtons()
                         }
@@ -1203,23 +1184,23 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             }
     }
     @IBAction func newPageTapped(_ sender: UIButton) {
-        let newPage = NotePage()
-        NotesManager.activeNote!.pages.insert(newPage, at: NotesManager.activeNote!.activePageIndex + 1)
+        let newPage = NoteXPage()
+        SKFileManager.activeNote!.pages.insert(newPage, at: SKFileManager.activeNote!.activePageIndex + 1)
         saveCurrentPage()
-        NotesManager.activeNote!.nextPage()
+        SKFileManager.activeNote!.nextPage()
         updatePage()
         saveCurrentPage()
         updatePaginationButtons()
     }
         
     private func updatePaginationButtons() {
-        previousPageButton.isEnabled = NotesManager.activeNote!.hasPreviousPage()
-        nextPageButton.isEnabled = NotesManager.activeNote!.hasNextPage()
-        pageButton.setTitle("Page \(NotesManager.activeNote!.activePageIndex + 1)", for: .normal)
+        previousPageButton.isEnabled = SKFileManager.activeNote!.hasPreviousPage()
+        nextPageButton.isEnabled = SKFileManager.activeNote!.hasNextPage()
+        pageButton.setTitle("Page \(SKFileManager.activeNote!.activePageIndex + 1)", for: .normal)
     }
     
     private func updatePage() {
-        self.canvasView.drawing = NotesManager.activeNote!.getCurrentPage().canvasDrawing
+        self.canvasView.drawing = SKFileManager.activeNote!.getCurrentPage().canvasDrawing
         clearConceptHighlights()
         setupConceptHighlights()
         drawingViews = [UIView]()
@@ -1243,23 +1224,17 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             self.toggleConceptHighlight()
         }
         self.processDrawingRecognition()
-        traitCollection.performAsCurrent {
-            NotesManager.activeNote!.getCurrentPage().image = canvasView.drawing.image(from: CGRect(x: canvasView.frame.minX, y: canvasView.frame.minY, width: canvasView.contentSize.width, height: canvasView.contentSize.height), scale: 1.0)
-            if traitCollection.userInterfaceStyle == .dark {
-                NotesManager.activeNote!.getCurrentPage().image = NotesManager.activeNote!.getCurrentPage().image!.invert()
-            }
-        }
-        NotesManager.activeNote!.setUpdateDate()
-        NotesManager.activeNote!.getCurrentPage().canvasDrawing = self.canvasView.drawing
-        NotesManager.activeNote!.save()
-        log.info("Saving note for current page.")
+        SKFileManager.activeNote!.setUpdateDate()
+        SKFileManager.activeNote!.getCurrentPage().canvasDrawing = self.canvasView.drawing
+        SKFileManager.save(file: SKFileManager.activeNote!)
+        log.info("Saved note for current page.")
     }
     
     // MARK : Related Notes collection view
     @IBOutlet var relatedNotesView: UIView!
     @IBOutlet var relatedNotesCollectionView: UICollectionView!
     @IBOutlet var relatedNotesButton: UIButton!
-    var relatedNotes = [Sketchnote]()
+    var relatedNotes = [NoteX]()
     
     var similarityThreshold = 0.0
     var highSimilarity = 10.0
@@ -1278,13 +1253,13 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     }
     
     private func refreshRelatedNotes() {
-        self.relatedNotes = [Sketchnote]()
-        var allNotes = NotesManager.notes
-        allNotes.removeAll{$0 == NotesManager.activeNote!}
+        self.relatedNotes = [NoteX]()
+        var allNotes = SKFileManager.notes
+        allNotes.removeAll{$0 == SKFileManager.activeNote!}
         var highSimilarityCount = 0
         var anySimilarityCount = 0
         for note in allNotes {
-            let similarity = NotesManager.activeNote!.similarTo(note: note)
+            let similarity = SKFileManager.activeNote!.similarTo(note: note)
             if similarity > similarityThreshold {
                 relatedNotes.append(note)
             }
@@ -1314,16 +1289,16 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     // MARK: Documents View Controller delegate
     func resetDocuments() {
         self.clearConceptHighlights()
-        self.annotateText(text: NotesManager.activeNote!.getText())
+        self.annotateText(text: SKFileManager.activeNote!.getText())
     }
     var oldDocuments: [Document]!
     func updateTopicsCount() {
-        self.topicsBadgeHub.setCount(NotesManager.activeNote!.documents.count)
-        let differences = zip(oldDocuments, NotesManager.activeNote!.documents).map {$0.0 == $0.1}
+        self.topicsBadgeHub.setCount(SKFileManager.activeNote!.documents.count)
+        let differences = zip(oldDocuments, SKFileManager.activeNote!.documents).map {$0.0 == $0.1}
         if differences.count > 0 {
             setupConceptHighlights()
         }
-        bookshelfSegmentedControl.setTitle("Documents (\(NotesManager.activeNote!.documents.count))", forSegmentAt: 0)
+        bookshelfSegmentedControl.setTitle("Documents (\(SKFileManager.activeNote!.documents.count))", forSegmentAt: 0)
     }
     
     // MARK: Bookshelf Options Delegate
@@ -1346,9 +1321,9 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     }
 
     func notePageSelected(index: Int) {
-        if NotesManager.activeNote!.activePageIndex != index {
+        if SKFileManager.activeNote!.activePageIndex != index {
             self.saveCurrentPage()
-            NotesManager.activeNote!.activePageIndex = index
+            SKFileManager.activeNote!.activePageIndex = index
             self.updatePage()
             self.updatePaginationButtons()
         }

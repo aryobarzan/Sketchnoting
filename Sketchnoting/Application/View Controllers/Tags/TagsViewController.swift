@@ -15,7 +15,7 @@ class TagsViewController: UIViewController, UITableViewDataSource, UITableViewDe
     var isEditingTags: Bool = false
     var isFiltering: Bool = false
     
-    var note: Sketchnote?
+    var note: NoteX?
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -112,7 +112,7 @@ class TagsViewController: UIViewController, UITableViewDataSource, UITableViewDe
         
         if note != nil {
             note!.tags = selectedTags
-            note!.save()
+            SKFileManager.save(file: note!)
         }
         else if isFiltering {
             TagsManager.filterTags = selectedTags

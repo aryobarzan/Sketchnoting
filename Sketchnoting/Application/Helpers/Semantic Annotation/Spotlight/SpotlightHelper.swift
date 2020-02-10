@@ -11,7 +11,7 @@ import Alamofire
 import SwiftyJSON
 
 class SpotlightHelper {
-    func fetch(text: String, note: Sketchnote) {
+    func fetch(text: String, note: NoteX) {
         let chunks = text.split(by: 6000)
         
         for chunk in chunks {
@@ -49,7 +49,7 @@ class SpotlightHelper {
         }
     }
     
-    private func fetchJSONOfResource(concept: String, conceptURI: String, secondRankPercentage: Double, resourceJSONURL: String, note: Sketchnote) {
+    private func fetchJSONOfResource(concept: String, conceptURI: String, secondRankPercentage: Double, resourceJSONURL: String, note: NoteX) {
         let headers: HTTPHeaders = [
             "Accept": "application/json"
         ]

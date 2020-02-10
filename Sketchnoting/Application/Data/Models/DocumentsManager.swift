@@ -17,7 +17,7 @@ class DocumentsManager {
             log.info("Document \(document.title) hidden.")
         }
         else {
-            print("Failed hiding document \(document.title).")
+            log.error("Failed hiding document \(document.title).")
         }
     }
     public static func isHidden(document: Document) -> Bool {

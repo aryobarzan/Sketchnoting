@@ -18,7 +18,7 @@ class ReceivedNoteCollectionViewCell: UICollectionViewCell {
     
     var delegate: ReceivedNoteCellDelegate?
     
-    var note: Sketchnote!
+    var note: NoteX!
     override func awakeFromNib() {
         super.awakeFromNib()
     }
@@ -26,13 +26,15 @@ class ReceivedNoteCollectionViewCell: UICollectionViewCell {
            super.init(coder: aDecoder)
     }
        
-    func setNote(note: Sketchnote) {
+    func setNote(note: NoteX) {
         self.note = note
            
-        imageView.image = note.getPreviewImage()
+        note.getPreviewImage() { image in
+            self.imageView.image = image
+        }
         imageView.layer.borderColor = UIColor.gray.cgColor
         imageView.layer.borderWidth = 1
-        noteTitleLabel.text = note.getTitle()
+        noteTitleLabel.text = note.getName()
         senderLabel.text = note.sharedByDevice
         
         grabButton.layer.cornerRadius = 17
@@ -47,6 +49,6 @@ class ReceivedNoteCollectionViewCell: UICollectionViewCell {
 }
 
 protocol ReceivedNoteCellDelegate {
-    func acceptReceivedNote(note: Sketchnote)
-    func rejectReceivedNote(note: Sketchnote)
+    func acceptReceivedNote(note: NoteX)
+    func rejectReceivedNote(note: NoteX)
 }

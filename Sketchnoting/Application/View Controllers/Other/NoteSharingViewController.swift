@@ -6,7 +6,7 @@
 //  Copyright © 2019 Aryobarzan. All rights reserved.
 //
 
-import UIKit
+/*import UIKit
 import MultipeerConnectivity
 import PencilKit
 
@@ -130,7 +130,7 @@ class NoteSharingViewController: UIViewController, MCSessionDelegate {
     }
     
     func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
-        if let decodedNote = NotesManager.decodeNoteFromData(data: data) {
+        if let decodedNote = SKFileManager.decodeNoteFromData(data: data) {
             decodedNote.sharedByDevice = peerID.displayName
             DispatchQueue.main.async {
                 self.pendingSharedNotes.append(decodedNote)
@@ -189,3 +189,4 @@ class NoteSharingViewController: UIViewController, MCSessionDelegate {
         }
     }
 }
+*/

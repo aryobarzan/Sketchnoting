@@ -25,7 +25,7 @@ class NoteCollectionViewDetailCell: UICollectionViewCell {
     
     var delegate : NoteCollectionViewDetailCellDelegate!
     
-    var sketchnote: Sketchnote!
+    var file: File?
     
     var longPressGesture: UILongPressGestureRecognizer?
     
@@ -37,41 +37,43 @@ class NoteCollectionViewDetailCell: UICollectionViewCell {
         super.init(coder: aDecoder)
     }
     
-    func setNote(note: Sketchnote) {
-        sketchnote = note
+    func setFile(file: File) {
+        self.file = file
         
-        titleLabel.text = note.getTitle()
+        titleLabel.text = file.getName()
         
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
         
-        let dateAsString = formatter.string(from: sketchnote.creationDate)
+        let dateAsString = formatter.string(from: file.creationDate)
         let date = formatter.date(from: dateAsString)
         formatter.dateFormat = "dd MMM yyyy"
         let formattedDateAsString = formatter.string(from: date!)
         self.creationLabel.text = "Created: " + formattedDateAsString
         
-        if let updateDate = sketchnote.updateDate {
-            let dateAsString = formatter.string(from: updateDate)
-            let date = formatter.date(from: dateAsString)
-            formatter.dateFormat = "dd MMM yyyy"
-            let formattedDateAsString = formatter.string(from: date!)
-            self.updatedLabel.text = "Updated: " + formattedDateAsString
-        }
-        else {
-            self.updatedLabel.text = "Updated: Never"
-        }
+        let updateDateAsString = formatter.string(from: file.updateDate)
+        let updateDate = formatter.date(from: updateDateAsString)
+        formatter.dateFormat = "dd MMM yyyy"
+        let formattedupdateDateAsString = formatter.string(from: updateDate!)
+        self.updatedLabel.text = "Updated: " + formattedupdateDateAsString
         
-        if sketchnote.tags.count > 0 {
-            self.tagsLabel.text = ""
-            for tag in sketchnote.tags {
-                self.tagsLabel.text = self.tagsLabel.text! + tag.title + " · "
+        self.tagsLabel.text = ""
+        self.editTagsButton.isHidden = true
+        self.shareButton.isHidden = true
+        self.sendButton.isHidden = true
+        self.copyTextButton.isHidden = true
+        if let note = file as? NoteX {
+            if note.tags.count > 0 {
+                self.tagsLabel.text = ""
+                for tag in note.tags {
+                    self.tagsLabel.text = self.tagsLabel.text! + tag.title + " · "
+                }
             }
+            self.editTagsButton.isHidden = false
+            self.shareButton.isHidden = false
+            self.sendButton.isHidden = false
+            self.copyTextButton.isHidden = false
         }
-        else {
-             self.tagsLabel.text = ""
-        }
-        
         similarityWeightProgressRing.isHidden = true
     }
     
@@ -81,32 +83,32 @@ class NoteCollectionViewDetailCell: UICollectionViewCell {
         similarityWeightProgressRing.isHidden = false
     }
     
-    @IBAction func editTitleTapped(_ sender: UIButton) {
-        delegate.noteCollectionViewDetailCellEditTitleTapped(sketchnote: sketchnote, sender: sender, cell: self)
+    @IBAction func renameTapped(_ sender: UIButton) {
+        delegate.noteCollectionViewDetailCellRenameTapped(file: file!, sender: sender, cell: self)
     }
     @IBAction func tagTapped(_ sender: UIButton) {
-        delegate.noteCollectionViewDetailCellTagTapped(sketchnote: sketchnote, sender: sender, cell: self)
+        delegate.noteCollectionViewDetailCellTagTapped(note: file! as! NoteX, sender: sender, cell: self)
     }
     @IBAction func shareTapped(_ sender: UIButton) {
-        delegate.noteCollectionViewDetailCellShareTapped(sketchnote: sketchnote, sender: sender, cell: self)
+        delegate.noteCollectionViewDetailCellShareTapped(note: file! as! NoteX, sender: sender, cell: self)
     }
     @IBAction func sendTapped(_ sender: UIButton) {
-        delegate.noteCollectionViewDetailCellSendTapped(sketchnote: sketchnote, sender: sender, cell: self)
+        delegate.noteCollectionViewDetailCellSendTapped(note: file! as! NoteX, sender: sender, cell: self)
     }
     @IBAction func copyTextTapped(_ sender: UIButton) {
-        delegate.noteCollectionViewDetailCellCopyTextTapped(sketchnote: sketchnote, sender: sender, cell: self)
+        delegate.noteCollectionViewDetailCellCopyTextTapped(note: file! as! NoteX, sender: sender, cell: self)
     }
     @IBAction func deleteTapped(_ sender: UIButton) {
-        delegate.noteCollectionViewDetailCellDeleteTapped(sketchnote: sketchnote, sender: sender, cell: self)
+        delegate.noteCollectionViewDetailCellDeleteTapped(file: file!, sender: sender, cell: self)
     }
 }
 
 protocol NoteCollectionViewDetailCellDelegate {
-    func noteCollectionViewDetailCellEditTitleTapped(sketchnote: Sketchnote, sender: UIButton, cell: NoteCollectionViewDetailCell)
-    func noteCollectionViewDetailCellTagTapped(sketchnote: Sketchnote, sender: UIButton, cell: NoteCollectionViewDetailCell)
-    func noteCollectionViewDetailCellShareTapped(sketchnote: Sketchnote, sender: UIButton, cell: NoteCollectionViewDetailCell)
-    func noteCollectionViewDetailCellSendTapped(sketchnote: Sketchnote, sender: UIButton, cell: NoteCollectionViewDetailCell)
-    func noteCollectionViewDetailCellCopyTextTapped(sketchnote: Sketchnote, sender: UIButton, cell: NoteCollectionViewDetailCell)
-    func noteCollectionViewDetailCellDeleteTapped(sketchnote: Sketchnote, sender: UIButton, cell: NoteCollectionViewDetailCell)
+    func noteCollectionViewDetailCellRenameTapped(file: File, sender: UIButton, cell: NoteCollectionViewDetailCell)
+    func noteCollectionViewDetailCellTagTapped(note: NoteX, sender: UIButton, cell: NoteCollectionViewDetailCell)
+    func noteCollectionViewDetailCellShareTapped(note: NoteX, sender: UIButton, cell: NoteCollectionViewDetailCell)
+    func noteCollectionViewDetailCellSendTapped(note: NoteX, sender: UIButton, cell: NoteCollectionViewDetailCell)
+    func noteCollectionViewDetailCellCopyTextTapped(note: NoteX, sender: UIButton, cell: NoteCollectionViewDetailCell)
+    func noteCollectionViewDetailCellDeleteTapped(file: File, sender: UIButton, cell: NoteCollectionViewDetailCell)
 }
 

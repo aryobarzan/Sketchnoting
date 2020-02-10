@@ -1,96 +1,76 @@
 //
-//  Sketchnote.swift
+//  Note.swift
 //  Sketchnoting
 //
-//  Created by Aryobarzan on 26/02/2019.
-//  Copyright © 2019 Aryobarzan. All rights reserved.
+//  Created by Aryobarzan on 07/02/2020.
+//  Copyright © 2020 Aryobarzan. All rights reserved.
 //
 
 import UIKit
 import PDFKit
 import PencilKit
 
-protocol SketchnoteDelegate {
-    func sketchnoteHasNewDocument(sketchnote: Sketchnote, document: Document)
-    func sketchnoteHasRemovedDocument(sketchnote: Sketchnote, document: Document)
-    func sketchnoteDocumentHasChanged(sketchnote: Sketchnote, document: Document)
-    func sketchnoteHasChanged(sketchnote: Sketchnote)
+protocol NoteXDelegate {
+    func noteHasNewDocument(note: NoteX, document: Document)
+    func noteHasRemovedDocument(note: NoteX, document: Document)
+    func noteDocumentHasChanged(note: NoteX, document: Document)
+    func noteHasChanged(note: NoteX)
 }
 
-class Sketchnote: Note, Equatable, DocumentVisitor, Comparable, DocumentDelegate, Hashable {
-    
-    var delegate: SketchnoteDelegate?
-    
-    var id: String!
-    private var title: String!
-    var creationDate: Date!
-    var updateDate: Date?
-    var pages: [NotePage]!
-    var documents: [Document]!
-    var tags: [Tag]!
+class NoteX: File, DocumentVisitor, DocumentDelegate {
+    var pages: [NoteXPage]
+    var documents: [Document]
+    var tags: [Tag]
     var activePageIndex = 0
-    var helpLinesType: HelpLinesType!
-    
+    var helpLinesType: HelpLinesType
     var sharedByDevice: String?
     
-    enum CodingKeys: String, CodingKey {
-        case id
-        case title
-        case creationDate
-        case updateDate
-        case relatedDocuments = "relatedDocuments"
+    var delegate: NoteXDelegate?
+    
+    init(name: String, parent: String?, documents: [Document]?) {
+        self.documents = documents ?? [Document]()
+        self.pages = [NoteXPage]()
+        self.tags = [Tag]()
+        self.helpLinesType = .None
+        let firstPage = NoteXPage()
+        self.pages.append(firstPage)
+        super.init(name: name, parent: parent)
+    }
+    
+    //Codable
+    enum NoteCodingKeys: String, CodingKey {
+        case documents = "documents"
         case tags = "tags"
         case activePageIndex
         case helpLinesType = "helpLinesType"
+        case pages = "pages"
     }
-    
-    //MARK: Initialization
-    
-    init?(relatedDocuments: [Document]?) {
-        self.id = UUID().uuidString
-        self.title = "Untitled"
-        self.creationDate = Date.init(timeIntervalSinceNow: 0)
-        self.documents = relatedDocuments ?? [Document]()
-        self.pages = [NotePage]()
-        self.tags = [Tag]()
-        self.helpLinesType = .None
-        
-        let firstPage = NotePage()
-        self.pages.append(firstPage)
+    private enum DocumentTypeKey : String, CodingKey {
+        case type = "DocumentType"
     }
-    
-    //MARK: Persistence
-    func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(id, forKey: .id)
-        try container.encode(title, forKey: .title)
-        try container.encode(creationDate.timeIntervalSince1970, forKey: .creationDate)
-        try container.encode(updateDate?.timeIntervalSince1970, forKey: .updateDate)
+    private enum DocumentTypes : String, Decodable {
+        case spotlight = "Spotlight"
+        case bioportal = "BioPortal"
+        case chebi = "CHEBI"
+        case tagme = "TAGME"
+    }
+    override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: NoteCodingKeys.self)
         do {
-            try container.encode(documents, forKey: .relatedDocuments)
+            try container.encode(documents, forKey: .documents)
         } catch {
         }
         try container.encode(tags, forKey: .tags)
         try container.encode(activePageIndex, forKey: .activePageIndex)
         try container.encode(helpLinesType, forKey: .helpLinesType)
+        try container.encode(pages, forKey: .pages)
     }
     
     required init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let container = try decoder.container(keyedBy: NoteCodingKeys.self)
 
-        id = try? container.decode(String.self, forKey: .id)
-        title = try? container.decode(String.self, forKey: .title)
-        if title == nil || title.isEmpty {
-            title = "Untitled"
-        }
-        creationDate = Date(timeIntervalSince1970: try container.decode(TimeInterval.self, forKey: .creationDate))
-        do {
-            _ = try container.decode(TimeInterval.self, forKey: .updateDate)
-            updateDate = Date(timeIntervalSince1970: try container.decode(TimeInterval.self, forKey: .updateDate))
-        } catch {
-        }
-
-        var docsArrayForType = try container.nestedUnkeyedContainer(forKey: .relatedDocuments)
+        var docsArrayForType = try container.nestedUnkeyedContainer(forKey: .documents)
         var docs = [Document]()
         var docsArray = docsArrayForType
         do {
@@ -117,70 +97,25 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable, DocumentDelegate
             }
         } catch {
             log.error("Decoding a note's documents failed.")
-            print(error)
+            log.error(error)
         }
         self.documents = docs
+        tags = (try? container.decode([Tag].self, forKey: .tags)) ?? [Tag]()
+        activePageIndex = try container.decode(Int.self, forKey: .activePageIndex)
+        helpLinesType = (try? container.decode(HelpLinesType.self, forKey: .helpLinesType)) ?? .None
+        pages = try container.decode([NoteXPage].self, forKey: .pages)
+        try super.init(from: decoder)
         for doc in documents {
             doc.delegate = self
         }
-        tags = try? container.decode([Tag].self, forKey: .tags)
-        if tags == nil {
-            tags = [Tag]()
-        }
-        activePageIndex = try container.decode(Int.self, forKey: .activePageIndex)
-        helpLinesType = try? container.decode(HelpLinesType.self, forKey: .helpLinesType)
-        if helpLinesType == nil {
-            helpLinesType = .None
-        }
-        
-        log.info("Sketchnote " + self.id + " decoded.")
+        log.info("Note " + self.getName() + " decoded.")
     }
     
-    private enum DocumentTypeKey : String, CodingKey {
-        case type = "DocumentType"
-    }
-    private enum DocumentTypes : String, Decodable {
-        case spotlight = "Spotlight"
-        case bioportal = "BioPortal"
-        case chebi = "CHEBI"
-        case tagme = "TAGME"
-    }
-    
-    private let serializationQueue = DispatchQueue(label: "SerializationQueue", qos: .background)
-    public func save() {
-        serializationQueue.async {
-            let encodedData = self.packageNoteAsData()
-            let sketchnotesDirectory = NotesManager.getSketchnotesDirectory()
-            try? encodedData!.write(to: sketchnotesDirectory.appendingPathComponent(self.id + ".sketchnote"))
-        }
-    }
-    
-    public func packageNoteAsData() -> Data? {
-        var data = [Data]()
-        // Encode metadata
-        let metaDataEncoder = JSONEncoder()
-        if let encodedMetaData = try? metaDataEncoder.encode(self) {
-            data.append(encodedMetaData)
-            log.info("Note \(self.id ?? "") meta data encoded.")
-        }
-        else {
-            log.error("Encoding failed for note " + self.id + ".")
-        }
-        // Encode note pages
-        if let encodedPages = try? NSKeyedArchiver.archivedData(withRootObject: self.pages as Any, requiringSecureCoding: false) {
-            data.append(encodedPages)
-            log.info("Note " + self.id + " pages encoded.")
-        }
-        let dataEncoded = try? NSKeyedArchiver.archivedData(withRootObject: data, requiringSecureCoding: false)
-        return dataEncoded
-    }
-    
-    public func duplicate() -> Sketchnote {
+    public func duplicate() -> NoteX {
         let documents = self.documents
-        let duplicate = Sketchnote(relatedDocuments: documents)!
-        duplicate.setTitle(title: self.getTitle() + " #2")
+        let duplicate = NoteX(name: self.getName(), parent: self.parent, documents: documents)
+        duplicate.setName(name: self.getName() + " #2")
         duplicate.tags = self.tags
-        duplicate.save()
         return duplicate
     }
     
@@ -190,13 +125,10 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable, DocumentDelegate
     }
     
     func addDocument(document: Document) {
-        if documents == nil {
-            documents = [Document]()
-        }
-        if !documents!.contains(document) && isDocumentValid(document: document) {
-            documents!.append(document)
+        if !documents.contains(document) && isDocumentValid(document: document) {
+            documents.append(document)
             document.delegate = self
-            self.delegate?.sketchnoteHasNewDocument(sketchnote: self, document: document)
+            self.delegate?.noteHasNewDocument(note: self, document: document)
         }
     }
     
@@ -228,58 +160,39 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable, DocumentDelegate
     }
     
     func removeDocument(document: Document) {
-        if documents == nil {
-            documents = [Document]()
-        }
-        else if documents!.contains(document) {
+        if documents.contains(document) {
             documents.removeAll{$0 == document}
-            self.delegate?.sketchnoteHasRemovedDocument(sketchnote: self, document: document)
+            self.delegate?.noteHasRemovedDocument(note: self, document: document)
         }
     }
     
     func setDocumentPreviewImage(document: Document, image: UIImage) {
         if self.documents.contains(document) {
             document.previewImage = image
-            self.delegate?.sketchnoteDocumentHasChanged(sketchnote: self, document: document)
+            self.delegate?.noteDocumentHasChanged(note: self, document: document)
         }
     }
     func setDocumentMapImage(document: Document, image: UIImage) {
         if self.documents.contains(document) {
             if document is TAGMEDocument {
                 (document as! TAGMEDocument).mapImage = image
-                self.delegate?.sketchnoteDocumentHasChanged(sketchnote: self, document: document)
+                self.delegate?.noteDocumentHasChanged(note: self, document: document)
             }
             else if document is SpotlightDocument {
                 (document as! SpotlightDocument).mapImage = image
-                self.delegate?.sketchnoteDocumentHasChanged(sketchnote: self, document: document)
+                self.delegate?.noteDocumentHasChanged(note: self, document: document)
             }
         }
     }
     func setDocumentMoleculeImage(document: CHEBIDocument, image: UIImage) {
         if self.documents.contains(document) {
             document.moleculeImage = image
-            self.delegate?.sketchnoteDocumentHasChanged(sketchnote: self, document: document)
+            self.delegate?.noteDocumentHasChanged(note: self, document: document)
         }
     }
     
     func documentHasChanged(document: Document) {
-        self.delegate?.sketchnoteDocumentHasChanged(sketchnote: self, document: document)
-    }
-    
-    func setUpdateDate() {
-        self.updateDate = Date.init(timeIntervalSinceNow: 0)
-    }
-    
-    func setTitle(title: String) {
-        if title.isEmpty || title.count < 1 {
-            self.title = "Untitled"
-        }
-        else {
-            self.title = title
-        }
-    }
-    func getTitle() -> String {
-        return self.title
+        self.delegate?.noteDocumentHasChanged(note: self, document: document)
     }
     
     //MARK: recognized text
@@ -301,13 +214,13 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable, DocumentDelegate
             switch filter.type {
             case .All:
                 var isInText = false
-                if (self.title.lowercased().contains(filter.term) || self.getText().lowercased().contains(filter.term)) {
+                if (self.getName().lowercased().contains(filter.term) || self.getText().lowercased().contains(filter.term)) {
                     matches += 1
                     isInText = true
                 }
                 var isInDrawings = false
                     for page in pages {
-                                       if page.drawingLabels?.contains(filter.term) ?? false {
+                                       if page.drawingLabels.contains(filter.term) {
                                            matches += 1
                                         isInDrawings = true
                                            break
@@ -315,24 +228,22 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable, DocumentDelegate
                                    }
                 if !isInText && !isInDrawings {
                     currentSearchFilter = filter
-                    if let documents = self.documents {
-                        for doc in documents {
-                            doc.accept(visitor: self)
-                            if matchesSearch {
-                                matches += 1
-                            }
+                    for doc in documents {
+                        doc.accept(visitor: self)
+                        if matchesSearch {
+                            matches += 1
                         }
                     }
                 }
                 break
             case .Text:
-                if (self.title.lowercased().contains(filter.term) || self.getText().lowercased().contains(filter.term)) {
+                if (self.getName().lowercased().contains(filter.term) || self.getText().lowercased().contains(filter.term)) {
                     matches += 1
                 }
                 break
             case .Drawing:
                 for page in pages {
-                    if page.drawingLabels?.contains(filter.term) ?? false {
+                    if page.drawingLabels.contains(filter.term) {
                         matches += 1
                         break
                     }
@@ -340,12 +251,10 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable, DocumentDelegate
                 break
             case .Document:
                 currentSearchFilter = filter
-                if let documents = self.documents {
-                    for doc in documents {
-                        doc.accept(visitor: self)
-                        if matchesSearch {
-                            matches += 1
-                        }
+                for doc in documents {
+                    doc.accept(visitor: self)
+                    if matchesSearch {
+                        matches += 1
                     }
                 }
                 break
@@ -417,56 +326,49 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable, DocumentDelegate
     // MARK: PDF Generation
     
     func createPDF() -> Data? {
-        if let pages = pages {
-            if pages.count > 0 {
-                let pdfWidth = UIScreen.main.bounds.width
-                let pdfHeight = pages[0].canvasDrawing.bounds.maxY + 100
-                
-                let bounds = CGRect(x: 0, y: 0, width: pdfWidth, height: pdfHeight)
-                let mutableData = NSMutableData()
-                UIGraphicsBeginPDFContextToData(mutableData, bounds, nil)
-                for page in pages {
-                    UIGraphicsBeginPDFPage()
-                        
-                    var yOrigin: CGFloat = 0
-                    let imageHeight: CGFloat = 1024
-                    while yOrigin < bounds.maxY {
-                        let imgBounds = CGRect(x: 0, y: yOrigin, width: UIScreen.main.bounds.width, height: min(imageHeight, bounds.maxY - yOrigin))
-                        UITraitCollection(userInterfaceStyle: .light).performAsCurrent {
-                            let image = page.canvasDrawing.image(from: imgBounds, scale: 2)
-                            image.draw(in: imgBounds)
-                            yOrigin += imageHeight
-                        }
+        if pages.count > 0 {
+            let pdfWidth = UIScreen.main.bounds.width
+            let pdfHeight = pages[0].canvasDrawing.bounds.maxY + 100
+            
+            let bounds = CGRect(x: 0, y: 0, width: pdfWidth, height: pdfHeight)
+            let mutableData = NSMutableData()
+            UIGraphicsBeginPDFContextToData(mutableData, bounds, nil)
+            for page in pages {
+                UIGraphicsBeginPDFPage()
+                    
+                var yOrigin: CGFloat = 0
+                let imageHeight: CGFloat = 1024
+                while yOrigin < bounds.maxY {
+                    let imgBounds = CGRect(x: 0, y: yOrigin, width: UIScreen.main.bounds.width, height: min(imageHeight, bounds.maxY - yOrigin))
+                    UITraitCollection(userInterfaceStyle: .light).performAsCurrent {
+                        let image = page.canvasDrawing.image(from: imgBounds, scale: 2)
+                        image.draw(in: imgBounds)
+                        yOrigin += imageHeight
                     }
                 }
-                UIGraphicsEndPDFContext()
-                return mutableData as Data
             }
-            return nil
+            UIGraphicsEndPDFContext()
+            return mutableData as Data
         }
         return nil
     }
     
     // MARK: Page helper functions
     
-    public func getCurrentPage() -> NotePage {
+    public func getCurrentPage() -> NoteXPage {
         if activePageIndex >= pages.count {
             activePageIndex = 0
         }
         if pages.count == 0 {
-            pages.append(NotePage())
+            pages.append(NoteXPage())
         }
         return pages[activePageIndex]
     }
     
-    public func getPreviewImage() -> UIImage? {
-        if let pages = pages {
-            if pages.count > 0 {
-                return pages[0].image
-            }
-            return nil
+    override public func getPreviewImage(completion: @escaping (UIImage) -> Void) {
+        UITraitCollection(userInterfaceStyle: .light).performAsCurrent {
+            completion(pages[0].canvasDrawing.image(from: UIScreen.main.bounds, scale: 1.0))
         }
-        return nil
     }
     
     public func hasNextPage() -> Bool {
@@ -504,33 +406,15 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable, DocumentDelegate
       pages.remove(at: indexPath.row)
     }
       
-    func insertPage(_ notePage: NotePage, at indexPath: IndexPath) {
+    func insertPage(_ notePage: NoteXPage, at indexPath: IndexPath) {
       pages.insert(notePage, at: indexPath.row)
     }
-    
-    // MARK: Comparable, equatable, hashable
 
-    static func == (lhs: Sketchnote, rhs: Sketchnote) -> Bool {
-        if lhs.id == rhs.id {
-            return true
-        }
-        return false
-    }
-    
-    static func < (lhs: Sketchnote, rhs: Sketchnote) -> Bool {
-        return lhs.creationDate < rhs.creationDate
-    }
-    
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(id)
-    }
-
-    
     // MARK: Compare similarity of content
     
-    public func similarTo(note: Sketchnote) -> Double {
+    public func similarTo(note: NoteX) -> Double {
         var similarity = 0.0
-        if self.getTitle().lowercased() == note.getTitle().lowercased() {
+        if self.getName().lowercased() == note.getName().lowercased() {
             similarity += 0.2
         }
         for document in documents {
@@ -538,15 +422,6 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable, DocumentDelegate
                 if document.title.lowercased() == other.title.lowercased() {
                     similarity += 5
                 }
-                /*if let description = document.description, let otherDescription = other.description {
-                    let distance = description.levenshtein(otherDescription)
-                    if distance == 0 {
-                        similarity += 5
-                    }
-                    else {
-                        similarity += Double(5 * (1 / distance))
-                    }
-                }*/
                 if document.documentType == other.documentType {
                     similarity += 0.5
                     switch document.documentType {
@@ -578,66 +453,21 @@ class Sketchnote: Note, Equatable, DocumentVisitor, Comparable, DocumentDelegate
     }
     
     
-    public func mergeWith(note: Sketchnote) {
+    public func mergeWith(note: NoteX) {
         if note != self {
             for page in note.pages {
                 self.pages.append(page)
             }
             self.mergeTagsWith(note: note)
             self.setUpdateDate()
-            self.save()
-            
-            NotesManager.delete(note: note)
         }
     }
     
-    public func mergeTagsWith(note: Sketchnote) {
+    public func mergeTagsWith(note: NoteX) {
         for tag in note.tags {
             if !self.tags.contains(tag) {
                 self.tags.append(tag)
             }
-        }
-        self.save()
-    }
-}
-
-public enum HelpLinesType: Codable {
-    case None
-    case Horizontal
-    case Grid
-    
-    enum Key: CodingKey {
-        case rawValue
-    }
-    
-    enum CodingError: Error {
-        case unknownValue
-    }
-    
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: Key.self)
-        let rawValue = try container.decode(Int.self, forKey: .rawValue)
-        switch rawValue {
-        case 0:
-            self = .None
-        case 1:
-            self = .Horizontal
-        case 2:
-            self = .Grid
-        default:
-            throw CodingError.unknownValue
-        }
-    }
-    
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: Key.self)
-        switch self {
-        case .None:
-            try container.encode(0, forKey: .rawValue)
-        case .Horizontal:
-            try container.encode(1, forKey: .rawValue)
-        case .Grid:
-            try container.encode(2, forKey: .rawValue)
         }
     }
 }

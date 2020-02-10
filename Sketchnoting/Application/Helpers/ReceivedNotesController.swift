@@ -15,7 +15,7 @@ class ReceivedNotesController: NSObject, MCSessionDelegate {
     }
     
     func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
-        if let decodedNote = NotesManager.decodeNoteFromData(data: data) {
+        if let decodedNote = SKFileManager.decodeNoteFromData(data: data) {
             decodedNote.sharedByDevice = peerID.displayName
             DispatchQueue.main.async {
                 self.receivedNotes.append(decodedNote)
@@ -37,14 +37,14 @@ class ReceivedNotesController: NSObject, MCSessionDelegate {
     func session(_ session: MCSession, didFinishReceivingResourceWithName resourceName: String, fromPeer peerID: MCPeerID, at localURL: URL?, withError error: Error?) {
     }
     
-    var receivedNotes: [Sketchnote]!
+    var receivedNotes: [NoteX]!
     var peerID: MCPeerID!
     var mcSession: MCSession!
     var mcAdvertiserAssistant: MCAdvertiserAssistant?
     
     override init() {
         super.init()
-        receivedNotes = [Sketchnote]()
+        receivedNotes = [NoteX]()
         peerID = MCPeerID(displayName: UIDevice.current.name)
         mcSession = MCSession(peer: peerID, securityIdentity: nil, encryptionPreference: .required)
         mcSession.delegate = self

@@ -22,7 +22,7 @@ class HandwritingRecognizer {
         self.textRecognizerCloud = vision.cloudTextRecognizer(options: options)
     }
     
-    public func recognize(spellcheck: Bool = true, image: UIImage, handleFinish:@escaping ((_ success: Bool, _ param: TextData?)->())){
+    public func recognize(spellcheck: Bool = true, image: UIImage, handleFinish:@escaping ((_ success: Bool, _ param: NoteText?)->())){
         let visionImage = VisionImage(image: image)
         
         switch SettingsManager.textRecognitionSetting() {
@@ -32,8 +32,8 @@ class HandwritingRecognizer {
                     handleFinish(false, nil)
                     return
                 }
-                let textData = TextData(visionText: result, original: result.text, spellcheck: spellcheck)
-                handleFinish(true, textData)
+                let noteText = NoteText(visionText: result, spellcheck: spellcheck)
+                handleFinish(true, noteText)
             }
         case .CloudSparse:
             self.textRecognizerCloud = vision.cloudTextRecognizer()
@@ -43,8 +43,8 @@ class HandwritingRecognizer {
                     handleFinish(false, nil)
                     return
                 }
-                let textData = TextData(visionText: result, original: result.text, spellcheck: spellcheck)
-                handleFinish(true, textData)
+                let noteText = NoteText(visionText: result, spellcheck: spellcheck)
+                handleFinish(true, noteText)
             }
         case .CloudDense:
             let options = VisionCloudTextRecognizerOptions()
@@ -56,8 +56,8 @@ class HandwritingRecognizer {
                     handleFinish(false, nil)
                     return
                 }
-                let textData = TextData(visionText: result, original: result.text, spellcheck: spellcheck)
-                handleFinish(true, textData)
+                let noteText = NoteText(visionText: result, spellcheck: spellcheck)
+                handleFinish(true, noteText)
             }
         }
     }

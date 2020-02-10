@@ -13,7 +13,7 @@ import SwiftyJSON
 class BioPortalHelper {
     let apiKey = "79790f4e-3333-477a-b9c2-7c0a815a62e0"
     
-    func fetch(text: String, note: Sketchnote) {
+    func fetch(text: String, note: NoteX) {
         let parameters: Parameters = ["apikey": apiKey, "input": text]
         let headers: HTTPHeaders = [
             "Accept": "application/json"
@@ -38,11 +38,11 @@ class BioPortalHelper {
         }
     }
     
-    func fetchCHEBI(text: String, note: Sketchnote) {
+    func fetchCHEBI(text: String, note: NoteX) {
         self.annotate(text: text, ontology: "CHEBI", note: note)
     }
     
-    private func annotate(text: String, ontology: String, note: Sketchnote) {
+    private func annotate(text: String, ontology: String, note: NoteX) {
         let parameters: Parameters = ["apikey": apiKey, "text": text, "ontologies": ontology, "include": "prefLabel,definition"]
         let headers: HTTPHeaders = [
             "Accept": "application/json"
@@ -94,7 +94,7 @@ class BioPortalHelper {
         }
     }
     
-    private func fetchMoleculeImageForCHEBI(document: CHEBIDocument!, id: String, note: Sketchnote) {
+    private func fetchMoleculeImageForCHEBI(document: CHEBIDocument!, id: String, note: NoteX) {
         let regex = try? NSRegularExpression(pattern: "http://purl.obolibrary.org/obo/CHEBI_([0-9]*)", options: .caseInsensitive)
         if let match = regex?.firstMatch(in: id, options: [], range: NSRange(location: 0, length: id.utf16.count)) {
             if let valueRange = Range(match.range(at: 1), in: id) {

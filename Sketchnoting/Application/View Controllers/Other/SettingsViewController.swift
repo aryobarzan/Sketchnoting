@@ -65,9 +65,9 @@ class SettingsViewController: UITableViewController {
     @IBAction func backupNotesTapped(_ sender: UIButton) {
     }
     @IBAction func clearDataTapped(_ sender: UIButton) {
-        let alert = UIAlertController(title: "Clear Data", message: "Are you sure you want to delete all your notes? This is irreversible.", preferredStyle: .alert)
+        let alert = UIAlertController(title: "Clear Data", message: "Are you sure you want to delete all your notes? This is permanent.", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Clear", style: .destructive, handler: { action in
-              NotesManager.clearData()
+              SKFileManager.wipe()
               let banner = FloatingNotificationBanner(title: "Data Cleared", subtitle: "All notes and document resources on your device have been wiped.", style: .info)
               banner.show()
         }))

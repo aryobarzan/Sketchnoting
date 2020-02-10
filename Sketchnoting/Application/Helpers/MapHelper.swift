@@ -10,7 +10,7 @@ import UIKit
 import Alamofire
 
 class MapHelper {
-    static func fetchMap(location: String, document: Document, note: Sketchnote) {
+    static func fetchMap(location: String, document: Document, note: NoteX) {
         let parameters: Parameters = ["q": location, "maxRows": 1, "username": "aryo"]
         let headers: HTTPHeaders = [
                 "Accept": "application/json"
@@ -25,7 +25,7 @@ class MapHelper {
                 print(error.localizedDescription)
                 return
             }
-            print("GeoNames Coordinates: API call successful.")
+            log.info("GeoNames Coordinates: API call successful.")
                 
             let result = json
             let resources = result["geonames"] as? [[String: Any]]
@@ -37,11 +37,11 @@ class MapHelper {
                 }
             }
             else {
-                print("GeoNames Coordinates: API call failed.")
+                log.error("GeoNames Coordinates: API call failed.")
             }
         }
     }
-    static func fetchMapImage(latitude: String, longitude: String, document: Document, note: Sketchnote) {
+    static func fetchMapImage(latitude: String, longitude: String, document: Document, note: NoteX) {
         DispatchQueue.global().async {
             if let url = URL(string: "https://www.mapquestapi.com/staticmap/v5/map?key=bAELaFV3A8vNwICyhbziI7tNeSfYdUvr&center=" + latitude + "," + longitude + "&size=800,600") {
                 document.downloadImage(url: url, type: .Map)
