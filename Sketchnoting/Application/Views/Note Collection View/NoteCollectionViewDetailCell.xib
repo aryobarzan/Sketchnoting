@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="15705" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15706"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
@@ -144,26 +145,6 @@
                                 <color key="textColor" name="SketchnotingTextColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="imY-pe-E3U" customClass="UICircularProgressRing" customModule="UICircularProgressRing">
-                                <rect key="frame" x="332" y="46" width="30" height="30"/>
-                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="30" id="RXI-0W-zFQ"/>
-                                    <constraint firstAttribute="height" constant="30" id="csr-ad-c1t"/>
-                                </constraints>
-                                <userDefinedRuntimeAttributes>
-                                    <userDefinedRuntimeAttribute type="number" keyPath="outerRingWidth">
-                                        <real key="value" value="1"/>
-                                    </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="boolean" keyPath="shouldShowValueText" value="NO"/>
-                                    <userDefinedRuntimeAttribute type="color" keyPath="innerRingColor">
-                                        <color key="value" systemColor="systemPurpleColor" red="0.68627450980000004" green="0.32156862749999998" blue="0.87058823529999996" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                    </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="number" keyPath="innerRingWidth">
-                                        <real key="value" value="2"/>
-                                    </userDefinedRuntimeAttribute>
-                                </userDefinedRuntimeAttributes>
-                            </view>
                         </subviews>
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
@@ -171,7 +152,6 @@
                             <constraint firstItem="k0v-ST-wt7" firstAttribute="leading" secondItem="sY4-k3-X1u" secondAttribute="leading" constant="8" id="DU8-Yk-jjf"/>
                             <constraint firstAttribute="trailing" secondItem="QZS-Fe-uVH" secondAttribute="trailing" constant="9" id="HO2-jF-Iyw"/>
                             <constraint firstItem="KVj-5V-WI4" firstAttribute="leading" secondItem="upo-Ij-hdB" secondAttribute="trailing" constant="8" id="HQM-PW-OXy"/>
-                            <constraint firstItem="QZS-Fe-uVH" firstAttribute="top" secondItem="imY-pe-E3U" secondAttribute="bottom" constant="4" id="I17-Kc-7Hq"/>
                             <constraint firstItem="QZS-Fe-uVH" firstAttribute="top" secondItem="upo-Ij-hdB" secondAttribute="bottom" constant="4" id="JFV-Y3-1Yc"/>
                             <constraint firstItem="iLB-Kh-kU4" firstAttribute="leading" secondItem="7Km-n8-Ck8" secondAttribute="trailing" constant="10" id="KfU-UN-PvY"/>
                             <constraint firstItem="srw-cZ-38I" firstAttribute="leading" secondItem="H9N-Sk-6vo" secondAttribute="trailing" constant="8" id="MJx-Fn-C9V"/>
@@ -185,7 +165,6 @@
                             <constraint firstItem="k0v-ST-wt7" firstAttribute="top" secondItem="3Bf-8B-bSK" secondAttribute="bottom" constant="7" id="XY5-4B-hEN"/>
                             <constraint firstItem="QZS-Fe-uVH" firstAttribute="top" secondItem="KVj-5V-WI4" secondAttribute="bottom" constant="4" id="Yyx-ud-Bwp"/>
                             <constraint firstAttribute="bottom" secondItem="QZS-Fe-uVH" secondAttribute="bottom" constant="7" id="bV5-QR-ITp"/>
-                            <constraint firstItem="J89-fd-1Fn" firstAttribute="leading" secondItem="imY-pe-E3U" secondAttribute="trailing" constant="8" id="f10-Q1-geS"/>
                             <constraint firstItem="QZS-Fe-uVH" firstAttribute="top" secondItem="iLB-Kh-kU4" secondAttribute="bottom" constant="4" id="f3P-L5-bug"/>
                             <constraint firstAttribute="bottom" secondItem="H9N-Sk-6vo" secondAttribute="bottom" constant="35" id="fhp-JY-cXe"/>
                             <constraint firstItem="QZS-Fe-uVH" firstAttribute="top" secondItem="J89-fd-1Fn" secondAttribute="bottom" constant="4" id="lol-g9-ApT"/>
@@ -216,7 +195,6 @@
                 <outlet property="editTitleButton" destination="J89-fd-1Fn" id="FiZ-tu-Mpd"/>
                 <outlet property="sendButton" destination="hm8-pl-JWC" id="KrF-08-0j4"/>
                 <outlet property="shareButton" destination="KVj-5V-WI4" id="wKk-gh-VUH"/>
-                <outlet property="similarityWeightProgressRing" destination="imY-pe-E3U" id="YU3-ng-E1J"/>
                 <outlet property="tagsLabel" destination="QZS-Fe-uVH" id="U4z-D5-NKv"/>
                 <outlet property="titleLabel" destination="PJ2-PF-qai" id="sh5-jE-0Sg"/>
                 <outlet property="updatedLabel" destination="srw-cZ-38I" id="srP-9j-4O6"/>

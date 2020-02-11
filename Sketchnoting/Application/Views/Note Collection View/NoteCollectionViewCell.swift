@@ -7,13 +7,11 @@
 //
 
 import UIKit
-import UICircularProgressRing
 
 class NoteCollectionViewCell: UICollectionViewCell {
     @IBOutlet weak var imageView: UIImageView!
     @IBOutlet weak var titleBackgroundView: UIView!
     @IBOutlet weak var titleLabel: UILabel!
-    @IBOutlet weak var similarityWeightProgressRing: UICircularProgressRing!
     
     var file: File?
         
@@ -35,12 +33,5 @@ class NoteCollectionViewCell: UICollectionViewCell {
             self.imageView.image = image
         }
         titleLabel.text = file.getName()
-        similarityWeightProgressRing.isHidden = true
-    }
-    
-    func showSimilarityRing(weight: Double, max: Double) {
-        similarityWeightProgressRing.maxValue = CGFloat(max)
-        similarityWeightProgressRing.value = CGFloat(weight)
-        similarityWeightProgressRing.isHidden = false
     }
 }

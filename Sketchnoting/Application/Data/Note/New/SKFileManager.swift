@@ -208,6 +208,15 @@ class SKFileManager {
         return true
     }
     
+    public static func add(folder: Folder) -> Bool {
+        if self.folders.contains(folder) {
+            return false
+        }
+        self.folders.append(folder)
+        self.save(file: folder)
+        return true
+    }
+    
     public static func importNoteFile(url: URL) -> NoteX? {
         do {
             let data = try Data(contentsOf: url)

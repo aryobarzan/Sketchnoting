@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="15505" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="15705" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15510"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15706"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -43,41 +43,30 @@
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                             </textView>
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" userInteractionEnabled="NO" contentMode="scaleToFill" editable="NO" text="Documents: ..." textAlignment="natural" selectable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="oMi-8X-zgd">
-                                <rect key="frame" x="4" y="125" width="326" height="55"/>
+                                <rect key="frame" x="4" y="125" width="326" height="75"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                             </textView>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="0.0" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6WZ-N0-p1j">
-                                <rect key="frame" x="8" y="184" width="175" height="16"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="175" id="P4L-Au-28K"/>
-                                </constraints>
-                                <fontDescription key="fontDescription" type="italicSystem" pointSize="13"/>
-                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <nil key="highlightedColor"/>
-                            </label>
                         </subviews>
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="jt0-ib-6qp" firstAttribute="top" secondItem="Qm4-yi-XYi" secondAttribute="top" constant="7" id="2or-IG-Hks"/>
-                            <constraint firstItem="6WZ-N0-p1j" firstAttribute="top" secondItem="oMi-8X-zgd" secondAttribute="bottom" constant="4" id="367-vw-Kle"/>
+                            <constraint firstItem="oMi-8X-zgd" firstAttribute="top" secondItem="Dzg-Ac-oUf" secondAttribute="bottom" constant="8" id="3Gq-D1-kDV"/>
                             <constraint firstItem="Dzg-Ac-oUf" firstAttribute="top" secondItem="eax-EF-gpl" secondAttribute="bottom" constant="2" id="53q-Lo-NIP"/>
-                            <constraint firstItem="oMi-8X-zgd" firstAttribute="top" secondItem="Dzg-Ac-oUf" secondAttribute="bottom" constant="8" id="88y-4w-b4i"/>
                             <constraint firstItem="oMi-8X-zgd" firstAttribute="leading" secondItem="Qm4-yi-XYi" secondAttribute="leading" constant="4" id="E5Y-R3-sLU"/>
                             <constraint firstItem="eax-EF-gpl" firstAttribute="top" secondItem="Qm4-yi-XYi" secondAttribute="top" constant="7" id="IpO-Ah-APo"/>
                             <constraint firstAttribute="height" constant="208" id="JEo-yA-RR1"/>
                             <constraint firstAttribute="trailing" secondItem="Dzg-Ac-oUf" secondAttribute="trailing" constant="14" id="R7M-dh-7hf"/>
+                            <constraint firstAttribute="bottom" secondItem="oMi-8X-zgd" secondAttribute="bottom" constant="8" id="S3h-Af-A53"/>
                             <constraint firstItem="oMi-8X-zgd" firstAttribute="top" secondItem="jt0-ib-6qp" secondAttribute="bottom" constant="8" id="Tk6-f8-5Hi"/>
                             <constraint firstItem="Dzg-Ac-oUf" firstAttribute="leading" secondItem="jt0-ib-6qp" secondAttribute="trailing" constant="2" id="XLv-jJ-FHF"/>
                             <constraint firstAttribute="trailing" secondItem="eax-EF-gpl" secondAttribute="trailing" constant="8" id="ZcL-aR-zBX"/>
                             <constraint firstItem="jt0-ib-6qp" firstAttribute="leading" secondItem="Qm4-yi-XYi" secondAttribute="leading" constant="8" id="aHD-UA-5Xu"/>
-                            <constraint firstItem="6WZ-N0-p1j" firstAttribute="leading" secondItem="Qm4-yi-XYi" secondAttribute="leading" constant="8" id="agF-tk-EeF"/>
                             <constraint firstAttribute="width" constant="334" id="bjQ-W1-djV"/>
                             <constraint firstItem="eax-EF-gpl" firstAttribute="leading" secondItem="jt0-ib-6qp" secondAttribute="trailing" constant="8" id="iSh-hO-uaP"/>
                             <constraint firstAttribute="trailing" secondItem="oMi-8X-zgd" secondAttribute="trailing" constant="4" id="kRW-kh-Z08"/>
-                            <constraint firstAttribute="bottom" secondItem="6WZ-N0-p1j" secondAttribute="bottom" constant="8" id="p87-M5-xVr"/>
                         </constraints>
                     </view>
                 </subviews>
@@ -94,7 +83,6 @@
                 <outlet property="documentsTextView" destination="oMi-8X-zgd" id="Pus-Kq-Xes"/>
                 <outlet property="noteTextView" destination="Dzg-Ac-oUf" id="Omo-BW-nCy"/>
                 <outlet property="previewImageView" destination="jt0-ib-6qp" id="2pP-XZ-CaJ"/>
-                <outlet property="similarityRatingLabel" destination="6WZ-N0-p1j" id="eeM-Mi-l2h"/>
                 <outlet property="titleLabel" destination="eax-EF-gpl" id="iFt-KN-NhH"/>
             </connections>
             <point key="canvasLocation" x="337.68115942028987" y="181.47321428571428"/>

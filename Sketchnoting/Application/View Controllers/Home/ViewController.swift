@@ -33,41 +33,18 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     @IBOutlet var newNoteButton: UIButton!
     @IBOutlet var noteLoadingIndicator: NVActivityIndicatorView!
     
-    @IBOutlet var searchField: UITextField!
-    @IBOutlet var searchFiltersScrollView: UIScrollView!
-    @IBOutlet var searchFiltersStackView: UIStackView!
-    @IBOutlet var searchTypeButton: UIButton!
-    private var searchType = SearchType.All
-    @IBOutlet var searchPanelButton: UIButton!
-    @IBOutlet var clearSearchButton: UIButton!
     @IBOutlet var noteListViewButton: UIButton!
     @IBOutlet weak var filtersButton: UIButton!
     @IBOutlet weak var receivedNotesButton: UIButton!
     var receivedNotesBadge: BadgeHub!
     
-    @IBOutlet var searchPanel: UIView!
     @IBOutlet var noteSortingButton: UIButton!
-    @IBOutlet var searchPanelHeightConstraint: NSLayoutConstraint!
-    var searchPanelIsOpen = false
-    @IBOutlet weak var searchFiltersPanel: UIView!
-    
-    @IBOutlet var drawingSearchPanel: UIView!
-    @IBOutlet var clearDrawingSearchButton: UIButton!
-    @IBOutlet var drawingSearchButton: UIButton!
-    @IBOutlet var drawingSearchCanvas: PKCanvasView!
-    @IBOutlet var blurView: UIVisualEffectView!
-    
     
     @IBOutlet weak var clearSimilarNotesButton: UIButton!
     @IBOutlet weak var similarNotesTitleLabel: UILabel!
     
     var activeFiltersBadge: BadgeHub!
     var activeSearchFiltersBadge: BadgeHub!
-    
-    // Each search term entered is stored.
-    var searchFilters = [SearchFilter]()
-    // Each search term is displayed as a button, which when tapped, removes the search term.
-    var searchFilterViews = [SearchFilterView]()
         
     // This properties are related to note-sharing.
     // Each device is given an ID (peerID).
@@ -91,13 +68,10 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     override func viewDidLoad() {
         super.viewDidLoad()
         self.navigationController?.setNavigationBarHidden(true, animated: false)
-        self.navigationController?.navigationBar.barStyle = .black
-        // Badge Hubs
+        self.tabBarController?.tabBar.isHidden = false
         
         activeFiltersBadge = BadgeHub(view: filtersButton)
-        activeSearchFiltersBadge = BadgeHub(view: searchPanelButton)
         activeFiltersBadge.scaleCircleSize(by: 0.45)
-        activeSearchFiltersBadge.scaleCircleSize(by: 0.45)
         
         receivedNotesBadge = BadgeHub(view: receivedNotesButton)
         receivedNotesBadge.scaleCircleSize(by: 0.45)
@@ -109,18 +83,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         
         noteListViewButton.layer.masksToBounds = true
         noteListViewButton.layer.cornerRadius = 5
-        
-        searchPanelHeightConstraint.constant = 0
-        
-        drawingSearchPanel.layer.masksToBounds = true
-        drawingSearchPanel.layer.cornerRadius = 5
-        drawingSearchCanvas.tool = PKInkingTool(.pen, color: .black, width: 75)
-        self.drawingSearchPanel.alpha = 0.0
-        
-        self.blurView.alpha = 0.0
-        
-        // The search views are setup, including the search field and the pop-up view for searching by drawing
-        self.searchField.delegate = self
         
         noteCollectionView.register(UINib(nibName: "NoteCollectionViewCell", bundle: nil), forCellWithReuseIdentifier: reuseIdentifier)
         noteCollectionView.register(UINib(nibName: "NoteCollectionViewDetailCell", bundle: nil), forCellWithReuseIdentifier: reuseIdentifierDetailCell)
@@ -142,29 +104,15 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             self.newNoteButton.isEnabled = true
         }
         
-        
-        //Drawing Recognition - This loads the labels for the drawing recognition's CoreML model.
-        if let path = Bundle.main.path(forResource: "labels", ofType: "txt") {
-            do {
-                let data = try String(contentsOfFile: path, encoding: .utf8)
-                let labelNames = data.components(separatedBy: .newlines).filter { $0.count > 0 }
-                self.labelNames.append(contentsOf: labelNames)
-            } catch {
-                log.error("Failed to load labels for drawing recognition model: \(error)")
-            }
-        }
         let notificationCentre = NotificationCenter.default
         notificationCentre.addObserver(self, selector: #selector(self.notifiedImportSketchnote(_:)), name: NSNotification.Name(rawValue: Notifications.NOTIFICATION_IMPORT_NOTE), object: nil)
         notificationCentre.addObserver(self, selector: #selector(self.notifiedReceiveSketchnote(_:)), name: NSNotification.Name(rawValue: Notifications.NOTIFICATION_RECEIVE_NOTE), object: nil)
         notificationCentre.addObserver(self, selector: #selector(self.notifiedDeviceVisibility(_:)), name: NSNotification.Name(rawValue: Notifications.NOTIFICATION_DEVICE_VISIBILITY), object: nil)
-        
-        //Knowledge.refreshSimilarNotesGraph()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         self.navigationController?.setNavigationBarHidden(true, animated: true)
-        self.setNeedsStatusBarAppearanceUpdate()
         
         self.updateReceivedNotesButton()
     }
@@ -173,10 +121,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         self.updateDisplayedNotes(false)
         self.selectedNoteForTagEditing = nil
         activeFiltersBadge.setCount(TagsManager.filterTags.count)        
-    }
- 
-    override var preferredStatusBarStyle : UIStatusBarStyle {
-        return .lightContent
     }
     
     // Respond to NotificationCenter events
@@ -197,7 +141,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             receivedNotesButton.tintColor = UIColor.systemBlue
         }
         else {
-            receivedNotesButton.tintColor = UIColor.white
+            receivedNotesButton.tintColor = UIColor.systemGray
         }
         receivedNotesBadge.setCount(SKFileManager.receivedNotesController.receivedNotes.count)
     }
@@ -261,6 +205,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             }
             self.updateDisplayedNotes(false)
         }
+        self.tabBarController?.tabBar.isHidden = false
     }
     
     func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
@@ -287,32 +232,25 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         if let noteForSimilarityFilter = noteForSimilarityFilter, let similarNotes = similarNotes {
             self.items = [File]()
             self.items.append(noteForSimilarityFilter)
-            self.items.append(contentsOf: Array(similarNotes.keys))
+            self.items.append(contentsOf: similarNotes.map { $0.0 })
         }
         
-        /*var filteredNotesToRemove = [NoteX]()
+        var filteredNotesToRemove = [File]()
         if TagsManager.filterTags.count > 0 {
-            for note in self.items {
-                for tag in TagsManager.filterTags {
-                    if !note.tags.contains(tag) {
-                        filteredNotesToRemove.append(note)
-                        break
+            for file in self.items {
+                if file is Folder {
+                    filteredNotesToRemove.append(file)
+                }
+                else if let note = file as? NoteX {
+                    for tag in TagsManager.filterTags {
+                        if !note.tags.contains(tag) {
+                            filteredNotesToRemove.append(note)
+                            break
+                        }
                     }
                 }
             }
             self.items = self.items.filter { !filteredNotesToRemove.contains($0) }
-        }*/
-        
-        if searchFilters.count > 0 {
-            var searchedNotesToRemove = [File]()
-            for file in self.items {
-                if let n = file as? NoteX {
-                    if !n.applySearchFilters(filters: searchFilters) {
-                        searchedNotesToRemove.append(file)
-                    }
-                }
-            }
-            self.items = self.items.filter { !searchedNotesToRemove.contains($0) }
         }
         
         if SettingsManager.noteSortingByNewest() {
@@ -355,24 +293,17 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             })
         })
     }
-    
-    
-    // When the user taps Return on the on-screen keyboard when the search field is in focus, the entered text is used as a search term and the application runs the search.
-    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        // Hide the keyboard.
-        if textField.tag == 100 {
-            searchField.resignFirstResponder()
-            performSearch()
-        }
-        return true
-    }
 
     @IBAction func newNoteButtonTapped(_ sender: UIButton) {
-        clearSearch()
         let newNote = NoteX(name: "Untitled", parent: SKFileManager.currentFolder?.id, documents: nil)
         _ = SKFileManager.add(note: newNote)
         SKFileManager.activeNote = newNote
         performSegue(withIdentifier: "NewSketchnote", sender: self)
+    }
+    @IBAction func newFolderButtonTapped(_ sender: UIButton) {
+        let newFolder = Folder(name: "Untitled", parent: SKFileManager.currentFolder?.id)
+        _ = SKFileManager.add(folder: newFolder)
+        self.updateDisplayedNotes(false)
     }
     
     @IBAction func noteSortingTapped(_ sender: UIButton) {
@@ -405,7 +336,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
 
         return UIContextMenuConfiguration(identifier: nil, previewProvider: nil, actionProvider: { suggestedActions in
 
-            // "puppers" is the array backing the collection view
             return self.makeNoteContextMenu(file: self.items[indexPath.row], point: point, cellIndexPath: indexPath)
         })
     }
@@ -452,268 +382,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         }
         menuElements.append(deleteAction)
         return UIMenu(title: file.getName(), children: menuElements)
-    }
-    
-    // MARK: Search
-    
-    @IBAction func searchPanelButtonTapped(_ sender: UIButton) {
-        if searchPanelIsOpen {
-            self.collapseSearchPanel()
-        }
-        else {
-            self.expandSearchPanel()
-        }
-    }
-    
-    private func expandSearchPanel() {
-        self.view.layoutIfNeeded()
-        UIView.animate(withDuration: 0.25, delay: 0, animations: {
-            self.searchPanel.isHidden = false
-            self.searchPanelHeightConstraint.constant = 48
-            self.view.layoutIfNeeded()
-        }, completion: { (ended) in
-            self.expandSearchFiltersPanel()
-        })
-        searchPanelIsOpen = true
-    }
-    private func collapseSearchPanel() {
-        if self.searchPanelHeightConstraint.constant == 113 {
-            self.view.layoutIfNeeded()
-            UIView.animate(withDuration: 0.25, delay: 0, animations: {
-                self.searchPanelHeightConstraint.constant = 48
-                self.view.layoutIfNeeded()
-            }, completion: { (ended) in
-                self.searchFiltersPanel.isHidden = true
-                self.view.layoutIfNeeded()
-                UIView.animate(withDuration: 0.25, delay: 0, animations: {
-                    self.searchPanelHeightConstraint.constant = 0
-                    self.view.layoutIfNeeded()
-                }, completion: { (ended) in
-                    self.searchPanel.isHidden = true
-                })
-            })
-        }
-        else {
-            self.view.layoutIfNeeded()
-            UIView.animate(withDuration: 0.25, delay: 0, animations: {
-                self.searchPanelHeightConstraint.constant = 0
-                self.view.layoutIfNeeded()
-            }, completion: { (ended) in
-                self.searchPanel.isHidden = true
-            })
-        }
-        searchPanelIsOpen = false
-    }
-    
-    private func expandSearchFiltersPanel() {
-        if self.searchFilters.count > 0 {
-            self.view.layoutIfNeeded()
-            UIView.animate(withDuration: 0.25, delay: 0, animations: {
-                self.searchFiltersPanel.isHidden = false
-                self.searchPanelHeightConstraint.constant = 113
-                self.view.layoutIfNeeded()
-            }, completion: { (ended) in
-            })
-        }
-    }
-    private func collapseSearchFiltersPanel() {
-        if self.searchPanelHeightConstraint.constant == 113 {
-            self.view.layoutIfNeeded()
-            UIView.animate(withDuration: 0.25, delay: 0, animations: {
-                self.searchPanelHeightConstraint.constant = 48
-                self.view.layoutIfNeeded()
-            }, completion: { (ended) in
-                self.searchFiltersPanel.isHidden = true
-            })
-        }
-    }
-    
-    private func performSearch() {
-        if !searchField.text!.isEmpty {
-            let searchString = searchField.text!.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-            createSearchFilter(term: searchString, type: self.searchType)
-            clearSearchButton.isHidden = false
-            searchField.text = ""
-        }
-        if SKFileManager.notes.count == 0 || searchFilters.count == 0 {
-            self.clearSearch()
-        }
-        else {
-            clearSearchButton.isHidden = false
-            self.expandSearchFiltersPanel()
-            self.updateDisplayedNotes(false)
-        }
-        
-        activeSearchFiltersBadge.setCount(self.searchFilters.count)
-    }
-    
-    private func createSearchFilter(term: String, type: SearchType) {
-        let termTrimmed = term.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-        let filter = SearchFilter(term: termTrimmed, type: type)
-        if !searchFilters.contains(filter) {
-            let filterView = SearchFilterView(filter: filter)
-            filterView.setContent(filter: filter)
-            searchFiltersStackView.insertArrangedSubview(filterView, at: 0)
-            searchFilterViews.append(filterView)
-            filterView.isUserInteractionEnabled = true
-            let filterTapGesture = UITapGestureRecognizer(target: self, action: #selector(self.handleFilterTap(_:)))
-            filterTapGesture.cancelsTouchesInView = false
-            filterView.addGestureRecognizer(filterTapGesture)
-            
-            searchFilters.append(filter)
-        }
-    }
-    
-    // By pressing a search term, the search term is removed and the application re-runs the search with the remaining search terms.
-    @objc func handleFilterTap(_ sender: UITapGestureRecognizer) {
-        let filterView = sender.view as! SearchFilterView
-        if filterView.searchFilter != nil {
-            if searchFilters.contains(filterView.searchFilter!) {
-                searchFilters.removeAll{$0 == filterView.searchFilter!}
-            }
-        }
-        filterView.removeFromSuperview()
-        self.performSearch()
-    }
-    
-    @IBAction func drawingSearchButtonTapped(_ sender: UIButton) {
-        self.view.layoutIfNeeded()
-        UIView.animate(withDuration: 0.25, delay: 0.0, options: UIView.AnimationOptions.curveEaseIn, animations: {
-            self.drawingSearchPanel.alpha = 1.0
-            self.blurView.alpha = 1.0
-            self.blurView.isHidden = false
-            self.drawingSearchPanel.isHidden = false
-            self.view.layoutIfNeeded()
-        }, completion: nil)
-    }
-
-    @IBAction func clearSearchButtonTapped(_ sender: UIButton) {
-        clearSearch()
-    }
-
-    private func clearSearch() {
-        searchFilters = [SearchFilter]()
-        for view in searchFilterViews {
-            view.removeFromSuperview()
-        }
-        searchFilterViews = [SearchFilterView]()
-        clearSearchButton.isHidden = true
-        searchField.text = ""
-        
-        activeSearchFiltersBadge.setCount(0)
-        
-        self.updateDisplayedNotes(false)
-        self.collapseSearchFiltersPanel()
-    }
-    @IBAction func searchTypeButtonTapped(_ sender: UIButton) {
-        let popMenu = PopMenuViewController(sourceView: sender, actions: [PopMenuAction](), appearance: nil)
-        popMenu.appearance.popMenuBackgroundStyle = .blurred(.dark)
-        let allAction = PopMenuDefaultAction(title: "All", image: UIImage(systemName: "magnifyingglass.circle.fill"), didSelect: { action in
-            self.searchTypeButton.setImage(UIImage(systemName: "magnifyingglass.circle.fill"), for: .normal)
-            self.searchType = .All
-            
-        })
-        popMenu.addAction(allAction)
-        let textAction = PopMenuDefaultAction(title: "Text", image: UIImage(systemName: "text.alignleft"), didSelect: { action in
-            self.searchTypeButton.setImage(UIImage(systemName: "text.alignleft"), for: .normal)
-            self.searchType = .Text
-            
-        })
-        popMenu.addAction(textAction)
-        let drawingAction = PopMenuDefaultAction(title: "Drawing", image: UIImage(systemName: "scribble"), didSelect: { action in
-            self.searchTypeButton.setImage(UIImage(systemName: "scribble"), for: .normal)
-            self.searchType = .Drawing
-            
-        })
-        popMenu.addAction(drawingAction)
-        let documentAction = PopMenuDefaultAction(title: "Document", image: UIImage(systemName: "doc"), didSelect: { action in
-            self.searchTypeButton.setImage(UIImage(systemName: "doc"), for: .normal)
-            self.searchType = .Document
-            
-        })
-        popMenu.addAction(documentAction)
-        self.present(popMenu, animated: true, completion: nil)
-    }
-    
-    // MARK: Drawing Search
-    private func closeDrawingSearchPanel() {
-        self.view.layoutIfNeeded()
-        UIView.animate(withDuration: 0.25, delay: 0.0, options: UIView.AnimationOptions.curveEaseOut, animations: {
-            self.drawingSearchPanel.alpha = 0.0
-            self.blurView.alpha = 0.0
-        }, completion: { completed in
-            self.blurView.isHidden = true
-            self.drawingSearchPanel.isHidden = true
-             self.view.layoutIfNeeded()
-        })
-    }
-
-    @IBAction func blurViewTapped(_ sender: UITapGestureRecognizer) {
-        if sender.state == .ended {
-            if !drawingSearchPanel.isHidden {
-                 self.closeDrawingSearchPanel()
-            }
-        }
-    }
-    @IBAction func clearDrawingSearchTapped(_ sender: UIButton) {
-        drawingSearchCanvas.drawing = PKDrawing()
-    }
-    @IBAction func drawingSearchTapped(_ sender: UIButton) {
-        UITraitCollection(userInterfaceStyle: .dark).performAsCurrent {
-            let image = drawingSearchCanvas.drawing.image(from: drawingSearchCanvas.drawing.bounds, scale: 2)
-            let resized = image.resize(newSize: CGSize(width: 28, height: 28))
-            
-            guard let pixelBuffer = resized.grayScalePixelBuffer() else {
-                log.error("Failed to create pixel buffer.")
-                return
-            }
-            do {
-                currentPrediction = try drawnImageClassifier.prediction(image: pixelBuffer)
-            }
-            catch {
-                log.error("Prediction failed: \(error)")
-            }
-        }
-    }
-
-    
-    // Drawing recognition
-    private var labelNames: [String] = []
-    // THis variable is used to run predictions using the drawing recognition model.
-    // In this case, this model is used when the user searches by drawing. The user's drawing is fed to the recognition model.
-    // If the model recognizes the drawing with at least a >50% confidence, the drawing's label is used as a search term.
-    private let drawnImageClassifier = DrawnImageClassifier()
-    private var currentPrediction: DrawnImageClassifierOutput? {
-        didSet {
-            if let currentPrediction = currentPrediction {
-                
-                let sorted = currentPrediction.category_softmax_scores.sorted { $0.value > $1.value }
-                let top5 = sorted.prefix(5)
-                print(top5.map { $0.key + "(" + String($0.value) + ")"}.joined(separator: ", "))
-                var found = false
-                for (label, score) in top5 {
-                    if score > 0.5 {
-                        self.closeDrawingSearchPanel()
-                        if !searchPanelIsOpen {
-                            self.expandSearchPanel()
-                        }
-                        createSearchFilter(term: label, type: .Drawing)
-                        self.searchField.text = ""
-                        self.performSearch()
-                        found = true
-                        break
-                    }
-                }
-                if !found {
-                    let alert = UIAlertController(title: "No drawing recognized", message: "Try drawing again and make sure the drawing isn't too small.", preferredStyle: .alert)
-                    alert.addAction(UIAlertAction(title: "Okay", style: .cancel, handler: nil))
-                    self.present(alert, animated: true)
-                }
-            }
-            else {
-                print("Waiting for drawing...")
-            }
-        }
     }
     
     // Multipeer Connectivity - The following functions are related to the note-sharing feature.
@@ -804,21 +472,11 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         case .Grid:
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath as IndexPath) as! NoteCollectionViewCell
             cell.setFile(file: self.items[indexPath.item])
-            /*if noteForSimilarityFilter != nil && similarNotes != nil && similarityMax != nil {
-                if self.items[indexPath.item] != noteForSimilarityFilter! {
-                    cell.showSimilarityRing(weight: similarNotes![self.items[indexPath.item]]!, max: similarityMax!)
-                }
-            }*/
             return cell
         case .Detail:
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifierDetailCell, for: indexPath as IndexPath) as! NoteCollectionViewDetailCell
             cell.setFile(file: self.items[indexPath.item])
             cell.delegate = self
-            /*if noteForSimilarityFilter != nil && similarNotes != nil && similarityMax != nil {
-                if self.items[indexPath.item] != noteForSimilarityFilter! {
-                    cell.showSimilarityRing(weight: similarNotes![self.items[indexPath.item]]!, max: similarityMax!)
-                }
-            }*/
             return cell
         }
     }
@@ -841,14 +499,20 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             self.open(note: note)
         }
         else if let folder = file as? Folder {
-            // TODO
+            self.open(folder: folder)
         }
     }
     
-    private func open(note: NoteX) {
+    public func open(note: NoteX) {
         SKFileManager.activeNote = note
         self.performSegue(withIdentifier: "EditSketchnote", sender: self)
         log.info("Opening note.")
+    }
+    
+    private func open(folder: Folder) {
+        SKFileManager.currentFolder = folder
+        self.updateDisplayedNotes(false)
+        log.info("Opening folder.")
     }
     
     private func renameFile(file: File) {
@@ -876,24 +540,23 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     }
     
     var noteForSimilarityFilter: NoteX?
-    var similarNotes: [NoteX : Double]?
-    var similarityMax: Double?
+    var similarNotes: [(NoteX, Float)]?
     private func filterSimilarNotesFor(_ note: NoteX) {
-        /*similarNotes = Knowledge.getNotesSimilarTo(note)
-        if similarNotes != nil {
-            noteForSimilarityFilter = note
-            similarityMax = Array(similarNotes!.values).max()!
-            self.updateDisplayedNotes(false)
-            
-            
-            clearSimilarNotesButton.isHidden = false
-            similarNotesTitleLabel.text = "Showing similar notes for: " + note.getTitle()
-            similarNotesTitleLabel.isHidden = false
+        Knowledge.setupSimilarityMatrix()
+        similarNotes = Knowledge.similarNotesFor(note: note)
+        if let similarNotes = similarNotes {
+            if similarNotes.count > 1 {
+                self.noteForSimilarityFilter = note
+                self.updateDisplayedNotes(true)
+                clearSimilarNotesButton.isHidden = false
+                similarNotesTitleLabel.text = "Showing similar notes for: " + note.getName()
+                similarNotesTitleLabel.isHidden = false
+            }
+            else {
+                let banner = FloatingNotificationBanner(title: note.getName(), subtitle: "No similar notes could be found.", style: .info)
+                banner.show()
+            }
         }
-        else {
-            let banner = FloatingNotificationBanner(title: note.getTitle(), subtitle: "No similar notes could be found.", style: .info)
-            banner.show()
-        }*/
     }
     @IBAction func clearSimilarNotesTapped(_ sender: UIButton) {
         clearSimilarNotes()
@@ -902,7 +565,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     private func clearSimilarNotes() {
         noteForSimilarityFilter = nil
         similarNotes = nil
-        similarityMax = nil
         self.updateDisplayedNotes(false)
         clearSimilarNotesButton.isHidden = true
         similarNotesTitleLabel.isHidden = true

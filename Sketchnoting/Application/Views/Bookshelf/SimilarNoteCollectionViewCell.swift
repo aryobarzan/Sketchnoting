@@ -14,7 +14,6 @@ class SimilarNoteCollectionViewCell: UICollectionViewCell {
     @IBOutlet var titleLabel: UILabel!
     @IBOutlet var noteTextView: UITextView!
     @IBOutlet var documentsTextView: UITextView!
-    @IBOutlet var similarityRatingLabel: UILabel!
     
     var note: NoteX!
     override func awakeFromNib() {
@@ -24,7 +23,7 @@ class SimilarNoteCollectionViewCell: UICollectionViewCell {
            super.init(coder: aDecoder)
     }
        
-    func setNote(note: NoteX, similarityRating: Double) {
+    func setNote(note: NoteX) {
         self.note = note
            
         titleLabel.text = note.getName()
@@ -32,7 +31,6 @@ class SimilarNoteCollectionViewCell: UICollectionViewCell {
         note.getPreviewImage() { image in
             self.previewImageView.image = image
         }
-        similarityRatingLabel.text = "Similarity Rating: \(similarityRating)"
         
         var documentsText = "Documents: "
         for i in 0...note.documents.count-1 {

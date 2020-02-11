@@ -14,5 +14,4 @@ target 'Sketchnoting' do
   pod 'SVGKit'
   pod 'Repeat'
   pod 'MaterialComponents/BottomSheet'
-  pod 'UICircularProgressRing'
 end

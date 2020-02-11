@@ -38,6 +38,9 @@
 		9F65983D23EDD2FA00CDBE0C /* NoteTextComplete.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F65983C23EDD2FA00CDBE0C /* NoteTextComplete.swift */; };
 		9F65983F23EDD80B00CDBE0C /* HelpLinesType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F65983E23EDD80B00CDBE0C /* HelpLinesType.swift */; };
 		9F65984123EE1EE900CDBE0C /* SKFileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F65984023EE1EE900CDBE0C /* SKFileManager.swift */; };
+		9F65984823F315FE00CDBE0C /* SearchFilterCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F65984723F315FE00CDBE0C /* SearchFilterCollectionViewCell.swift */; };
+		9F65984B23F3175E00CDBE0C /* SearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F65984A23F3175E00CDBE0C /* SearchViewController.swift */; };
+		9F65984D23F3227300CDBE0C /* DrawingSearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F65984C23F3227300CDBE0C /* DrawingSearchViewController.swift */; };
 		9F75E448230C368F00488BBD /* NoteSharingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F75E447230C368F00488BBD /* NoteSharingViewController.swift */; };
 		9F75E44C230C583200488BBD /* NoteCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F75E44A230C583200488BBD /* NoteCollectionViewCell.swift */; };
 		9F75E44D230C583200488BBD /* NoteCollectionViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9F75E44B230C583200488BBD /* NoteCollectionViewCell.xib */; };
@@ -144,6 +147,9 @@
 		9F65983C23EDD2FA00CDBE0C /* NoteTextComplete.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteTextComplete.swift; sourceTree = "<group>"; };
 		9F65983E23EDD80B00CDBE0C /* HelpLinesType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpLinesType.swift; sourceTree = "<group>"; };
 		9F65984023EE1EE900CDBE0C /* SKFileManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SKFileManager.swift; sourceTree = "<group>"; };
+		9F65984723F315FE00CDBE0C /* SearchFilterCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchFilterCollectionViewCell.swift; sourceTree = "<group>"; };
+		9F65984A23F3175E00CDBE0C /* SearchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchViewController.swift; sourceTree = "<group>"; };
+		9F65984C23F3227300CDBE0C /* DrawingSearchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrawingSearchViewController.swift; sourceTree = "<group>"; };
 		9F75E447230C368F00488BBD /* NoteSharingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteSharingViewController.swift; sourceTree = "<group>"; };
 		9F75E44A230C583200488BBD /* NoteCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteCollectionViewCell.swift; sourceTree = "<group>"; };
 		9F75E44B230C583200488BBD /* NoteCollectionViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NoteCollectionViewCell.xib; sourceTree = "<group>"; };
@@ -276,6 +282,7 @@
 		9F5E89EA2391AF1B002FA8B2 /* View Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				9F65984923F3174A00CDBE0C /* Search */,
 				9F7BAFF4239C1D110045CD12 /* Home */,
 				9F7BAFF5239C1D230045CD12 /* Note Editing */,
 				9F5E89F12391CE5A002FA8B2 /* Documents Bookshelf */,
@@ -306,6 +313,15 @@
 				9F4B38C423EC76F400F87B61 /* DocumentPreviewViewController.swift */,
 			);
 			path = "Document Detail";
+			sourceTree = "<group>";
+		};
+		9F65984923F3174A00CDBE0C /* Search */ = {
+			isa = PBXGroup;
+			children = (
+				9F65984A23F3175E00CDBE0C /* SearchViewController.swift */,
+				9F65984C23F3227300CDBE0C /* DrawingSearchViewController.swift */,
+			);
+			path = Search;
 			sourceTree = "<group>";
 		};
 		9F75E449230C580300488BBD /* Note Collection View */ = {
@@ -377,6 +393,7 @@
 			children = (
 				9F92D11923217CFA00BC0E57 /* SearchFilterView.xib */,
 				9F92D11B23217D0500BC0E57 /* SearchFilterView.swift */,
+				9F65984723F315FE00CDBE0C /* SearchFilterCollectionViewCell.swift */,
 			);
 			path = Search;
 			sourceTree = "<group>";
@@ -760,12 +777,14 @@
 				9F4B38C323EB1E6D00F87B61 /* Notifications.swift in Sources */,
 				9F75E451230D8AE100488BBD /* SettingsManager.swift in Sources */,
 				9F75E482231410A100488BBD /* TAGMEHelper.swift in Sources */,
+				9F65984823F315FE00CDBE0C /* SearchFilterCollectionViewCell.swift in Sources */,
 				9FA6238B22D37213007ED794 /* BioPortalHelper.swift in Sources */,
 				9FA6239322DE30AC007ED794 /* SpotlightDocument.swift in Sources */,
 				9FD29C58223C3CF700CC969A /* UIImageExtensions.swift in Sources */,
 				9F00428923E9FB2600961636 /* BadgeHub.swift in Sources */,
 				9F65983B23EDD29300CDBE0C /* NoteTextBlock.swift in Sources */,
 				9F4B38C523EC76F400F87B61 /* DocumentPreviewViewController.swift in Sources */,
+				9F65984B23F3175E00CDBE0C /* SearchViewController.swift in Sources */,
 				9F65983723EDD15C00CDBE0C /* NoteTextElement.swift in Sources */,
 				9FA6238822CEA7FE007ED794 /* MapHelper.swift in Sources */,
 				9F4B38C123EA41C900F87B61 /* ReceivedNotesController.swift in Sources */,
@@ -797,6 +816,7 @@
 				9F0FC54923760E7600070FA0 /* NoteOptionsTableViewController.swift in Sources */,
 				9FFE07EA232A63BA00DBD0AC /* TagsManager.swift in Sources */,
 				9F4B38BF23EA3EE200F87B61 /* ReceivedNotesViewController.swift in Sources */,
+				9F65984D23F3227300CDBE0C /* DrawingSearchViewController.swift in Sources */,
 				9FD29C4E223998BC00CC969A /* UIViewControllerExtensions.swift in Sources */,
 				9FD29C472239588E00CC969A /* UIViewExtensions.swift in Sources */,
 				9FA8C000239B18BA00BAA42B /* TagsViewController.swift in Sources */,

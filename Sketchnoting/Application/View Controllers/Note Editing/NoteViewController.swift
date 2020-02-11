@@ -65,7 +65,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     override func viewDidLoad() {
         super.viewDidLoad()
         self.navigationController?.setNavigationBarHidden(true, animated: false)
-        
+        self.tabBarController?.tabBar.isHidden = true
 
         let storyboard = UIStoryboard(name: "Main", bundle: Bundle.main)
         self.documentsVC = storyboard.instantiateViewController(withIdentifier: "DocumentsViewController") as? DocumentsViewController
@@ -577,7 +577,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                         documentPreviewVC.imageView.image = doc[0].previewImage
                         documentPreviewVC.titleLabel.text = doc[0].title
                         documentPreviewVC.bodyTextView.text = doc[0].description
-
                     }
                 }
             }
@@ -909,7 +908,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseSimilarNoteIdentifier, for: indexPath as IndexPath) as! SimilarNoteCollectionViewCell
-        /*cell.setNote(note: self.relatedNotes[indexPath.item], similarityRating: SKFileManager.activeNote!.similarTo(note: self.relatedNotes[indexPath.item]))*/
+        cell.setNote(note: self.relatedNotes[indexPath.item])
         return cell
     }
     
@@ -1236,8 +1235,8 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     @IBOutlet var relatedNotesButton: UIButton!
     var relatedNotes = [NoteX]()
     
-    var similarityThreshold = 0.0
-    var highSimilarity = 10.0
+    var similarityThreshold: Float = 0.0
+    var highSimilarity: Float = 10.0
     @IBAction func documentsRelatedNotesSegmentChanged(_ sender: UISegmentedControl) {
         if sender.selectedSegmentIndex == 0 {
             relatedNotesView.isHidden = true
@@ -1253,20 +1252,19 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     }
     
     private func refreshRelatedNotes() {
-        self.relatedNotes = [NoteX]()
-        var allNotes = SKFileManager.notes
-        allNotes.removeAll{$0 == SKFileManager.activeNote!}
+        Knowledge.setupSimilarityMatrix()
+        let foundNotes = Knowledge.similarNotesFor(note: SKFileManager.activeNote!)
         var highSimilarityCount = 0
         var anySimilarityCount = 0
-        for note in allNotes {
-            let similarity = SKFileManager.activeNote!.similarTo(note: note)
-            if similarity > similarityThreshold {
-                relatedNotes.append(note)
+        self.relatedNotes = [NoteX]()
+        for (note, score) in foundNotes {
+            if score > similarityThreshold {
+                self.relatedNotes.append(note)
             }
-            if similarity > 0.0 {
+            if score > 0.0 {
                 anySimilarityCount += 1
             }
-            if similarity > highSimilarity {
+            if score > highSimilarity {
                 highSimilarityCount += 1
             }
         }

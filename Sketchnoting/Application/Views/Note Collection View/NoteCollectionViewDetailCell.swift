@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import UICircularProgressRing
 
 class NoteCollectionViewDetailCell: UICollectionViewCell {
     
@@ -21,7 +20,6 @@ class NoteCollectionViewDetailCell: UICollectionViewCell {
     @IBOutlet weak var sendButton: UIButton!
     @IBOutlet weak var copyTextButton: UIButton!
     @IBOutlet weak var deleteButton: UIButton!
-    @IBOutlet weak var similarityWeightProgressRing: UICircularProgressRing!
     
     var delegate : NoteCollectionViewDetailCellDelegate!
     
@@ -74,13 +72,6 @@ class NoteCollectionViewDetailCell: UICollectionViewCell {
             self.sendButton.isHidden = false
             self.copyTextButton.isHidden = false
         }
-        similarityWeightProgressRing.isHidden = true
-    }
-    
-    func showSimilarityRing(weight: Double, max: Double) {
-        similarityWeightProgressRing.maxValue = CGFloat(max)
-        similarityWeightProgressRing.value = CGFloat(weight)
-        similarityWeightProgressRing.isHidden = false
     }
     
     @IBAction func renameTapped(_ sender: UIButton) {
