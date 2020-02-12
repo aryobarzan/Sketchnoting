@@ -106,18 +106,9 @@ class NotePagesViewController: UIViewController, UICollectionViewDelegate, UICol
         }
     }
     
-    func collectionView(
-      _ collectionView: UICollectionView,
-      dropSessionDidUpdate session: UIDropSession,
-      withDestinationIndexPath destinationIndexPath: IndexPath?)
-      -> UICollectionViewDropProposal {
-      return UICollectionViewDropProposal(
-        operation: .move,
-        intent: .insertAtDestinationIndexPath)
+    func collectionView(_ collectionView: UICollectionView, dropSessionDidUpdate session: UIDropSession, withDestinationIndexPath destinationIndexPath: IndexPath?) -> UICollectionViewDropProposal {
+      return UICollectionViewDropProposal(operation: .move, intent: .insertAtDestinationIndexPath)
     }
-    
-    
-
 }
 
 protocol NotePagesDelegate {

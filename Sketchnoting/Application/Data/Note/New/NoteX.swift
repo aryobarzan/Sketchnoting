@@ -219,19 +219,20 @@ class NoteX: File, DocumentVisitor, DocumentDelegate {
                     isInText = true
                 }
                 var isInDrawings = false
-                    for page in pages {
-                                       if page.drawingLabels.contains(filter.term) {
-                                           matches += 1
-                                        isInDrawings = true
-                                           break
-                                       }
-                                   }
+                for page in pages {
+                    if page.drawingLabels.contains(filter.term) {
+                        matches += 1
+                        isInDrawings = true
+                        break
+                    }
+                }
                 if !isInText && !isInDrawings {
                     currentSearchFilter = filter
                     for doc in documents {
                         doc.accept(visitor: self)
                         if matchesSearch {
                             matches += 1
+                            break
                         }
                     }
                 }
@@ -255,6 +256,7 @@ class NoteX: File, DocumentVisitor, DocumentDelegate {
                     doc.accept(visitor: self)
                     if matchesSearch {
                         matches += 1
+                        break
                     }
                 }
                 break

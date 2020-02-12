@@ -120,7 +120,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         
         canvasView.bringSubviewToFront(drawingInsertionCanvas)
         
-        relatedNotesCollectionView.register(UINib(nibName: "SimilarNoteCollectionViewCell", bundle: nil), forCellWithReuseIdentifier: reuseSimilarNoteIdentifier)
+        relatedNotesCollectionView.register(UINib(nibName: "NoteCollectionViewCell", bundle: nil), forCellWithReuseIdentifier: reuseSimilarNoteIdentifier)
         relatedNotesCollectionView.delegate = self
         relatedNotesCollectionView.dataSource = self
         
@@ -282,7 +282,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         }
         self.helpLinesHorizontal = [HoritonzalHelpLine]()
         self.helpLinesVertical = [VerticalHelpLine]()
-        var height = CGFloat(20)
+        var height = CGFloat(30)
         while (CGFloat(height) < self.canvasView.bounds.height + 80) {
             let line = HoritonzalHelpLine(frame: CGRect(x: 0, y: height, width: UIScreen.main.bounds.width, height: 1))
             
@@ -290,9 +290,9 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             line.isHidden = true
             self.backdropView.addSubview(line)
             self.helpLinesHorizontal.append(line)
-            height = height + 20
+            height = height + 30
         }
-        var width = CGFloat(20)
+        var width = CGFloat(30)
         while (CGFloat(width) < UIScreen.main.bounds.width + 80) {
             let line = VerticalHelpLine(frame: CGRect(x: width, y: 0, width: 1, height: self.canvasView.bounds.height))
     
@@ -300,7 +300,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             line.isHidden = true
             self.backdropView.addSubview(line)
             self.helpLinesVertical.append(line)
-            width = width + 20
+            width = width + 30
         }
     }
     
@@ -487,7 +487,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         return nil
     }
     private func createScaledFrame(featureFrame: CGRect, imageSize: CGSize) -> CGRect {
-            let viewSize = canvasView.frame.size
+            let viewSize = canvasView.bounds.size
             
             let resolutionView = viewSize.width / viewSize.height
             let resolutionImage = imageSize.width / imageSize.height
@@ -692,7 +692,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         }
     }
     private func generateHandwritingRecognitionImage() -> UIImage {
-        var noteImage = canvasView.drawing.image(from: CGRect(x: canvasView.frame.minX, y: canvasView.frame.minY, width: canvasView.contentSize.width, height: canvasView.contentSize.height), scale: 1.0)
+        var noteImage = canvasView.drawing.image(from: canvasView.bounds, scale: 1.0)
         if UITraitCollection.current.userInterfaceStyle == .dark {
             log.info("Handwriting recognition image generation - dark mode detected, inverting image")
             noteImage = noteImage.invertedImage() ?? noteImage
@@ -900,15 +900,15 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     }
     
     // MARK: Documents Collection View
-    let reuseSimilarNoteIdentifier = "similarNoteCell"
+    let reuseSimilarNoteIdentifier = "NoteCollectionViewCell"
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return self.relatedNotes.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseSimilarNoteIdentifier, for: indexPath as IndexPath) as! SimilarNoteCollectionViewCell
-        cell.setNote(note: self.relatedNotes[indexPath.item])
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseSimilarNoteIdentifier, for: indexPath as IndexPath) as! NoteCollectionViewCell
+        cell.setFile(file: self.relatedNotes[indexPath.item])
         return cell
     }
     
@@ -1314,7 +1314,10 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         let storyboard = UIStoryboard(name: "Main", bundle: Bundle.main)
         let notePagesViewController = storyboard.instantiateViewController(withIdentifier: "NotePagesViewController") as! NotePagesViewController
         notePagesViewController.delegate = self
+        
         let bottomNotePagesSheet = MDCBottomSheetController(contentViewController: notePagesViewController)
+        bottomNotePagesSheet.dismissOnDraggingDownSheet = true
+        bottomNotePagesSheet.trackingScrollView = notePagesViewController.collectionView
         self.present(bottomNotePagesSheet, animated: true, completion: nil)
     }
 

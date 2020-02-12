@@ -41,7 +41,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             UserDefaults.settings.set(true, forKey: SettingsKeys.TextRecognitionCloud.rawValue)
             UserDefaults.settings.set(true, forKey: SettingsKeys.TextRecognitionCloudOption.rawValue)
         }
-        
         return true
     }
 

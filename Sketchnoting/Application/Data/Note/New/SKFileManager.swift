@@ -88,15 +88,7 @@ class SKFileManager {
         } catch {
             log.error("Error while enumerating files \(getNotesDirectory().path): \(error.localizedDescription)")
         }
-        if SettingsManager.noteSortingByNewest() {
-            log.info("Sorting notes by newest first.")
-            return notes.sorted(by: { (note0: NoteX, note1: NoteX) -> Bool in
-                return note0 > note1
-            })
-        }
-        else {
-            return notes.sorted()
-        }
+        return notes
     }
     private static func loadFolders() -> [Folder] {
         var folders = [Folder]()
@@ -115,15 +107,7 @@ class SKFileManager {
         } catch {
             log.error("Error while enumerating files \(getFoldersDirectory().path): \(error.localizedDescription)")
         }
-        if SettingsManager.noteSortingByNewest() {
-            log.info("Sorting folders by newest first.")
-            return folders.sorted(by: { (folder0: Folder, folder1: Folder) -> Bool in
-                return folder0 > folder1
-            })
-        }
-        else {
-            return folders.sorted()
-        }
+        return folders
     }
     
     public static func getCurrentFiles() -> [File] {

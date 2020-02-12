@@ -59,16 +59,13 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     // The two above variables are added to this following array and this array is sent to the receiving device(s)
     var dataToShare = [Data]()
     
-    // Similarly, a received note from some other device is stored here.
-    var receivedSketchnote: NoteX?
-    // The strokes linked to that received note are stored here.
-    var receivedPathArray: NSMutableArray?
-    
     // This function initializes the home page view.
     override func viewDidLoad() {
         super.viewDidLoad()
         self.navigationController?.setNavigationBarHidden(true, animated: false)
         self.tabBarController?.tabBar.isHidden = false
+        
+        
         
         activeFiltersBadge = BadgeHub(view: filtersButton)
         activeFiltersBadge.scaleCircleSize(by: 0.45)
@@ -90,14 +87,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         self.noteLoadingIndicator.startAnimating()
         self.newNoteButton.isEnabled = false
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            self.items = SKFileManager.getCurrentFiles()
-            self.noteCollectionView.reloadData()
-            let animations = [AnimationType.from(direction: .bottom, offset: 200.0)]
-            self.noteCollectionView.performBatchUpdates({
-                UIView.animate(views: self.noteCollectionView.orderedVisibleCells,
-                animations: animations, completion: {
-                })
-            })
+            self.updateDisplayedNotes(true)
             log.info("Files loaded.")
             self.noteLoadingIndicator.stopAnimating()
             self.noteLoadingIndicator.isHidden = true
@@ -108,6 +98,11 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         notificationCentre.addObserver(self, selector: #selector(self.notifiedImportSketchnote(_:)), name: NSNotification.Name(rawValue: Notifications.NOTIFICATION_IMPORT_NOTE), object: nil)
         notificationCentre.addObserver(self, selector: #selector(self.notifiedReceiveSketchnote(_:)), name: NSNotification.Name(rawValue: Notifications.NOTIFICATION_RECEIVE_NOTE), object: nil)
         notificationCentre.addObserver(self, selector: #selector(self.notifiedDeviceVisibility(_:)), name: NSNotification.Name(rawValue: Notifications.NOTIFICATION_DEVICE_VISIBILITY), object: nil)
+        
+        if noteCollectionViewState == .List {
+            noteListViewButton.backgroundColor = self.view.tintColor
+            noteListViewButton.tintColor = .white
+        }
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -253,15 +248,23 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             self.items = self.items.filter { !filteredNotesToRemove.contains($0) }
         }
         
-        if SettingsManager.noteSortingByNewest() {
+        switch SettingsManager.getFileSorting() {
+            
+        case .ByNewest:
             self.items = self.items.sorted(by: { (file0: File, file1: File) -> Bool in
                 return file0 > file1
             })
-        }
-        else {
+        case .ByOldest:
             self.items = self.items.sorted()
+        case .ByNameAZ:
+            self.items = self.items.sorted(by: { (file0: File, file1: File) -> Bool in
+                return file0.getName() < file1.getName()
+            })
+        case .ByNameZA:
+            self.items = self.items.sorted(by: { (file0: File, file1: File) -> Bool in
+                return file0.getName() > file1.getName()
+            })
         }
-       
         noteCollectionView.reloadData()
         if animated {
             let animations = [AnimationType.from(direction: .bottom, offset: 200.0)]
@@ -276,11 +279,13 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     @IBAction func noteListViewButtonTapped(_ sender: UIButton) {
         switch self.noteCollectionViewState {
         case .Grid:
-            self.noteCollectionViewState = .Detail
+            self.noteCollectionViewState = .List
+            SettingsManager.setFileDisplayLayout(type: .List)
             sender.backgroundColor = self.view.tintColor
             sender.tintColor = .white
-        case .Detail:
+        case .List:
             self.noteCollectionViewState = .Grid
+            SettingsManager.setFileDisplayLayout(type: .Grid)
             sender.backgroundColor = .clear
             sender.tintColor = self.view.tintColor
         }
@@ -312,23 +317,39 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         
         var newestFirstImage: UIImage? = nil
         var oldestFirstImage: UIImage? = nil
-        if SettingsManager.noteSortingByNewest() {
+        var nameAZFirstImage: UIImage? = nil
+        var nameZAFirstImage: UIImage? = nil
+        switch SettingsManager.getFileSorting() {
+        case .ByNewest:
             newestFirstImage = UIImage(systemName: "checkmark.circle.fill")
-        }
-        else {
+        case .ByOldest:
             oldestFirstImage = UIImage(systemName: "checkmark.circle.fill")
+        case .ByNameAZ:
+            nameAZFirstImage = UIImage(systemName: "checkmark.circle.fill")
+        case .ByNameZA:
+            nameZAFirstImage = UIImage(systemName: "checkmark.circle.fill")
         }
         let newestFirstAction = PopMenuDefaultAction(title: "Newest First", image: newestFirstImage,  didSelect: { action in
-            UserDefaults.settings.set(true, forKey: SettingsKeys.NoteSortingByNewest.rawValue)
+            SettingsManager.setFileSorting(type: .ByNewest)
             self.updateDisplayedNotes(false)
             
         })
         popMenu.addAction(newestFirstAction)
         let oldestFirstAction = PopMenuDefaultAction(title: "Oldest First", image: oldestFirstImage, didSelect: { action in
-            UserDefaults.settings.set(false, forKey: SettingsKeys.NoteSortingByNewest.rawValue)
+            SettingsManager.setFileSorting(type: .ByOldest)
             self.updateDisplayedNotes(false)
         })
         popMenu.addAction(oldestFirstAction)
+        let nameAZAction = PopMenuDefaultAction(title: "Alphabetically (A-Z)", image: nameAZFirstImage, didSelect: { action in
+            SettingsManager.setFileSorting(type: .ByNameAZ)
+            self.updateDisplayedNotes(false)
+        })
+        popMenu.addAction(nameAZAction)
+        let nameZAAction = PopMenuDefaultAction(title: "Alphabetically (Z-A)", image: nameZAFirstImage, didSelect: { action in
+            SettingsManager.setFileSorting(type: .ByNameZA)
+            self.updateDisplayedNotes(false)
+        })
+        popMenu.addAction(nameZAAction)
         
         self.present(popMenu, animated: true, completion: nil)
     }
@@ -452,12 +473,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         print("Joining sessions...")
     }
     
-    // MARK: Note Collection View
-    private enum NoteCollectionViewState : String {
-        case Grid
-        case Detail
-    }
-    private var noteCollectionViewState = NoteCollectionViewState.Grid
+    private var noteCollectionViewState = SettingsManager.getFileDisplayLayout()
     
     @IBOutlet weak var noteCollectionView: UICollectionView!
     let reuseIdentifier = "NoteCollectionViewCell" // also enter this string as the cell identifier in the storyboard
@@ -473,7 +489,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath as IndexPath) as! NoteCollectionViewCell
             cell.setFile(file: self.items[indexPath.item])
             return cell
-        case .Detail:
+        case .List:
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifierDetailCell, for: indexPath as IndexPath) as! NoteCollectionViewDetailCell
             cell.setFile(file: self.items[indexPath.item])
             cell.delegate = self
@@ -487,7 +503,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         switch self.noteCollectionViewState {
         case .Grid:
             return CGSize(width: CGFloat(200), height: CGFloat(300))
-        case .Detail:
+        case .List:
             return CGSize(width: collectionView.bounds.size.width - CGFloat(10), height: CGFloat(105))
         }
         

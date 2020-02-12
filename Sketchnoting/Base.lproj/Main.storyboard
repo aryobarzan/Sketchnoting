@@ -584,7 +584,6 @@
                                 </constraints>
                             </view>
                         </subviews>
-                        <color key="backgroundColor" red="0.26051741839999998" green="0.2605243921" blue="0.260520637" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
                             <constraint firstItem="CoV-ID-6VL" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="2Cm-yr-FvP"/>
                             <constraint firstItem="hut-mJ-mJj" firstAttribute="bottom" secondItem="6Tk-OE-BBY" secondAttribute="bottom" id="5UW-JY-C8u"/>
@@ -632,11 +631,8 @@
                     <tabBarItem key="tabBarItem" title="Home" image="house.fill" catalog="system" id="zLQ-EK-YyN"/>
                     <toolbarItems/>
                     <nil key="simulatedTopBarMetrics"/>
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="JFo-VG-TvB">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translucent="NO" id="JFo-VG-TvB">
                         <autoresizingMask key="autoresizingMask"/>
-                        <textAttributes key="titleTextAttributes">
-                            <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                        </textAttributes>
                     </navigationBar>
                     <nil name="viewControllers"/>
                     <connections>
@@ -2207,7 +2203,7 @@
                                             <subviews>
                                                 <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="9NU-kW-WNa">
                                                     <rect key="frame" x="0.0" y="0.0" width="180" height="240"/>
-                                                    <color key="backgroundColor" systemColor="systemGrayColor" red="0.5568627451" green="0.5568627451" blue="0.57647058819999997" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="240" id="Xys-Eo-AvE"/>
                                                         <constraint firstAttribute="width" constant="180" id="oLZ-xE-CXF"/>
@@ -2709,6 +2705,7 @@
                 <tabBarController automaticallyAdjustsScrollViewInsets="NO" id="c3X-aa-9QU" sceneMemberID="viewController">
                     <toolbarItems/>
                     <tabBar key="tabBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="Mjd-LF-zzB">
+                        <rect key="frame" x="0.0" y="0.0" width="1000" height="1000"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     </tabBar>
@@ -2770,7 +2767,7 @@
     </resources>
     <inferredMetricsTieBreakers>
         <segue reference="yvs-ei-HRy"/>
-        <segue reference="58e-4d-iJp"/>
+        <segue reference="OAt-q3-0jJ"/>
         <segue reference="ct4-u7-KZY"/>
     </inferredMetricsTieBreakers>
 </document>
