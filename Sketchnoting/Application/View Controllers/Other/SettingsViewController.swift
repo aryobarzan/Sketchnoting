@@ -15,11 +15,17 @@ class SettingsViewController: UITableViewController {
     @IBOutlet var automaticAnnotationSwitch: UISwitch!
     @IBOutlet var pencilSideButtonSegmentedControl: UISegmentedControl!
     @IBOutlet var textRecognitionSegmentedControl: UISegmentedControl!
+    @IBOutlet var tagmeSwitch: UISwitch!
+    @IBOutlet var bioportalSwitch: UISwitch!
+    @IBOutlet var chebiSwitch: UISwitch!
     override func viewDidLoad() {
         super.viewDidLoad()
         self.navigationController?.setNavigationBarHidden(false, animated: false)
         
         automaticAnnotationSwitch.setOn(SettingsManager.automaticAnnotation(), animated: false)
+        tagmeSwitch.setOn(SettingsManager.getAnnotatorStatus(annotator: .TAGME), animated: false)
+        bioportalSwitch.setOn(SettingsManager.getAnnotatorStatus(annotator: .BioPortal), animated: false)
+        chebiSwitch.setOn(SettingsManager.getAnnotatorStatus(annotator: .CHEBI), animated: false)
         pencilSideButtonSegmentedControl.selectedSegmentIndex = UserDefaults.settings.integer(forKey: SettingsKeys.PencilSideButtonDoubleTap.rawValue)
         switch SettingsManager.textRecognitionSetting() {
         case .OnDevice:
@@ -40,6 +46,15 @@ class SettingsViewController: UITableViewController {
     
     @IBAction func automaticAnnotationSwitchChanged(_ sender: UISwitch) {
         UserDefaults.settings.set(sender.isOn, forKey: SettingsKeys.AutomaticAnnotation.rawValue)
+    }
+    @IBAction func tagmeSwitchChanged(_ sender: UISwitch) {
+        SettingsManager.setAnnotatorStatus(annotator: .TAGME, status: sender.isOn)
+    }
+    @IBAction func bioportalSwitchChanged(_ sender: UISwitch) {
+        SettingsManager.setAnnotatorStatus(annotator: .BioPortal, status: sender.isOn)
+    }
+    @IBAction func chebiSwitchChanged(_ sender: UISwitch) {
+        SettingsManager.setAnnotatorStatus(annotator: .CHEBI, status: sender.isOn)
     }
     @IBAction func pencilSideButtonSegmentedControlChanged(_ sender: UISegmentedControl) {
         UserDefaults.settings.set(sender.selectedSegmentIndex, forKey: SettingsKeys.PencilSideButtonDoubleTap.rawValue)

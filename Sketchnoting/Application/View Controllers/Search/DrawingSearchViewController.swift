@@ -48,19 +48,21 @@ class DrawingSearchViewController: UIViewController, PKCanvasViewDelegate {
         canvasView.drawing = PKDrawing()
     }
     
-    func canvasViewDidEndUsingTool(_ canvasView: PKCanvasView) {
-        let image = canvasView.drawing.image(from: canvasView.frame, scale: 2.0)
-        let resized = image.resize(newSize: CGSize(width: 28, height: 28))
-        
-        guard let pixelBuffer = resized.grayScalePixelBuffer() else {
-            log.error("Failed to create pixel buffer.")
-            return
-        }
-        do {
-            currentPrediction = try drawnImageClassifier.prediction(image: pixelBuffer)
-        }
-        catch {
-            log.error("Prediction failed: \(error)")
+    func canvasViewDrawingDidChange(_ canvasView: PKCanvasView) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+            let image = canvasView.asImage()
+            let resized = image.resize(newSize: CGSize(width: 28, height: 28))
+            
+            guard let pixelBuffer = resized.grayScalePixelBuffer() else {
+                log.error("Failed to create pixel buffer.")
+                return
+            }
+            do {
+                self.currentPrediction = try self.drawnImageClassifier.prediction(image: pixelBuffer)
+            }
+            catch {
+                log.error("Prediction failed: \(error)")
+            }
         }
     }
     

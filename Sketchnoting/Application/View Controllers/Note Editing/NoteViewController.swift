@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import PencilKit
 
 import Firebase
 import PopMenu
@@ -15,8 +16,7 @@ import Repeat
 import NotificationBannerSwift
 import ViewAnimator
 import MaterialComponents.MaterialBottomSheet
-
-import PencilKit
+import Connectivity
 
 class NoteViewController: UIViewController, UIPencilInteractionDelegate, UICollectionViewDataSource, UICollectionViewDelegate, NoteXDelegate, PKCanvasViewDelegate, PKToolPickerObserver, UIScreenshotServiceDelegate, NoteOptionsDelegate, DocumentsViewControllerDelegate, BookshelfOptionsDelegate, NotePagesDelegate {
     
@@ -42,8 +42,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     @IBOutlet var activityIndicator: UIActivityIndicatorView!
     @IBOutlet var documentsUnderlyingView: UIView!
         
-    var helpLinesHorizontal = [HoritonzalHelpLine]()
-    var helpLinesVertical = [VerticalHelpLine]()
     @IBOutlet weak var helpLinesButton: UIButton!
     
     @IBOutlet weak var bookshelfSegmentedControl: UISegmentedControl!
@@ -60,6 +58,8 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     var conceptHighlights = [UIView : [Document]]()
     
     var isDeletingNote = false
+    
+    var gridView: GridView?
     
     // This function sets up the page and every element contained within it.
     override func viewDidLoad() {
@@ -80,7 +80,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         
         self.bookshelfLeftDragView.curveTopCorners(size: 5)
         
-        canvasView.drawing = PKDrawing()
+        self.canvasView.drawing = SKFileManager.activeNote!.getCurrentPage().canvasDrawing
         canvasView.allowsFingerDrawing = false
         canvasView.delegate = self
         if let window = parent?.view.window {
@@ -103,7 +103,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             }
         }
         
-        setupHelpLines()
         self.rightScreenSidePanGesture.edges = [.right]
         self.topicsBadgeHub = BadgeHub(view: topicsButton)
         self.topicsBadgeHub.scaleCircleSize(by: 0.55)
@@ -131,16 +130,14 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     
     override func viewWillAppear(_ animated: Bool) {
         SKFileManager.activeNote!.delegate = self
-        
+        updatePaginationButtons()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
         setupConceptHighlights()
         setupDrawingRegions()
-          
-        self.canvasView.drawing = SKFileManager.activeNote!.getCurrentPage().canvasDrawing
-        updatePaginationButtons()
-        
         self.refreshHelpLines()
         self.refreshHelpLinesButton()
-        
         self.refreshRelatedNotes()
         self.updateTopicsCount()
     }
@@ -157,7 +154,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         
         switch(segue.identifier ?? "") {
         case "Placeholder":
-            print("Placeholder")
+            log.info("Placeholder")
             break
         case "CloseNote":
             if !isDeletingNote {
@@ -168,12 +165,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                     saveTimer!.invalidate()
                 }
                 documentsVC.bookshelfUpdateTimer?.reset(nil)
-                for helpLine in self.helpLinesHorizontal {
-                    helpLine.removeFromSuperview()
-                }
-                for helpLine in self.helpLinesVertical {
-                    helpLine.removeFromSuperview()
-                }
                 if topicsShown {
                     toggleConceptHighlight()
                 }
@@ -259,9 +250,14 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) { // Handle screen orientation change
         super.viewWillTransition(to: size, with: coordinator)
-        self.refreshHelpLines()
+        if let gridView = gridView {
+            gridView.removeFromSuperview()
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            self.refreshHelpLines()
+        }
     }
-    
+        
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
         var drawingViewBorderColor = UIColor.black.cgColor
@@ -271,68 +267,21 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         for drawingRegionView in drawingViews {
             drawingRegionView.layer.borderColor = drawingViewBorderColor
         }
-    }
-    
-    private func setupHelpLines() {
-        for helpLine in self.helpLinesHorizontal {
-            helpLine.removeFromSuperview()
-        }
-        for helpLine in self.helpLinesVertical {
-            helpLine.removeFromSuperview()
-        }
-        self.helpLinesHorizontal = [HoritonzalHelpLine]()
-        self.helpLinesVertical = [VerticalHelpLine]()
-        var height = CGFloat(30)
-        while (CGFloat(height) < self.canvasView.bounds.height + 80) {
-            let line = HoritonzalHelpLine(frame: CGRect(x: 0, y: height, width: UIScreen.main.bounds.width, height: 1))
-            
-            line.isUserInteractionEnabled = false
-            line.isHidden = true
-            self.backdropView.addSubview(line)
-            self.helpLinesHorizontal.append(line)
-            height = height + 30
-        }
-        var width = CGFloat(30)
-        while (CGFloat(width) < UIScreen.main.bounds.width + 80) {
-            let line = VerticalHelpLine(frame: CGRect(x: width, y: 0, width: 1, height: self.canvasView.bounds.height))
-    
-            line.isUserInteractionEnabled = false
-            line.isHidden = true
-            self.backdropView.addSubview(line)
-            self.helpLinesVertical.append(line)
-            width = width + 30
-        }
+        self.refreshHelpLines()
     }
     
     private func refreshHelpLines() {
-        self.setupHelpLines()
-        
-        switch SKFileManager.activeNote!.helpLinesType {
-        case .None:
-            for helpLine in self.helpLinesHorizontal {
-                helpLine.isHidden = true
-            }
-            for helpLine in self.helpLinesVertical {
-                helpLine.isHidden = true
-            }
-            break
-        case .Horizontal:
-            for helpLine in self.helpLinesHorizontal {
-                helpLine.isHidden = false
-            }
-            for helpLine in self.helpLinesVertical {
-                helpLine.isHidden = true
-            }
-            break
-        case .Grid:
-            for helpLine in self.helpLinesHorizontal {
-                helpLine.isHidden = false
-            }
-            for helpLine in self.helpLinesVertical {
-                helpLine.isHidden = false
-            }
-            break
+        if let gridView = gridView {
+            gridView.removeFromSuperview()
         }
+        gridView = GridView(frame: self.backdropView.frame)
+        gridView!.backgroundColor = .clear
+        if traitCollection.userInterfaceStyle == .light {
+            gridView!.lineColor = .black
+        }
+        self.backdropView.addSubview(gridView!)
+        self.gridView!.type = SKFileManager.activeNote!.helpLinesType
+        gridView!.draw(self.backdropView.frame)
         refreshHelpLinesButton()
     }
     
@@ -344,27 +293,15 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         switch SKFileManager.activeNote!.helpLinesType {
         case .None:
             SKFileManager.activeNote!.helpLinesType = .Horizontal
-            for line in helpLinesHorizontal {
-                line.isHidden = false
-            }
-            for line in helpLinesVertical {
-                line.isHidden = true
-            }
             break
         case .Horizontal:
             SKFileManager.activeNote!.helpLinesType = .Grid
-            for line in helpLinesHorizontal {
-                line.isHidden = false
-            }
-            for line in helpLinesVertical {
-                line.isHidden = false
-            }
             break
         case .Grid:
             SKFileManager.activeNote!.helpLinesType = .None
-            hideAllHelpLines()
             break
         }
+        refreshHelpLines()
         refreshHelpLinesButton()
         SKFileManager.save(file: SKFileManager.activeNote!)
     }
@@ -387,11 +324,8 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     }
 
     private func hideAllHelpLines() {
-        for line in helpLinesHorizontal {
-            line.isHidden = true
-        }
-        for line in helpLinesVertical {
-            line.isHidden = true
+        if let gridView = gridView {
+            gridView.removeFromSuperview()
         }
     }
     
@@ -700,14 +634,34 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         return noteImage
     }
     
+    var connectivity: Connectivity?
     func annotateText(text: String) {
         self.activityIndicator.stopAnimating()
         self.clearConceptHighlights()
         
-        DispatchQueue.global(qos: .background).async {
-            self.tagmeHelper.fetch(text: text, note: SKFileManager.activeNote!)
-            self.bioportalHelper.fetch(text: text, note: SKFileManager.activeNote!)
-            self.bioportalHelper.fetchCHEBI(text: text, note: SKFileManager.activeNote!)
+        connectivity = Connectivity()
+        connectivity!.framework = .network
+        connectivity!.checkConnectivity { connectivity in
+            log.info("Checking Internet connection.")
+            switch connectivity.status {
+                case .connected, .connectedViaWiFi, .connectedViaCellular:
+                    log.info("Internet Connection detected.")
+                    DispatchQueue.global(qos: .background).async {
+                        if SettingsManager.getAnnotatorStatus(annotator: .TAGME) {
+                            self.tagmeHelper.fetch(text: text, note: SKFileManager.activeNote!)
+                        }
+                        if SettingsManager.getAnnotatorStatus(annotator: .BioPortal) {
+                            self.bioportalHelper.fetch(text: text, note: SKFileManager.activeNote!)
+                        }
+                        if SettingsManager.getAnnotatorStatus(annotator: .CHEBI) {
+                            self.bioportalHelper.fetchCHEBI(text: text, note: SKFileManager.activeNote!)
+                        }
+                    }
+                    break
+                default:
+                    log.info("Internet Connection not detected.")
+                    break
+            }
         }
     }
     
@@ -1236,7 +1190,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     var relatedNotes = [NoteX]()
     
     var similarityThreshold: Float = 0.0
-    var highSimilarity: Float = 10.0
+    var highSimilarity: Float = 1.0
     @IBAction func documentsRelatedNotesSegmentChanged(_ sender: UISegmentedControl) {
         if sender.selectedSegmentIndex == 0 {
             relatedNotesView.isHidden = true
@@ -1344,65 +1298,5 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     }
     @IBAction func canvasUpSwiped(_ sender: UISwipeGestureRecognizer) {
         showNotePagesBottomSheet()
-    }
-}
-
-
-
-public class HoritonzalHelpLine: UIView  {
-    
-    
-    public init() {
-        super.init(frame: CGRect(x: 0, y: 0, width: 320, height: 480))
-        backgroundColor = .clear
-    }
-    
-    public required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    public override init(frame: CGRect) {
-        super.init(frame: frame)
-        backgroundColor = .clear
-    }
-    
-    public override func draw(_ rect: CGRect) {
-        guard let context = UIGraphicsGetCurrentContext() else { return }
-        context.setLineWidth(2.0)
-        context.setStrokeColor(#colorLiteral(red: 0.8374180198, green: 0.8374378085, blue: 0.8374271393, alpha: 1))
-        if UITraitCollection.current.userInterfaceStyle == .dark {
-            context.setStrokeColor(#colorLiteral(red: 0.5704585314, green: 0.5704723597, blue: 0.5704649091, alpha: 1))
-        }
-        context.move(to: CGPoint(x: 0, y: 0))
-        context.addLine(to: CGPoint(x: self.frame.width, y: 0))
-        context.strokePath()
-    }
-}
-public class VerticalHelpLine: UIView  {
-        
-    public init() {
-        super.init(frame: CGRect(x: 0, y: 0, width: 320, height: 480))
-        backgroundColor = .clear
-    }
-    
-    public required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    public override init(frame: CGRect) {
-        super.init(frame: frame)
-        backgroundColor = .clear
-    }
-    
-    public override func draw(_ rect: CGRect) {
-        guard let context = UIGraphicsGetCurrentContext() else { return }
-        context.setLineWidth(2.0)
-        context.setStrokeColor(#colorLiteral(red: 0.8374180198, green: 0.8374378085, blue: 0.8374271393, alpha: 1))
-        if UITraitCollection.current.userInterfaceStyle == .dark {
-            context.setStrokeColor(#colorLiteral(red: 0.5704585314, green: 0.5704723597, blue: 0.5704649091, alpha: 1))
-        }
-        context.move(to: CGPoint(x: 0, y: 0))
-        context.addLine(to: CGPoint(x: 0, y: self.frame.height))
-        context.strokePath()
     }
 }

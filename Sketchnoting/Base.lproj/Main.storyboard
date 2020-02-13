@@ -39,7 +39,7 @@
                                                         <action selector="automaticAnnotationSwitchChanged:" destination="9zg-b6-ctU" eventType="valueChanged" id="j08-Er-AvQ"/>
                                                     </connections>
                                                 </switch>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="The app recognizes your handwriting and fetches related documents in the background as you are writing." textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Xvt-qH-fSd">
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="The app recognizes your handwriting and annotates in the background as you are writing." textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Xvt-qH-fSd">
                                                     <rect key="frame" x="20" y="40" width="670" height="25"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                     <fontDescription key="fontDescription" style="UICTFontTextStyleFootnote"/>
@@ -57,17 +57,126 @@
                                     </tableViewCell>
                                 </cells>
                             </tableViewSection>
+                            <tableViewSection headerTitle="Annotators" id="Gkg-cy-zVV">
+                                <cells>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" rowHeight="70" id="VAV-iu-kNd">
+                                        <rect key="frame" x="0.0" y="154" width="712" height="70"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="VAV-iu-kNd" id="eCt-0X-LQ7">
+                                            <rect key="frame" x="0.0" y="0.0" width="712" height="70"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="TAGME (Recommended)" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="3cy-GG-uJh">
+                                                    <rect key="frame" x="20" y="11" width="188.5" height="21"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="BgV-Kh-M93">
+                                                    <rect key="frame" x="641" y="6" width="51" height="31"/>
+                                                    <connections>
+                                                        <action selector="tagmeSwitchChanged:" destination="9zg-b6-ctU" eventType="valueChanged" id="Oi7-Nf-tSM"/>
+                                                    </connections>
+                                                </switch>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="General information retrieved from Wikipedia, including maps." textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="qMV-X1-xzj">
+                                                    <rect key="frame" x="20" y="40" width="670" height="25"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <fontDescription key="fontDescription" style="UICTFontTextStyleFootnote"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="3cy-GG-uJh" firstAttribute="top" secondItem="eCt-0X-LQ7" secondAttribute="topMargin" id="J16-J7-uT4"/>
+                                                <constraint firstAttribute="trailing" secondItem="BgV-Kh-M93" secondAttribute="trailing" constant="22" id="aGK-Nj-lm0"/>
+                                                <constraint firstItem="BgV-Kh-M93" firstAttribute="top" secondItem="eCt-0X-LQ7" secondAttribute="top" constant="6" id="dAJ-ji-bxd"/>
+                                                <constraint firstItem="3cy-GG-uJh" firstAttribute="leading" secondItem="eCt-0X-LQ7" secondAttribute="leadingMargin" id="kKT-k1-pua"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" rowHeight="70" id="TSQ-0E-nhj">
+                                        <rect key="frame" x="0.0" y="224" width="712" height="70"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="TSQ-0E-nhj" id="iEl-74-Ujv">
+                                            <rect key="frame" x="0.0" y="0.0" width="712" height="70"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="BioPortal" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="FPP-CA-oQs">
+                                                    <rect key="frame" x="20" y="11" width="69.5" height="21"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="LdY-yR-OsO">
+                                                    <rect key="frame" x="641" y="6" width="51" height="31"/>
+                                                    <connections>
+                                                        <action selector="bioportalSwitchChanged:" destination="9zg-b6-ctU" eventType="valueChanged" id="5Wc-4J-t28"/>
+                                                    </connections>
+                                                </switch>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Biology-related web resources." textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="oVN-Y4-ogg">
+                                                    <rect key="frame" x="20" y="40" width="670" height="25"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <fontDescription key="fontDescription" style="UICTFontTextStyleFootnote"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="FPP-CA-oQs" firstAttribute="top" secondItem="iEl-74-Ujv" secondAttribute="topMargin" id="9Gh-55-wxy"/>
+                                                <constraint firstItem="LdY-yR-OsO" firstAttribute="top" secondItem="iEl-74-Ujv" secondAttribute="top" constant="6" id="EHI-os-oqN"/>
+                                                <constraint firstItem="FPP-CA-oQs" firstAttribute="leading" secondItem="iEl-74-Ujv" secondAttribute="leadingMargin" id="Mja-R2-JLE"/>
+                                                <constraint firstAttribute="trailing" secondItem="LdY-yR-OsO" secondAttribute="trailing" constant="22" id="Ttf-ed-Uhf"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" rowHeight="70" id="e9d-Ld-RGo">
+                                        <rect key="frame" x="0.0" y="294" width="712" height="70"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="e9d-Ld-RGo" id="fXP-UW-zV3">
+                                            <rect key="frame" x="0.0" y="0.0" width="712" height="70"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="CHEBI" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="1Jf-rv-MKQ">
+                                                    <rect key="frame" x="20" y="11" width="49" height="21"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Vlz-Q3-7hh">
+                                                    <rect key="frame" x="641" y="6" width="51" height="31"/>
+                                                    <connections>
+                                                        <action selector="chebiSwitchChanged:" destination="9zg-b6-ctU" eventType="valueChanged" id="qPR-Fq-thd"/>
+                                                    </connections>
+                                                </switch>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Chemistry-related web resources, including images of molecule structures." textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="KVB-YR-Piu">
+                                                    <rect key="frame" x="20" y="40" width="670" height="25"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <fontDescription key="fontDescription" style="UICTFontTextStyleFootnote"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="Vlz-Q3-7hh" firstAttribute="top" secondItem="fXP-UW-zV3" secondAttribute="top" constant="6" id="HDh-nz-2aX"/>
+                                                <constraint firstItem="1Jf-rv-MKQ" firstAttribute="leading" secondItem="fXP-UW-zV3" secondAttribute="leadingMargin" id="VPO-h0-gwT"/>
+                                                <constraint firstItem="1Jf-rv-MKQ" firstAttribute="top" secondItem="fXP-UW-zV3" secondAttribute="topMargin" id="ajP-Zu-kTc"/>
+                                                <constraint firstAttribute="trailing" secondItem="Vlz-Q3-7hh" secondAttribute="trailing" constant="22" id="mUT-9x-ccP"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                </cells>
+                            </tableViewSection>
                             <tableViewSection headerTitle="Apple Pencil (2nd Gen.)" id="dwn-np-DMw">
                                 <cells>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" rowHeight="100" id="99Z-mE-RB5">
-                                        <rect key="frame" x="0.0" y="154" width="712" height="100"/>
+                                        <rect key="frame" x="0.0" y="420" width="712" height="100"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="99Z-mE-RB5" id="gl0-jM-dr8">
                                             <rect key="frame" x="0.0" y="0.0" width="712" height="100"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Side Button Double-Tap" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="C8w-mE-3y9">
-                                                    <rect key="frame" x="20" y="11" width="182" height="21"/>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="Side Button Double-Tap" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="C8w-mE-3y9">
+                                                    <rect key="frame" x="20" y="11" width="200" height="21"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
@@ -98,7 +207,7 @@
                             <tableViewSection headerTitle="For testing only (Cloud Dense yields the best results)" id="2To-3X-cV7">
                                 <cells>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" rowHeight="100" id="CUQ-lh-XRA">
-                                        <rect key="frame" x="0.0" y="310" width="712" height="100"/>
+                                        <rect key="frame" x="0.0" y="576" width="712" height="100"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="CUQ-lh-XRA" id="EjF-7R-sc4">
                                             <rect key="frame" x="0.0" y="0.0" width="712" height="100"/>
@@ -135,7 +244,7 @@
                             <tableViewSection headerTitle="Manage your data" footerTitle="Clearing data will delete all your notes and cached document resources." id="7gD-oF-Arh">
                                 <cells>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" rowHeight="100" id="eH1-ZN-Yjj">
-                                        <rect key="frame" x="0.0" y="466" width="712" height="100"/>
+                                        <rect key="frame" x="0.0" y="732" width="712" height="100"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="eH1-ZN-Yjj" id="x3Q-rp-Seq">
                                             <rect key="frame" x="0.0" y="0.0" width="712" height="100"/>
@@ -193,7 +302,10 @@
                     <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" prompted="NO"/>
                     <connections>
                         <outlet property="automaticAnnotationSwitch" destination="Csy-l9-mh1" id="G3N-cT-oxo"/>
+                        <outlet property="bioportalSwitch" destination="LdY-yR-OsO" id="7yg-4G-xWK"/>
+                        <outlet property="chebiSwitch" destination="Vlz-Q3-7hh" id="3eo-2f-k20"/>
                         <outlet property="pencilSideButtonSegmentedControl" destination="8Sn-sq-rPx" id="Dev-LW-PNh"/>
+                        <outlet property="tagmeSwitch" destination="BgV-Kh-M93" id="rtm-1D-ksd"/>
                         <outlet property="textRecognitionSegmentedControl" destination="To0-14-nYX" id="3dV-Z0-IFv"/>
                     </connections>
                 </tableViewController>
@@ -2022,7 +2134,7 @@
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <textField opaque="NO" tag="101" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="OWB-7G-1Cd">
+                            <textField opaque="NO" tag="101" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Enter your search term(s)" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="OWB-7G-1Cd">
                                 <rect key="frame" x="20" y="69" width="670" height="34"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits"/>

@@ -36,6 +36,12 @@ class SettingsManager {
         let type = FileDisplayLayout(rawValue: typeString)
         return type ?? FileDisplayLayout.Grid
     }
+    public static func setAnnotatorStatus(annotator: Annotator, status: Bool) {
+        UserDefaults.annotators.set(status, forKey: annotator.rawValue)
+    }
+    public static func getAnnotatorStatus(annotator: Annotator) -> Bool {
+        return UserDefaults.annotators.bool(forKey: annotator.rawValue)
+    }
     public static func pencilSideButton() -> PencilSideButtonKeys {
         switch UserDefaults.settings.integer(forKey: SettingsKeys.PencilSideButtonDoubleTap.rawValue) {
             case 0:
@@ -83,6 +89,11 @@ public enum FileSorting: String {
 public enum FileDisplayLayout: String {
     case Grid = "Grid"
     case List = "List"
+}
+public enum Annotator: String {
+    case TAGME = "TAGME"
+    case BioPortal = "BioPortal"
+    case CHEBI = "CHEBI"
 }
 public enum PencilSideButtonKeys : String {
     case ManageDrawings
