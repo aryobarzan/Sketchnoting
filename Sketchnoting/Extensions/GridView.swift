@@ -50,34 +50,6 @@ class GridView: UIView {
                         width = width + 30
                 }
             }
-            
-            
-            /*numberOfColumns = Int(rect.width / 30) + 1
-            let columnWidth = Int(rect.width) / (numberOfColumns + 1)
-            for i in 1...numberOfColumns {
-                var startPoint = CGPoint.zero
-                var endPoint = CGPoint.zero
-                startPoint.x = CGFloat(columnWidth * i)
-                startPoint.y = 0.0
-                endPoint.x = startPoint.x
-                endPoint.y = frame.size.height
-                context.move(to: CGPoint(x: startPoint.x, y: startPoint.y))
-                context.addLine(to: CGPoint(x: endPoint.x, y: endPoint.y))
-                context.strokePath()
-            }
-
-            let rowHeight = Int(rect.height) / (numberOfRows + 1)
-            for j in 1...numberOfRows {
-                var startPoint = CGPoint.zero
-                var endPoint = CGPoint.zero
-                startPoint.x = 0.0
-                startPoint.y = CGFloat(rowHeight * j)
-                endPoint.x = frame.size.width
-                endPoint.y = startPoint.y
-                context.move(to: CGPoint(x: startPoint.x, y: startPoint.y))
-                context.addLine(to: CGPoint(x: endPoint.x, y: endPoint.y))
-                context.strokePath()
-            }*/
         }
     }
 }

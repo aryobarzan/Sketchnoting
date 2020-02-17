@@ -26,7 +26,12 @@ import MobileCoreServices
 // It also contains note collection views, which in turn contain sketchnote views.
 
 //This controller handles all interactions of the user on the home page, including creating new note collections and new notes, searching, sharing notes, and generating pdfs from notes.
-class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextFieldDelegate, MCSessionDelegate, MCBrowserViewControllerDelegate, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, NoteCollectionViewDetailCellDelegate, UIApplicationDelegate, UIPopoverPresentationControllerDelegate, UIDocumentPickerDelegate {
+class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextFieldDelegate, MCSessionDelegate, MCBrowserViewControllerDelegate, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, NoteCollectionViewDetailCellDelegate, UIApplicationDelegate, UIPopoverPresentationControllerDelegate, UIDocumentPickerDelegate, FolderButtonDelegate {
+    
+    @IBOutlet weak var navigationHierarchyScrollView: UIScrollView!
+    @IBOutlet weak var navigationHierarchyStackView: UIStackView!
+    private var folderButtons = [FolderButton]()
+    private var spacerView = UIView()
     
     private var selectedNoteForTagEditing: NoteX?
     
@@ -88,6 +93,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         self.newNoteButton.isEnabled = false
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             self.updateDisplayedNotes(true)
+            self.updateFoldersHierarchy()
             log.info("Files loaded.")
             self.noteLoadingIndicator.stopAnimating()
             self.noteLoadingIndicator.isHidden = true
@@ -274,6 +280,36 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
                 })
             })
         }
+    }
+    
+    private func updateFoldersHierarchy() {
+        for button in folderButtons {
+            button.removeFromSuperview()
+        }
+        folderButtons = [FolderButton]()
+        let homeButton = FolderButton()
+        homeButton.frame = CGRect(x: 0, y: 0, width: 100, height: 35)
+        homeButton.setFolder(folder: nil)
+        homeButton.delegate = self
+        navigationHierarchyStackView.addArrangedSubview(homeButton)
+        folderButtons.append(homeButton)
+        for f in SKFileManager.currentFoldersHierarchy {
+            let folderButton = FolderButton()
+            folderButton.frame = CGRect(x: 0, y: 0, width: 100, height: 35)
+            folderButton.setFolder(folder: f)
+            folderButton.delegate = self
+            navigationHierarchyStackView.addArrangedSubview(folderButton)
+            folderButtons.append(folderButton)
+        }
+        spacerView.removeFromSuperview()
+        spacerView.setContentHuggingPriority(.defaultLow, for: .horizontal)
+        navigationHierarchyStackView.addArrangedSubview(spacerView)
+    }
+    
+    func onTap(folder: Folder?) {
+        SKFileManager.setCurrentFolder(folder: folder)
+        self.updateDisplayedNotes(false)
+        self.updateFoldersHierarchy()
     }
     
     @IBAction func noteListViewButtonTapped(_ sender: UIButton) {
@@ -526,8 +562,9 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     }
     
     private func open(folder: Folder) {
-        SKFileManager.currentFolder = folder
+        SKFileManager.setCurrentFolder(folder: folder)
         self.updateDisplayedNotes(false)
+        self.updateFoldersHierarchy()
         log.info("Opening folder.")
     }
     

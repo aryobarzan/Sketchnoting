@@ -12,6 +12,7 @@ import Kingfisher
 
 class SKFileManager {
     static var currentFolder: Folder?
+    static var currentFoldersHierarchy = [Folder]()
     static var folders = loadFolders()
     static var notes = loadNotes()
     static var activeNote: NoteX?
@@ -261,5 +262,27 @@ class SKFileManager {
         
         let cache = ImageCache.default
         cache.clearDiskCache{ log.info("KingFisher image cache cleared.") }
+    }
+    
+    // MARK: Folder traversal
+    public static func setCurrentFolder(folder: Folder?) {
+        currentFolder = folder
+        currentFoldersHierarchy = [Folder]()
+        if let folder = folder {
+            currentFoldersHierarchy.append(folder)
+            if folder.parent != nil {
+                var parent = getFolder(id: folder.parent!)
+                while parent != nil {
+                    currentFoldersHierarchy.append(parent!)
+                    if parent!.parent != nil {
+                        parent = getFolder(id: parent!.parent!)
+                    }
+                    else {
+                        parent = nil
+                    }
+                }
+            }
+        }
+        currentFoldersHierarchy = currentFoldersHierarchy.reversed()
     }
 }

@@ -13,6 +13,7 @@
 		9F0FC54923760E7600070FA0 /* NoteOptionsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0FC54823760E7600070FA0 /* NoteOptionsTableViewController.swift */; };
 		9F10EC162347D64C005340AA /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 9F10EC152347D64C005340AA /* Kingfisher */; };
 		9F10EC192347E4B4005340AA /* SwiftyBeaver in Frameworks */ = {isa = PBXBuildFile; productRef = 9F10EC182347E4B4005340AA /* SwiftyBeaver */; };
+		9F18E7A823FB4F1600543D78 /* FolderButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F18E7A723FB4F1600543D78 /* FolderButton.swift */; };
 		9F2C00062351123700D53EE9 /* SwiftyJSON in Frameworks */ = {isa = PBXBuildFile; productRef = 9F2C00052351123700D53EE9 /* SwiftyJSON */; };
 		9F2C00092351126800D53EE9 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 9F2C00082351126800D53EE9 /* Alamofire */; };
 		9F4B38BD23EA3D8500F87B61 /* ReceivedNoteCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F4B38BC23EA3D8500F87B61 /* ReceivedNoteCollectionViewCell.swift */; };
@@ -124,6 +125,7 @@
 		9F05B5A2232BF0C800983AF2 /* NoteCollectionViewDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteCollectionViewDetailCell.swift; sourceTree = "<group>"; };
 		9F05BC7E23761C4A00D49A88 /* NoteTextViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteTextViewController.swift; sourceTree = "<group>"; };
 		9F0FC54823760E7600070FA0 /* NoteOptionsTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteOptionsTableViewController.swift; sourceTree = "<group>"; };
+		9F18E7A723FB4F1600543D78 /* FolderButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderButton.swift; sourceTree = "<group>"; };
 		9F4B38BC23EA3D8500F87B61 /* ReceivedNoteCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceivedNoteCollectionViewCell.swift; sourceTree = "<group>"; };
 		9F4B38BE23EA3EE200F87B61 /* ReceivedNotesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceivedNotesViewController.swift; sourceTree = "<group>"; };
 		9F4B38C023EA41C900F87B61 /* ReceivedNotesController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceivedNotesController.swift; sourceTree = "<group>"; };
@@ -261,10 +263,10 @@
 		9F5010CA22491F8900425424 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				9FB9E502237F63A500279F3E /* Bookshelf */,
 				9FFE07DC232A595D00DBD0AC /* Tags */,
 				9F92D11623217C8300BC0E57 /* Search */,
 				9F75E449230C580300488BBD /* Note Collection View */,
+				9F18E7A723FB4F1600543D78 /* FolderButton.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -471,13 +473,6 @@
 				9F65983E23EDD80B00CDBE0C /* HelpLinesType.swift */,
 			);
 			path = Note;
-			sourceTree = "<group>";
-		};
-		9FB9E502237F63A500279F3E /* Bookshelf */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Bookshelf;
 			sourceTree = "<group>";
 		};
 		9FBF6ABB22EA1D0D001FD730 /* Handwriting Recognition */ = {
@@ -844,6 +839,7 @@
 				9F65983523EDD09F00CDBE0C /* NoteText.swift in Sources */,
 				9F65984123EE1EE900CDBE0C /* SKFileManager.swift in Sources */,
 				9FA6238D22D38AEE007ED794 /* SpotlightHelper.swift in Sources */,
+				9F18E7A823FB4F1600543D78 /* FolderButton.swift in Sources */,
 				9FFE07E8232A622A00DBD0AC /* Tag.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -538,7 +538,7 @@
                                             <action selector="importDocumentTapped:" destination="BYZ-38-t0r" eventType="touchUpInside" id="OLj-oc-pfS"/>
                                         </connections>
                                     </button>
-                                    <button opaque="NO" contentMode="scaleToFill" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="oeF-CX-ZSK">
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="oeF-CX-ZSK">
                                         <rect key="frame" x="315" y="13" width="28" height="30"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="30" id="MvT-1R-W6y"/>
@@ -578,7 +578,7 @@
                                 <rect key="frame" x="0.0" y="56" width="768" height="918"/>
                                 <subviews>
                                     <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="khA-pa-wBN">
-                                        <rect key="frame" x="0.0" y="60" width="768" height="858"/>
+                                        <rect key="frame" x="0.0" y="117" width="768" height="801"/>
                                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                                         <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="5" minimumInteritemSpacing="5" id="TAb-Qi-OQa">
                                             <size key="itemSize" width="220" height="320"/>
@@ -655,7 +655,7 @@
                                         </connections>
                                     </button>
                                     <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Showing notes similar to: ..." textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="YYc-gA-00h">
-                                        <rect key="frame" x="8" y="38" width="188" height="21"/>
+                                        <rect key="frame" x="8" y="36" width="188" height="18"/>
                                         <fontDescription key="fontDescription" type="italicSystem" pointSize="15"/>
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
@@ -673,6 +673,25 @@
                                             <action selector="clearSimilarNotesTapped:" destination="BYZ-38-t0r" eventType="touchUpInside" id="42F-3B-CNq"/>
                                         </connections>
                                     </button>
+                                    <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="4x9-Nc-HFb">
+                                        <rect key="frame" x="8" y="67" width="752" height="42"/>
+                                        <subviews>
+                                            <stackView opaque="NO" contentMode="scaleToFill" alignment="center" spacing="5" translatesAutoresizingMaskIntoConstraints="NO" id="80o-Gw-p38">
+                                                <rect key="frame" x="0.0" y="0.0" width="752" height="42"/>
+                                            </stackView>
+                                        </subviews>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="42" id="Ddy-3w-8Ol"/>
+                                            <constraint firstItem="80o-Gw-p38" firstAttribute="top" secondItem="4x9-Nc-HFb" secondAttribute="top" id="Ewv-l6-or4"/>
+                                            <constraint firstAttribute="trailing" secondItem="80o-Gw-p38" secondAttribute="trailing" id="Jg0-yN-UPs"/>
+                                            <constraint firstItem="80o-Gw-p38" firstAttribute="leading" secondItem="4x9-Nc-HFb" secondAttribute="leading" id="NUD-79-j2f"/>
+                                            <constraint firstAttribute="bottom" secondItem="80o-Gw-p38" secondAttribute="bottom" id="XJE-On-b15"/>
+                                            <constraint firstItem="80o-Gw-p38" firstAttribute="centerY" secondItem="4x9-Nc-HFb" secondAttribute="centerY" id="xSV-Q4-wcb"/>
+                                            <constraint firstItem="80o-Gw-p38" firstAttribute="centerX" secondItem="4x9-Nc-HFb" secondAttribute="centerX" id="yBR-Mr-zgF"/>
+                                        </constraints>
+                                        <viewLayoutGuide key="contentLayoutGuide" id="FQo-gF-fBI"/>
+                                        <viewLayoutGuide key="frameLayoutGuide" id="LT3-Ih-Ccu"/>
+                                    </scrollView>
                                 </subviews>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                                 <constraints>
@@ -682,16 +701,18 @@
                                     <constraint firstItem="Zrv-fS-6w6" firstAttribute="top" secondItem="hut-mJ-mJj" secondAttribute="top" constant="2" id="6U1-Sg-etO"/>
                                     <constraint firstItem="vgL-tn-nRc" firstAttribute="top" secondItem="hut-mJ-mJj" secondAttribute="top" constant="5" id="CUe-JV-3Kx"/>
                                     <constraint firstAttribute="trailing" secondItem="khA-pa-wBN" secondAttribute="trailing" id="D8W-Hb-YF9"/>
-                                    <constraint firstItem="khA-pa-wBN" firstAttribute="top" secondItem="IRa-tg-YTc" secondAttribute="bottom" constant="30" id="ETC-GU-g5G"/>
+                                    <constraint firstItem="4x9-Nc-HFb" firstAttribute="leading" secondItem="hut-mJ-mJj" secondAttribute="leading" constant="8" id="FQt-t3-UQA"/>
                                     <constraint firstAttribute="bottom" secondItem="khA-pa-wBN" secondAttribute="bottom" id="Hrv-Xf-kaF"/>
-                                    <constraint firstItem="khA-pa-wBN" firstAttribute="top" secondItem="YYc-gA-00h" secondAttribute="bottom" constant="1" id="alV-ls-XBv"/>
+                                    <constraint firstAttribute="trailing" secondItem="4x9-Nc-HFb" secondAttribute="trailing" constant="8" id="J91-q7-BPI"/>
+                                    <constraint firstItem="4x9-Nc-HFb" firstAttribute="top" secondItem="YYc-gA-00h" secondAttribute="bottom" constant="13" id="ac0-PS-jux"/>
                                     <constraint firstItem="QAN-3k-yxQ" firstAttribute="leading" secondItem="IRa-tg-YTc" secondAttribute="trailing" constant="8" id="bjc-oT-WOl"/>
                                     <constraint firstItem="QAN-3k-yxQ" firstAttribute="top" secondItem="hut-mJ-mJj" secondAttribute="top" constant="1" id="d4x-E6-vbk"/>
                                     <constraint firstItem="IRa-tg-YTc" firstAttribute="leading" secondItem="hut-mJ-mJj" secondAttribute="leading" constant="8" id="gCO-xa-ccc"/>
                                     <constraint firstItem="sHd-m9-c4G" firstAttribute="centerY" secondItem="hut-mJ-mJj" secondAttribute="centerY" id="hGF-da-dfx"/>
                                     <constraint firstAttribute="trailing" secondItem="vgL-tn-nRc" secondAttribute="trailing" constant="8" id="hPl-4B-cfM"/>
-                                    <constraint firstItem="YYc-gA-00h" firstAttribute="top" secondItem="QAN-3k-yxQ" secondAttribute="bottom" constant="5" id="hkm-rF-UgS"/>
+                                    <constraint firstItem="YYc-gA-00h" firstAttribute="top" secondItem="QAN-3k-yxQ" secondAttribute="bottom" constant="3" id="hkm-rF-UgS"/>
                                     <constraint firstItem="khA-pa-wBN" firstAttribute="leading" secondItem="hut-mJ-mJj" secondAttribute="leading" id="rrk-Ek-z9e"/>
+                                    <constraint firstItem="khA-pa-wBN" firstAttribute="top" secondItem="4x9-Nc-HFb" secondAttribute="bottom" constant="8" id="uvw-oC-c7X"/>
                                     <constraint firstItem="IRa-tg-YTc" firstAttribute="top" secondItem="hut-mJ-mJj" secondAttribute="top" constant="5" id="zxs-4P-mxB"/>
                                 </constraints>
                             </view>
@@ -712,6 +733,8 @@
                     <connections>
                         <outlet property="clearSimilarNotesButton" destination="Zrv-fS-6w6" id="MAH-7D-eSP"/>
                         <outlet property="filtersButton" destination="QAN-3k-yxQ" id="66B-EJ-JR9"/>
+                        <outlet property="navigationHierarchyScrollView" destination="4x9-Nc-HFb" id="mxf-aA-F9W"/>
+                        <outlet property="navigationHierarchyStackView" destination="80o-Gw-p38" id="je1-GP-kJJ"/>
                         <outlet property="newNoteButton" destination="UAF-TK-CJG" id="BJS-Sr-u5U"/>
                         <outlet property="noteCollectionView" destination="khA-pa-wBN" id="jLd-Rn-697"/>
                         <outlet property="noteListViewButton" destination="vgL-tn-nRc" id="UiN-4X-xgz"/>
@@ -2879,7 +2902,7 @@
     </resources>
     <inferredMetricsTieBreakers>
         <segue reference="yvs-ei-HRy"/>
-        <segue reference="OAt-q3-0jJ"/>
+        <segue reference="58e-4d-iJp"/>
         <segue reference="ct4-u7-KZY"/>
     </inferredMetricsTieBreakers>
 </document>
