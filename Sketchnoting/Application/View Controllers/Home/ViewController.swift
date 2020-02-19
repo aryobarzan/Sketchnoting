@@ -26,7 +26,7 @@ import MobileCoreServices
 // It also contains note collection views, which in turn contain sketchnote views.
 
 //This controller handles all interactions of the user on the home page, including creating new note collections and new notes, searching, sharing notes, and generating pdfs from notes.
-class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextFieldDelegate, MCSessionDelegate, MCBrowserViewControllerDelegate, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, NoteCollectionViewDetailCellDelegate, UIApplicationDelegate, UIPopoverPresentationControllerDelegate, UIDocumentPickerDelegate, FolderButtonDelegate {
+class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextFieldDelegate, MCSessionDelegate, MCBrowserViewControllerDelegate, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UIApplicationDelegate, UIPopoverPresentationControllerDelegate, UIDocumentPickerDelegate, FolderButtonDelegate {
     
     @IBOutlet weak var navigationHierarchyScrollView: UIScrollView!
     @IBOutlet weak var navigationHierarchyStackView: UIStackView!
@@ -434,7 +434,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             }
             menuElements.append(sendAction)
         }
-        let deleteAction = UIAction(title: "Delete", image: UIImage(systemName: "xmark.circle.fill")) { action in
+        let deleteAction = UIAction(title: "Delete", image: UIImage(systemName: "xmark.circle.fill"), attributes: .destructive) { action in
             self.deleteFile(file: file)
         }
         menuElements.append(deleteAction)
@@ -528,7 +528,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         case .List:
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifierDetailCell, for: indexPath as IndexPath) as! NoteCollectionViewDetailCell
             cell.setFile(file: self.items[indexPath.item])
-            cell.delegate = self
             return cell
         }
     }
@@ -540,7 +539,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         case .Grid:
             return CGSize(width: CGFloat(200), height: CGFloat(300))
         case .List:
-            return CGSize(width: collectionView.bounds.size.width - CGFloat(10), height: CGFloat(105))
+            return CGSize(width: collectionView.bounds.size.width - CGFloat(10), height: CGFloat(60))
         }
         
     }
@@ -689,31 +688,4 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         }))
         self.present(alert, animated: true, completion: nil)
     }
-
-    
-    // MARK: Note Collection View DETAIL cell delegate
-    func noteCollectionViewDetailCellRenameTapped(file: File, sender: UIButton, cell: NoteCollectionViewDetailCell) {
-        self.renameFile(file: file)
-    }
-    
-    func noteCollectionViewDetailCellTagTapped(note: NoteX, sender: UIButton, cell: NoteCollectionViewDetailCell) {
-        self.editNoteTags(note: note, cell: cell)
-    }
-    
-    func noteCollectionViewDetailCellShareTapped(note: NoteX, sender: UIButton, cell: NoteCollectionViewDetailCell) {
-        self.shareNote(note: note, sender: cell)
-    }
-    
-    func noteCollectionViewDetailCellSendTapped(note: NoteX, sender: UIButton, cell: NoteCollectionViewDetailCell) {
-        self.sendNote(note: note)
-    }
-    
-    func noteCollectionViewDetailCellCopyTextTapped(note: NoteX, sender: UIButton, cell: NoteCollectionViewDetailCell) {
-        UIPasteboard.general.string = note.getText()
-    }
-    
-    func noteCollectionViewDetailCellDeleteTapped(file: File, sender: UIButton, cell: NoteCollectionViewDetailCell) {
-        self.deleteFile(file: file)
-    }
-
 }

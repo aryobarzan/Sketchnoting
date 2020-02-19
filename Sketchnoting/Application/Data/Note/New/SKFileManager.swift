@@ -151,13 +151,11 @@ class SKFileManager {
         
         if let folder = file as? Folder {
             for c in folder.getChildren() {
-                let fileChildURL = self.getNotesDirectory().appendingPathComponent(c + ".sketchnote")
-                let folderChildURL = self.getFoldersDirectory().appendingPathComponent(c) // TO DO: recursively delete children
-                if FileManager.default.fileExists(atPath: fileChildURL.path) {
-                    try? FileManager.default.removeItem(atPath: noteURL.path)
+                if let n = getNote(id: c) {
+                    self.delete(file: n)
                 }
-                else if FileManager.default.fileExists(atPath: folderChildURL.path) {
-                    try? FileManager.default.removeItem(atPath: noteURL.path)
+                else if let f = getFolder(id: c) {
+                    self.delete(file: f)
                 }
             }
         }

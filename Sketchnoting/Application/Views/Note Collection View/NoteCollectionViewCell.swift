@@ -33,5 +33,12 @@ class NoteCollectionViewCell: UICollectionViewCell {
             self.imageView.image = image
         }
         titleLabel.text = file.getName()
+        
+        if file is Folder {
+            self.imageView.backgroundColor = .clear
+        }
+        else {
+            self.imageView.backgroundColor = .white
+        }
     }
 }

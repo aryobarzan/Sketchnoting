@@ -15,7 +15,7 @@ class FolderButton: UIButton {
     func setFolder(folder: Folder?) {
         self.folder = folder
         self.addTarget(self, action: #selector(onTap), for: .touchUpInside)
-        
+        self.setTitleColor(.link, for: .normal)
         if let folder = folder {
             self.setTitle(" " + folder.getName(), for: .normal)
             self.setImage(UIImage(systemName: "arrowtriangle.right"), for: .normal)
@@ -24,7 +24,6 @@ class FolderButton: UIButton {
             self.setTitle(" Home", for: .normal)
             self.setImage(UIImage(systemName: "house"), for: .normal)
         }
-        self.setTitleColor(.link, for: .normal)
     }
 
     @objc func onTap(sender: UIButton!) {
