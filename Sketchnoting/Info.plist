@@ -41,7 +41,7 @@
 		<true/>
 	</dict>
 	<key>NSCameraUsageDescription</key>
-	<string>This will allow you to take a picture and insert it into your note.</string>
+	<string>This allows Sketchnoting to scan pictures of documents and import them.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>This will allow you to insert images into your notes.</string>
 	<key>UILaunchStoryboardName</key>

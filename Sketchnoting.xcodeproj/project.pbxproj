@@ -49,6 +49,7 @@
 		9F75E451230D8AE100488BBD /* SettingsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F75E450230D8AE100488BBD /* SettingsManager.swift */; };
 		9F75E482231410A100488BBD /* TAGMEHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F75E481231410A100488BBD /* TAGMEHelper.swift */; };
 		9F75E484231419FA00488BBD /* TAGMEDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F75E483231419FA00488BBD /* TAGMEDocument.swift */; };
+		9F77DBCA23FFD619007C8B7D /* AnnotationUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F77DBC923FFD619007C8B7D /* AnnotationUtilities.swift */; };
 		9F8551B123A539D9006EB0B1 /* NotePageCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F8551B023A539D9006EB0B1 /* NotePageCollectionViewCell.swift */; };
 		9F92D10E231E95B400BC0E57 /* UICollectionViewExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F92D10D231E95B400BC0E57 /* UICollectionViewExtensions.swift */; };
 		9F92D110231E97DF00BC0E57 /* UserDefaultsExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F92D10F231E97DF00BC0E57 /* UserDefaultsExtensions.swift */; };
@@ -159,6 +160,7 @@
 		9F75E450230D8AE100488BBD /* SettingsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsManager.swift; sourceTree = "<group>"; };
 		9F75E481231410A100488BBD /* TAGMEHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TAGMEHelper.swift; sourceTree = "<group>"; };
 		9F75E483231419FA00488BBD /* TAGMEDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TAGMEDocument.swift; sourceTree = "<group>"; };
+		9F77DBC923FFD619007C8B7D /* AnnotationUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnnotationUtilities.swift; sourceTree = "<group>"; };
 		9F8551B023A539D9006EB0B1 /* NotePageCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotePageCollectionViewCell.swift; sourceTree = "<group>"; };
 		9F92D10D231E95B400BC0E57 /* UICollectionViewExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UICollectionViewExtensions.swift; sourceTree = "<group>"; };
 		9F92D10F231E97DF00BC0E57 /* UserDefaultsExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsExtensions.swift; sourceTree = "<group>"; };
@@ -415,6 +417,7 @@
 				9F75E4802314108500488BBD /* TAGME */,
 				9FA6239922DE3ACD007ED794 /* BioPortal */,
 				9FA6239822DE3AC0007ED794 /* Spotlight */,
+				9F77DBC923FFD619007C8B7D /* AnnotationUtilities.swift */,
 			);
 			path = "Semantic Annotation";
 			sourceTree = "<group>";
@@ -775,6 +778,7 @@
 				9F65984823F315FE00CDBE0C /* SearchFilterCollectionViewCell.swift in Sources */,
 				9FA6238B22D37213007ED794 /* BioPortalHelper.swift in Sources */,
 				9FA6239322DE30AC007ED794 /* SpotlightDocument.swift in Sources */,
+				9F77DBCA23FFD619007C8B7D /* AnnotationUtilities.swift in Sources */,
 				9FD29C58223C3CF700CC969A /* UIImageExtensions.swift in Sources */,
 				9F00428923E9FB2600961636 /* BadgeHub.swift in Sources */,
 				9F65983B23EDD29300CDBE0C /* NoteTextBlock.swift in Sources */,

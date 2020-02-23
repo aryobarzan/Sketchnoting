@@ -168,4 +168,22 @@ class TAGMEHelper {
             completion(false)
         }
     }
+    
+    func checkForSubconcepts(note: NoteX) {
+        let text = note.getText().lowercased().replacingOccurrences(of: "\n", with: " ")
+        var words = text.components(separatedBy: " ")
+        var wordsToRemove = [String]()
+        for word in words {
+            if AnnotationUtilities.stopWordsEN.contains(word) {
+                wordsToRemove.append(word)
+            }
+        }
+        words = words.filter { !wordsToRemove.contains($0) }
+        if words.count > 1 {
+            for word in words {
+                self.fetch(text: word, note: note)
+                log.info("Fetching TAGME document for subconcept: \(word)")
+            }
+        }
+    }
 }

@@ -23,6 +23,7 @@ class NoteX: File, DocumentVisitor, DocumentDelegate {
     var tags: [Tag]
     var activePageIndex = 0
     var helpLinesType: HelpLinesType
+    
     var sharedByDevice: String?
     
     var delegate: NoteXDelegate?
@@ -356,7 +357,6 @@ class NoteX: File, DocumentVisitor, DocumentDelegate {
     }
     
     // MARK: Page helper functions
-    
     public func getCurrentPage() -> NoteXPage {
         if activePageIndex >= pages.count {
             activePageIndex = 0
@@ -368,8 +368,10 @@ class NoteX: File, DocumentVisitor, DocumentDelegate {
     }
     
     override public func getPreviewImage(completion: @escaping (UIImage) -> Void) {
-        UITraitCollection(userInterfaceStyle: .light).performAsCurrent {
-            completion(pages[0].canvasDrawing.image(from: UIScreen.main.bounds, scale: 1.0))
+        if pages.count > 0 {
+            UITraitCollection(userInterfaceStyle: .light).performAsCurrent {
+                completion(pages[0].canvasDrawing.image(from: UIScreen.main.bounds, scale: 1.0))
+            }
         }
     }
     
@@ -411,49 +413,6 @@ class NoteX: File, DocumentVisitor, DocumentDelegate {
     func insertPage(_ notePage: NoteXPage, at indexPath: IndexPath) {
       pages.insert(notePage, at: indexPath.row)
     }
-
-    // MARK: Compare similarity of content
-    
-    public func similarTo(note: NoteX) -> Double {
-        var similarity = 0.0
-        if self.getName().lowercased() == note.getName().lowercased() {
-            similarity += 0.2
-        }
-        for document in documents {
-            for other in note.documents {
-                if document.title.lowercased() == other.title.lowercased() {
-                    similarity += 5
-                }
-                if document.documentType == other.documentType {
-                    similarity += 0.5
-                    switch document.documentType {
-                    case .Spotlight:
-                        let d1 = document as! SpotlightDocument
-                        let d2 = other as! SpotlightDocument
-                        if let types = d1.types, let otherTypes = d2.types {
-                            let commonTypes = SketchnotingUtilities.commonElements(types, otherTypes)
-                            similarity += Double(3 * commonTypes.count)
-                        }
-                    case .TAGME:
-                        let d1 = document as! TAGMEDocument
-                        let d2 = other as! TAGMEDocument
-                        if let categories = d1.categories, let otherCategories = d2.categories {
-                            let commonCategories = SketchnotingUtilities.commonElements(categories, otherCategories)
-                            similarity += Double(3 * commonCategories.count)
-                        }
-                    case .BioPortal:
-                        break
-                    case .Chemistry:
-                        break
-                    case .Other:
-                        break
-                    }
-                }
-            }
-        }
-        return similarity
-    }
-    
     
     public func mergeWith(note: NoteX) {
         if note != self {

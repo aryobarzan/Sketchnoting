@@ -19,14 +19,14 @@ import MultipeerConnectivity
 import Vision
 import PencilKit
 import MobileCoreServices
-
+import VisionKit
 
 // This is the controller for the app's home page view.
 // It contains the search bar and all the buttons related to it.
 // It also contains note collection views, which in turn contain sketchnote views.
 
 //This controller handles all interactions of the user on the home page, including creating new note collections and new notes, searching, sharing notes, and generating pdfs from notes.
-class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextFieldDelegate, MCSessionDelegate, MCBrowserViewControllerDelegate, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UIApplicationDelegate, UIPopoverPresentationControllerDelegate, UIDocumentPickerDelegate, FolderButtonDelegate {
+class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextFieldDelegate, MCSessionDelegate, MCBrowserViewControllerDelegate, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UIApplicationDelegate, UIPopoverPresentationControllerDelegate, UIDocumentPickerDelegate, VNDocumentCameraViewControllerDelegate, FolderButtonDelegate {
     
     @IBOutlet weak var navigationHierarchyScrollView: UIScrollView!
     @IBOutlet weak var navigationHierarchyStackView: UIStackView!
@@ -109,6 +109,8 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             noteListViewButton.backgroundColor = self.view.tintColor
             noteListViewButton.tintColor = .white
         }
+        
+        self.setupVisionRecognition()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -226,6 +228,65 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     @IBAction func importDocumentTapped(_ sender: UIButton) {
         displayDocumentPicker()
     }
+    
+    //MARK: Camera
+    var textRecognitionRequest = VNRecognizeTextRequest(completionHandler: nil)
+    let textRecognitionWorkQueue = DispatchQueue(label: "TextRecognitionQueue", qos: .userInitiated, attributes: [], autoreleaseFrequency: .workItem, target: nil)
+    private func setupVisionRecognition() {
+        self.textRecognitionRequest = VNRecognizeTextRequest { (request, error) in
+            guard let observations = request.results as? [VNRecognizedTextObservation] else { return }
+            var recognizedText = ""
+            for obs in observations {
+                guard let topCandidate = obs.topCandidates(1).first else { return }
+                recognizedText += topCandidate.string
+                recognizedText += "\n"
+            }
+            log.info("Vision: recognized text:")
+            log.info(recognizedText)
+        }
+        self.textRecognitionRequest.recognitionLevel = .accurate
+    }
+    @IBAction func cameraTapped(_ sender: UIButton) {
+        let scannerVC = VNDocumentCameraViewController()
+        scannerVC.delegate = self
+        present(scannerVC, animated: true)
+    }
+    func documentCameraViewController(_ controller: VNDocumentCameraViewController, didFinishWith scan: VNDocumentCameraScan) {
+        controller.dismiss(animated: true, completion: nil)
+        
+        let note = NoteX(name: "Scan", parent: SKFileManager.currentFolder?.id, documents: nil)
+        var pages = [NoteXPage]()
+        for i in 0..<scan.pageCount {
+            let image = scan.imageOfPage(at: i)
+            self.recognizeTextInImage(image)
+            let page = NoteXPage()
+            page.setBackdrop(image: image)
+            pages.append(page)
+        }
+        note.pages = pages
+        _ = SKFileManager.add(note: note)
+        self.updateDisplayedNotes(true)
+    }
+    func documentCameraViewControllerDidCancel(_ controller: VNDocumentCameraViewController) {
+        controller.dismiss(animated: true, completion: nil)
+    }
+    func documentCameraViewController(_ controller: VNDocumentCameraViewController, didFailWithError error: Error) {
+        log.error(error)
+        controller.dismiss(animated: true, completion: nil)
+    }
+    func recognizeTextInImage(_ image: UIImage) {
+        guard let cgImage = image.cgImage else { return }
+        
+        self.textRecognitionWorkQueue.async {
+            let handler = VNImageRequestHandler(cgImage: cgImage, options: [:])
+            do {
+                try handler.perform([self.textRecognitionRequest])
+            } catch {
+                log.error(error)
+            }
+        }
+    }
+    
     
     // MARK: Note display management
     private func updateDisplayedNotes(_ animated: Bool) {

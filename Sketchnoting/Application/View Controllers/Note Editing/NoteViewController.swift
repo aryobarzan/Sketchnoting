@@ -23,6 +23,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     private var documentsVC: DocumentsViewController!
     
     @IBOutlet var backdropView: UIView!
+    @IBOutlet weak var backdropImageView: UIImageView!
     @IBOutlet var canvasView: PKCanvasView!
     
     @IBOutlet var topicsButton: UIButton!
@@ -79,6 +80,14 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         documentsVC.setNote(note: SKFileManager.activeNote!)
         
         self.bookshelfLeftDragView.curveTopCorners(size: 5)
+        
+        if let (backdropData, isPDF) = SKFileManager.activeNote!.getCurrentPage().getBackdrop() {
+            if !isPDF {
+                if let image = UIImage(data: backdropData) {
+                    self.backdropImageView.image = image
+                }
+            }
+        }
         
         self.canvasView.drawing = SKFileManager.activeNote!.getCurrentPage().canvasDrawing
         canvasView.allowsFingerDrawing = false
@@ -228,7 +237,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     }
     
     private func processDrawingRecognition() {
-        let canvasImage = canvasView.drawing.image(from: CGRect(x: canvasView.frame.minX, y: canvasView.frame.minY, width: canvasView.contentSize.width, height: canvasView.contentSize.height), scale: 1.0)
+        let canvasImage = canvasView.asImage()
         let mainImage = canvasImage.invertedImage() ?? canvasImage
         for region in self.drawingViews {
             let image = UIImage(cgImage: mainImage.cgImage!.cropping(to: region.frame)!)
@@ -649,6 +658,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                     DispatchQueue.global(qos: .background).async {
                         if SettingsManager.getAnnotatorStatus(annotator: .TAGME) {
                             self.tagmeHelper.fetch(text: text, note: SKFileManager.activeNote!)
+                            self.tagmeHelper.checkForSubconcepts(note: SKFileManager.activeNote!)
                         }
                         if SettingsManager.getAnnotatorStatus(annotator: .BioPortal) {
                             self.bioportalHelper.fetch(text: text, note: SKFileManager.activeNote!)
@@ -1161,6 +1171,13 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         if previousStateOfTopicsShown {
             toggleConceptHighlight()
         }
+        if let (backdropData, isPDF) = SKFileManager.activeNote!.getCurrentPage().getBackdrop() {
+            if !isPDF {
+                if let image = UIImage(data: backdropData) {
+                    self.backdropImageView.image = image
+                }
+            }
+        }
     }
     
     var previousStateOfTopicsShown = false
@@ -1230,7 +1247,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     }
     @IBAction func similaritySegmentChanged(_ sender: UISegmentedControl) {
         if sender.selectedSegmentIndex == 0 {
-            similarityThreshold = 0.0
+            similarityThreshold = 1.0
         }
         else {
             similarityThreshold = 10.0

@@ -14,6 +14,8 @@ class NoteXPage: Codable {
     var drawingLabels: [String]
     var drawingViewRects: [CGRect]
     var noteTextArray: [NoteText]
+    private var backdropData: Data?
+    private var backdropIsPDF: Bool?
     
     init() {
         self.canvasDrawing = PKDrawing()
@@ -28,6 +30,8 @@ class NoteXPage: Codable {
         case drawingLabels = "drawingLabels"
         case drawingViewRects = "drawingViewRects"
         case noteTextArray = "noteTextArray"
+        case backdropData = "backdropData"
+        case backdropIsPDF = "backdropIsPDF"
     }
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
@@ -35,6 +39,8 @@ class NoteXPage: Codable {
         try container.encode(drawingLabels, forKey: .drawingLabels)
         try container.encode(drawingViewRects, forKey: .drawingViewRects)
         try container.encode(noteTextArray, forKey: .noteTextArray)
+        try container.encode(backdropData, forKey: .backdropData)
+        try container.encode(backdropIsPDF, forKey: .backdropIsPDF)
         log.info("Note Page encoded.")
 
     }
@@ -45,10 +51,12 @@ class NoteXPage: Codable {
         drawingLabels = try container.decode([String].self, forKey: .drawingLabels)
         drawingViewRects = try container.decode([CGRect].self, forKey: .drawingViewRects)
         noteTextArray = try container.decode([NoteText].self, forKey: .noteTextArray)
+        backdropData = try? container.decode(Data.self, forKey: .backdropData)
+        backdropIsPDF = try? container.decode(Bool.self, forKey: .backdropIsPDF)
         log.info("Note page decoded.")
     }
     
-    // Mark
+    // MARK: drawing recognition
     // This function only stores a recognized drawing's label for a note. The drawing itself (i.e. an image) is not stored.
     // Only the label is necessary, as it is used for search results.
     func addDrawing(drawing: String) {
@@ -123,4 +131,20 @@ class NoteXPage: Codable {
         }
     }
     
+    public func setBackdrop(image: UIImage) {
+        self.backdropData = image.jpegData(compressionQuality: 1)
+        self.backdropIsPDF = false
+    }
+    
+    public func setBackdrop(data: Data) { // PDF page
+        self.backdropData = data
+        self.backdropIsPDF = true
+    }
+    
+    public func getBackdrop() -> (Data, Bool)? {
+        if backdropData != nil {
+            return (backdropData!, backdropIsPDF!)
+        }
+        return nil
+    }
 }

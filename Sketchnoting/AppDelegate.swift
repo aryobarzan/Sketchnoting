@@ -37,7 +37,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         FirebaseApp.configure()
         
         if SettingsManager.firstAppStartup() {
-            UserDefaults.settings.set(true, forKey: SettingsKeys.AutomaticAnnotation.rawValue)
+            UserDefaults.settings.set(false, forKey: SettingsKeys.AutomaticAnnotation.rawValue)
             UserDefaults.settings.set(true, forKey: SettingsKeys.TextRecognitionCloud.rawValue)
             UserDefaults.settings.set(true, forKey: SettingsKeys.TextRecognitionCloudOption.rawValue)
             UserDefaults.annotators.set(true, forKey: Annotator.TAGME.rawValue)
