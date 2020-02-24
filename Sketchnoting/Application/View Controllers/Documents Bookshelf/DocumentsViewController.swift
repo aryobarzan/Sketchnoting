@@ -51,6 +51,12 @@ class DocumentsViewController: UICollectionViewController{
         self.updateBookshelf()
     }
     
+    public func clear() {
+        self.note.documents = [Document]()
+        self.items = self.note.documents
+        self.updateBookshelf()
+    }
+    
     // MARK: UICollectionViewDataSource
 
 
@@ -212,6 +218,11 @@ class DocumentsViewController: UICollectionViewController{
         })
     }
     private func makeDocumentContextMenu(document: Document) -> UIMenu {
+        let subConceptsAction = UIAction(title: "Subconcepts", image: UIImage(systemName: "doc.text.magnifyingglass")) { action in
+            if let document = document as? TAGMEDocument {
+                TAGMEHelper.shared.checkForSubconcepts(document: document, note: self.note)
+            }
+        }
         let hideAction = UIAction(title: "Hide", image: UIImage(systemName: "eye.slash")) { action in
             self.note.removeDocument(document: document)
             DocumentsManager.hide(document: document)
@@ -223,7 +234,7 @@ class DocumentsViewController: UICollectionViewController{
             self.updateBookshelf()
             self.delegate?.updateTopicsCount()
         }
-        return UIMenu(title: document.title, children: [hideAction])
+        return UIMenu(title: document.title, children: [subConceptsAction, hideAction])
     }
     
     func showTopicDocuments(documents: [Document]) {

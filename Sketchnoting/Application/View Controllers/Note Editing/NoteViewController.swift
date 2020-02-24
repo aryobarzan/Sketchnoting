@@ -54,7 +54,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     
     var spotlightHelper: SpotlightHelper!
     var bioportalHelper: BioPortalHelper!
-    var tagmeHelper: TAGMEHelper!
     
     var conceptHighlights = [UIView : [Document]]()
     
@@ -124,7 +123,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         
         spotlightHelper = SpotlightHelper()
         bioportalHelper = BioPortalHelper()
-        tagmeHelper = TAGMEHelper()
         
         canvasView.bringSubviewToFront(drawingInsertionCanvas)
         
@@ -657,8 +655,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                     log.info("Internet Connection detected.")
                     DispatchQueue.global(qos: .background).async {
                         if SettingsManager.getAnnotatorStatus(annotator: .TAGME) {
-                            self.tagmeHelper.fetch(text: text, note: SKFileManager.activeNote!)
-                            self.tagmeHelper.checkForSubconcepts(note: SKFileManager.activeNote!)
+                            TAGMEHelper.shared.fetch(text: text, note: SKFileManager.activeNote!)
                         }
                         if SettingsManager.getAnnotatorStatus(annotator: .BioPortal) {
                             self.bioportalHelper.fetch(text: text, note: SKFileManager.activeNote!)
@@ -673,6 +670,10 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                     break
             }
         }
+    }
+    
+    func checkForSubconcepts(document: TAGMEDocument) {
+        TAGMEHelper.shared.checkForSubconcepts(document: document, note: SKFileManager.activeNote!)
     }
     
     
@@ -1258,6 +1259,8 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     // MARK: Documents View Controller delegate
     func resetDocuments() {
         self.clearConceptHighlights()
+        SKFileManager.activeNote!.documents = [Document]()
+        documentsVC.clear()
         self.annotateText(text: SKFileManager.activeNote!.getText())
     }
     var oldDocuments: [Document]!
