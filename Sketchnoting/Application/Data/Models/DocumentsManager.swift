@@ -26,4 +26,9 @@ class DocumentsManager {
         }
         return false
     }
+    public static func unhide(document: Document) {
+        if self.isHidden(document: document) {
+            UserDefaults.hiddenDocuments.removeObject(forKey: document.title)
+        }
+    }
 }
