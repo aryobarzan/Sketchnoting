@@ -18,7 +18,7 @@ import ViewAnimator
 import MaterialComponents.MaterialBottomSheet
 import Connectivity
 
-class NoteViewController: UIViewController, UIPencilInteractionDelegate, UICollectionViewDataSource, UICollectionViewDelegate, NoteXDelegate, PKCanvasViewDelegate, PKToolPickerObserver, UIScreenshotServiceDelegate, NoteOptionsDelegate, DocumentsViewControllerDelegate, BookshelfOptionsDelegate, NotePagesDelegate {
+class NoteViewController: UIViewController, UIPencilInteractionDelegate, UICollectionViewDataSource, UICollectionViewDelegate, NoteXDelegate, PKCanvasViewDelegate, PKToolPickerObserver, UIScreenshotServiceDelegate, NoteOptionsDelegate, DocumentsViewControllerDelegate, NotePagesDelegate {
     
     private var documentsVC: DocumentsViewController!
     
@@ -189,12 +189,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             if let destination = segue.destination as? NoteOptionsTableViewController {
                 destination.delegate = self
                 destination.canDeletePage = (SKFileManager.activeNote!.pages.count > 1)
-            }
-            break
-        case "BookshelfOptions":
-            if let destination = segue.destination as? BookshelfOptionsTableViewController {
-                destination.delegate = self
-                destination.currentFilter = documentsVC.bookshelfFilter
             }
             break
         case "ViewNoteText":
@@ -1273,14 +1267,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         bookshelfSegmentedControl.setTitle("Documents (\(SKFileManager.activeNote!.documents.count))", forSegmentAt: 0)
     }
     
-    // MARK: Bookshelf Options Delegate
-    
-    func bookshelfOptionSelected(option: BookshelfOption) {
-        documentsVC.setFilter(option: option)
-    }
-    
     // Note Pages Bottom Sheet
-    
     @IBAction func pageBrowserTapped(_ sender: UIButton) {
         showNotePagesBottomSheet()
     }

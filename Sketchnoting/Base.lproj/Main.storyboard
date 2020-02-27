@@ -1398,11 +1398,6 @@
                                                     <constraint firstAttribute="width" constant="24" id="AR7-xN-oXZ"/>
                                                 </constraints>
                                                 <state key="normal" image="slider.horizontal.3" catalog="system"/>
-                                                <connections>
-                                                    <segue destination="9N8-9s-Pfz" kind="popoverPresentation" identifier="BookshelfOptions" popoverAnchorView="dT1-d9-SEx" id="NLG-br-oX7">
-                                                        <popoverArrowDirection key="popoverArrowDirection" up="YES" down="YES" left="YES" right="YES"/>
-                                                    </segue>
-                                                </connections>
                                             </button>
                                             <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="RU1-z1-xzW">
                                                 <rect key="frame" x="20" y="44" width="340" height="932"/>
@@ -2128,19 +2123,29 @@
                                     <constraint firstAttribute="trailing" secondItem="I3r-Cc-yC6" secondAttribute="trailing" constant="8" id="sTu-O2-YW1"/>
                                 </constraints>
                             </view>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="aVI-Of-r9M">
+                                <rect key="frame" x="170" y="280" width="200" height="155"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="155" id="2gs-2q-2X2"/>
+                                    <constraint firstAttribute="width" constant="200" id="AAV-sj-YIS"/>
+                                </constraints>
+                            </imageView>
                         </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                         <constraints>
+                            <constraint firstItem="aVI-Of-r9M" firstAttribute="centerX" secondItem="ddx-Q9-fYR" secondAttribute="centerX" id="AXb-aR-H6Q"/>
                             <constraint firstItem="BBL-7D-f52" firstAttribute="top" secondItem="5vG-Zg-SJC" secondAttribute="top" constant="24" id="Rwt-ir-0mS"/>
                             <constraint firstItem="BBL-7D-f52" firstAttribute="centerX" secondItem="ddx-Q9-fYR" secondAttribute="centerX" id="YQN-bZ-A86"/>
                             <constraint firstItem="Hzf-61-Ige" firstAttribute="centerX" secondItem="ddx-Q9-fYR" secondAttribute="centerX" id="jMT-fF-uxC"/>
                             <constraint firstItem="Hzf-61-Ige" firstAttribute="top" secondItem="BBL-7D-f52" secondAttribute="bottom" constant="8" id="khR-6Y-pBT"/>
+                            <constraint firstItem="aVI-Of-r9M" firstAttribute="top" secondItem="Hzf-61-Ige" secondAttribute="bottom" constant="8" id="ukd-Vu-Btd"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="5vG-Zg-SJC"/>
                     </view>
                     <modalFormSheetSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
                     <connections>
                         <outlet property="canvasView" destination="BBL-7D-f52" id="4yP-I0-N1I"/>
+                        <outlet property="debugImageView" destination="aVI-Of-r9M" id="Jsc-pE-E76"/>
                         <outlet property="searchButton" destination="W7s-Hn-CpX" id="HhZ-Xm-HWk"/>
                     </connections>
                 </viewController>
@@ -2425,167 +2430,6 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="j10-G4-0gk" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="3491.40625" y="-850.1953125"/>
-        </scene>
-        <!--Bookshelf Options Table View Controller-->
-        <scene sceneID="wyr-Sh-lOk">
-            <objects>
-                <tableViewController id="9N8-9s-Pfz" customClass="BookshelfOptionsTableViewController" customModule="Sketchnoting" customModuleProvider="target" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="b3a-gs-B4J">
-                        <rect key="frame" x="0.0" y="0.0" width="333" height="480"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
-                        <sections>
-                            <tableViewSection headerTitle="Filter" id="71E-eR-YaV">
-                                <cells>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" id="x9x-if-V83">
-                                        <rect key="frame" x="0.0" y="28" width="333" height="43.5"/>
-                                        <autoresizingMask key="autoresizingMask"/>
-                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="x9x-if-V83" id="62a-w5-wgs">
-                                            <rect key="frame" x="13" y="0.0" width="320" height="43.5"/>
-                                            <autoresizingMask key="autoresizingMask"/>
-                                            <subviews>
-                                                <button opaque="NO" userInteractionEnabled="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="wz0-4W-FyW">
-                                                    <rect key="frame" x="16" y="6" width="30" height="30"/>
-                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                                    <state key="normal" title="All"/>
-                                                </button>
-                                                <imageView hidden="YES" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="checkmark.circle.fill" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="pkj-Ra-3Ct">
-                                                    <rect key="frame" x="280" y="8.5" width="24" height="24"/>
-                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                                </imageView>
-                                            </subviews>
-                                        </tableViewCellContentView>
-                                    </tableViewCell>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" id="Zpd-d1-mIn">
-                                        <rect key="frame" x="0.0" y="71.5" width="333" height="43.5"/>
-                                        <autoresizingMask key="autoresizingMask"/>
-                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="Zpd-d1-mIn" id="gUg-Vl-IPn">
-                                            <rect key="frame" x="13" y="0.0" width="320" height="43.5"/>
-                                            <autoresizingMask key="autoresizingMask"/>
-                                            <subviews>
-                                                <button opaque="NO" userInteractionEnabled="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="eLQ-Gt-7kX">
-                                                    <rect key="frame" x="20" y="7" width="50" height="30"/>
-                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                                    <state key="normal" title="TAGME"/>
-                                                </button>
-                                                <imageView hidden="YES" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="checkmark.circle.fill" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="Zmu-Zn-SHE">
-                                                    <rect key="frame" x="280" y="9.5" width="24" height="24"/>
-                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                                </imageView>
-                                            </subviews>
-                                        </tableViewCellContentView>
-                                    </tableViewCell>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" id="rlC-Vo-oXA">
-                                        <rect key="frame" x="0.0" y="115" width="333" height="43.5"/>
-                                        <autoresizingMask key="autoresizingMask"/>
-                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="rlC-Vo-oXA" id="AwQ-g1-pOz">
-                                            <rect key="frame" x="13" y="0.0" width="320" height="43.5"/>
-                                            <autoresizingMask key="autoresizingMask"/>
-                                            <subviews>
-                                                <button opaque="NO" userInteractionEnabled="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Q5v-L0-BL0">
-                                                    <rect key="frame" x="20" y="6" width="62" height="30"/>
-                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                                    <state key="normal" title="Spotlight"/>
-                                                </button>
-                                                <imageView hidden="YES" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="checkmark.circle.fill" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="geV-Zg-m54">
-                                                    <rect key="frame" x="280" y="8.5" width="24" height="24"/>
-                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                                </imageView>
-                                            </subviews>
-                                        </tableViewCellContentView>
-                                    </tableViewCell>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" id="Rzd-Mj-VJO">
-                                        <rect key="frame" x="0.0" y="158.5" width="333" height="43.5"/>
-                                        <autoresizingMask key="autoresizingMask"/>
-                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="Rzd-Mj-VJO" id="1hm-96-L0u">
-                                            <rect key="frame" x="13" y="0.0" width="320" height="43.5"/>
-                                            <autoresizingMask key="autoresizingMask"/>
-                                            <subviews>
-                                                <button opaque="NO" userInteractionEnabled="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="X8c-6H-rDy">
-                                                    <rect key="frame" x="20" y="6" width="63" height="30"/>
-                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                                    <state key="normal" title="BioPortal"/>
-                                                </button>
-                                                <imageView hidden="YES" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="checkmark.circle.fill" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="HnI-Hf-Fp5">
-                                                    <rect key="frame" x="280" y="8.5" width="24" height="24"/>
-                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                                </imageView>
-                                            </subviews>
-                                        </tableViewCellContentView>
-                                    </tableViewCell>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" id="zMT-1g-cuZ">
-                                        <rect key="frame" x="0.0" y="202" width="333" height="43.5"/>
-                                        <autoresizingMask key="autoresizingMask"/>
-                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="zMT-1g-cuZ" id="ZgV-tf-1En">
-                                            <rect key="frame" x="13" y="0.0" width="320" height="43.5"/>
-                                            <autoresizingMask key="autoresizingMask"/>
-                                            <subviews>
-                                                <button opaque="NO" userInteractionEnabled="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="WZc-pI-hHf">
-                                                    <rect key="frame" x="20" y="6" width="44" height="30"/>
-                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                                    <state key="normal" title="CHEBI"/>
-                                                </button>
-                                                <imageView hidden="YES" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="checkmark.circle.fill" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="m9p-t7-gco">
-                                                    <rect key="frame" x="280" y="8.5" width="24" height="24"/>
-                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                                </imageView>
-                                            </subviews>
-                                        </tableViewCellContentView>
-                                    </tableViewCell>
-                                </cells>
-                            </tableViewSection>
-                            <tableViewSection headerTitle="Manage" id="T9t-bX-PGd">
-                                <cells>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" id="tDL-US-bx6">
-                                        <rect key="frame" x="0.0" y="301.5" width="333" height="43.5"/>
-                                        <autoresizingMask key="autoresizingMask"/>
-                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="tDL-US-bx6" id="KYN-L9-dUV">
-                                            <rect key="frame" x="13" y="0.0" width="320" height="43.5"/>
-                                            <autoresizingMask key="autoresizingMask"/>
-                                            <subviews>
-                                                <button opaque="NO" userInteractionEnabled="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="8ey-w0-A9b">
-                                                    <rect key="frame" x="20" y="7" width="177" height="30"/>
-                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                                    <state key="normal" title="Reset Related Documents"/>
-                                                </button>
-                                            </subviews>
-                                        </tableViewCellContentView>
-                                    </tableViewCell>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" id="h5H-9S-Dxh">
-                                        <rect key="frame" x="0.0" y="345" width="333" height="43.5"/>
-                                        <autoresizingMask key="autoresizingMask"/>
-                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="h5H-9S-Dxh" id="fPc-fi-lnu">
-                                            <rect key="frame" x="13" y="0.0" width="320" height="43.5"/>
-                                            <autoresizingMask key="autoresizingMask"/>
-                                            <subviews>
-                                                <button opaque="NO" userInteractionEnabled="NO" contentMode="scaleToFill" fixedFrame="YES" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="dMP-tI-oTf">
-                                                    <rect key="frame" x="20" y="6" width="191" height="30"/>
-                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                                    <state key="normal" title="Manage Hidden Documents"/>
-                                                </button>
-                                            </subviews>
-                                        </tableViewCellContentView>
-                                    </tableViewCell>
-                                </cells>
-                            </tableViewSection>
-                        </sections>
-                        <connections>
-                            <outlet property="dataSource" destination="9N8-9s-Pfz" id="aAS-ZC-BRZ"/>
-                            <outlet property="delegate" destination="9N8-9s-Pfz" id="3QL-Q4-rxg"/>
-                        </connections>
-                    </tableView>
-                    <navigationItem key="navigationItem" id="Zky-1q-9Nl"/>
-                    <connections>
-                        <outlet property="filterAllCheckmark" destination="pkj-Ra-3Ct" id="dd4-bP-AjO"/>
-                        <outlet property="filterBioPortalCheckmark" destination="HnI-Hf-Fp5" id="OzT-dl-8xi"/>
-                        <outlet property="filterCHEBICheckmark" destination="m9p-t7-gco" id="Gan-xD-mL2"/>
-                        <outlet property="filterSpotlightCheckmark" destination="geV-Zg-m54" id="JUQ-5t-wK7"/>
-                        <outlet property="filterTAGMECheckmark" destination="Zmu-Zn-SHE" id="msP-kr-rTm"/>
-                    </connections>
-                </tableViewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="iUS-h3-SUM" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="4746.875" y="1704.4921875"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="NFl-5D-b7N">
@@ -2962,7 +2806,6 @@
         <image name="book.circle" catalog="system" width="64" height="60"/>
         <image name="book.circle.fill" catalog="system" width="64" height="60"/>
         <image name="camera.viewfinder" catalog="system" width="64" height="56"/>
-        <image name="checkmark.circle.fill" catalog="system" width="64" height="60"/>
         <image name="clear.fill" catalog="system" width="64" height="56"/>
         <image name="doc.plaintext" catalog="system" width="56" height="64"/>
         <image name="doc.richtext" catalog="system" width="56" height="64"/>

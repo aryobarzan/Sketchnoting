@@ -25,6 +25,7 @@
 		9F4D2336239C1FDB0078B364 /* UIColorExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F4D2335239C1FDB0078B364 /* UIColorExtensions.swift */; };
 		9F4D2338239C22FD0078B364 /* OtherExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F4D2337239C22FD0078B364 /* OtherExtensions.swift */; };
 		9F509144235BE29100853E84 /* DataCompression in Frameworks */ = {isa = PBXBuildFile; productRef = 9F509143235BE29100853E84 /* DataCompression */; };
+		9F560FAA240855F700932A55 /* GPUImage in Frameworks */ = {isa = PBXBuildFile; productRef = 9F560FA9240855F700932A55 /* GPUImage */; };
 		9F5D80F02332D32600552D58 /* SVGImageProcessorExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5D80EF2332D32600552D58 /* SVGImageProcessorExtension.swift */; };
 		9F5E89EC2391AF49002FA8B2 /* DocumentsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5E89EB2391AF49002FA8B2 /* DocumentsViewController.swift */; };
 		9F5E89EE2391B474002FA8B2 /* DocumentsCollectionReusableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5E89ED2391B474002FA8B2 /* DocumentsCollectionReusableView.swift */; };
@@ -97,7 +98,6 @@
 		9FD29C58223C3CF700CC969A /* UIImageExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29C57223C3CF700CC969A /* UIImageExtensions.swift */; };
 		9FD29C6422431BFA00CC969A /* DrawnImageClassifier.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29C6322431BFA00CC969A /* DrawnImageClassifier.mlmodel */; };
 		9FD29C6622431C0000CC969A /* labels.txt in Resources */ = {isa = PBXBuildFile; fileRef = 9FD29C6522431C0000CC969A /* labels.txt */; };
-		9FFB815D23765D5C00B5390C /* BookshelfOptionsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FFB815C23765D5C00B5390C /* BookshelfOptionsTableViewController.swift */; };
 		9FFE07E6232A5FE500DBD0AC /* TagTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FFE07E5232A5FE500DBD0AC /* TagTableViewCell.swift */; };
 		9FFE07E8232A622A00DBD0AC /* Tag.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FFE07E7232A622A00DBD0AC /* Tag.swift */; };
 		9FFE07EA232A63BA00DBD0AC /* TagsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FFE07E9232A63BA00DBD0AC /* TagsManager.swift */; };
@@ -208,7 +208,6 @@
 		9FD29C57223C3CF700CC969A /* UIImageExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIImageExtensions.swift; sourceTree = "<group>"; };
 		9FD29C6322431BFA00CC969A /* DrawnImageClassifier.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = DrawnImageClassifier.mlmodel; sourceTree = "<group>"; };
 		9FD29C6522431C0000CC969A /* labels.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = labels.txt; sourceTree = "<group>"; };
-		9FFB815C23765D5C00B5390C /* BookshelfOptionsTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookshelfOptionsTableViewController.swift; sourceTree = "<group>"; };
 		9FFE07E5232A5FE500DBD0AC /* TagTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagTableViewCell.swift; sourceTree = "<group>"; };
 		9FFE07E7232A622A00DBD0AC /* Tag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tag.swift; sourceTree = "<group>"; };
 		9FFE07E9232A63BA00DBD0AC /* TagsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagsManager.swift; sourceTree = "<group>"; };
@@ -223,6 +222,7 @@
 				9F2C00092351126800D53EE9 /* Alamofire in Frameworks */,
 				9F5F340423AC64C900EB2804 /* SwiftGraph in Frameworks */,
 				9F509144235BE29100853E84 /* DataCompression in Frameworks */,
+				9F560FAA240855F700932A55 /* GPUImage in Frameworks */,
 				9F10EC162347D64C005340AA /* Kingfisher in Frameworks */,
 				9FAA827E236DD45200B2004F /* ViewAnimator in Frameworks */,
 				9F2C00062351123700D53EE9 /* SwiftyJSON in Frameworks */,
@@ -285,8 +285,8 @@
 		9F5E89EA2391AF1B002FA8B2 /* View Controllers */ = {
 			isa = PBXGroup;
 			children = (
-				9F65984923F3174A00CDBE0C /* Search */,
 				9F7BAFF4239C1D110045CD12 /* Home */,
+				9F65984923F3174A00CDBE0C /* Search */,
 				9F7BAFF5239C1D230045CD12 /* Note Editing */,
 				9F5E89F12391CE5A002FA8B2 /* Documents Bookshelf */,
 				9F5E89F22391CE6A002FA8B2 /* Document Detail */,
@@ -304,7 +304,6 @@
 				9F5E89EB2391AF49002FA8B2 /* DocumentsViewController.swift */,
 				9F5E89ED2391B474002FA8B2 /* DocumentsCollectionReusableView.swift */,
 				9F5E89EF2391CBA2002FA8B2 /* DocumentViewCell.swift */,
-				9FFB815C23765D5C00B5390C /* BookshelfOptionsTableViewController.swift */,
 			);
 			path = "Documents Bookshelf";
 			sourceTree = "<group>";
@@ -652,6 +651,7 @@
 				9FAA827D236DD45200B2004F /* ViewAnimator */,
 				9F5F340323AC64C900EB2804 /* SwiftGraph */,
 				9F9460E123F5BAA10073D709 /* Connectivity */,
+				9F560FA9240855F700932A55 /* GPUImage */,
 			);
 			productName = Sketchnoting;
 			productReference = 9FD29BA32220524D00CC969A /* Sketchnoting.app */;
@@ -692,6 +692,7 @@
 				9F5F340223AC64C900EB2804 /* XCRemoteSwiftPackageReference "SwiftGraph" */,
 				9FCD3D5723EA08A1005CB98D /* XCRemoteSwiftPackageReference "CocoaLumberjack" */,
 				9F9460E023F5BAA10073D709 /* XCRemoteSwiftPackageReference "Connectivity" */,
+				9F560FA8240855F700932A55 /* XCRemoteSwiftPackageReference "GPUImage2" */,
 			);
 			productRefGroup = 9FD29BA42220524D00CC969A /* Products */;
 			projectDirPath = "";
@@ -800,7 +801,6 @@
 				9FA6239722DE3806007ED794 /* CHEBIDocument.swift in Sources */,
 				9F4D2338239C22FD0078B364 /* OtherExtensions.swift in Sources */,
 				9F5E89EC2391AF49002FA8B2 /* DocumentsViewController.swift in Sources */,
-				9FFB815D23765D5C00B5390C /* BookshelfOptionsTableViewController.swift in Sources */,
 				9FD29BA72220524D00CC969A /* AppDelegate.swift in Sources */,
 				9FD29C6422431BFA00CC969A /* DrawnImageClassifier.mlmodel in Sources */,
 				9FA6239C22E64EA2007ED794 /* TextData.swift in Sources */,
@@ -1106,6 +1106,14 @@
 				minimumVersion = 3.6.0;
 			};
 		};
+		9F560FA8240855F700932A55 /* XCRemoteSwiftPackageReference "GPUImage2" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/BradLarson/GPUImage2";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
 		9F5F340223AC64C900EB2804 /* XCRemoteSwiftPackageReference "SwiftGraph" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/davecom/SwiftGraph";
@@ -1165,6 +1173,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 9F509142235BE29100853E84 /* XCRemoteSwiftPackageReference "DataCompression" */;
 			productName = DataCompression;
+		};
+		9F560FA9240855F700932A55 /* GPUImage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9F560FA8240855F700932A55 /* XCRemoteSwiftPackageReference "GPUImage2" */;
+			productName = GPUImage;
 		};
 		9F5F340323AC64C900EB2804 /* SwiftGraph */ = {
 			isa = XCSwiftPackageProductDependency;

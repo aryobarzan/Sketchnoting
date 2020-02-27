@@ -445,6 +445,16 @@ public enum BookshelfState {
     case Topic
 }
 
+enum BookshelfOption {
+    case FilterAll
+    case FilterTAGME
+    case FilterSpotlight
+    case FilterBioPortal
+    case FilterCHEBI
+    case ResetDocuments
+}
+
+
 protocol DocumentsViewControllerDelegate  {
     func resetDocuments()
     func updateTopicsCount()

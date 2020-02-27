@@ -6,7 +6,7 @@
 //  Copyright © 2019 Aryobarzan. All rights reserved.
 //
 
-import Foundation
+import UIKit
 import GPUImage
 
 // This file contains the post-processing functions for the handwriting recognition (OCR)
