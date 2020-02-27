@@ -9,6 +9,7 @@
 import UIKit
 import Repeat
 import ViewAnimator
+import PopMenu
 
 private let reuseIdentifier = "cell"
 
@@ -29,7 +30,7 @@ class DocumentsViewController: UICollectionViewController{
     var documentDetailVC: DocumentDetailViewController!
     
     var delegate: DocumentsViewControllerDelegate?
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -44,6 +45,20 @@ class DocumentsViewController: UICollectionViewController{
         documentDetailVC.didMove(toParent: self)
         documentDetailVC.view.isHidden = true
    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        super.prepare(for: segue, sender: sender)
+        switch(segue.identifier ?? "") {
+        case "ManageHiddenDocuments":
+            log.info("Managing hidden documents.")
+            let destinationVC = segue.destination as! HiddenDocumentsViewController
+            destinationVC.note = self.note
+            destinationVC.tableView.setEditing(true, animated: true)
+            break
+        default:
+            log.info("Unaccounted-for segue.")
+        }
+    }
     
     public func setNote(note: NoteX) {
         self.note = note
@@ -224,8 +239,7 @@ class DocumentsViewController: UICollectionViewController{
             }
         }
         let hideAction = UIAction(title: "Hide", image: UIImage(systemName: "eye.slash")) { action in
-            self.note.removeDocument(document: document)
-            DocumentsManager.hide(document: document)
+            self.note.hide(document: document)
             if self.bookshelfState == .Topic {
                 if self.selectedTopicDocuments != nil && self.selectedTopicDocuments!.contains(document) {
                     self.selectedTopicDocuments!.removeAll{$0 == document}
@@ -344,6 +358,77 @@ class DocumentsViewController: UICollectionViewController{
     @objc func clearFilterTapped(_ sender: UIButton) {
         header?.clearFilterButton.isHidden = true
         clearTopicDocuments()
+    }
+    @IBAction func settingsTapped(_ sender: UIButton) {
+        let popMenu = PopMenuViewController(sourceView: sender, actions: [PopMenuAction](), appearance: nil)
+        popMenu.appearance.popMenuBackgroundStyle = .blurred(.dark)
+        let resetAction = PopMenuDefaultAction(title: "Reset Documents", image: UIImage(systemName: "wand.and.rays"),  didSelect: { action in
+            self.resetDocuments()
+        })
+        popMenu.addAction(resetAction)
+        let hiddenDocumentsAction = PopMenuDefaultAction(title: "Manage Hidden Documents", image: UIImage(systemName: "eye.slash"),  didSelect: { action in
+            popMenu.dismiss(animated: true, completion: nil)
+            self.performSegue(withIdentifier: "ManageHiddenDocuments", sender: self)
+        })
+        popMenu.addAction(hiddenDocumentsAction)
+        
+        self.present(popMenu, animated: true, completion: nil)
+    }
+    @IBAction func filterTapped(_ sender: UIButton) {
+        let popMenu = PopMenuViewController(sourceView: sender, actions: [PopMenuAction](), appearance: nil)
+        popMenu.appearance.popMenuBackgroundStyle = .blurred(.dark)
+        
+        var allImage: UIImage? = nil
+        var spotlightImage: UIImage? = nil
+        var tagmeImage: UIImage? = nil
+        var bioportalImage: UIImage? = nil
+        var chebiImage: UIImage? = nil
+        switch self.bookshelfFilter {
+        case .All:
+            allImage = UIImage(systemName: "checkmark.circle.fill")
+            break
+        case .TAGME:
+            tagmeImage = UIImage(systemName: "checkmark.circle.fill")
+            break
+        case .Spotlight:
+            spotlightImage = UIImage(systemName: "checkmark.circle.fill")
+            break
+        case .BioPortal:
+            bioportalImage = UIImage(systemName: "checkmark.circle.fill")
+            break
+        case .CHEBI:
+            chebiImage = UIImage(systemName: "checkmark.circle.fill")
+            break
+        }
+        let allAction = PopMenuDefaultAction(title: "All", image: allImage,  didSelect: { action in
+            self.bookshelfFilter = .All
+            self.updateBookshelf()
+            
+        })
+        popMenu.addAction(allAction)
+        let spotlightAction = PopMenuDefaultAction(title: "Spotlight", image: spotlightImage,  didSelect: { action in
+            self.bookshelfFilter = .Spotlight
+            self.updateBookshelf()
+            
+        })
+        popMenu.addAction(spotlightAction)
+        let tagmeAction = PopMenuDefaultAction(title: "TAGME", image: tagmeImage, didSelect: { action in
+            self.bookshelfFilter = .TAGME
+            self.updateBookshelf()
+        })
+        popMenu.addAction(tagmeAction)
+        let bioportalAction = PopMenuDefaultAction(title: "BioPortal", image: bioportalImage, didSelect: { action in
+            self.bookshelfFilter = .BioPortal
+            self.updateBookshelf()
+        })
+        popMenu.addAction(bioportalAction)
+        let chebiAction = PopMenuDefaultAction(title: "CHEBI", image: chebiImage, didSelect: { action in
+            self.bookshelfFilter = .CHEBI
+            self.updateBookshelf()
+        })
+        popMenu.addAction(chebiAction)
+        
+        self.present(popMenu, animated: true, completion: nil)
     }
 }
 

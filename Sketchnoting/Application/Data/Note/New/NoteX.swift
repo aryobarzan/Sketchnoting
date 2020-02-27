@@ -20,6 +20,7 @@ protocol NoteXDelegate {
 class NoteX: File, DocumentVisitor, DocumentDelegate {
     var pages: [NoteXPage]
     var documents: [Document]
+    var hiddenDocuments: [Document]
     var tags: [Tag]
     var activePageIndex = 0
     var helpLinesType: HelpLinesType
@@ -30,6 +31,7 @@ class NoteX: File, DocumentVisitor, DocumentDelegate {
     
     init(name: String, parent: String?, documents: [Document]?) {
         self.documents = documents ?? [Document]()
+        self.hiddenDocuments = [Document]()
         self.pages = [NoteXPage]()
         self.tags = [Tag]()
         self.helpLinesType = .None
@@ -41,6 +43,7 @@ class NoteX: File, DocumentVisitor, DocumentDelegate {
     //Codable
     enum NoteCodingKeys: String, CodingKey {
         case documents = "documents"
+        case hiddenDocuments = "hiddenDocuments"
         case tags = "tags"
         case activePageIndex
         case helpLinesType = "helpLinesType"
@@ -60,6 +63,7 @@ class NoteX: File, DocumentVisitor, DocumentDelegate {
         var container = encoder.container(keyedBy: NoteCodingKeys.self)
         do {
             try container.encode(documents, forKey: .documents)
+            try container.encode(hiddenDocuments, forKey: .hiddenDocuments)
         } catch {
         }
         try container.encode(tags, forKey: .tags)
@@ -70,13 +74,83 @@ class NoteX: File, DocumentVisitor, DocumentDelegate {
     
     required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: NoteCodingKeys.self)
-
         var docsArrayForType = try container.nestedUnkeyedContainer(forKey: .documents)
-        var docs = [Document]()
+        documents = [Document]()
         var docsArray = docsArrayForType
         do {
             while(!docsArrayForType.isAtEnd) {
                 let doc = try docsArrayForType.nestedContainer(keyedBy: DocumentTypeKey.self)
+                let t = try doc.decode(DocumentType.self, forKey: DocumentTypeKey.type)
+                switch t {
+                case .Spotlight:
+                    documents.append(try docsArray.decode(SpotlightDocument.self))
+                    break
+                case .BioPortal:
+                    documents.append(try docsArray.decode(BioPortalDocument.self))
+                    break
+                case .Chemistry:
+                    documents.append(try docsArray.decode(CHEBIDocument.self))
+                    break
+                case .TAGME:
+                    documents.append(try docsArray.decode(TAGMEDocument.self))
+                    break
+                case .Other:
+                    documents.append(try docsArray.decode(Document.self))
+                    break
+                }
+            }
+        } catch {
+            log.error("Decoding a note's documents failed.")
+            log.error(error)
+        }
+        hiddenDocuments = [Document]()
+        do {
+            var hiddenDocsArrayForType = try container.nestedUnkeyedContainer(forKey: .hiddenDocuments)
+            docsArray = hiddenDocsArrayForType
+            while(!hiddenDocsArrayForType.isAtEnd) {
+                let doc = try hiddenDocsArrayForType.nestedContainer(keyedBy: DocumentTypeKey.self)
+                let t = try doc.decode(DocumentType.self, forKey: DocumentTypeKey.type)
+                switch t {
+                case .Spotlight:
+                        hiddenDocuments.append(try docsArray.decode(SpotlightDocument.self))
+                        break
+                case .BioPortal:
+                        hiddenDocuments.append(try docsArray.decode(BioPortalDocument.self))
+                        break
+                case .Chemistry:
+                        hiddenDocuments.append(try docsArray.decode(CHEBIDocument.self))
+                        break
+                case .TAGME:
+                        hiddenDocuments.append(try docsArray.decode(TAGMEDocument.self))
+                        break
+                case .Other:
+                        hiddenDocuments.append(try docsArray.decode(Document.self))
+                        break
+                }
+            }
+        } catch {
+            log.error("Decoding a note's hidden documents failed.")
+            log.error(error)
+        }
+        
+        tags = (try? container.decode([Tag].self, forKey: .tags)) ?? [Tag]()
+        activePageIndex = try container.decode(Int.self, forKey: .activePageIndex)
+        helpLinesType = (try? container.decode(HelpLinesType.self, forKey: .helpLinesType)) ?? .None
+        pages = try container.decode([NoteXPage].self, forKey: .pages)
+        try super.init(from: decoder)
+        for doc in documents {
+            doc.delegate = self
+        }
+        log.info("Note " + self.getName() + " decoded.")
+    }
+    
+    private func decodeDocuments(decodingContainer: UnkeyedDecodingContainer) -> [Document] {
+        var docs = [Document]()
+        var decodingContainer = decodingContainer
+        var docsArray = decodingContainer
+        do {
+            while(!decodingContainer.isAtEnd) {
+                let doc = try decodingContainer.nestedContainer(keyedBy: DocumentTypeKey.self)
                 let t = try doc.decode(DocumentType.self, forKey: DocumentTypeKey.type)
                 switch t {
                 case .Spotlight:
@@ -100,16 +174,7 @@ class NoteX: File, DocumentVisitor, DocumentDelegate {
             log.error("Decoding a note's documents failed.")
             log.error(error)
         }
-        self.documents = docs
-        tags = (try? container.decode([Tag].self, forKey: .tags)) ?? [Tag]()
-        activePageIndex = try container.decode(Int.self, forKey: .activePageIndex)
-        helpLinesType = (try? container.decode(HelpLinesType.self, forKey: .helpLinesType)) ?? .None
-        pages = try container.decode([NoteXPage].self, forKey: .pages)
-        try super.init(from: decoder)
-        for doc in documents {
-            doc.delegate = self
-        }
-        log.info("Note " + self.getName() + " decoded.")
+        return docs
     }
     
     public func duplicate() -> NoteX {
@@ -121,6 +186,27 @@ class NoteX: File, DocumentVisitor, DocumentDelegate {
     }
     
     //MARK: updating data
+    func hide(document: Document) {
+        if (!isHidden(document: document)) {
+            hiddenDocuments.append(document)
+        }
+        removeDocument(document: document)
+    }
+    
+    func isHidden(document: Document) -> Bool {
+        if hiddenDocuments.contains(document) {
+            return true
+        }
+        return false
+    }
+    
+    func unhide(document: Document) {
+        if isHidden(document: document) {
+            hiddenDocuments.removeAll{$0 == document}
+        }
+        self.addDocument(document: document)
+    }
+    
     public func clear() {
         documents = [Document]()
     }
@@ -134,7 +220,7 @@ class NoteX: File, DocumentVisitor, DocumentDelegate {
     }
     
     private func isDocumentValid(document: Document) -> Bool {
-        if DocumentsManager.isHidden(document: document) {
+        if isHidden(document: document) {
             return false
         }
         if let doc = document as? BioPortalDocument {

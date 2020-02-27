@@ -10,24 +10,10 @@ import UIKit
 
 class HiddenDocumentsViewController: UITableViewController {
     
-    var dictionary: [String : Document]!
-
+    var note: NoteX!
     override func viewDidLoad() {
         super.viewDidLoad()
-
         self.navigationItem.rightBarButtonItem = self.editButtonItem
-        
-        dictionary = [String : Document]()
-        for (key, data) in UserDefaults.hiddenDocuments.dictionaryRepresentation() {
-            if let data = data as? Data {
-                let decoder = JSONDecoder()
-                if let document = try? decoder.decode(Document.self, from: data) {
-                    dictionary[key] = document
-                } else {
-                    log.error("Could not decode hidden document.")
-                }
-            }
-        }
     }
 
     // MARK: - Table view data source
@@ -36,14 +22,13 @@ class HiddenDocumentsViewController: UITableViewController {
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return dictionary.keys.count
+        return note.hiddenDocuments.count
     }
 
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "HiddenDocumentTableCell", for: indexPath) as! HiddenDocumentTableCell
-        let documentKey = Array(dictionary.keys)[indexPath.row]
-        let document = dictionary[documentKey]!
+        let document = note.hiddenDocuments[indexPath.row]
         cell.document = document
         cell.titleLabel.text = document.title
         return cell
@@ -52,11 +37,9 @@ class HiddenDocumentsViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
             // Delete the row from the data source
-            let documentKey = Array(dictionary.keys)[indexPath.row]
-            let document = dictionary[documentKey]!
-            DocumentsManager.unhide(document: document)
+            let document = note.hiddenDocuments[indexPath.row]
+            note.unhide(document: document)
             log.info("Hidden document unhidden.")
-            dictionary.removeValue(forKey: documentKey)
             tableView.deleteRows(at: [indexPath], with: .fade)
         } else if editingStyle == .insert {
         }

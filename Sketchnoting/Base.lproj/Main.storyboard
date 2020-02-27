@@ -166,32 +166,10 @@
                                     </tableViewCell>
                                 </cells>
                             </tableViewSection>
-                            <tableViewSection headerTitle="Hidden Documents" id="Ju1-Rc-Dfe">
-                                <cells>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" rowHeight="50" id="fea-hl-Wt3">
-                                        <rect key="frame" x="0.0" y="420" width="712" height="50"/>
-                                        <autoresizingMask key="autoresizingMask"/>
-                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="fea-hl-Wt3" id="ZIs-se-XIo">
-                                            <rect key="frame" x="0.0" y="0.0" width="712" height="50"/>
-                                            <autoresizingMask key="autoresizingMask"/>
-                                            <subviews>
-                                                <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Sq5-0Z-5LY">
-                                                    <rect key="frame" x="20" y="10" width="672" height="30"/>
-                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                                    <state key="normal" title="Manage Hidden Documents"/>
-                                                    <connections>
-                                                        <segue destination="WZz-EP-bxy" kind="show" id="ceD-mY-Bfk"/>
-                                                    </connections>
-                                                </button>
-                                            </subviews>
-                                        </tableViewCellContentView>
-                                    </tableViewCell>
-                                </cells>
-                            </tableViewSection>
                             <tableViewSection headerTitle="Apple Pencil (2nd Gen.)" id="dwn-np-DMw">
                                 <cells>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" rowHeight="100" id="99Z-mE-RB5">
-                                        <rect key="frame" x="0.0" y="526" width="712" height="100"/>
+                                        <rect key="frame" x="0.0" y="420" width="712" height="100"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="99Z-mE-RB5" id="gl0-jM-dr8">
                                             <rect key="frame" x="0.0" y="0.0" width="712" height="100"/>
@@ -229,7 +207,7 @@
                             <tableViewSection headerTitle="For testing only (Cloud Dense yields the best results)" id="2To-3X-cV7">
                                 <cells>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" rowHeight="100" id="CUQ-lh-XRA">
-                                        <rect key="frame" x="0.0" y="682" width="712" height="100"/>
+                                        <rect key="frame" x="0.0" y="576" width="712" height="100"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="CUQ-lh-XRA" id="EjF-7R-sc4">
                                             <rect key="frame" x="0.0" y="0.0" width="712" height="100"/>
@@ -266,7 +244,7 @@
                             <tableViewSection headerTitle="Manage your data" footerTitle="Clearing data will delete all your notes and cached document resources." id="7gD-oF-Arh">
                                 <cells>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" rowHeight="100" id="eH1-ZN-Yjj">
-                                        <rect key="frame" x="0.0" y="838" width="712" height="100"/>
+                                        <rect key="frame" x="0.0" y="732" width="712" height="100"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="eH1-ZN-Yjj" id="x3Q-rp-Seq">
                                             <rect key="frame" x="0.0" y="0.0" width="712" height="100"/>
@@ -2702,12 +2680,38 @@
                                         </userDefinedRuntimeAttribute>
                                     </userDefinedRuntimeAttributes>
                                 </view>
+                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="5Ok-xW-I9b">
+                                    <rect key="frame" x="727" y="14" width="21" height="22"/>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="22" id="bJO-P0-fgL"/>
+                                        <constraint firstAttribute="width" constant="21" id="oHV-5j-sSR"/>
+                                    </constraints>
+                                    <state key="normal" image="slider.horizontal.3" catalog="system"/>
+                                    <connections>
+                                        <action selector="settingsTapped:" destination="0KN-3H-VTv" eventType="touchUpInside" id="UTf-Rc-oD6"/>
+                                    </connections>
+                                </button>
+                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="UZc-Eq-PXR">
+                                    <rect key="frame" x="685" y="14" width="21" height="22"/>
+                                    <constraints>
+                                        <constraint firstAttribute="width" constant="21" id="F98-0Y-V5l"/>
+                                        <constraint firstAttribute="height" constant="22" id="NzS-o0-fdJ"/>
+                                    </constraints>
+                                    <state key="normal" image="line.horizontal.3.decrease.circle" catalog="system"/>
+                                    <connections>
+                                        <action selector="filterTapped:" destination="0KN-3H-VTv" eventType="touchUpInside" id="ZTX-oE-c3t"/>
+                                    </connections>
+                                </button>
                             </subviews>
                             <constraints>
+                                <constraint firstItem="UZc-Eq-PXR" firstAttribute="centerY" secondItem="5zn-hf-XKJ" secondAttribute="centerY" id="04W-eY-rKp"/>
+                                <constraint firstAttribute="trailingMargin" secondItem="5Ok-xW-I9b" secondAttribute="trailing" constant="12" id="7Ts-da-FhC"/>
                                 <constraint firstItem="5e2-C6-xKa" firstAttribute="centerY" secondItem="5zn-hf-XKJ" secondAttribute="centerY" id="Ko3-lr-Ldc"/>
                                 <constraint firstItem="Slf-us-Ztk" firstAttribute="centerY" secondItem="5zn-hf-XKJ" secondAttribute="centerY" id="PMu-j4-JBi"/>
+                                <constraint firstItem="5Ok-xW-I9b" firstAttribute="centerY" secondItem="5zn-hf-XKJ" secondAttribute="centerY" id="rKH-bU-MT4"/>
                                 <constraint firstItem="Slf-us-Ztk" firstAttribute="leading" secondItem="5zn-hf-XKJ" secondAttribute="leadingMargin" id="rau-xf-zFI"/>
                                 <constraint firstItem="5e2-C6-xKa" firstAttribute="centerX" secondItem="5zn-hf-XKJ" secondAttribute="centerX" id="swa-Yy-gtG"/>
+                                <constraint firstItem="5Ok-xW-I9b" firstAttribute="leading" secondItem="UZc-Eq-PXR" secondAttribute="trailing" constant="21" id="uq4-Yr-thu"/>
                             </constraints>
                             <connections>
                                 <outlet property="clearFilterButton" destination="Slf-us-Ztk" id="ruc-5K-a3W"/>
@@ -2720,6 +2724,11 @@
                         </connections>
                     </collectionView>
                     <navigationItem key="navigationItem" id="ekg-wk-mak"/>
+                    <connections>
+                        <segue destination="WZz-EP-bxy" kind="popoverPresentation" identifier="ManageHiddenDocuments" popoverAnchorView="CS9-2K-czh" id="SiB-1A-RHr">
+                            <popoverArrowDirection key="popoverArrowDirection" up="YES" down="YES" left="YES" right="YES"/>
+                        </segue>
+                    </connections>
                 </collectionViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="pgG-l1-zuE" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
@@ -2846,17 +2855,17 @@
         <!--Hidden Documents-->
         <scene sceneID="JuK-3x-TDH">
             <objects>
-                <tableViewController id="WZz-EP-bxy" customClass="HiddenDocumentsViewController" customModule="Sketchnoting" customModuleProvider="target" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="f86-du-Meg">
-                        <rect key="frame" x="0.0" y="0.0" width="712" height="984"/>
+                <tableViewController storyboardIdentifier="HiddenDocumentsViewController" modalPresentationStyle="formSheet" id="WZz-EP-bxy" customClass="HiddenDocumentsViewController" customModule="Sketchnoting" customModuleProvider="target" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" allowsSelection="NO" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="f86-du-Meg">
+                        <rect key="frame" x="0.0" y="0.0" width="333" height="480"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                         <prototypes>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="HiddenDocumentTableCell" id="pgJ-4i-a3S" customClass="HiddenDocumentTableCell" customModule="Sketchnoting" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="28" width="712" height="43.5"/>
+                                <rect key="frame" x="0.0" y="28" width="333" height="43.5"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="pgJ-4i-a3S" id="yVr-dR-0KT">
-                                    <rect key="frame" x="0.0" y="0.0" width="712" height="43.5"/>
+                                    <rect key="frame" x="13" y="0.0" width="320" height="43.5"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Document Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ecS-5j-1aU">
@@ -2884,7 +2893,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="zJh-xr-X3n" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="5171" y="-850"/>
+            <point key="canvasLocation" x="2285" y="3086"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="com-Ei-8ib">
@@ -2965,6 +2974,7 @@
         <image name="hand.thumbsup.fill" catalog="system" width="64" height="62"/>
         <image name="house.fill" catalog="system" width="64" height="52"/>
         <image name="line.horizontal.3" catalog="system" width="64" height="32"/>
+        <image name="line.horizontal.3.decrease.circle" catalog="system" width="64" height="60"/>
         <image name="list.dash" catalog="system" width="64" height="42"/>
         <image name="magnifyingglass" catalog="system" width="64" height="56"/>
         <image name="magnifyingglass.circle.fill" catalog="system" width="64" height="60"/>
@@ -2991,7 +3001,7 @@
     </resources>
     <inferredMetricsTieBreakers>
         <segue reference="yvs-ei-HRy"/>
-        <segue reference="58e-4d-iJp"/>
+        <segue reference="OAt-q3-0jJ"/>
         <segue reference="ct4-u7-KZY"/>
     </inferredMetricsTieBreakers>
 </document>

@@ -15,9 +15,6 @@ extension UserDefaults {
     static var annotators: UserDefaults {
         return UserDefaults(suiteName: "lu.uni.coast.sketchnoting.annotators")!
     }
-    static var hiddenDocuments: UserDefaults {
-        return UserDefaults(suiteName: "lu.uni.coast.sketchnoting.hiddenDocuments")!
-    }
     static var tags: UserDefaults {
         return UserDefaults(suiteName: "lu.uni.coast.sketchnoting.tags")!
     }
