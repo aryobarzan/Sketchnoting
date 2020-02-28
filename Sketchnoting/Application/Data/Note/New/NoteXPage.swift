@@ -127,7 +127,17 @@ class NoteXPage: Codable {
     
     public func getAsImage(completion: @escaping (UIImage) -> Void) {
         UITraitCollection(userInterfaceStyle: .light).performAsCurrent {
-            completion(canvasDrawing.image(from: UIScreen.main.bounds, scale: 1.0))
+            var image = canvasDrawing.image(from: UIScreen.main.bounds, scale: 1.0)
+            let canvasImage = image
+            if let (backdropData, backdropIsPDF) = getBackdrop() {
+                if !backdropIsPDF {
+                    if let backdropImage = UIImage(data: backdropData) {
+                        image = backdropImage.mergeWith(topImage: canvasImage)
+                    }
+                    
+                }
+            }
+            completion(image)
         }
     }
     

@@ -144,39 +144,6 @@ class NoteX: File, DocumentVisitor, DocumentDelegate {
         log.info("Note " + self.getName() + " decoded.")
     }
     
-    private func decodeDocuments(decodingContainer: UnkeyedDecodingContainer) -> [Document] {
-        var docs = [Document]()
-        var decodingContainer = decodingContainer
-        var docsArray = decodingContainer
-        do {
-            while(!decodingContainer.isAtEnd) {
-                let doc = try decodingContainer.nestedContainer(keyedBy: DocumentTypeKey.self)
-                let t = try doc.decode(DocumentType.self, forKey: DocumentTypeKey.type)
-                switch t {
-                case .Spotlight:
-                    docs.append(try docsArray.decode(SpotlightDocument.self))
-                    break
-                case .BioPortal:
-                    docs.append(try docsArray.decode(BioPortalDocument.self))
-                    break
-                case .Chemistry:
-                    docs.append(try docsArray.decode(CHEBIDocument.self))
-                    break
-                case .TAGME:
-                    docs.append(try docsArray.decode(TAGMEDocument.self))
-                    break
-                case .Other:
-                    docs.append(try docsArray.decode(Document.self))
-                    break
-                }
-            }
-        } catch {
-            log.error("Decoding a note's documents failed.")
-            log.error(error)
-        }
-        return docs
-    }
-    
     public func duplicate() -> NoteX {
         let documents = self.documents
         let duplicate = NoteX(name: self.getName(), parent: self.parent, documents: documents)
@@ -230,18 +197,6 @@ class NoteX: File, DocumentVisitor, DocumentDelegate {
                     return false
                 }
             }
-        }
-        var existingDocumentsToRemove = [Document]()
-        for doc in documents {
-            if doc.title.lowercased().contains(document.title.lowercased()) && doc.title.lowercased() != document.title.lowercased() {
-                return false
-            }
-            else if document.title.lowercased().contains(doc.title.lowercased()) && document.title.lowercased() != doc.title.lowercased() {
-                existingDocumentsToRemove.append(doc)
-            }
-        }
-        for doc in existingDocumentsToRemove {
-            self.removeDocument(document: doc)
         }
         return true
     }
@@ -456,7 +411,9 @@ class NoteX: File, DocumentVisitor, DocumentDelegate {
     override public func getPreviewImage(completion: @escaping (UIImage) -> Void) {
         if pages.count > 0 {
             UITraitCollection(userInterfaceStyle: .light).performAsCurrent {
-                completion(pages[0].canvasDrawing.image(from: UIScreen.main.bounds, scale: 1.0))
+                pages[0].getAsImage(completion: {image in
+                    completion(image)
+                })
             }
         }
     }

@@ -283,4 +283,19 @@ class SKFileManager {
         }
         currentFoldersHierarchy = currentFoldersHierarchy.reversed()
     }
+    
+    public static func move(file: File, toFolder folder: Folder) {
+        if file.parent == folder.id {
+            return
+        }
+        if let previousParentFolderID = file.parent {
+            if let previousParentFolder = getFolder(id: previousParentFolderID) {
+                previousParentFolder.removeChild(file: file)
+                self.save(file: previousParentFolder)
+            }
+        }
+        folder.addChild(file: file)
+        self.save(file: file)
+        self.save(file: folder)
+    }
 }

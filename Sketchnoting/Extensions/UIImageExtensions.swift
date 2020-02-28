@@ -57,10 +57,7 @@ func resize(toWidth width: CGFloat) -> UIImage? {
     
     // For drawing recognition
     public func resize(newSize: CGSize) -> UIImage {
-        // create context - make sure we are on a 1.0 scale
         UIGraphicsBeginImageContextWithOptions(newSize, false, 1.0);
-        
-        // draw with new size, get image, and return
         draw(in: CGRect(origin: CGPoint.zero, size: newSize))
         let newImage = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext();
@@ -69,13 +66,6 @@ func resize(toWidth width: CGFloat) -> UIImage? {
     }
     
     public func invert() -> UIImage {
-        /*let beginImage = CIImage(image: self)
-        if let filter = CIFilter(name: "CIColorInvert") {
-            filter.setValue(beginImage, forKey: kCIInputImageKey)
-            let newImage = UIImage(ciImage: filter.outputImage!)
-            return newImage
-        }
-        return self*/
         var inverted = false
         let image = CIImage(cgImage: self.cgImage!)
         if let filter = CIFilter(name: "CIColorInvert") {
@@ -103,7 +93,6 @@ func resize(toWidth width: CGFloat) -> UIImage? {
         let filter = CIFilter(name: "CIColorMonochrome")
         filter?.setValue(currentCIImage, forKey: "inputImage")
 
-        // set a gray value for the tint color
         filter?.setValue(CIColor(red: 0.7, green: 0.7, blue: 0.7), forKey: "inputColor")
 
         filter?.setValue(1.0, forKey: "inputIntensity")
@@ -151,5 +140,19 @@ extension UIImage {
         guard let outputImage = filter.outputImage else { return nil }
         guard let outputImageCopy = context.createCGImage(outputImage, from: outputImage.extent) else { return nil }
         return UIImage(cgImage: outputImageCopy, scale: self.scale, orientation: .up)
+    }
+    func mergeWith(topImage: UIImage) -> UIImage {
+      let bottomImage = self
+
+      UIGraphicsBeginImageContext(size)
+
+      let areaSize = CGRect(x: 0, y: 0, width: bottomImage.size.width, height: bottomImage.size.height)
+      bottomImage.draw(in: areaSize)
+
+      topImage.draw(in: areaSize, blendMode: .normal, alpha: 1.0)
+
+      let mergedImage = UIGraphicsGetImageFromCurrentImageContext()!
+      UIGraphicsEndImageContext()
+      return mergedImage
     }
 }

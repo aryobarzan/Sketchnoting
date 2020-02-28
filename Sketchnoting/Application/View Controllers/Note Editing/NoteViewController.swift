@@ -958,9 +958,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         documentsVC.showTopicDocuments(documents: documents)
     }
     
-    // MARK: Collection view document filtering
-    @IBOutlet weak var bookshelfOptionsButton: UIButton!
-    
     //MARK: Drawing insertion mode
     private func setupDrawingRegions() {
         let drawingRegionRects = SKFileManager.activeNote!.getCurrentPage().drawingViewRects
@@ -1202,7 +1199,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     var relatedNotes = [NoteX]()
     
     var similarityThreshold: Float = 0.0
-    var highSimilarity: Float = 1.0
+    var highSimilarity: Float = 5.0
     @IBAction func documentsRelatedNotesSegmentChanged(_ sender: UISegmentedControl) {
         if sender.selectedSegmentIndex == 0 {
             relatedNotesView.isHidden = true
@@ -1245,7 +1242,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             similarityThreshold = 1.0
         }
         else {
-            similarityThreshold = 10.0
+            similarityThreshold = highSimilarity
         }
         refreshRelatedNotes()
     }

@@ -26,7 +26,7 @@ import VisionKit
 // It also contains note collection views, which in turn contain sketchnote views.
 
 //This controller handles all interactions of the user on the home page, including creating new note collections and new notes, searching, sharing notes, and generating pdfs from notes.
-class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextFieldDelegate, MCSessionDelegate, MCBrowserViewControllerDelegate, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UIApplicationDelegate, UIPopoverPresentationControllerDelegate, UIDocumentPickerDelegate, VNDocumentCameraViewControllerDelegate, FolderButtonDelegate {
+class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextFieldDelegate, MCSessionDelegate, MCBrowserViewControllerDelegate, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UIApplicationDelegate, UIPopoverPresentationControllerDelegate, UIDocumentPickerDelegate, VNDocumentCameraViewControllerDelegate, UICollectionViewDragDelegate, UICollectionViewDropDelegate, FolderButtonDelegate {
     
     @IBOutlet weak var navigationHierarchyScrollView: UIScrollView!
     @IBOutlet weak var navigationHierarchyStackView: UIStackView!
@@ -88,6 +88,10 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         
         noteCollectionView.register(UINib(nibName: "NoteCollectionViewCell", bundle: nil), forCellWithReuseIdentifier: reuseIdentifier)
         noteCollectionView.register(UINib(nibName: "NoteCollectionViewDetailCell", bundle: nil), forCellWithReuseIdentifier: reuseIdentifierDetailCell)
+        noteCollectionView.dragDelegate = self
+        noteCollectionView.dropDelegate = self
+        noteCollectionView.dragInteractionEnabled = true
+        
         self.noteLoadingIndicator.isHidden = false
         self.noteLoadingIndicator.startAnimating()
         self.newNoteButton.isEnabled = false
@@ -748,5 +752,53 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
               log.info("Not deleting note.")
         }))
         self.present(alert, animated: true, completion: nil)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, itemsForBeginning session: UIDragSession, at indexPath: IndexPath) -> [UIDragItem] {
+        let item = self.items[indexPath.row]
+        let itemProvider = NSItemProvider(object: item.getName() as NSString)
+        let dragItem = UIDragItem(itemProvider: itemProvider)
+        return [dragItem]
+    }
+    
+    func collectionView(_ collectionView: UICollectionView,
+                        canHandle session: UIDropSession) -> Bool {
+      return true
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, performDropWith coordinator: UICollectionViewDropCoordinator) {
+        guard let destinationIndexPath = coordinator.destinationIndexPath else {
+          return
+        }
+        
+        coordinator.items.forEach { dropItem in
+          guard let sourceIndexPath = dropItem.sourceIndexPath else {
+            return
+          }
+
+          collectionView.performBatchUpdates({
+            let sourceFile = self.items[sourceIndexPath.item]
+            
+            //SKFileManager.activeNote!.removePage(at: sourceIndexPath)
+            if let folderDestination = self.items[destinationIndexPath.item] as? Folder {
+                log.info("Moving file to folder.")
+                SKFileManager.move(file: sourceFile, toFolder: folderDestination)
+                //noteCollectionView.deleteItems(at: [sourceIndexPath])
+                self.updateDisplayedNotes(false)
+            }
+          }, completion: { _ in
+           coordinator.drop(dropItem.dragItem,
+                              toItemAt: destinationIndexPath)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                //self.updateDisplayedNotes(false)
+                print("ok")
+            }
+          })
+        }
+    }
+    
+    
+    func collectionView(_ collectionView: UICollectionView, dropSessionDidUpdate session: UIDropSession, withDestinationIndexPath destinationIndexPath: IndexPath?) -> UICollectionViewDropProposal {
+        return UICollectionViewDropProposal(operation: .move, intent: .insertIntoDestinationIndexPath)
     }
 }
