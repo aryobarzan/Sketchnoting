@@ -127,17 +127,25 @@ class NoteXPage: Codable {
     
     public func getAsImage(completion: @escaping (UIImage) -> Void) {
         UITraitCollection(userInterfaceStyle: .light).performAsCurrent {
+            var hasBackdrop = false
             var image = canvasDrawing.image(from: UIScreen.main.bounds, scale: 1.0)
             let canvasImage = image
             if let (backdropData, backdropIsPDF) = getBackdrop() {
                 if !backdropIsPDF {
-                    if let backdropImage = UIImage(data: backdropData) {
-                        image = backdropImage.mergeWith(topImage: canvasImage)
+                    hasBackdrop = true
+                    DispatchQueue.global(qos: .utility).async {
+                        if let backdropImage = UIImage(data: backdropData) {
+                            image = backdropImage.mergeWith(topImage: canvasImage)
+                        }
+                        DispatchQueue.main.async {
+                            completion(image)
+                        }
                     }
-                    
                 }
             }
-            completion(image)
+            if !hasBackdrop {
+                completion(image)
+            }
         }
     }
     

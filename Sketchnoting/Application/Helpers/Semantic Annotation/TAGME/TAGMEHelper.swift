@@ -17,7 +17,7 @@ class TAGMEHelper {
         let chunks = text.split(by: 6000)
         
         for chunk in chunks {
-            let parameters: Parameters = ["text": chunk, "lang": "en", "include_abstract": "true", "include_categories": "true", "gcube-token": "5f57008b-3114-47e9-9ee2-742c877d37b2-843339462"]
+            let parameters: Parameters = ["text": chunk, "lang": "en", "include_abstract": "true", "include_categories": "true", "gcube-token": "5f57008b-3114-47e9-9ee2-742c877d37b2-843339462", "epsilon": note.tagmeEpsilon]
             let headers: HTTPHeaders = [
                 "Accept": "application/json"
             ]
@@ -29,10 +29,10 @@ class TAGMEHelper {
                 case .success(let res):
                     json = JSON(res)
                 case .failure(let error):
-                    print(error.localizedDescription)
+                    log.error(error.localizedDescription)
                     return
                 }
-                print("TAGME: API call successful.")
+                log.info("TAGME: API call successful.")
                 var results = [String: String]()
                 if let annotations = json["annotations"].array {
                     for annotation in annotations {

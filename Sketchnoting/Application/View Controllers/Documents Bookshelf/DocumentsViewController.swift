@@ -362,6 +362,35 @@ class DocumentsViewController: UICollectionViewController{
     @IBAction func settingsTapped(_ sender: UIButton) {
         let popMenu = PopMenuViewController(sourceView: sender, actions: [PopMenuAction](), appearance: nil)
         popMenu.appearance.popMenuBackgroundStyle = .blurred(.dark)
+        let tagmeEpsilonAction = PopMenuDefaultAction(title: "Change TAGME Accuracy", image: UIImage(systemName: "dial"),  didSelect: { action in
+            popMenu.dismiss(animated: true, completion: nil)
+            var title = "Favor Common Topics (More)"
+            if self.note.tagmeEpsilon == Float(0.0) {
+                title = "✔︎ Favor Common Topics (More)"
+            }
+            let alert = UIAlertController(title: "TAGME Accuracy", message: "Choose how documents are fetched.", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: NSLocalizedString(title, comment: ""), style: .default, handler: { _ in
+                self.note.tagmeEpsilon = 0.0
+            }))
+            
+            title = "Balanced"
+            if self.note.tagmeEpsilon == Float(0.3) {
+                title = "✔︎ Balanced"
+            }
+            alert.addAction(UIAlertAction(title: NSLocalizedString(title, comment: ""), style: .default, handler: { _ in
+                self.note.tagmeEpsilon = 0.3
+            }))
+            
+            title = "Favor Contextual Topics (Less)"
+            if self.note.tagmeEpsilon == Float(0.5) {
+                title = "✔︎ Favor Contextual Topics (Less)"
+            }
+            alert.addAction(UIAlertAction(title: NSLocalizedString(title, comment: ""), style: .default, handler: { _ in
+                self.note.tagmeEpsilon = 0.5
+            }))
+            self.present(alert, animated: true, completion: nil)
+        })
+        popMenu.addAction(tagmeEpsilonAction)
         let resetAction = PopMenuDefaultAction(title: "Reset Documents", image: UIImage(systemName: "wand.and.rays"),  didSelect: { action in
             self.resetDocuments()
         })

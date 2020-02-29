@@ -24,6 +24,7 @@ class NoteX: File, DocumentVisitor, DocumentDelegate {
     var tags: [Tag]
     var activePageIndex = 0
     var helpLinesType: HelpLinesType
+    var tagmeEpsilon: Float = 0.3
     
     var sharedByDevice: String?
     
@@ -48,6 +49,7 @@ class NoteX: File, DocumentVisitor, DocumentDelegate {
         case activePageIndex
         case helpLinesType = "helpLinesType"
         case pages = "pages"
+        case tagmeEpsilon = "tagmeEpsilon"
     }
     private enum DocumentTypeKey : String, CodingKey {
         case type = "DocumentType"
@@ -70,6 +72,7 @@ class NoteX: File, DocumentVisitor, DocumentDelegate {
         try container.encode(activePageIndex, forKey: .activePageIndex)
         try container.encode(helpLinesType, forKey: .helpLinesType)
         try container.encode(pages, forKey: .pages)
+        try container.encode(tagmeEpsilon, forKey: .tagmeEpsilon)
     }
     
     required init(from decoder: Decoder) throws {
@@ -137,6 +140,7 @@ class NoteX: File, DocumentVisitor, DocumentDelegate {
         activePageIndex = try container.decode(Int.self, forKey: .activePageIndex)
         helpLinesType = (try? container.decode(HelpLinesType.self, forKey: .helpLinesType)) ?? .None
         pages = try container.decode([NoteXPage].self, forKey: .pages)
+        tagmeEpsilon = (try? container.decode(Float.self, forKey: .tagmeEpsilon)) ?? 0.3
         try super.init(from: decoder)
         for doc in documents {
             doc.delegate = self

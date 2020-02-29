@@ -770,30 +770,19 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         guard let destinationIndexPath = coordinator.destinationIndexPath else {
           return
         }
-        
         coordinator.items.forEach { dropItem in
           guard let sourceIndexPath = dropItem.sourceIndexPath else {
             return
           }
-
           collectionView.performBatchUpdates({
             let sourceFile = self.items[sourceIndexPath.item]
             
-            //SKFileManager.activeNote!.removePage(at: sourceIndexPath)
             if let folderDestination = self.items[destinationIndexPath.item] as? Folder {
                 log.info("Moving file to folder.")
                 SKFileManager.move(file: sourceFile, toFolder: folderDestination)
-                //noteCollectionView.deleteItems(at: [sourceIndexPath])
                 self.updateDisplayedNotes(false)
             }
-          }, completion: { _ in
-           coordinator.drop(dropItem.dragItem,
-                              toItemAt: destinationIndexPath)
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                //self.updateDisplayedNotes(false)
-                print("ok")
-            }
-          })
+          }, completion: nil)
         }
     }
     
