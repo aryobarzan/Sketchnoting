@@ -35,6 +35,9 @@ class SettingsViewController: UITableViewController {
         case .CloudDense:
             textRecognitionSegmentedControl.selectedSegmentIndex = 2
         }
+        FirebaseUsage.shared.getAPIUsage(completion: {remaining in
+            self.textRecognitionSegmentedControl.setTitle("Cloud (Dense) [\(remaining)]", forSegmentAt: 2)
+        })
     }
     // MARK: - Navigation
 

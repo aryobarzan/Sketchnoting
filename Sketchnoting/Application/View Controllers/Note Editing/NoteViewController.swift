@@ -508,7 +508,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                     if let documentPreviewVC = documentPreviewVC {
                         documentPreviewVC.modalPresentationStyle = .popover
                         documentPreviewVC.popoverPresentationController?.sourceView = view
-                        present(documentPreviewVC, animated: true, completion:nil)
+                        present(documentPreviewVC, animated: true, completion: nil)
                         documentPreviewVC.imageView.image = doc[0].previewImage
                         documentPreviewVC.titleLabel.text = doc[0].title
                         documentPreviewVC.bodyTextView.text = doc[0].description
