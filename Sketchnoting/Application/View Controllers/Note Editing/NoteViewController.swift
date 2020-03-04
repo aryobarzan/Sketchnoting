@@ -17,6 +17,7 @@ import NotificationBannerSwift
 import ViewAnimator
 import MaterialComponents.MaterialBottomSheet
 import Connectivity
+import GPUImage
 
 class NoteViewController: UIViewController, UIPencilInteractionDelegate, UICollectionViewDataSource, UICollectionViewDelegate, NoteXDelegate, PKCanvasViewDelegate, PKToolPickerObserver, UIScreenshotServiceDelegate, NoteOptionsDelegate, DocumentsViewControllerDelegate, NotePagesDelegate {
     
@@ -147,6 +148,12 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         self.refreshHelpLinesButton()
         self.refreshRelatedNotes()
         self.updateTopicsCount()
+        
+        if traitCollection.userInterfaceStyle == .dark {
+            for drawingRegionView in drawingViews {
+                drawingRegionView.layer.borderColor = UIColor.white.cgColor
+            }
+        }
     }
     
     // Notification Center events
@@ -216,35 +223,44 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         case .ManageDrawings:
             toggleManageDrawings()
             break
-        case .ToggleEraserPencil:
-            // TO REDO
-            break
-        case .Undo:
-            self.undo()
-            break
-        case .Redo:
-            self.redo()
+        case .System:
             break
         }
     }
     
+    // Drawing recognition
+    // In case the user's drawing has been recognized with at least a >40% confidence, the recognized drawing's label, e.g. "light bulb", is stored for the sketchnote.
+    private var labelNames: [String] = []
+    private let drawnImageClassifier = DrawnImageClassifier()
     private func processDrawingRecognition() {
-        let canvasImage = canvasView.asImage()
-        let mainImage = canvasImage.invertedImage() ?? canvasImage
-        for region in self.drawingViews {
-            let image = UIImage(cgImage: mainImage.cgImage!.cropping(to: region.frame)!)
-            
-            let resized = image.resize(newSize: CGSize(width: 28, height: 28))
-            
-            guard let pixelBuffer = resized.grayScalePixelBuffer() else {
-                print("Pixel buffer for drawing recognition could not be created.")
-                return
-            }
-            do {
-                currentPrediction = try drawnImageClassifier.prediction(image: pixelBuffer)
-            }
-            catch {
-                print("Drawing recognition prediction error: \(error)")
+        let note = SKFileManager.activeNote!
+        UITraitCollection(userInterfaceStyle: .light).performAsCurrent {
+            let whiteBackground = UIColor.white.image(CGSize(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height))
+            let canvasImage = canvasView.drawing.image(from: UIScreen.main.bounds, scale: 1.0)
+            DispatchQueue.main.async {
+                var merged = whiteBackground.mergeWith(topImage: canvasImage)
+                merged = merged.invertedImage() ?? merged
+                for region in self.drawingViews {
+                    let image = UIImage(cgImage: merged.cgImage!.cropping(to: region.frame)!)
+                    var bestPrediction = ""
+                    var bestPredictionScore = 0.0
+                    var dilatedImages = [UIImage]()
+                    dilatedImages.append(self.dilateLow(image: image))
+                    dilatedImages.append(self.dilateMedium(image: image))
+                    dilatedImages.append(self.dilateHigh(image: image))
+                    for img in dilatedImages {
+                        let (label, score) = self.recognizeDrawing(image: img)
+                        if score > bestPredictionScore {
+                            bestPredictionScore = score
+                            bestPrediction = label
+                        }
+                    }
+                    if bestPredictionScore >= 0.4 {
+                        log.info("Recognized drawing: \(bestPrediction)")
+                        SKFileManager.activeNote!.getCurrentPage().addDrawing(drawing: bestPrediction)
+                        SKFileManager.save(file: note)
+                    }
+                }
             }
         }
     }
@@ -269,6 +285,41 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             drawingRegionView.layer.borderColor = drawingViewBorderColor
         }
         self.refreshHelpLines()
+    }
+    
+    private func dilateLow(image: UIImage) -> UIImage {
+        return image.filterWithPipeline{input, output in
+            input --> Dilation() --> Dilation() --> output
+        }
+    }
+    private func dilateMedium(image: UIImage) -> UIImage {
+        return image.filterWithPipeline{input, output in
+            input --> Dilation() --> Dilation() --> Dilation() --> Dilation() --> output
+        }
+    }
+    private func dilateHigh(image: UIImage) -> UIImage {
+        return image.filterWithPipeline{input, output in
+            input --> Dilation() --> Dilation() --> Dilation() --> Dilation() --> Dilation() --> Dilation() --> output
+        }
+    }
+    
+    private func recognizeDrawing(image: UIImage) -> (String, Double) {
+        let resized = image.resize(newSize: CGSize(width: 28, height: 28))
+            
+        guard let pixelBuffer = resized.grayScalePixelBuffer() else {
+            log.error("Failed to create pixel buffer.")
+            return ("", 0.0)
+        }
+        
+        if let prediction = try? self.drawnImageClassifier.prediction(image: pixelBuffer) {
+            let sorted = prediction.category_softmax_scores.sorted { $0.value > $1.value }
+            let top5 = sorted.prefix(5)
+            log.info(top5.map { $0.key + "(" + String($0.value) + ")"}.joined(separator: ", "))
+            for (label, score) in top5 {
+                return (label, score)
+            }
+        }
+        return ("", 0.0)
     }
     
     private func refreshHelpLines() {
@@ -666,10 +717,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         }
     }
     
-    func checkForSubconcepts(document: TAGMEDocument) {
-        TAGMEHelper.shared.checkForSubconcepts(document: document, note: SKFileManager.activeNote!)
-    }
-    
     
     @IBAction func bookshelfButtonTapped(_ sender: UIButton) {
         let animation = AnimationType.rotate(angle: 360)
@@ -705,13 +752,16 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     var resetHandwritingRecognition = false
 
     func canvasViewDidEndUsingTool(_ canvasView: PKCanvasView) {
-        self.resetHandwritingRecognition = true
-        self.startSaveTimer()
         if (canvasView.tool is PKInkingTool && (canvasView.tool as! PKInkingTool).inkType != PKInkingTool.InkType.marker) || canvasView.tool is PKEraserTool {
             if SettingsManager.automaticAnnotation() {
                 self.startRecognitionTimer()
             }
         }
+    }
+    
+    func canvasViewDrawingDidChange(_ canvasView: PKCanvasView) {
+        self.resetHandwritingRecognition = true
+        self.startSaveTimer()
     }
     
     private func startRecognitionTimer() {
@@ -747,30 +797,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         log.info("Auto-saving sketchnote strokes and text data.")
         SKFileManager.activeNote!.getCurrentPage().canvasDrawing = self.canvasView.drawing
         SKFileManager.save(file: SKFileManager.activeNote!)
-    }
-    
-    // Drawing recognition
-    // In case the user's drawing has been recognized with at least a >40% confidence, the recognized drawing's label, e.g. "light bulb", is stored for the sketchnote.
-    private var labelNames: [String] = []
-    private let drawnImageClassifier = DrawnImageClassifier()
-    private var currentPrediction: DrawnImageClassifierOutput? {
-        didSet {
-            if let currentPrediction = currentPrediction {
-                let sorted = currentPrediction.category_softmax_scores.sorted { $0.value > $1.value }
-                let top5 = sorted.prefix(5)
-                log.info(top5.map { $0.key + "(" + String($0.value) + ")"}.joined(separator: ", "))
-                
-                for (label, score) in top5 {
-                    if score > 0.4 {
-                        log.info("Adding recognized drawing's label: " + label)
-                        SKFileManager.activeNote!.getCurrentPage().addDrawing(drawing: label)
-                    }
-                }
-            }
-            else {
-                log.info("Waiting for drawing")
-            }
-        }
     }
     
     //MARK: Bookshelf resize
@@ -1024,6 +1050,9 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             startPoint = tapPoint
             currentDrawingRegion = UIView(frame: CGRect(x: tapPoint.x, y: tapPoint.y, width: 1, height: 1))
             currentDrawingRegion?.layer.borderColor = UIColor.black.cgColor
+            if traitCollection.userInterfaceStyle == .dark {
+                currentDrawingRegion?.layer.borderColor = UIColor.white.cgColor
+            }
             currentDrawingRegion?.layer.borderWidth = 1
             drawingInsertionCanvas.addSubview(currentDrawingRegion!)
             break

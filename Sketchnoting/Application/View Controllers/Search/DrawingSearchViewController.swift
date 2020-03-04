@@ -118,7 +118,6 @@ class DrawingSearchViewController: UIViewController, PKCanvasViewDelegate {
                 }
             }
         }
-        
     }
     
     // Drawing recognition

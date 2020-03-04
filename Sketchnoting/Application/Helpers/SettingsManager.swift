@@ -47,11 +47,7 @@ class SettingsManager {
             case 0:
                 return PencilSideButtonKeys.ManageDrawings
             case 1:
-                return PencilSideButtonKeys.ToggleEraserPencil
-            case 2:
-                return PencilSideButtonKeys.Undo
-            case 3:
-                return PencilSideButtonKeys.Redo
+                return PencilSideButtonKeys.System
             default:
                 return PencilSideButtonKeys.ManageDrawings
         }
@@ -97,9 +93,7 @@ public enum Annotator: String {
 }
 public enum PencilSideButtonKeys : String {
     case ManageDrawings
-    case ToggleEraserPencil
-    case Undo
-    case Redo
+    case System
 }
 
 public enum TextRecognitionSetting : String {

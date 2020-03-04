@@ -13,7 +13,7 @@
         <scene sceneID="Vkf-KL-WO9">
             <objects>
                 <tableViewController title="Settings" modalPresentationStyle="pageSheet" id="9zg-b6-ctU" customClass="SettingsViewController" customModule="Sketchnoting" customModuleProvider="target" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="fWV-nU-jIa">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="plain" separatorStyle="default" allowsSelection="NO" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="fWV-nU-jIa">
                         <rect key="frame" x="0.0" y="0.0" width="712" height="984"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -182,12 +182,10 @@
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="8Sn-sq-rPx">
-                                                    <rect key="frame" x="64.5" y="40" width="583" height="32"/>
+                                                    <rect key="frame" x="226.5" y="40" width="259" height="32"/>
                                                     <segments>
                                                         <segment title="Manage Drawings"/>
-                                                        <segment title="Toggle Eraser/Pencil"/>
-                                                        <segment title="Undo"/>
-                                                        <segment title="Redo"/>
+                                                        <segment title="System"/>
                                                     </segments>
                                                     <connections>
                                                         <action selector="pencilSideButtonSegmentedControlChanged:" destination="9zg-b6-ctU" eventType="valueChanged" id="l1m-a3-eaG"/>
