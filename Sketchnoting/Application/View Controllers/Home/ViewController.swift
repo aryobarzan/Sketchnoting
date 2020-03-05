@@ -13,7 +13,6 @@ import NVActivityIndicatorView
 import NotificationBannerSwift
 import DataCompression
 import ViewAnimator
-import SwiftGraph
 
 import MultipeerConnectivity
 import Vision
