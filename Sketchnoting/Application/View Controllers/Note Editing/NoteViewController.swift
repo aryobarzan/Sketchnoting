@@ -8,6 +8,7 @@
 
 import UIKit
 import PencilKit
+import VisionKit
 
 import Firebase
 import PopMenu
@@ -18,8 +19,9 @@ import ViewAnimator
 import MaterialComponents.MaterialBottomSheet
 import Connectivity
 import GPUImage
+import PopMenu
 
-class NoteViewController: UIViewController, UIPencilInteractionDelegate, UICollectionViewDataSource, UICollectionViewDelegate, NoteXDelegate, PKCanvasViewDelegate, PKToolPickerObserver, UIScreenshotServiceDelegate, NoteOptionsDelegate, DocumentsViewControllerDelegate, NotePagesDelegate {
+class NoteViewController: UIViewController, UIPencilInteractionDelegate, UICollectionViewDataSource, UICollectionViewDelegate, NoteXDelegate, PKCanvasViewDelegate, PKToolPickerObserver, UIScreenshotServiceDelegate, NoteOptionsDelegate, DocumentsViewControllerDelegate, NotePagesDelegate, VNDocumentCameraViewControllerDelegate {
     
     private var documentsVC: DocumentsViewController!
     
@@ -35,7 +37,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     @IBOutlet var previousPageButton: UIButton!
     @IBOutlet var nextPageButton: UIButton!
     @IBOutlet var newPageButton: UIButton!
-    @IBOutlet var pageButton: UIButton!
     
     @IBOutlet var closeButton: UIButton!
     var topicsBadgeHub: BadgeHub!
@@ -661,29 +662,43 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     let handwritingRecognizer = HandwritingRecognizer()
     
     private func processHandwritingRecognition() {
-        let image = self.generateHandwritingRecognitionImage()
-        handwritingRecognizer.recognize(spellcheck: false, image: image) { (success, noteText) in
-            if success {
-                SKFileManager.activeNote!.getCurrentPage().clearTextData()
-                if let noteText = noteText {
-                    SKFileManager.activeNote!.getCurrentPage().noteTextArray.append(noteText)
-                    self.annotateText(text: SKFileManager.activeNote!.getText())
-                    log.info(noteText.spellchecked)
+        self.generateHandwritingRecognitionImage(completion: { image in
+            self.handwritingRecognizer.recognize(spellcheck: false, image: image) { (success, noteText) in
+                if success {
+                    SKFileManager.activeNote!.getCurrentPage().clearTextData()
+                    if let noteText = noteText {
+                        SKFileManager.activeNote!.getCurrentPage().noteTextArray.append(noteText)
+                        self.annotateText(text: SKFileManager.activeNote!.getText())
+                        log.info(noteText.spellchecked)
+                    }
+                }
+                else {
+                    self.activityIndicator.stopAnimating()
+                    log.error("Handwriting recognition returned no result.")
                 }
             }
-            else {
-                self.activityIndicator.stopAnimating()
-                log.error("Handwriting recognition returned no result.")
+        })
+    }
+    private func generateHandwritingRecognitionImage(completion: @escaping (UIImage) -> Void){
+        UITraitCollection(userInterfaceStyle: .light).performAsCurrent {
+            var hasBackdrop = false
+            var image = canvasView.drawing.image(from: UIScreen.main.bounds, scale: 1.0)
+            let canvasImage = image
+            if let (backdropData, backdropIsPDF) = SKFileManager.activeNote!.getCurrentPage().getBackdrop() {
+                if !backdropIsPDF {
+                    hasBackdrop = true
+                    if let backdropImage = UIImage(data: backdropData) {
+                        image = backdropImage.mergeWith(topImage: canvasImage)
+                    }
+                    DispatchQueue.main.async {
+                        completion(image)
+                    }
+                }
+            }
+            if !hasBackdrop {
+                completion(image)
             }
         }
-    }
-    private func generateHandwritingRecognitionImage() -> UIImage {
-        var noteImage = canvasView.drawing.image(from: canvasView.bounds, scale: 1.0)
-        if UITraitCollection.current.userInterfaceStyle == .dark {
-            log.info("Handwriting recognition image generation - dark mode detected, inverting image")
-            noteImage = noteImage.invertedImage() ?? noteImage
-        }
-        return noteImage
     }
     
     var connectivity: Connectivity?
@@ -942,9 +957,11 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     // MARK: NoteXDelegate
     func noteHasNewDocument(note: NoteX, document: Document) {
         documentsVC.noteHasNewDocument(note: note, document: document)
+        startSaveTimer()
     }
     func noteHasRemovedDocument(note: NoteX, document: Document) {
         documentsVC.noteDocumentHasChanged(note: note, document: document)
+        startSaveTimer()
     }
     func noteDocumentHasChanged(note: NoteX, document: Document) {
         documentsVC.noteDocumentHasChanged(note: note, document: document)
@@ -1151,36 +1168,50 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         updatePaginationButtons()
     }
     
-    
-    @IBAction func pageButtonTapped(_ sender: UIButton) {
-        self.showInputDialog(title: "Go to page:", subtitle: nil, actionTitle: "Go", cancelTitle: "Cancel", inputPlaceholder: "Page Number", inputKeyboardType: .numberPad, cancelHandler: nil)
-            { (input:String?) in
-                if input != nil && Int(input!) != nil {
-                    if let pageNumber = Int(input!) {
-                        if (pageNumber - 1) >= 0 && (pageNumber - 1) < SKFileManager.activeNote!.pages.count && (pageNumber - 1) != SKFileManager.activeNote!.activePageIndex {
-                            self.saveCurrentPage()
-                            SKFileManager.activeNote!.activePageIndex = (pageNumber - 1)
-                            self.updatePage()
-                            self.updatePaginationButtons()
-                        }
-                    }
-                }
-            }
-    }
     @IBAction func newPageTapped(_ sender: UIButton) {
-        let newPage = NoteXPage()
-        SKFileManager.activeNote!.pages.insert(newPage, at: SKFileManager.activeNote!.activePageIndex + 1)
-        saveCurrentPage()
-        SKFileManager.activeNote!.nextPage()
-        updatePage()
-        saveCurrentPage()
-        updatePaginationButtons()
+        let popMenu = PopMenuViewController(sourceView: sender, actions: [PopMenuAction](), appearance: nil)
+        popMenu.appearance.popMenuBackgroundStyle = .blurred(.dark)
+        let newPageAction = PopMenuDefaultAction(title: "New Page", image: UIImage(systemName: "plus.circle"),  didSelect: { action in
+            let newPage = NoteXPage()
+            SKFileManager.activeNote!.pages.insert(newPage, at: SKFileManager.activeNote!.activePageIndex + 1)
+            self.saveCurrentPage()
+            SKFileManager.activeNote!.nextPage()
+            self.updatePage()
+            self.saveCurrentPage()
+            self.updatePaginationButtons()
+        })
+        popMenu.addAction(newPageAction)
+        let scanAction = PopMenuDefaultAction(title: "Scan Document(s)", image: UIImage(systemName: "doc.text.viewfinder"),  didSelect: { action in
+            popMenu.dismiss(animated: true, completion: nil)
+            let scannerVC = VNDocumentCameraViewController()
+            scannerVC.delegate = self
+            self.present(scannerVC, animated: true)
+        })
+        popMenu.addAction(scanAction)
+        self.present(popMenu, animated: true, completion: nil)
+    }
+    
+    func documentCameraViewController(_ controller: VNDocumentCameraViewController, didFinishWith scan: VNDocumentCameraScan) {
+        controller.dismiss(animated: true, completion: nil)
+        for i in 0..<scan.pageCount {
+            let image = scan.imageOfPage(at: i)
+            let page = NoteXPage()
+            page.setBackdrop(image: image)
+            SKFileManager.activeNote!.pages.insert(page, at: SKFileManager.activeNote!.activePageIndex + 1)
+        }
+        self.saveCurrentPage()
+    }
+    func documentCameraViewControllerDidCancel(_ controller: VNDocumentCameraViewController) {
+        controller.dismiss(animated: true, completion: nil)
+    }
+    func documentCameraViewController(_ controller: VNDocumentCameraViewController, didFailWithError error: Error) {
+        log.error(error)
+        controller.dismiss(animated: true, completion: nil)
     }
         
     private func updatePaginationButtons() {
         previousPageButton.isEnabled = SKFileManager.activeNote!.hasPreviousPage()
         nextPageButton.isEnabled = SKFileManager.activeNote!.hasNextPage()
-        pageButton.setTitle("Page \(SKFileManager.activeNote!.activePageIndex + 1)", for: .normal)
     }
     
     private func updatePage() {
@@ -1192,6 +1223,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         if previousStateOfTopicsShown {
             toggleConceptHighlight()
         }
+        self.backdropImageView.image = nil
         if let (backdropData, isPDF) = SKFileManager.activeNote!.getCurrentPage().getBackdrop() {
             if !isPDF {
                 if let image = UIImage(data: backdropData) {

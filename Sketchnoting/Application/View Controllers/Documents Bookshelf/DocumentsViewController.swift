@@ -400,9 +400,9 @@ class DocumentsViewController: UICollectionViewController{
             self.performSegue(withIdentifier: "ManageHiddenDocuments", sender: self)
         })
         popMenu.addAction(hiddenDocumentsAction)
-        
         self.present(popMenu, animated: true, completion: nil)
     }
+    
     @IBAction func filterTapped(_ sender: UIButton) {
         let popMenu = PopMenuViewController(sourceView: sender, actions: [PopMenuAction](), appearance: nil)
         popMenu.appearance.popMenuBackgroundStyle = .blurred(.dark)

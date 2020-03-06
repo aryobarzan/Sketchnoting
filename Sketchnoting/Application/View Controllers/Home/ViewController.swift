@@ -112,8 +112,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             noteListViewButton.backgroundColor = self.view.tintColor
             noteListViewButton.tintColor = .white
         }
-        
-        self.setupVisionRecognition()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -232,23 +230,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         displayDocumentPicker()
     }
     
-    //MARK: Camera
-    var textRecognitionRequest = VNRecognizeTextRequest(completionHandler: nil)
-    let textRecognitionWorkQueue = DispatchQueue(label: "TextRecognitionQueue", qos: .userInitiated, attributes: [], autoreleaseFrequency: .workItem, target: nil)
-    private func setupVisionRecognition() {
-        self.textRecognitionRequest = VNRecognizeTextRequest { (request, error) in
-            guard let observations = request.results as? [VNRecognizedTextObservation] else { return }
-            var recognizedText = ""
-            for obs in observations {
-                guard let topCandidate = obs.topCandidates(1).first else { return }
-                recognizedText += topCandidate.string
-                recognizedText += "\n"
-            }
-            log.info("Vision: recognized text:")
-            log.info(recognizedText)
-        }
-        self.textRecognitionRequest.recognitionLevel = .accurate
-    }
     @IBAction func cameraTapped(_ sender: UIButton) {
         let scannerVC = VNDocumentCameraViewController()
         scannerVC.delegate = self
@@ -261,7 +242,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         var pages = [NoteXPage]()
         for i in 0..<scan.pageCount {
             let image = scan.imageOfPage(at: i)
-            self.recognizeTextInImage(image)
             let page = NoteXPage()
             page.setBackdrop(image: image)
             pages.append(page)
@@ -277,19 +257,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         log.error(error)
         controller.dismiss(animated: true, completion: nil)
     }
-    func recognizeTextInImage(_ image: UIImage) {
-        guard let cgImage = image.cgImage else { return }
-        
-        self.textRecognitionWorkQueue.async {
-            let handler = VNImageRequestHandler(cgImage: cgImage, options: [:])
-            do {
-                try handler.perform([self.textRecognitionRequest])
-            } catch {
-                log.error(error)
-            }
-        }
-    }
-    
     
     // MARK: Note display management
     private func updateDisplayedNotes(_ animated: Bool) {

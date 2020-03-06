@@ -11,7 +11,6 @@ import Firebase
 import Alamofire
 import SwiftyBeaver
 let log = SwiftyBeaver.self
-import Kingfisher
 import MultipeerConnectivity
 
 @UIApplicationMain
@@ -30,9 +29,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         log.addDestination(console)
         log.addDestination(file)
         
-        let cache = ImageCache.default
-        cache.diskStorage.config.expiration = .never
-        cache.diskStorage.config.sizeLimit = 1000 * 1024 * 1024 // 1GB
+        SKCacheManager.cache.diskStorage.config.expiration = .never
+        SKCacheManager.cache.diskStorage.config.sizeLimit = 1000 * 1024 * 1024 // 1GB
+        SKCacheManager.cache.memoryStorage.config.countLimit = 150
         
         FirebaseApp.configure()
         

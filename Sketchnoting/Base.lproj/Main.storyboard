@@ -1224,25 +1224,6 @@
                                             <action selector="newPageTapped:" destination="lDo-DG-9fX" eventType="touchUpInside" id="qcu-pK-mdr"/>
                                         </connections>
                                     </button>
-                                    <button opaque="NO" contentMode="scaleToFill" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="jEA-WA-cjb">
-                                        <rect key="frame" x="564" y="8" width="25" height="24"/>
-                                        <state key="normal" image="arrow.left.circle" catalog="system">
-                                            <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="large"/>
-                                        </state>
-                                        <connections>
-                                            <action selector="previousPageTapped:" destination="lDo-DG-9fX" eventType="touchUpInside" id="8Yw-b3-m8l"/>
-                                        </connections>
-                                    </button>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="x8F-Ks-ZDb">
-                                        <rect key="frame" x="594" y="5" width="64" height="30"/>
-                                        <constraints>
-                                            <constraint firstAttribute="width" constant="64" id="5G1-BK-2fs"/>
-                                        </constraints>
-                                        <state key="normal" title="Page 1"/>
-                                        <connections>
-                                            <action selector="pageButtonTapped:" destination="lDo-DG-9fX" eventType="touchUpInside" id="ba3-cm-ypl"/>
-                                        </connections>
-                                    </button>
                                     <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" style="white" translatesAutoresizingMaskIntoConstraints="NO" id="SX7-51-XS7">
                                         <rect key="frame" x="417" y="10" width="20" height="20"/>
                                         <constraints>
@@ -1251,7 +1232,7 @@
                                         </constraints>
                                     </activityIndicatorView>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="qbj-Vt-kvI">
-                                        <rect key="frame" x="531" y="7" width="25" height="26.5"/>
+                                        <rect key="frame" x="627" y="7" width="25" height="26.5"/>
                                         <state key="normal" image="square.stack.3d.down.right.fill" catalog="system">
                                             <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="large"/>
                                         </state>
@@ -1259,12 +1240,20 @@
                                             <action selector="pageBrowserTapped:" destination="lDo-DG-9fX" eventType="touchUpInside" id="Kd1-OG-JCo"/>
                                         </connections>
                                     </button>
+                                    <button opaque="NO" contentMode="scaleToFill" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="jEA-WA-cjb">
+                                        <rect key="frame" x="594" y="8" width="25" height="24"/>
+                                        <state key="normal" image="arrow.left.circle" catalog="system">
+                                            <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="large"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="previousPageTapped:" destination="lDo-DG-9fX" eventType="touchUpInside" id="8Yw-b3-m8l"/>
+                                        </connections>
+                                    </button>
                                 </subviews>
                                 <color key="backgroundColor" red="0.26051741839999998" green="0.2605243921" blue="0.260520637" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="40" id="20h-xc-IL8"/>
                                     <constraint firstItem="jEA-WA-cjb" firstAttribute="centerY" secondItem="gne-qG-Zx4" secondAttribute="centerY" id="24q-s3-XNb"/>
-                                    <constraint firstItem="x8F-Ks-ZDb" firstAttribute="leading" secondItem="jEA-WA-cjb" secondAttribute="trailing" constant="5" id="25w-Kv-KLR"/>
                                     <constraint firstItem="Xyr-WH-2aV" firstAttribute="leading" secondItem="RnC-a4-JG6" secondAttribute="trailing" constant="8" id="2q6-hM-OwD"/>
                                     <constraint firstItem="8pq-Hf-1xV" firstAttribute="centerY" secondItem="gne-qG-Zx4" secondAttribute="centerY" id="35w-Rx-If1"/>
                                     <constraint firstAttribute="trailing" secondItem="KuJ-PR-Rao" secondAttribute="trailing" id="7P1-fl-qgB"/>
@@ -1282,9 +1271,9 @@
                                     <constraint firstItem="Q9N-HC-Ppd" firstAttribute="leading" secondItem="WzL-oA-wuL" secondAttribute="trailing" constant="8" id="Pg0-M1-64h"/>
                                     <constraint firstItem="SiY-ox-qPY" firstAttribute="leading" secondItem="YQI-WO-Gvp" secondAttribute="trailing" constant="8" id="QRi-KA-kF6"/>
                                     <constraint firstItem="7xW-9Y-mzw" firstAttribute="top" secondItem="gne-qG-Zx4" secondAttribute="top" constant="1" id="Rcp-S9-wSV"/>
-                                    <constraint firstItem="x8F-Ks-ZDb" firstAttribute="centerY" secondItem="gne-qG-Zx4" secondAttribute="centerY" id="Sp9-dp-4UM"/>
                                     <constraint firstItem="g83-cE-vKX" firstAttribute="centerY" secondItem="gne-qG-Zx4" secondAttribute="centerY" id="T5T-zx-FOX"/>
                                     <constraint firstAttribute="bottom" secondItem="TGv-gD-axJ" secondAttribute="bottom" constant="1" id="UTh-UE-SjO"/>
+                                    <constraint firstItem="WzL-oA-wuL" firstAttribute="leading" secondItem="qbj-Vt-kvI" secondAttribute="trailing" constant="8" id="UhK-EE-Qx9"/>
                                     <constraint firstItem="qiG-6C-Pe4" firstAttribute="centerY" secondItem="gne-qG-Zx4" secondAttribute="centerY" id="VTk-94-VDr"/>
                                     <constraint firstAttribute="trailing" secondItem="hgu-d3-kvK" secondAttribute="trailing" constant="8" id="Wsp-J5-3YY"/>
                                     <constraint firstItem="KuJ-PR-Rao" firstAttribute="leading" secondItem="gne-qG-Zx4" secondAttribute="leading" id="Y8X-z3-Cdv"/>
@@ -1296,12 +1285,11 @@
                                     <constraint firstItem="SiY-ox-qPY" firstAttribute="top" secondItem="gne-qG-Zx4" secondAttribute="top" constant="2" id="h3h-LV-sZV"/>
                                     <constraint firstItem="YQI-WO-Gvp" firstAttribute="centerY" secondItem="gne-qG-Zx4" secondAttribute="centerY" id="hID-7z-uad"/>
                                     <constraint firstItem="SX7-51-XS7" firstAttribute="leading" secondItem="X7t-cI-jkp" secondAttribute="trailing" constant="8" id="jxp-ai-faU"/>
-                                    <constraint firstItem="WzL-oA-wuL" firstAttribute="leading" secondItem="x8F-Ks-ZDb" secondAttribute="trailing" constant="2" id="mGo-jv-39r"/>
                                     <constraint firstItem="qbj-Vt-kvI" firstAttribute="centerY" secondItem="gne-qG-Zx4" secondAttribute="centerY" id="mjI-bN-hTX"/>
                                     <constraint firstItem="7xW-9Y-mzw" firstAttribute="leading" secondItem="Xyr-WH-2aV" secondAttribute="trailing" constant="8" id="oGx-Ie-Shr"/>
                                     <constraint firstAttribute="bottom" secondItem="7xW-9Y-mzw" secondAttribute="bottom" constant="1" id="oZw-6X-P9n"/>
                                     <constraint firstItem="qiG-6C-Pe4" firstAttribute="leading" secondItem="Q9N-HC-Ppd" secondAttribute="trailing" constant="8" id="sBg-xq-t9a"/>
-                                    <constraint firstItem="jEA-WA-cjb" firstAttribute="leading" secondItem="qbj-Vt-kvI" secondAttribute="trailing" constant="8" id="yXv-43-2nC"/>
+                                    <constraint firstItem="qbj-Vt-kvI" firstAttribute="leading" secondItem="jEA-WA-cjb" secondAttribute="trailing" constant="8" id="ulA-SL-fON"/>
                                     <constraint firstItem="RnC-a4-JG6" firstAttribute="leading" secondItem="SiY-ox-qPY" secondAttribute="trailing" constant="8" id="yhS-X4-qB3"/>
                                     <constraint firstItem="TGv-gD-axJ" firstAttribute="leading" secondItem="g83-cE-vKX" secondAttribute="trailing" constant="8" id="zb3-QY-AFt"/>
                                 </constraints>
@@ -1536,7 +1524,6 @@
                         <outlet property="newPageButton" destination="Q9N-HC-Ppd" id="Kx2-4C-tAi"/>
                         <outlet property="nextPageButton" destination="WzL-oA-wuL" id="ECK-fv-UfO"/>
                         <outlet property="optionsButton" destination="hgu-d3-kvK" id="eHm-5U-EfK"/>
-                        <outlet property="pageButton" destination="x8F-Ks-ZDb" id="O7W-HJ-14d"/>
                         <outlet property="previousPageButton" destination="jEA-WA-cjb" id="1TU-s6-01d"/>
                         <outlet property="relatedNotesButton" destination="u9I-hG-Uoe" id="Ar6-eC-5ue"/>
                         <outlet property="relatedNotesCollectionView" destination="EUr-m2-zMG" id="PMK-XR-oTn"/>
@@ -2382,19 +2369,29 @@
                                     </collectionViewCell>
                                 </cells>
                             </collectionView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="1M6-ae-ssb">
+                                <rect key="frame" x="702" y="20" width="46" height="30"/>
+                                <state key="normal" title="Page 1"/>
+                                <connections>
+                                    <action selector="pageButtonTapped:" destination="oax-zI-aHM" eventType="touchUpInside" id="giN-WK-FTA"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <constraints>
                             <constraint firstItem="LSc-VW-p0l" firstAttribute="trailing" secondItem="SCj-TA-b7V" secondAttribute="trailing" constant="20" id="5Lb-Kc-uvW"/>
+                            <constraint firstItem="LSc-VW-p0l" firstAttribute="trailing" secondItem="1M6-ae-ssb" secondAttribute="trailing" constant="20" id="CIS-og-OlM"/>
                             <constraint firstItem="5NX-rX-sqc" firstAttribute="centerX" secondItem="fe8-qe-me4" secondAttribute="centerX" id="E4q-wR-YOQ"/>
                             <constraint firstItem="LSc-VW-p0l" firstAttribute="bottom" secondItem="SCj-TA-b7V" secondAttribute="bottom" constant="20" id="GZe-6A-HVK"/>
                             <constraint firstItem="SCj-TA-b7V" firstAttribute="top" secondItem="LSc-VW-p0l" secondAttribute="top" constant="60" id="Q5s-uR-J2P"/>
                             <constraint firstItem="5NX-rX-sqc" firstAttribute="top" secondItem="LSc-VW-p0l" secondAttribute="top" constant="25" id="gql-XQ-tTz"/>
+                            <constraint firstItem="1M6-ae-ssb" firstAttribute="top" secondItem="LSc-VW-p0l" secondAttribute="top" constant="20" id="jK4-gX-cNF"/>
                             <constraint firstItem="SCj-TA-b7V" firstAttribute="leading" secondItem="LSc-VW-p0l" secondAttribute="leading" constant="20" id="oYE-YL-MZJ"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="LSc-VW-p0l"/>
                     </view>
                     <connections>
                         <outlet property="collectionView" destination="SCj-TA-b7V" id="d3Z-VX-Q4F"/>
+                        <outlet property="pageButton" destination="1M6-ae-ssb" id="36Z-pz-4mF"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="PcT-BJ-JPT" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -2832,7 +2829,7 @@
     </resources>
     <inferredMetricsTieBreakers>
         <segue reference="yvs-ei-HRy"/>
-        <segue reference="58e-4d-iJp"/>
+        <segue reference="OAt-q3-0jJ"/>
         <segue reference="ct4-u7-KZY"/>
     </inferredMetricsTieBreakers>
 </document>

@@ -13,6 +13,7 @@ class NotePagesViewController: UIViewController, UICollectionViewDelegate, UICol
     @IBOutlet weak var collectionView: UICollectionView!
     var delegate: NotePagesDelegate?
     
+    @IBOutlet weak var pageButton: UIButton!
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -21,6 +22,8 @@ class NotePagesViewController: UIViewController, UICollectionViewDelegate, UICol
         collectionView.dragDelegate = self
         collectionView.dropDelegate = self
         collectionView.dragInteractionEnabled = true
+        
+        pageButton.setTitle("Page \(SKFileManager.activeNote!.activePageIndex+1)", for: .normal)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -108,6 +111,19 @@ class NotePagesViewController: UIViewController, UICollectionViewDelegate, UICol
     
     func collectionView(_ collectionView: UICollectionView, dropSessionDidUpdate session: UIDropSession, withDestinationIndexPath destinationIndexPath: IndexPath?) -> UICollectionViewDropProposal {
       return UICollectionViewDropProposal(operation: .move, intent: .insertAtDestinationIndexPath)
+    }
+    @IBAction func pageButtonTapped(_ sender: UIButton) {
+        self.showInputDialog(title: "Go to page:", subtitle: nil, actionTitle: "Go", cancelTitle: "Cancel", inputPlaceholder: "Page Number", inputKeyboardType: .numberPad, cancelHandler: nil)
+        { (input:String?) in
+            if input != nil && Int(input!) != nil {
+                if let pageNumber = Int(input!) {
+                    if (pageNumber - 1) >= 0 && (pageNumber - 1) < SKFileManager.activeNote!.pages.count && (pageNumber - 1) != SKFileManager.activeNote!.activePageIndex {
+                        self.delegate?.notePageSelected(index: pageNumber - 1)
+                        self.dismiss(animated: true, completion: nil)
+                    }
+                }
+            }
+        }
     }
 }
 

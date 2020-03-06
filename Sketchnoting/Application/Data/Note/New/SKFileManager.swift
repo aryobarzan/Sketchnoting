@@ -258,8 +258,7 @@ class SKFileManager {
         self.currentFolder = nil
         log.info("All files have been wiped.")
         
-        let cache = ImageCache.default
-        cache.clearDiskCache{ log.info("KingFisher image cache cleared.") }
+        SKCacheManager.cache.clearDiskCache{ log.info("KingFisher image cache cleared.") }
     }
     
     // MARK: Folder traversal
