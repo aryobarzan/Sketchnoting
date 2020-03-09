@@ -29,20 +29,20 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     @IBOutlet weak var backdropImageView: UIImageView!
     @IBOutlet var canvasView: PKCanvasView!
     
-    @IBOutlet var topicsButton: UIButton!
-    @IBOutlet var bookshelfButton: UIButton!
-    @IBOutlet var drawingsButton: UIButton!
-    @IBOutlet var manageDrawingsButton: UIButton!
-    @IBOutlet var optionsButton: UIButton!
-    @IBOutlet var previousPageButton: UIButton!
-    @IBOutlet var nextPageButton: UIButton!
-    @IBOutlet var newPageButton: UIButton!
+    @IBOutlet weak var topicsButton: UIButton!
+    @IBOutlet weak var bookshelfButton: UIButton!
+    @IBOutlet weak var drawingsButton: UIButton!
+    @IBOutlet weak var manageDrawingsButton: UIButton!
+    @IBOutlet weak var optionsButton: UIButton!
+    @IBOutlet weak var previousPageButton: UIButton!
+    @IBOutlet weak var nextPageButton: UIButton!
+    @IBOutlet weak var newPageButton: UIButton!
     
-    @IBOutlet var closeButton: UIButton!
+    @IBOutlet weak var closeButton: UIButton!
     var topicsBadgeHub: BadgeHub!
     
     @IBOutlet var bookshelf: UIView!
-    @IBOutlet var activityIndicator: UIActivityIndicatorView!
+    @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     @IBOutlet var documentsUnderlyingView: UIView!
         
     @IBOutlet weak var helpLinesButton: UIButton!
@@ -68,6 +68,18 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         super.viewDidLoad()
         self.navigationController?.setNavigationBarHidden(true, animated: false)
         self.tabBarController?.tabBar.isHidden = true
+        
+        self.canvasView.drawing = SKFileManager.activeNote!.getCurrentPage().canvasDrawing
+        canvasView.allowsFingerDrawing = false
+        canvasView.delegate = self
+        if let window = parent?.view.window {
+            let toolPicker = PKToolPicker.shared(for: window)!
+            toolPicker.setVisible(true, forFirstResponder: canvasView)
+            toolPicker.addObserver(canvasView)
+            toolPicker.addObserver(self)
+            canvasView.becomeFirstResponder()
+        }
+        canvasViewLongPressGesture.allowedTouchTypes = [0]
 
         let storyboard = UIStoryboard(name: "Main", bundle: Bundle.main)
         self.documentsVC = storyboard.instantiateViewController(withIdentifier: "DocumentsViewController") as? DocumentsViewController
@@ -89,18 +101,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                 }
             }
         }
-        
-        self.canvasView.drawing = SKFileManager.activeNote!.getCurrentPage().canvasDrawing
-        canvasView.allowsFingerDrawing = false
-        canvasView.delegate = self
-        if let window = parent?.view.window {
-            let toolPicker = PKToolPicker.shared(for: window)!
-            toolPicker.setVisible(true, forFirstResponder: canvasView)
-            toolPicker.addObserver(canvasView)
-            toolPicker.addObserver(self)
-            canvasView.becomeFirstResponder()
-        }
-        canvasViewLongPressGesture.allowedTouchTypes = [0]
         
         //Drawing Recognition - This loads the labels for the drawing recognition's CoreML model.
         if let path = Bundle.main.path(forResource: "labels", ofType: "txt") {
@@ -147,7 +147,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         setupDrawingRegions()
         self.refreshHelpLines()
         self.refreshHelpLinesButton()
-        self.refreshRelatedNotes()
         self.updateTopicsCount()
         
         if traitCollection.userInterfaceStyle == .dark {
@@ -744,7 +743,13 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         }
     }
     
+    var relatedNotesLoadedFirstTime = false
+    
     private func showBookshelf() {
+        if !relatedNotesLoadedFirstTime {
+            relatedNotesLoadedFirstTime = true
+            self.refreshRelatedNotes()
+        }
         bookshelfButton.tintColor = self.view.tintColor
         self.bookshelf.isHidden = false
         let animation = AnimationType.from(direction: .right, offset: 400.0)
@@ -1159,7 +1164,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                 animation.isRemovedOnCompletion = false
                 animation.fillMode = CAMediaTimingFillMode(rawValue: "extended")
                 self.canvasView.layer.add(animation, forKey: "pageFlipAnimation")
-                //self.animatedUIView.addSubview(tempUIView)
             })
         }
         saveCurrentPage()

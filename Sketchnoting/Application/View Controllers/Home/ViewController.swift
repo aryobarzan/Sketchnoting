@@ -20,11 +20,6 @@ import PencilKit
 import MobileCoreServices
 import VisionKit
 
-// This is the controller for the app's home page view.
-// It contains the search bar and all the buttons related to it.
-// It also contains note collection views, which in turn contain sketchnote views.
-
-//This controller handles all interactions of the user on the home page, including creating new note collections and new notes, searching, sharing notes, and generating pdfs from notes.
 class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextFieldDelegate, MCSessionDelegate, MCBrowserViewControllerDelegate, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UIApplicationDelegate, UIPopoverPresentationControllerDelegate, UIDocumentPickerDelegate, VNDocumentCameraViewControllerDelegate, UICollectionViewDragDelegate, UICollectionViewDropDelegate, FolderButtonDelegate {
     
     @IBOutlet weak var navigationHierarchyScrollView: UIScrollView!
@@ -69,8 +64,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         self.navigationController?.setNavigationBarHidden(true, animated: false)
         self.tabBarController?.tabBar.isHidden = false
         
-        
-        
         activeFiltersBadge = BadgeHub(view: filtersButton)
         activeFiltersBadge.scaleCircleSize(by: 0.45)
         
@@ -94,7 +87,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         self.noteLoadingIndicator.isHidden = false
         self.noteLoadingIndicator.startAnimating()
         self.newNoteButton.isEnabled = false
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+        DispatchQueue.main.asyncAfter(deadline: .now()) {
             self.updateDisplayedNotes(true)
             self.updateFoldersHierarchy()
             log.info("Files loaded.")
@@ -117,7 +110,10 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         self.navigationController?.setNavigationBarHidden(true, animated: true)
-        
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
         self.updateReceivedNotesButton()
     }
     

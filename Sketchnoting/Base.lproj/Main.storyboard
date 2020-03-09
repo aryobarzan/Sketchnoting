@@ -499,7 +499,7 @@
                                             <constraint firstAttribute="width" constant="32" id="idC-Te-iJ5"/>
                                         </constraints>
                                         <fontDescription key="fontDescription" name=".SFNSDisplay" family=".SF NS Display" pointSize="40"/>
-                                        <state key="normal" image="gear" catalog="system">
+                                        <state key="normal" image="slider.horizontal.3" catalog="system">
                                             <preferredSymbolConfiguration key="preferredSymbolConfiguration" configurationType="pointSize" pointSize="15" scale="large"/>
                                         </state>
                                         <connections>
@@ -1062,9 +1062,9 @@
                                             <constraint firstAttribute="width" constant="30" id="5EF-r7-M79"/>
                                             <constraint firstAttribute="height" constant="30" id="hUn-GH-EVo"/>
                                         </constraints>
-                                        <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="13"/>
                                         <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                        <state key="normal" image="arrow.left" catalog="system">
+                                        <state key="normal" image="arrowshape.turn.up.left" catalog="system">
                                             <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="large"/>
                                         </state>
                                         <connections>
@@ -1112,8 +1112,9 @@
                                             <constraint firstAttribute="height" constant="24" id="2CR-8z-4en"/>
                                             <constraint firstAttribute="width" constant="24" id="Ahz-WM-S1d"/>
                                         </constraints>
+                                        <fontDescription key="fontDescription" type="system" pointSize="15"/>
                                         <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                        <state key="normal" image="ellipsis.circle" catalog="system">
+                                        <state key="normal" image="ellipsis" catalog="system">
                                             <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="large"/>
                                         </state>
                                         <connections>
@@ -2442,8 +2443,9 @@
                         <rect key="frame" x="0.0" y="0.0" width="768" height="1024"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                        <collectionViewFlowLayout key="collectionViewLayout" automaticEstimatedItemSize="YES" minimumLineSpacing="10" minimumInteritemSpacing="10" id="Ngr-Wq-e4P">
-                            <size key="itemSize" width="50" height="50"/>
+                        <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="Ngr-Wq-e4P">
+                            <size key="itemSize" width="220" height="240"/>
+                            <size key="estimatedItemSize" width="220" height="240"/>
                             <size key="headerReferenceSize" width="50" height="50"/>
                             <size key="footerReferenceSize" width="0.0" height="0.0"/>
                             <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
@@ -2464,19 +2466,18 @@
                                             </constraints>
                                         </imageView>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="093-Jh-ccm">
-                                            <rect key="frame" x="20" y="205" width="180" height="21"/>
+                                            <rect key="frame" x="20" y="206.5" width="180" height="19.5"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="16"/>
                                             <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                             <nil key="highlightedColor"/>
                                         </label>
                                     </subviews>
                                     <constraints>
-                                        <constraint firstAttribute="bottom" secondItem="093-Jh-ccm" secondAttribute="bottom" constant="14" id="Arb-GD-IW4"/>
+                                        <constraint firstAttribute="trailing" secondItem="I6o-9U-MdC" secondAttribute="trailing" constant="20" id="BDM-eI-onT"/>
+                                        <constraint firstItem="093-Jh-ccm" firstAttribute="top" secondItem="I6o-9U-MdC" secondAttribute="bottom" constant="9.5" id="Edf-Jw-N7K"/>
                                         <constraint firstItem="I6o-9U-MdC" firstAttribute="top" secondItem="wwS-rD-dVO" secondAttribute="top" constant="17" id="EsZ-Md-H71"/>
-                                        <constraint firstAttribute="trailing" secondItem="I6o-9U-MdC" secondAttribute="trailing" constant="20" id="GSn-13-2tu"/>
-                                        <constraint firstItem="I6o-9U-MdC" firstAttribute="leading" secondItem="wwS-rD-dVO" secondAttribute="leading" constant="20" id="JDl-OA-yf1"/>
+                                        <constraint firstItem="I6o-9U-MdC" firstAttribute="leading" secondItem="wwS-rD-dVO" secondAttribute="leading" constant="20" id="Ijv-dv-4GM"/>
                                         <constraint firstItem="093-Jh-ccm" firstAttribute="leading" secondItem="wwS-rD-dVO" secondAttribute="leading" constant="20" id="Lwb-tw-sfz"/>
-                                        <constraint firstItem="093-Jh-ccm" firstAttribute="top" secondItem="I6o-9U-MdC" secondAttribute="bottom" constant="8" id="any-9q-fy7"/>
                                         <constraint firstAttribute="trailing" secondItem="093-Jh-ccm" secondAttribute="trailing" constant="20" id="zWB-a7-TWZ"/>
                                     </constraints>
                                 </collectionViewCellContentView>
@@ -2788,6 +2789,7 @@
         <image name="arrow.left.circle" catalog="system" width="64" height="60"/>
         <image name="arrow.right.circle" catalog="system" width="64" height="60"/>
         <image name="arrow.up.arrow.down.circle" catalog="system" width="64" height="60"/>
+        <image name="arrowshape.turn.up.left" catalog="system" width="64" height="52"/>
         <image name="book.circle" catalog="system" width="64" height="60"/>
         <image name="book.circle.fill" catalog="system" width="64" height="60"/>
         <image name="camera.viewfinder" catalog="system" width="64" height="56"/>
@@ -2795,9 +2797,8 @@
         <image name="doc.plaintext" catalog="system" width="56" height="64"/>
         <image name="doc.richtext" catalog="system" width="56" height="64"/>
         <image name="doc.text.viewfinder" catalog="system" width="64" height="56"/>
-        <image name="ellipsis.circle" catalog="system" width="64" height="60"/>
+        <image name="ellipsis" catalog="system" width="64" height="18"/>
         <image name="folder.badge.plus" catalog="system" width="64" height="42"/>
-        <image name="gear" catalog="system" width="64" height="58"/>
         <image name="hand.thumbsdown.fill" catalog="system" width="64" height="62"/>
         <image name="hand.thumbsup.fill" catalog="system" width="64" height="62"/>
         <image name="house.fill" catalog="system" width="64" height="52"/>

@@ -31,29 +31,6 @@ var toGrayscale: UIImage {
     guard let processedCGImage = CIContext().createCGImage(grayscale, from: grayscale.extent) else { return self }
     return UIImage(cgImage: processedCGImage, scale: scale, orientation: imageOrientation)
 }
-var reduceNoise: UIImage? {
-    guard let openGLContext = EAGLContext(api: .openGLES2) else { return self }
-    let ciContext = CIContext(eaglContext: openGLContext)
-    
-    guard let noiseReduction = CIFilter(name: "CINoiseReduction") else { return self }
-    noiseReduction.setValue(CIImage(image: self), forKey: kCIInputImageKey)
-    noiseReduction.setValue(0.02, forKey: "inputNoiseLevel")
-    noiseReduction.setValue(0.40, forKey: "inputSharpness")
-    
-    if let output = noiseReduction.outputImage,
-        let cgImage = ciContext.createCGImage(output, from: output.extent) {
-        return UIImage(cgImage: cgImage, scale: scale, orientation: imageOrientation)
-    }
-    
-    return nil
-}
-func resize(toWidth width: CGFloat) -> UIImage? {
-    let canvasSize = CGSize(width: width, height: CGFloat(ceil(width/size.width * size.height)))
-    UIGraphicsBeginImageContextWithOptions(canvasSize, false, scale)
-    defer { UIGraphicsEndImageContext() }
-    draw(in: CGRect(origin: .zero, size: canvasSize))
-    return UIGraphicsGetImageFromCurrentImageContext()
-}
     
     // For drawing recognition
     public func resize(newSize: CGSize) -> UIImage {

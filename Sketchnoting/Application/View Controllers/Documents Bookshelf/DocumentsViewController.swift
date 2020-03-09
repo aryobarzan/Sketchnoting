@@ -73,8 +73,6 @@ class DocumentsViewController: UICollectionViewController{
     }
     
     // MARK: UICollectionViewDataSource
-
-
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return self.items.count
     }
@@ -82,11 +80,8 @@ class DocumentsViewController: UICollectionViewController{
     override func collectionView(_ collectionView: UICollectionView,
                                  viewForSupplementaryElementOfKind kind: String,
                                  at indexPath: IndexPath) -> UICollectionReusableView {
-      // 1
       switch kind {
-      // 2
       case UICollectionView.elementKindSectionHeader:
-        // 3
         guard
           let headerView = collectionView.dequeueReusableSupplementaryView(
             ofKind: kind,
@@ -107,13 +102,11 @@ class DocumentsViewController: UICollectionViewController{
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath as IndexPath) as! DocumentViewCell
         let document = self.items[indexPath.item]
-        cell.document = document
         cell.titleLabel.text = document.title
         cell.previewImage.image = document.previewImage
         cell.previewImage.layer.masksToBounds = true
         cell.previewImage.layer.cornerRadius = 90
         switch document.documentType {
-            
         case .Spotlight:
             cell.previewImage.layer.borderColor = #colorLiteral(red: 0.1764705926, green: 0.01176470611, blue: 0.5607843399, alpha: 1)
             break
@@ -131,9 +124,7 @@ class DocumentsViewController: UICollectionViewController{
             break
         }
         cell.previewImage.layer.borderWidth = 3
-        
         cell.layer.cornerRadius = 2
-        
         return cell
     }
 
@@ -143,10 +134,9 @@ class DocumentsViewController: UICollectionViewController{
         documentDetailVC.view.isHidden = false
         let animation = AnimationType.from(direction: .right, offset: 100.0)
         documentDetailVC.view.animate(animations: [animation])
-        
     }
     
-    func collectionView(_ collectionView: UICollectionView,
+   func collectionView(_ collectionView: UICollectionView,
                         layout collectionViewLayout: UICollectionViewLayout,
                         sizeForItemAt indexPath: IndexPath) -> CGSize {
         return CGSize(width: CGFloat(220), height: CGFloat(240))
@@ -155,10 +145,9 @@ class DocumentsViewController: UICollectionViewController{
     func updateBookshelf() {
         DispatchQueue.main.async {
             if self.bookshelfState == .All {
-                print("Updating Bookshelf.")
+                log.info("Updating Bookshelf.")
                 self.header?.clearFilterButton.isHidden = true
                 self.items = self.getFilteredDocuments(documents: self.note.documents)
-                
                 self.collectionView.reloadData()
             }
             else if self.bookshelfState == .Topic {

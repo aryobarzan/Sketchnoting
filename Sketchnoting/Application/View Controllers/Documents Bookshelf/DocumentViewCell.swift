@@ -9,7 +9,6 @@
 import UIKit
 
 class DocumentViewCell: UICollectionViewCell {
-    var document: Document!
-    @IBOutlet var previewImage: UIImageView!
-    @IBOutlet var titleLabel: UILabel!
+    @IBOutlet weak var previewImage: UIImageView!
+    @IBOutlet weak var titleLabel: UILabel!
 }
