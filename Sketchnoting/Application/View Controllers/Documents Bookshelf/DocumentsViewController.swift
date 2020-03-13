@@ -103,6 +103,7 @@ class DocumentsViewController: UICollectionViewController{
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath as IndexPath) as! DocumentViewCell
         let document = self.items[indexPath.item]
         cell.titleLabel.text = document.title
+        cell.previewImage.image = nil
         document.retrieveImage(type: .Standard, completion: { result in
             switch result {
             case .success(let value):

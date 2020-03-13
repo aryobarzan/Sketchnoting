@@ -105,24 +105,30 @@ class NoteXPage: Codable {
     }
     
     func createPDF() -> Data? {
-            let pdfWidth = UIScreen.main.bounds.width
-            let pdfHeight = canvasDrawing.bounds.maxY + 100
+        let pdfWidth = UIScreen.main.bounds.width
+        let pdfHeight = UIScreen.main.bounds.height
                 
-            let bounds = CGRect(x: 0, y: 0, width: pdfWidth, height: pdfHeight)
-            let mutableData = NSMutableData()
-            UIGraphicsBeginPDFContextToData(mutableData, bounds, nil)
-            UIGraphicsBeginPDFPage()
+        let bounds = CGRect(x: 0, y: 0, width: pdfWidth, height: pdfHeight)
+        let mutableData = NSMutableData()
+        UIGraphicsBeginPDFContextToData(mutableData, bounds, nil)
+        UIGraphicsBeginPDFPage()
                         
-            var yOrigin: CGFloat = 0
-            let imageHeight: CGFloat = 1024
-            while yOrigin < bounds.maxY {
-                let imgBounds = CGRect(x: 0, y: yOrigin, width: UIScreen.main.bounds.width, height: min(imageHeight, bounds.maxY - yOrigin))
-                let img = canvasDrawing.image(from: imgBounds, scale: 2)
-                img.draw(in: imgBounds)
-                yOrigin += imageHeight
+        var yOrigin: CGFloat = 0
+        while yOrigin < bounds.maxY {
+            let imgBounds = CGRect(x: 0, y: yOrigin, width: pdfWidth, height: pdfHeight)
+            var image = canvasDrawing.image(from: imgBounds, scale: 2)
+            if let (backdropData, backdropIsPDF) = getBackdrop() {
+                if !backdropIsPDF {
+                    if let backdropImage = UIImage(data: backdropData) {
+                        image = backdropImage.mergeWith(topImage: image)
+                    }
+                }
             }
-            UIGraphicsEndPDFContext()
-            return mutableData as Data
+            image.draw(in: imgBounds)
+            yOrigin += pdfHeight
+        }
+        UIGraphicsEndPDFContext()
+        return mutableData as Data
     }
     
     public func getAsImage(completion: @escaping (UIImage) -> Void) {

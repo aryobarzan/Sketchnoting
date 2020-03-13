@@ -375,7 +375,7 @@ class NoteX: File, DocumentVisitor, DocumentDelegate {
     func createPDF() -> Data? {
         if pages.count > 0 {
             let pdfWidth = UIScreen.main.bounds.width
-            let pdfHeight = pages[0].canvasDrawing.bounds.maxY + 100
+            let pdfHeight = UIScreen.main.bounds.height
             
             let bounds = CGRect(x: 0, y: 0, width: pdfWidth, height: pdfHeight)
             let mutableData = NSMutableData()
@@ -384,13 +384,19 @@ class NoteX: File, DocumentVisitor, DocumentDelegate {
                 UIGraphicsBeginPDFPage()
                     
                 var yOrigin: CGFloat = 0
-                let imageHeight: CGFloat = 1024
                 while yOrigin < bounds.maxY {
-                    let imgBounds = CGRect(x: 0, y: yOrigin, width: UIScreen.main.bounds.width, height: min(imageHeight, bounds.maxY - yOrigin))
+                    let imgBounds = CGRect(x: 0, y: yOrigin, width: pdfWidth, height: pdfHeight)
                     UITraitCollection(userInterfaceStyle: .light).performAsCurrent {
-                        let image = page.canvasDrawing.image(from: imgBounds, scale: 2)
+                        var image = page.canvasDrawing.image(from: imgBounds, scale: 2)
+                        if let (backdropData, backdropIsPDF) = page.getBackdrop() {
+                            if !backdropIsPDF {
+                               if let backdropImage = UIImage(data: backdropData) {
+                                    image = backdropImage.mergeWith(topImage: image)
+                                }
+                            }
+                        }
                         image.draw(in: imgBounds)
-                        yOrigin += imageHeight
+                        yOrigin += pdfHeight
                     }
                 }
             }
