@@ -28,7 +28,7 @@ class SpotlightDocument: Document { // Out of date and currently unused
         case mapImage
     }
     
-    init?(title: String, description: String?, URL: String, type: DocumentType, previewImage: UIImage?, rank: Double?, label: String?, types: [String]?, wikiPageID: Double?, latitude: Double?, longitude: Double?, mapImage: UIImage?) {
+    init?(title: String, description: String?, URL: String, type: DocumentType, rank: Double?, label: String?, types: [String]?, wikiPageID: Double?, latitude: Double?, longitude: Double?, mapImage: UIImage?) {
         self.secondRankPercentage = rank
         self.label = label
         self.types = types
@@ -36,7 +36,7 @@ class SpotlightDocument: Document { // Out of date and currently unused
         self.latitude = latitude
         self.longitude = longitude
         self.mapImage = mapImage
-        super.init(title: title, description: description, URL: URL, documentType: type, previewImage: previewImage)
+        super.init(title: title, description: description, URL: URL, documentType: type)
     }
     
     override func encode(to encoder: Encoder) throws {

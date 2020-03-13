@@ -12,9 +12,9 @@ class CHEBIDocument: BioPortalDocument {
     
     var moleculeImage: UIImage?
     
-    init?(title: String, description: String?, URL: String, type: DocumentType, previewImage: UIImage?, prefLabel: String, definition: String, moleculeImage: UIImage?) {
+    init?(title: String, description: String?, URL: String, type: DocumentType, prefLabel: String, definition: String, moleculeImage: UIImage?) {
         self.moleculeImage = moleculeImage
-        super.init(title: title, description: description, URL: URL, type: type, previewImage: previewImage, prefLabel: prefLabel, definition: definition)
+        super.init(title: title, description: description, URL: URL, type: type, prefLabel: prefLabel, definition: definition)
     }
     
     override func encode(to encoder: Encoder) throws {
@@ -40,9 +40,6 @@ class CHEBIDocument: BioPortalDocument {
                     log.info("Molecule image found for document \(self.title).")
                     DispatchQueue.main.async {
                         self.moleculeImage = value!
-                        if self.previewImage == nil {
-                            self.previewImage = value!
-                        }
                     }
                 }
             case .failure(let error):
@@ -53,7 +50,6 @@ class CHEBIDocument: BioPortalDocument {
     }
     
     override func reload() {
-        loadPreviewImage()
         loadMoleculeImage()
         delegate?.documentHasChanged(document: self)
     }

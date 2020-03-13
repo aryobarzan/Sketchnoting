@@ -62,14 +62,14 @@ class BioPortalHelper {
                                 classes[annotation] = id
                                 
                                 if ontology.lowercased() == "chebi" {
-                                     let document = CHEBIDocument(title: annotation, description: definition, URL: "https://bioportal.bioontology.org/search?utf8=%E2%9C%93&query=" + (prefLabel.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) ?? "https://bioportal.bioontology.org/"), type: .Chemistry, previewImage: nil, prefLabel: prefLabel, definition: definition, moleculeImage: nil)
+                                     let document = CHEBIDocument(title: annotation, description: definition, URL: "https://bioportal.bioontology.org/search?utf8=%E2%9C%93&query=" + (prefLabel.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) ?? "https://bioportal.bioontology.org/"), type: .Chemistry, prefLabel: prefLabel, definition: definition, moleculeImage: nil)
                                     if let document = document {
                                         documents.append(document)
                                         self.fetchMoleculeImageForCHEBI(document: document, id: id, note: note)
                                     }
                                 }
                                 else {
-                                    let document = BioPortalDocument(title: annotation, description: definition, URL: "https://bioportal.bioontology.org/search?utf8=%E2%9C%93&query=" + (prefLabel.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) ?? "https://bioportal.bioontology.org/"), type: .BioPortal, previewImage: nil, prefLabel: prefLabel, definition: definition)
+                                    let document = BioPortalDocument(title: annotation, description: definition, URL: "https://bioportal.bioontology.org/search?utf8=%E2%9C%93&query=" + (prefLabel.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) ?? "https://bioportal.bioontology.org/"), type: .BioPortal, prefLabel: prefLabel, definition: definition)
                                     if let document = document {
                                         documents.append(document)
                                     }

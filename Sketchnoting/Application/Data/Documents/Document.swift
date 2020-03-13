@@ -39,7 +39,6 @@ class Document: Codable, Visitable, Equatable {
     var description: String?
     var URL: String
     var documentType: DocumentType
-    var previewImage: UIImage?
     
     var delegate: DocumentDelegate?
     
@@ -50,7 +49,7 @@ class Document: Codable, Visitable, Equatable {
         case documentType = "DocumentType"
     }
     
-    init?(title: String, description: String?, URL: String, documentType: DocumentType, previewImage: UIImage?){
+    init?(title: String, description: String?, URL: String, documentType: DocumentType){
         guard !title.isEmpty && !URL.isEmpty else {
             return nil
         }
@@ -58,7 +57,6 @@ class Document: Codable, Visitable, Equatable {
         self.description = description
         self.URL = URL
         self.documentType = documentType
-        self.previewImage = previewImage
     }
     
     func encode(to encoder: Encoder) throws {
@@ -86,8 +84,6 @@ class Document: Codable, Visitable, Equatable {
         }
         URL = try container.decode(String.self, forKey: .URL)
         documentType = DocumentType(rawValue: try container.decode(String.self, forKey: .documentType)) ?? .Other
-        
-        loadPreviewImage()
     }
     
     //MARK: Visitable
@@ -120,14 +116,19 @@ class Document: Codable, Visitable, Equatable {
         else {
             log.info("SVG preview image detected.")
             if let svgImage = SVGKImage(contentsOf: url)?.uiImage {
-                if let jpegData = svgImage.jpegData(compressionQuality: 1) {
-                    if let jpegImage = UIImage(data: jpegData) {
-                        log.info("Preview image from SVG image to jpeg image created.")
-                        cache.store(jpegImage, forKey: key)
-                        self.reload()
+                if let jpegData = svgImage.jpegData(compressionQuality: 0.8) {
+                    if jpegData.count < 10000000 {
+                        if let jpegImage = UIImage(data: jpegData) {
+                            log.info("Preview image from SVG image to jpeg image created.")
+                            cache.store(jpegImage, forKey: key)
+                            self.reload()
+                        }
+                        else {
+                            log.error("Could not create UIImage from jpeg data.")
+                        }
                     }
                     else {
-                        log.error("Could not create UIImage from jpeg data.")
+                        log.error("Image bigger than 10MB, not stored.")
                     }
                 }
                 else {
@@ -146,44 +147,9 @@ class Document: Codable, Visitable, Equatable {
         cache.retrieveImageInDiskCache(forKey: key, completionHandler: { result in
             completion(result)
             })
-        /*
-         let processor = SVGProcessor()
-         let serializer = SVGCacheSerializer()
-         ImageCache.default.retrieveImageInDiskCache(forKey: key, options: [.processor(processor), .forceRefresh, .cacheSerializer(serializer), .waitForCache]) { result in
-            switch result {
-            case .success(let value):
-                if value != nil {
-                    log.info("Image found for key \(key).")
-                    DispatchQueue.main.async {
-                        self.previewImage = value!
-                        print(self.previewImage)
-                    }
-                }
-            case .failure(let error):
-                log.error("No image found for key \(key).")
-                print(error)
-            }
-        }*/
-    }
-    internal func loadPreviewImage() {
-        self.retrieveImage(type: .Standard, completion: { result in
-            switch result {
-            case .success(let value):
-                if value != nil {
-                    log.info("Preview image found for document \(self.title).")
-                    DispatchQueue.main.async {
-                        self.previewImage = value!
-                    }
-                }
-            case .failure(let error):
-                log.error("No preview image found for document \(self.title).")
-                print(error)
-            }
-        })
     }
     
     public func reload() {
-        loadPreviewImage()
         delegate?.documentHasChanged(document: self)
     }
     

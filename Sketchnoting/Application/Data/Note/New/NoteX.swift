@@ -214,7 +214,6 @@ class NoteX: File, DocumentVisitor, DocumentDelegate {
     
     func setDocumentPreviewImage(document: Document, image: UIImage) {
         if self.documents.contains(document) {
-            document.previewImage = image
             self.delegate?.noteDocumentHasChanged(note: self, document: document)
         }
     }

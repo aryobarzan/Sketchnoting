@@ -41,9 +41,19 @@ class DocumentDetailViewController: UIViewController, DocumentVisitor {
         typeLabel.text = "Document"
         previewImage.image = nil
         bottomImageView.image = nil
-        if let previewImage = document.previewImage {
-            self.previewImage.image = previewImage
-        }
+        document.retrieveImage(type: .Standard, completion: { result in
+            switch result {
+            case .success(let value):
+                if let value = value {
+                    log.info("Preview image found for document \(document.title).")
+                    DispatchQueue.main.async {
+                        self.previewImage.image = value
+                    }
+                }
+            case .failure(_):
+                log.error("No preview image found for document \(document.title).")
+            }
+        })
         document.accept(visitor: self)
     }
     

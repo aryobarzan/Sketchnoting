@@ -560,7 +560,18 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                         documentPreviewVC.modalPresentationStyle = .popover
                         documentPreviewVC.popoverPresentationController?.sourceView = view
                         present(documentPreviewVC, animated: true, completion: nil)
-                        documentPreviewVC.imageView.image = doc[0].previewImage
+                        doc[0].retrieveImage(type: .Standard, completion: { result in
+                            switch result {
+                            case .success(let value):
+                                if let value = value {
+                                    DispatchQueue.main.async {
+                                        documentPreviewVC.imageView.image = value
+                                    }
+                                }
+                            case .failure(_):
+                                log.error("No preview image found for document.")
+                            }
+                        })
                         documentPreviewVC.titleLabel.text = doc[0].title
                         documentPreviewVC.bodyTextView.text = doc[0].description
                     }

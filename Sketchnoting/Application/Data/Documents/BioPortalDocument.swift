@@ -18,10 +18,10 @@ class BioPortalDocument: Document {
         case definition
     }
     
-    init?(title: String, description: String?, URL: String, type: DocumentType, previewImage: UIImage?, prefLabel: String, definition: String) {
+    init?(title: String, description: String?, URL: String, type: DocumentType, prefLabel: String, definition: String) {
         self.prefLabel = prefLabel
         self.definition = definition
-        super.init(title: title, description: description, URL: URL, documentType: type, previewImage: previewImage)
+        super.init(title: title, description: description, URL: URL, documentType: type)
     }
     
     override func encode(to encoder: Encoder) throws {

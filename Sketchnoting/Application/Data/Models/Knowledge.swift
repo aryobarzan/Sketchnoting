@@ -71,11 +71,11 @@ class Knowledge {
                 }
             }
         }
-        /*let N = Float(NotesManager.notes.count)
+        let N = Float(SKFileManager.notes.count)
          for (t, f) in termIDFs {
             let division = N / f
             termIDFs[t] = log10(division)
-        }*/
+        }
         for note in SKFileManager.notes {
             var noteIDFs = Dictionary<String, Float>()
             for (t, f) in termTFs[note]! {

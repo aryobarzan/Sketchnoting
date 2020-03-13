@@ -21,11 +21,11 @@ class TAGMEDocument: Document {
         case wikiPageID
     }
     
-    init?(title: String, description: String?, URL: String, type: DocumentType, previewImage: UIImage?, spot: String?, categories: [String]?, wikiPageID: Double?) {
+    init?(title: String, description: String?, URL: String, type: DocumentType, spot: String?, categories: [String]?, wikiPageID: Double?) {
         self.spot = spot
         self.categories = categories
         self.wikiPageID = wikiPageID
-        super.init(title: title, description: description, URL: URL, documentType: type, previewImage: previewImage)
+        super.init(title: title, description: description, URL: URL, documentType: type)
     }
     
     override func encode(to encoder: Encoder) throws {
@@ -60,9 +60,6 @@ class TAGMEDocument: Document {
                     log.info("Map image found for document \(self.title).")
                     DispatchQueue.main.async {
                         self.mapImage = value!
-                        if self.previewImage == nil {
-                            self.previewImage = value!
-                        }
                     }
                 }
             case .failure(_):
@@ -72,7 +69,6 @@ class TAGMEDocument: Document {
     }
     
     override func reload() {
-        loadPreviewImage()
         loadMapImage()
         delegate?.documentHasChanged(document: self)
     }

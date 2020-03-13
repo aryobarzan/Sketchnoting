@@ -298,3 +298,4 @@ class SKFileManager {
         self.save(file: folder)
     }
 }
+

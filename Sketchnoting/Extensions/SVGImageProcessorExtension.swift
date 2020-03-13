@@ -30,10 +30,17 @@ struct SVGProcessor: ImageProcessor {
             //already an image
             return image
         case .data(let data):
-            print(data)
-            if let imageSVG : SVGKImage = SVGKImage(data: data) {
-                return imageSVG.uiImage
+            log.info("Processing image data. (SVGProcessor)")
+            if (data.count < 10000000) {
+                if let imageSVG : SVGKImage = SVGKImage(data: data) {
+                    return imageSVG.uiImage
+                }
+                return nil
             }
+            else {
+                log.error("Cannot process image, bigger than 10MB.")
+            }
+            
             return nil
         }
     }
@@ -46,9 +53,13 @@ struct SVGCacheSerializer: CacheSerializer {
     }
     
     func image(with data: Data, options: KingfisherParsedOptionsInfo) -> KFCrossPlatformImage? {
-        if let imageSVG : SVGKImage = SVGKImage(data: data) {
-            return imageSVG.uiImage
+        if (data.count < 10000000) {
+            if let imageSVG : SVGKImage = SVGKImage(data: data) {
+                return imageSVG.uiImage
+            }
+            return nil
         }
+        
         return nil
     }
 }

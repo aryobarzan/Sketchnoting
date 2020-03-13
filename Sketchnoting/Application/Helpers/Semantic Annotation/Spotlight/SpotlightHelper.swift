@@ -131,7 +131,7 @@ class SpotlightHelper {
                     }
                 }
                 
-                if let document = SpotlightDocument(title: concept, description: abstract, URL: conceptURI, type: .Spotlight, previewImage: thumbnail, rank: secondRankPercentage, label: label, types: types, wikiPageID: wikiPageID, latitude: latitude, longitude: longitude, mapImage: nil) {
+                if let document = SpotlightDocument(title: concept, description: abstract, URL: conceptURI, type: .Spotlight, rank: secondRankPercentage, label: label, types: types, wikiPageID: wikiPageID, latitude: latitude, longitude: longitude, mapImage: nil) {
                     if let latitude = latitude, let longitude = longitude {
                         MapHelper.fetchMapImage(latitude: String(latitude), longitude: String(longitude), document: document, note: note)
                     }

@@ -17,12 +17,7 @@ struct NoteText: Codable {
     var blocks: [NoteTextBlock]
     init(visionText: VisionText, spellcheck: Bool) {
         self.text = visionText.text
-        if spellcheck {
-            self.spellchecked = OCRHelper.postprocess(text: text)
-        }
-        else {
-            self.spellchecked = text
-        }
+        self.spellchecked = text
         self.corrected = spellchecked
         self.blocks = NoteText.createVisionTextWrapper(visionText: visionText)
     }
