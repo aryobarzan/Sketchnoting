@@ -11,6 +11,7 @@
 		9F05B5A1232BE4EC00983AF2 /* NoteCollectionViewDetailCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9F05B59F232BE4EC00983AF2 /* NoteCollectionViewDetailCell.xib */; };
 		9F05B5A3232BF0C800983AF2 /* NoteCollectionViewDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F05B5A2232BF0C800983AF2 /* NoteCollectionViewDetailCell.swift */; };
 		9F0ABB282412E5D400CA5A4E /* SKCacheManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0ABB272412E5D400CA5A4E /* SKCacheManager.swift */; };
+		9F0D8565242052E600B8BE2F /* BSImagePicker in Frameworks */ = {isa = PBXBuildFile; productRef = 9F0D8564242052E600B8BE2F /* BSImagePicker */; };
 		9F0FC54923760E7600070FA0 /* NoteOptionsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0FC54823760E7600070FA0 /* NoteOptionsTableViewController.swift */; };
 		9F10EC162347D64C005340AA /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 9F10EC152347D64C005340AA /* Kingfisher */; };
 		9F10EC192347E4B4005340AA /* SwiftyBeaver in Frameworks */ = {isa = PBXBuildFile; productRef = 9F10EC182347E4B4005340AA /* SwiftyBeaver */; };
@@ -219,6 +220,7 @@
 				9F2C00092351126800D53EE9 /* Alamofire in Frameworks */,
 				9F509144235BE29100853E84 /* DataCompression in Frameworks */,
 				9F560FAA240855F700932A55 /* GPUImage in Frameworks */,
+				9F0D8565242052E600B8BE2F /* BSImagePicker in Frameworks */,
 				9F10EC162347D64C005340AA /* Kingfisher in Frameworks */,
 				9FAA827E236DD45200B2004F /* ViewAnimator in Frameworks */,
 				9F2C00062351123700D53EE9 /* SwiftyJSON in Frameworks */,
@@ -646,6 +648,7 @@
 				9FAA827D236DD45200B2004F /* ViewAnimator */,
 				9F9460E123F5BAA10073D709 /* Connectivity */,
 				9F560FA9240855F700932A55 /* GPUImage */,
+				9F0D8564242052E600B8BE2F /* BSImagePicker */,
 			);
 			productName = Sketchnoting;
 			productReference = 9FD29BA32220524D00CC969A /* Sketchnoting.app */;
@@ -686,6 +689,7 @@
 				9FCD3D5723EA08A1005CB98D /* XCRemoteSwiftPackageReference "CocoaLumberjack" */,
 				9F9460E023F5BAA10073D709 /* XCRemoteSwiftPackageReference "Connectivity" */,
 				9F560FA8240855F700932A55 /* XCRemoteSwiftPackageReference "GPUImage2" */,
+				9F0D8563242052E600B8BE2F /* XCRemoteSwiftPackageReference "BSImagePicker" */,
 			);
 			productRefGroup = 9FD29BA42220524D00CC969A /* Products */;
 			projectDirPath = "";
@@ -1058,6 +1062,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		9F0D8563242052E600B8BE2F /* XCRemoteSwiftPackageReference "BSImagePicker" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/mikaoj/BSImagePicker";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.1.1;
+			};
+		};
 		9F10EC142347D64C005340AA /* XCRemoteSwiftPackageReference "Kingfisher" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/onevcat/Kingfisher.git";
@@ -1133,6 +1145,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		9F0D8564242052E600B8BE2F /* BSImagePicker */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9F0D8563242052E600B8BE2F /* XCRemoteSwiftPackageReference "BSImagePicker" */;
+			productName = BSImagePicker;
+		};
 		9F10EC152347D64C005340AA /* Kingfisher */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 9F10EC142347D64C005340AA /* XCRemoteSwiftPackageReference "Kingfisher" */;

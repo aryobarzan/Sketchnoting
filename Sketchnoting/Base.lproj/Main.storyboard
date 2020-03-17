@@ -556,25 +556,11 @@
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="iiX-te-jfO">
-                                        <rect key="frame" x="469" y="13" width="28" height="30"/>
-                                        <constraints>
-                                            <constraint firstAttribute="width" constant="28" id="9me-ML-fPL"/>
-                                            <constraint firstAttribute="height" constant="30" id="dAk-fG-q6Z"/>
-                                        </constraints>
-                                        <state key="normal" image="camera.viewfinder" catalog="system">
-                                            <preferredSymbolConfiguration key="preferredSymbolConfiguration" configurationType="pointSize" pointSize="24"/>
-                                        </state>
-                                        <connections>
-                                            <action selector="cameraTapped:" destination="BYZ-38-t0r" eventType="touchUpInside" id="yea-xw-GsF"/>
-                                        </connections>
-                                    </button>
                                 </subviews>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                                 <constraints>
                                     <constraint firstItem="aAp-yO-J3e" firstAttribute="top" secondItem="CoV-ID-6VL" secondAttribute="top" constant="12" id="2k0-iF-eO5"/>
                                     <constraint firstItem="UAF-TK-CJG" firstAttribute="centerY" secondItem="CoV-ID-6VL" secondAttribute="centerY" id="BKo-Zc-d3o"/>
-                                    <constraint firstItem="iiX-te-jfO" firstAttribute="centerY" secondItem="CoV-ID-6VL" secondAttribute="centerY" id="CBD-HZ-9KF"/>
                                     <constraint firstItem="xyG-l9-rRb" firstAttribute="top" secondItem="CoV-ID-6VL" secondAttribute="top" constant="12" id="Erd-r2-SGV"/>
                                     <constraint firstItem="VsX-f8-E6V" firstAttribute="centerY" secondItem="CoV-ID-6VL" secondAttribute="centerY" id="FYo-gY-T6b"/>
                                     <constraint firstAttribute="trailing" secondItem="aAp-yO-J3e" secondAttribute="trailing" constant="8" id="Hlo-bV-Lff"/>
@@ -584,7 +570,6 @@
                                     <constraint firstItem="oeF-CX-ZSK" firstAttribute="centerY" secondItem="CoV-ID-6VL" secondAttribute="centerY" id="hLv-ax-08r"/>
                                     <constraint firstItem="UAF-TK-CJG" firstAttribute="leading" secondItem="oeF-CX-ZSK" secondAttribute="trailing" constant="16" id="lRr-KQ-NGu"/>
                                     <constraint firstItem="VsX-f8-E6V" firstAttribute="leading" secondItem="UAF-TK-CJG" secondAttribute="trailing" constant="16" id="oYZ-Fm-BKz"/>
-                                    <constraint firstItem="iiX-te-jfO" firstAttribute="leading" secondItem="VsX-f8-E6V" secondAttribute="trailing" constant="16" id="uZ4-AU-XWc"/>
                                 </constraints>
                             </view>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="hut-mJ-mJj">
@@ -2792,7 +2777,6 @@
         <image name="arrowshape.turn.up.left" catalog="system" width="64" height="52"/>
         <image name="book.circle" catalog="system" width="64" height="60"/>
         <image name="book.circle.fill" catalog="system" width="64" height="60"/>
-        <image name="camera.viewfinder" catalog="system" width="64" height="56"/>
         <image name="clear.fill" catalog="system" width="64" height="56"/>
         <image name="doc.plaintext" catalog="system" width="56" height="64"/>
         <image name="doc.richtext" catalog="system" width="56" height="64"/>
@@ -2830,7 +2814,7 @@
     </resources>
     <inferredMetricsTieBreakers>
         <segue reference="yvs-ei-HRy"/>
-        <segue reference="OAt-q3-0jJ"/>
+        <segue reference="58e-4d-iJp"/>
         <segue reference="ct4-u7-KZY"/>
     </inferredMetricsTieBreakers>
 </document>

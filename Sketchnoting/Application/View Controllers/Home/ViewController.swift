@@ -13,12 +13,14 @@ import NVActivityIndicatorView
 import NotificationBannerSwift
 import DataCompression
 import ViewAnimator
+import BSImagePicker
 
 import MultipeerConnectivity
 import Vision
 import PencilKit
 import MobileCoreServices
 import VisionKit
+import Photos
 
 class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextFieldDelegate, MCSessionDelegate, MCBrowserViewControllerDelegate, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UIApplicationDelegate, UIPopoverPresentationControllerDelegate, UIDocumentPickerDelegate, VNDocumentCameraViewControllerDelegate, UICollectionViewDragDelegate, UICollectionViewDropDelegate, FolderButtonDelegate {
     
@@ -127,7 +129,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     @objc func notifiedImportSketchnote(_ noti : Notification)  {
         let importURL = (noti.userInfo as? [String : URL])!["importURL"]!
         print(importURL)
-        self.imoortNote(url: importURL)
+        self.importNote(url: importURL)
     }
     @objc func notifiedReceiveSketchnote(_ noti : Notification)  {
         updateReceivedNotesButton()
@@ -210,7 +212,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     
     func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
         if urls.count > 0 {
-            imoortNote(url: urls[0])
+            importNote(url: urls[0])
         }
     }
     
@@ -222,15 +224,67 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         self.present(documentPicker, animated: true, completion: nil)
     }
     
-    @IBAction func importDocumentTapped(_ sender: UIButton) {
-        displayDocumentPicker()
+    private func displayImagePicker() {
+        let imagePicker = ImagePickerController()
+
+        presentImagePicker(imagePicker,
+           select: { (asset) in
+        }, deselect: { (asset) in
+        }, cancel: { (assets) in
+        }, finish: { (assets) in
+            var images = [UIImage]()
+            let option = PHImageRequestOptions()
+            option.version = .original
+            option.isSynchronous = true
+            for asset in assets {
+                PHImageManager.default().requestImage(for: asset, targetSize: UIScreen.main.bounds.size, contentMode: .aspectFit, options: option) { (image, info) in
+                    if let image = image {
+                        images.append(image)
+                    }
+                }
+            }
+            if images.count > 0 {
+                let note = NoteX(name: "Image Import", parent: SKFileManager.currentFolder?.id, documents: nil)
+                var pages = [NoteXPage]()
+                for image in images {
+                    let page = NoteXPage()
+                    page.setBackdrop(image: image)
+                    pages.append(page)
+                }
+                note.pages = pages
+                _ = SKFileManager.add(note: note)
+                self.updateDisplayedNotes(true)
+            }
+        })
     }
     
-    @IBAction func cameraTapped(_ sender: UIButton) {
+    @IBAction func importDocumentTapped(_ sender: UIButton) {
+        let popMenu = PopMenuViewController(sourceView: sender, actions: [PopMenuAction](), appearance: nil)
+        popMenu.appearance.popMenuBackgroundStyle = .blurred(.dark)
+        let noteImportAction = PopMenuDefaultAction(title: "Import Note...", image: UIImage(systemName: "doc"),  didSelect: { action in
+            popMenu.dismiss(animated: true, completion: nil)
+            self.displayDocumentPicker()
+        })
+        popMenu.addAction(noteImportAction)
+        let scanAction = PopMenuDefaultAction(title: "Scan Document(s)...", image: UIImage(systemName: "camera.viewfinder"),  didSelect: { action in
+            popMenu.dismiss(animated: true, completion: nil)
+            self.showDocumentScanner()
+        })
+        popMenu.addAction(scanAction)
+        let imageImportAction = PopMenuDefaultAction(title: "Import Image(s)...", image: UIImage(systemName: "photo"),  didSelect: { action in
+            popMenu.dismiss(animated: true, completion: nil)
+            self.displayImagePicker()
+        })
+        popMenu.addAction(imageImportAction)
+        self.present(popMenu, animated: true, completion: nil)
+    }
+    
+    private func showDocumentScanner() {
         let scannerVC = VNDocumentCameraViewController()
         scannerVC.delegate = self
         present(scannerVC, animated: true)
     }
+    
     func documentCameraViewController(_ controller: VNDocumentCameraViewController, didFinishWith scan: VNDocumentCameraScan) {
         controller.dismiss(animated: true, completion: nil)
         
@@ -673,7 +727,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     }
     
     // TO UPDATE
-    func imoortNote(url: URL) {
+    func importNote(url: URL) {
         if let imported = SKFileManager.importNoteFile(url: url) {
             if SKFileManager.notes.contains(imported) {
                 log.info("Sketchnote already in your library, updating its data.")
