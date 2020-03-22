@@ -26,9 +26,17 @@ struct SVGProcessor: ImageProcessor {
     // Convert input data/image to target image and return it.
     func process(item: ImageProcessItem, options: KingfisherParsedOptionsInfo) -> KFCrossPlatformImage? {
         switch item {
-        case .image(let image):
-            //already an image
-            return image
+        case .image(let image): //already an image
+            if let data = image.jpegData(compressionQuality: 0.8) {
+                if data.count >= 10000000 {
+                    return nil
+                }
+                else {
+                    return image
+                }
+            }
+            return nil
+            
         case .data(let data):
             log.info("Processing image data. (SVGProcessor)")
             if (data.count < 10000000) {

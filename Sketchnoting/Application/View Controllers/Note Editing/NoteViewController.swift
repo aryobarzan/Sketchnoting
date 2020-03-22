@@ -1274,7 +1274,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     @IBOutlet var relatedNotesButton: UIButton!
     var relatedNotes = [NoteX]()
     
-    var similarityThreshold: Float = 0.0
+    var similarityThreshold: Float = 0.5
     var highSimilarity: Float = 5.0
     @IBAction func documentsRelatedNotesSegmentChanged(_ sender: UISegmentedControl) {
         if sender.selectedSegmentIndex == 0 {
@@ -1300,7 +1300,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             if score > similarityThreshold {
                 self.relatedNotes.append(note)
             }
-            if score > 0.0 {
+            if score >= 0.5 {
                 anySimilarityCount += 1
             }
             if score > highSimilarity {
@@ -1315,7 +1315,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     }
     @IBAction func similaritySegmentChanged(_ sender: UISegmentedControl) {
         if sender.selectedSegmentIndex == 0 {
-            similarityThreshold = 1.0
+            similarityThreshold = 0.5
         }
         else {
             similarityThreshold = highSimilarity

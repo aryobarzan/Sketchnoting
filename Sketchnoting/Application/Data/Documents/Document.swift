@@ -106,10 +106,12 @@ class Document: Codable, Visitable, Equatable {
             downloader.downloadImage(with: url) { result in
                 switch result {
                 case .success(let value):
-                    cache.store(value.image, original: value.originalData, forKey: key)
-                    self.reload()
+                    if value.originalData.count < 10000000 {
+                        cache.store(value.image, original: value.originalData, forKey: key)
+                        self.reload()
+                    }
                 case .failure(let error):
-                    print(error)
+                    log.error(error)
                 }
             }
         }

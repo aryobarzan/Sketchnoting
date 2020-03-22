@@ -64,30 +64,35 @@ class TAGMEHelper {
     
     private func performAdditionalSteps(document: TAGMEDocument, note: NoteX) {
         DispatchQueue.main.async {
-            print("TAGME: new document added - \(document.title)")
-            note.addDocument(document: document)
-        }
-        self.fetchWikipediaIntroText(document: document)
-        self.fetchWikipediaImage(document: document, completion: {foundImage in
-            if !foundImage {
-                KnowledgeGraphHelper.fetchWikipediaImage(note: note, document: document)
-            }
-        })
-        KnowledgeGraphHelper.isPlace(name: document.title, completionHandler: { isPlace in
-            if isPlace {
-                MapHelper.fetchMap(location: document.title, document: document, note: note)
-            }
-            else {
-                let placeTerms = ["place", "city", "populated", "country", "capital", "location", "state", "village"]
-                for term in placeTerms {
-                    if document.description?.lowercased().contains(term) ?? false {
-                        MapHelper.fetchMap(location: document.title, document: document, note: note)
-                        break
+            if !note.documents.contains(document) {
+                print("TAGME: new document added - \(document.title)")
+                note.addDocument(document: document)
+                self.fetchWikipediaIntroText(document: document)
+                self.fetchWikipediaImage(document: document, completion: {foundImage in
+                    if !foundImage {
+                        KnowledgeGraphHelper.fetchWikipediaImage(note: note, document: document)
                     }
-                }
-                
+                })
+                KnowledgeGraphHelper.isPlace(name: document.title, completionHandler: { isPlace in
+                    if isPlace {
+                        MapHelper.fetchMap(location: document.title, document: document, note: note)
+                    }
+                    else {
+                        let placeTerms = ["place", "city", "populated", "country", "capital", "location", "state", "village"]
+                        for term in placeTerms {
+                            if document.description?.lowercased().contains(term) ?? false {
+                                MapHelper.fetchMap(location: document.title, document: document, note: note)
+                                break
+                            }
+                        }
+                        
+                    }
+                })
             }
-        })
+            
+            
+        }
+        
     }
     
     private func fetchWikipediaIntroText(document: TAGMEDocument) {
@@ -144,6 +149,7 @@ class TAGMEHelper {
                                 if let imageURL = json["query"]["pages"][String(format: "%.0f", document.wikiPageID!)]["original"]["source"].string {
                                     DispatchQueue.global().async {
                                         if let url = URL(string: imageURL) {
+                                            log.info("Found Wikipedia preview image for: \(document.title)")
                                             document.downloadImage(url: url, type: .Standard)
                                             completion(true)
                                         }

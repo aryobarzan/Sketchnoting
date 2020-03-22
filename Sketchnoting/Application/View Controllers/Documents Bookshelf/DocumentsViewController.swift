@@ -108,7 +108,6 @@ class DocumentsViewController: UICollectionViewController{
             switch result {
             case .success(let value):
                 if let value = value {
-                    log.info("Preview image found for document \(document.title).")
                     DispatchQueue.main.async {
                         cell.previewImage.image = value
                     }

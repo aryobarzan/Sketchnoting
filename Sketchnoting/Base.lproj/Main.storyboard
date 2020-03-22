@@ -2451,7 +2451,7 @@
                                             </constraints>
                                         </imageView>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="093-Jh-ccm">
-                                            <rect key="frame" x="20" y="206.5" width="180" height="19.5"/>
+                                            <rect key="frame" x="20" y="206.5" width="180" height="29.5"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="16"/>
                                             <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                             <nil key="highlightedColor"/>
@@ -2463,6 +2463,7 @@
                                         <constraint firstItem="I6o-9U-MdC" firstAttribute="top" secondItem="wwS-rD-dVO" secondAttribute="top" constant="17" id="EsZ-Md-H71"/>
                                         <constraint firstItem="I6o-9U-MdC" firstAttribute="leading" secondItem="wwS-rD-dVO" secondAttribute="leading" constant="20" id="Ijv-dv-4GM"/>
                                         <constraint firstItem="093-Jh-ccm" firstAttribute="leading" secondItem="wwS-rD-dVO" secondAttribute="leading" constant="20" id="Lwb-tw-sfz"/>
+                                        <constraint firstAttribute="bottom" secondItem="093-Jh-ccm" secondAttribute="bottom" constant="4" id="lDy-tR-Igj"/>
                                         <constraint firstAttribute="trailing" secondItem="093-Jh-ccm" secondAttribute="trailing" constant="20" id="zWB-a7-TWZ"/>
                                     </constraints>
                                 </collectionViewCellContentView>
