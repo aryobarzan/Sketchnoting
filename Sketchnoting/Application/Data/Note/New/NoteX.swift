@@ -447,15 +447,18 @@ class NoteX: File, DocumentVisitor, DocumentDelegate {
         }
     }
     
-    public func deletePage(index: Int) {
+    public func deletePage(index: Int) -> Bool {
         if pages.count > 1 {
             if index >= 0 && index < pages.count {
                 pages.remove(at: index)
                 if activePageIndex == index {
                     activePageIndex -= 1
                 }
+                return true
             }
+            return false
         }
+        return false
     }
     
     func removePage(at indexPath: IndexPath) {

@@ -125,9 +125,26 @@ class NotePagesViewController: UIViewController, UICollectionViewDelegate, UICol
             }
         }
     }
+    
+    func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
+        return UIContextMenuConfiguration(identifier: nil, previewProvider: nil, actionProvider: { suggestedActions in
+            return self.makeDocumentContextMenu(pageIndex: indexPath.row)
+        })
+    }
+    private func makeDocumentContextMenu(pageIndex: Int) -> UIMenu {
+        let deleteAction = UIAction(title: "Delete", image: UIImage(systemName: "trash")) { action in
+            let isDeleted = SKFileManager.activeNote!.deletePage(index: pageIndex)
+            if isDeleted {
+                self.delegate?.notePageDeleted()
+            }
+            self.collectionView.reloadData()
+        }
+        return UIMenu(title: "Note Page", children: [deleteAction])
+    }
 }
 
 protocol NotePagesDelegate {
     func notePageSelected(index: Int)
     func notePagesReordered()
+    func notePageDeleted()
 }

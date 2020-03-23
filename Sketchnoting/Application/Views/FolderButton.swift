@@ -18,7 +18,7 @@ class FolderButton: UIButton {
         self.setTitleColor(.link, for: .normal)
         if let folder = folder {
             self.setTitle(" " + folder.getName(), for: .normal)
-            self.setImage(UIImage(systemName: "arrowtriangle.right"), for: .normal)
+            self.setImage(UIImage(systemName: "arrow.turn.down.right"), for: .normal)
         }
         else {
             self.setTitle(" Home", for: .normal)

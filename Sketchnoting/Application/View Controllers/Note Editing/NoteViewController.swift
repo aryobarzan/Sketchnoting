@@ -154,6 +154,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                 drawingRegionView.layer.borderColor = UIColor.white.cgColor
             }
         }
+        
     }
     
     // Notification Center events
@@ -1365,6 +1366,11 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     }
     func notePagesReordered() {
         self.updatePaginationButtons()
+    }
+    func notePageDeleted() {
+        self.updatePage()
+        self.updatePaginationButtons()
+        self.saveCurrentPage()
     }
     @IBAction func canvasRightSwiped(_ sender: UISwipeGestureRecognizer) {
         if sender.state == .ended {

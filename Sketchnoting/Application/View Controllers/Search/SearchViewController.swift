@@ -63,6 +63,7 @@ class SearchViewController: UIViewController, UICollectionViewDelegate, UICollec
     }
     func drawingSearchRecognized(label: String) {
         createSearchFilter(term: label, type: .Drawing)
+        self.updateResults()
     }
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         // Hide the keyboard.

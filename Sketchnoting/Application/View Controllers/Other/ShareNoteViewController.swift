@@ -19,13 +19,13 @@ class ShareNoteViewController: UIViewController {
     var note: NoteX!
     override func viewDidLoad() {
         super.viewDidLoad()
-        fileButton.layer.borderColor = view.tintColor.cgColor
+        fileButton.layer.borderColor = UIColor.white.cgColor
         fileButton.layer.borderWidth = 1
         fileButton.layer.cornerRadius = 5
-        pdfButton.layer.borderColor = view.tintColor.cgColor
+        pdfButton.layer.borderColor = UIColor.white.cgColor
         pdfButton.layer.borderWidth = 1
         pdfButton.layer.cornerRadius = 5
-        imageButton.layer.borderColor = view.tintColor.cgColor
+        imageButton.layer.borderColor = UIColor.white.cgColor
         imageButton.layer.borderWidth = 1
         imageButton.layer.cornerRadius = 5
     }

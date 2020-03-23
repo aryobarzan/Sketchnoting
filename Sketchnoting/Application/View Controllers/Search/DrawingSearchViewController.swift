@@ -55,13 +55,11 @@ class DrawingSearchViewController: UIViewController, PKCanvasViewDelegate {
     
     var bestPrediction = ""
     var bestPredictionScore = 0.0
-    @IBOutlet weak var debugImageView: UIImageView!
     func canvasViewDrawingDidChange(_ canvasView: PKCanvasView) {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
             let image = canvasView.asImage()
             
             var filteredImage = self.dilateLow(image: image)
-            self.debugImageView.image = filteredImage
             self.predict(image: filteredImage)
             filteredImage = self.dilateMedium(image: image)
             self.predict(image: filteredImage)
@@ -114,7 +112,6 @@ class DrawingSearchViewController: UIViewController, PKCanvasViewDelegate {
                 if score > bestPredictionScore {
                     bestPrediction = label
                     bestPredictionScore = score
-                    self.debugImageView.image = image
                 }
             }
         }

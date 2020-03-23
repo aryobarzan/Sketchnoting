@@ -374,13 +374,19 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         homeButton.delegate = self
         navigationHierarchyStackView.addArrangedSubview(homeButton)
         folderButtons.append(homeButton)
+        var i = 0
         for f in SKFileManager.currentFoldersHierarchy {
             let folderButton = FolderButton()
             folderButton.frame = CGRect(x: 0, y: 0, width: 100, height: 35)
             folderButton.setFolder(folder: f)
             folderButton.delegate = self
+            if i % 2 == 0 {
+                folderButton.setTitleColor(.systemTeal, for: .normal)
+                folderButton.tintColor = .systemTeal
+            }
             navigationHierarchyStackView.addArrangedSubview(folderButton)
             folderButtons.append(folderButton)
+            i += 1
         }
         spacerView.removeFromSuperview()
         spacerView.setContentHuggingPriority(.defaultLow, for: .horizontal)
@@ -481,12 +487,12 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     var shareNoteObject: NoteX?
     private func makeNoteContextMenu(file: File, point: CGPoint, cellIndexPath: IndexPath) -> UIMenu {
         var menuElements = [UIMenuElement]()
-        let renameAction = UIAction(title: "Rename", image: UIImage(systemName: "text.cursor")) { action in
+        let renameAction = UIAction(title: "Rename...", image: UIImage(systemName: "text.cursor")) { action in
             self.renameFile(file: file)
         }
         menuElements.append(renameAction)
         if let note = file as? NoteX {
-            let tagsAction = UIAction(title: "Manage Tags", image: UIImage(systemName: "tag.fill")) { action in
+            let tagsAction = UIAction(title: "Manage Tags...", image: UIImage(systemName: "tag.fill")) { action in
                 self.editNoteTags(note: note, cell: self.noteCollectionView.cellForItem(at: cellIndexPath))
             }
             menuElements.append(tagsAction)
@@ -510,7 +516,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
                 self.shareNote(note: note, sender: UIView(frame: CGRect(x: point.x, y: point.y, width: point.x, height: point.y)))
             }
             menuElements.append(shareAction)
-            let sendAction = UIAction(title: "Send", image: UIImage(systemName: "paperplane")) { action in
+            let sendAction = UIAction(title: "Send...", image: UIImage(systemName: "paperplane")) { action in
                 self.sendNote(note: note)
             }
             menuElements.append(sendAction)
