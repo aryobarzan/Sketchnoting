@@ -59,12 +59,15 @@ class DrawingSearchViewController: UIViewController, PKCanvasViewDelegate {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
             let image = canvasView.asImage()
             
-            var filteredImage = self.dilateLow(image: image)
-            self.predict(image: filteredImage)
-            filteredImage = self.dilateMedium(image: image)
-            self.predict(image: filteredImage)
-            filteredImage = self.dilateHigh(image: image)
-            self.predict(image: filteredImage)
+            self.predict(image: image)
+            for i in 1..<5 {
+                var filteredImage = self.dilate(image: image, radius: i, level: .Low)
+                self.predict(image: filteredImage)
+                filteredImage = self.dilate(image: image, radius: i, level: .Medium)
+                self.predict(image: filteredImage)
+                filteredImage = self.dilate(image: image, radius: i, level: .High)
+                self.predict(image: filteredImage)
+            }
 
             if self.bestPredictionScore >= 0.3 && !self.bestPrediction.isEmpty {
                 self.searchButton.setTitle(" " + self.bestPrediction, for: .normal)
@@ -80,21 +83,29 @@ class DrawingSearchViewController: UIViewController, PKCanvasViewDelegate {
             self.bestPredictionScore = 0.0
         }
     }
-    
-    private func dilateLow(image: UIImage) -> UIImage {
-        return image.filterWithPipeline{input, output in
-            input --> Dilation() --> Dilation() --> output
-        }
+    enum DilationLevel {
+        case Low
+        case Medium
+        case High
     }
-    private func dilateMedium(image: UIImage) -> UIImage {
-        return image.filterWithPipeline{input, output in
-            input --> Dilation() --> Dilation() --> Dilation() --> Dilation() --> output
+    private func dilate(image: UIImage, radius: Int, level: DilationLevel) -> UIImage {
+        let dilation = Dilation()
+        dilation.radius = UInt(radius)
+        switch level {
+        case .Low:
+            return image.filterWithPipeline{input, output in
+                input --> dilation --> Dilation() --> output
+            }
+        case .Medium:
+            return image.filterWithPipeline{input, output in
+                input --> dilation --> Dilation() --> Dilation() --> Dilation() --> output
+            }
+        case .High:
+            return image.filterWithPipeline{input, output in
+                input --> dilation --> Dilation() --> Dilation() --> Dilation() --> Dilation() --> Dilation() --> output
+            }
         }
-    }
-    private func dilateHigh(image: UIImage) -> UIImage {
-        return image.filterWithPipeline{input, output in
-            input --> Dilation() --> Dilation() --> Dilation() --> Dilation() --> Dilation() --> Dilation() --> output
-        }
+        
     }
     
     private func predict(image: UIImage) {

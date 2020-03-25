@@ -48,7 +48,8 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     @IBOutlet weak var helpLinesButton: UIButton!
     
     @IBOutlet weak var bookshelfSegmentedControl: UISegmentedControl!
-    @IBOutlet weak var relatedNotesSegmentedControl: UISegmentedControl!
+    @IBOutlet weak var relatedNotesSimilaritySlider: UISlider!
+    
     
     @IBOutlet var canvasViewLongPressGesture: UILongPressGestureRecognizer!
     var drawingViews = [UIView]()
@@ -62,6 +63,8 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     var isDeletingNote = false
     
     var gridView: GridView?
+    
+    var conceptHighlightsInitialized = false
     
     // This function sets up the page and every element contained within it.
     override func viewDidLoad() {
@@ -143,7 +146,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     }
     
     override func viewDidAppear(_ animated: Bool) {
-        setupConceptHighlights()
         setupDrawingRegions()
         self.refreshHelpLines()
         self.refreshHelpLinesButton()
@@ -539,6 +541,10 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     
     var topicsShown = false
     @IBAction func topicsTapped(_ sender: UIButton) {
+        if !conceptHighlightsInitialized {
+            setupConceptHighlights()
+            conceptHighlightsInitialized = true
+        }
         self.toggleConceptHighlight()
     }
     
@@ -615,7 +621,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             saveCurrentPage()
             break
         case .DeletePage:
-            SKFileManager.activeNote!.deletePage(index: SKFileManager.activeNote!.activePageIndex)
+            _ = SKFileManager.activeNote!.deletePage(index: SKFileManager.activeNote!.activePageIndex)
             updatePage()
             updatePaginationButtons()
             break
@@ -1276,7 +1282,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     var relatedNotes = [NoteX]()
     
     var similarityThreshold: Float = 0.5
-    var highSimilarity: Float = 5.0
     @IBAction func documentsRelatedNotesSegmentChanged(_ sender: UISegmentedControl) {
         if sender.selectedSegmentIndex == 0 {
             relatedNotesView.isHidden = true
@@ -1287,6 +1292,13 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             relatedNotesView.isHidden = false
         }
     }
+    @IBAction func similaritySliderEditedOutside(_ sender: UISlider) {
+        refreshRelatedNotes()
+    }
+    @IBAction func similaritySliderEditedInside(_ sender: UISlider) {
+        refreshRelatedNotes()
+    }
+    
     @IBAction func lookForRelatedNotesTapped(_ sender: UIButton) {
         refreshRelatedNotes()
     }
@@ -1294,34 +1306,16 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     private func refreshRelatedNotes() {
         Knowledge.setupSimilarityMatrix()
         let foundNotes = Knowledge.similarNotesFor(note: SKFileManager.activeNote!)
-        var highSimilarityCount = 0
-        var anySimilarityCount = 0
         self.relatedNotes = [NoteX]()
         for (note, score) in foundNotes {
-            if score > similarityThreshold {
+            if score > relatedNotesSimilaritySlider.value {
                 self.relatedNotes.append(note)
             }
-            if score >= 0.5 {
-                anySimilarityCount += 1
-            }
-            if score > highSimilarity {
-                highSimilarityCount += 1
-            }
+           
         }
         relatedNotesCollectionView.reloadData()
         
         bookshelfSegmentedControl.setTitle("Related Notes (\(relatedNotes.count))", forSegmentAt: 1)
-        relatedNotesSegmentedControl.setTitle("Any (\(anySimilarityCount))", forSegmentAt: 0)
-        relatedNotesSegmentedControl.setTitle("High Similarity (\(highSimilarityCount))", forSegmentAt: 1)
-    }
-    @IBAction func similaritySegmentChanged(_ sender: UISegmentedControl) {
-        if sender.selectedSegmentIndex == 0 {
-            similarityThreshold = 0.5
-        }
-        else {
-            similarityThreshold = highSimilarity
-        }
-        refreshRelatedNotes()
     }
     
     // MARK: Documents View Controller delegate

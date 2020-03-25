@@ -53,12 +53,14 @@ class ReceivedNotesController: NSObject, MCSessionDelegate {
     func startHosting() {
         mcAdvertiserAssistant = MCAdvertiserAssistant(serviceType: "hws-kb", discoveryInfo: nil, session: mcSession)
         mcAdvertiserAssistant!.start()
-        log.info("Started hosting session")
+        log.info("Started hosting session.")
     }
     
     func stopHosting() {
         if mcAdvertiserAssistant != nil {
             mcAdvertiserAssistant!.stop()
+            mcAdvertiserAssistant = nil
         }
+        log.info("Stopped hosting session.")
     }
 }
