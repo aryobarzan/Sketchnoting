@@ -1157,7 +1157,7 @@
                                             <action selector="topicsTapped:" destination="lDo-DG-9fX" eventType="touchUpInside" id="kAK-Ty-s4Z"/>
                                         </connections>
                                     </button>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Xyr-WH-2aV">
+                                    <button opaque="NO" contentMode="scaleToFill" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Xyr-WH-2aV">
                                         <rect key="frame" x="137" y="8" width="25" height="24"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="25" id="Ixt-Z0-LS1"/>
@@ -1793,7 +1793,7 @@
                                                     <state key="normal" title="Reset Text Recognition"/>
                                                 </button>
                                                 <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="arrow.clockwise" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="nwj-DW-B2t">
-                                                    <rect key="frame" x="295" y="10" width="22" height="22"/>
+                                                    <rect key="frame" x="282" y="10" width="22" height="22"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="22" id="WQx-mZ-we9"/>
                                                         <constraint firstAttribute="width" constant="22" id="z4J-le-9sR"/>
@@ -1822,7 +1822,7 @@
                                                     </state>
                                                 </button>
                                                 <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="xmark.circle.fill" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="eWn-lz-Etz">
-                                                    <rect key="frame" x="295" y="11.5" width="22" height="21"/>
+                                                    <rect key="frame" x="282" y="11.5" width="22" height="21"/>
                                                     <color key="tintColor" systemColor="systemRedColor" red="1" green="0.23137254900000001" blue="0.18823529410000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" constant="22" id="Fho-Ns-RGV"/>

@@ -83,20 +83,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             canvasView.becomeFirstResponder()
         }
         canvasViewLongPressGesture.allowedTouchTypes = [0]
-
-        let storyboard = UIStoryboard(name: "Main", bundle: Bundle.main)
-        self.documentsVC = storyboard.instantiateViewController(withIdentifier: "DocumentsViewController") as? DocumentsViewController
-        documentsVC.delegate = self
-        addChild(documentsVC)
-        documentsUnderlyingView.addSubview(documentsVC.view)
-        documentsVC.view.frame = documentsUnderlyingView.bounds
-        documentsVC.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        documentsVC.didMove(toParent: self)
-        documentsVC.collectionView.refreshLayout()
-        documentsVC.setNote(note: SKFileManager.activeNote!)
-        
-        self.bookshelfLeftDragView.curveTopCorners(size: 5)
-        
         if let (backdropData, isPDF) = SKFileManager.activeNote!.getCurrentPage().getBackdrop() {
             if !isPDF {
                 if let image = UIImage(data: backdropData) {
@@ -105,15 +91,23 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             }
         }
         
-        //Drawing Recognition - This loads the labels for the drawing recognition's CoreML model.
-        if let path = Bundle.main.path(forResource: "labels", ofType: "txt") {
-            do {
-                let data = try String(contentsOfFile: path, encoding: .utf8)
-                let labelNames = data.components(separatedBy: .newlines).filter { $0.count > 0 }
-                self.labelNames.append(contentsOf: labelNames)
-            } catch {
-                log.error("Could not load labels for drawing recognition model: \(error)")
-            }
+        let interaction = UIPencilInteraction()
+        interaction.delegate = self
+        view.addInteraction(interaction)
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            let storyboard = UIStoryboard(name: "Main", bundle: Bundle.main)
+            self.documentsVC = storyboard.instantiateViewController(withIdentifier: "DocumentsViewController") as? DocumentsViewController
+            self.documentsVC.delegate = self
+            self.addChild(self.documentsVC)
+            self.documentsUnderlyingView.addSubview(self.documentsVC.view)
+            self.documentsVC.view.frame = self.documentsUnderlyingView.bounds
+            self.documentsVC.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+            self.documentsVC.didMove(toParent: self)
+            self.documentsVC.collectionView.refreshLayout()
+            self.documentsVC.setNote(note: SKFileManager.activeNote!)
+            self.bookshelfLeftDragView.curveTopCorners(size: 5)
+            self.bookshelfButton.isEnabled = true
         }
         
         self.rightScreenSidePanGesture.edges = [.right]
@@ -121,10 +115,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         self.topicsBadgeHub.scaleCircleSize(by: 0.55)
         self.topicsBadgeHub.moveCircleBy(x: 4, y: -6)
         self.topicsBadgeHub.setCount(SKFileManager.activeNote!.documents.count)
-        
-        let interaction = UIPencilInteraction()
-        interaction.delegate = self
-        view.addInteraction(interaction)
         
         spotlightHelper = SpotlightHelper()
         bioportalHelper = BioPortalHelper()
@@ -142,7 +132,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     
     override func viewWillAppear(_ animated: Bool) {
         SKFileManager.activeNote!.delegate = self
-        updatePaginationButtons()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -150,6 +139,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         self.refreshHelpLines()
         self.refreshHelpLinesButton()
         self.updateTopicsCount()
+        updatePaginationButtons()
         
         if traitCollection.userInterfaceStyle == .dark {
             for drawingRegionView in drawingViews {
@@ -232,9 +222,8 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     }
     
     // Drawing recognition
-    // In case the user's drawing has been recognized with at least a >40% confidence, the recognized drawing's label, e.g. "light bulb", is stored for the sketchnote.
-    private var labelNames: [String] = []
-    private let drawnImageClassifier = DrawnImageClassifier()
+    // In case the user's drawing has been recognized with at least a >30% confidence, the recognized drawing's label, e.g. "light bulb", is stored for the sketchnote.
+    private var drawingRecognition = DrawingRecognition()
     private func processDrawingRecognition() {
         let note = SKFileManager.activeNote!
         UITraitCollection(userInterfaceStyle: .light).performAsCurrent {
@@ -245,22 +234,9 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                 merged = merged.invertedImage() ?? merged
                 for region in self.drawingViews {
                     let image = UIImage(cgImage: merged.cgImage!.cropping(to: region.frame)!)
-                    var bestPrediction = ""
-                    var bestPredictionScore = 0.0
-                    var dilatedImages = [UIImage]()
-                    dilatedImages.append(self.dilateLow(image: image))
-                    dilatedImages.append(self.dilateMedium(image: image))
-                    dilatedImages.append(self.dilateHigh(image: image))
-                    for img in dilatedImages {
-                        let (label, score) = self.recognizeDrawing(image: img)
-                        if score > bestPredictionScore {
-                            bestPredictionScore = score
-                            bestPrediction = label
-                        }
-                    }
-                    if bestPredictionScore >= 0.4 {
-                        log.info("Recognized drawing: \(bestPrediction)")
-                        SKFileManager.activeNote!.getCurrentPage().addDrawing(drawing: bestPrediction)
+                    if let recognition = self.drawingRecognition.recognize(image: image) {
+                        log.info("Recognized drawing: \(recognition)")
+                        SKFileManager.activeNote!.getCurrentPage().addDrawing(drawing: recognition)
                         SKFileManager.save(file: note)
                     }
                 }
@@ -288,41 +264,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             drawingRegionView.layer.borderColor = drawingViewBorderColor
         }
         self.refreshHelpLines()
-    }
-    
-    private func dilateLow(image: UIImage) -> UIImage {
-        return image.filterWithPipeline{input, output in
-            input --> Dilation() --> Dilation() --> output
-        }
-    }
-    private func dilateMedium(image: UIImage) -> UIImage {
-        return image.filterWithPipeline{input, output in
-            input --> Dilation() --> Dilation() --> Dilation() --> Dilation() --> output
-        }
-    }
-    private func dilateHigh(image: UIImage) -> UIImage {
-        return image.filterWithPipeline{input, output in
-            input --> Dilation() --> Dilation() --> Dilation() --> Dilation() --> Dilation() --> Dilation() --> output
-        }
-    }
-    
-    private func recognizeDrawing(image: UIImage) -> (String, Double) {
-        let resized = image.resize(newSize: CGSize(width: 28, height: 28))
-            
-        guard let pixelBuffer = resized.grayScalePixelBuffer() else {
-            log.error("Failed to create pixel buffer.")
-            return ("", 0.0)
-        }
-        
-        if let prediction = try? self.drawnImageClassifier.prediction(image: pixelBuffer) {
-            let sorted = prediction.category_softmax_scores.sorted { $0.value > $1.value }
-            let top5 = sorted.prefix(5)
-            log.info(top5.map { $0.key + "(" + String($0.value) + ")"}.joined(separator: ", "))
-            for (label, score) in top5 {
-                return (label, score)
-            }
-        }
-        return ("", 0.0)
     }
     
     private func refreshHelpLines() {

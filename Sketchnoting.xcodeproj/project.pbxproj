@@ -63,6 +63,7 @@
 		9F942506238A341E006B0E81 /* UIStoryboardSegueWithCompletion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F942505238A341E006B0E81 /* UIStoryboardSegueWithCompletion.swift */; };
 		9F9460DF23F5B0460073D709 /* GridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F9460DE23F5B0460073D709 /* GridView.swift */; };
 		9F9460E223F5BAA10073D709 /* Connectivity in Frameworks */ = {isa = PBXBuildFile; productRef = 9F9460E123F5BAA10073D709 /* Connectivity */; };
+		9F9DAFE0242CB7C100713E75 /* DrawingRecognition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F9DAFDF242CB7C100713E75 /* DrawingRecognition.swift */; };
 		9FA6238822CEA7FE007ED794 /* MapHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA6238722CEA7FE007ED794 /* MapHelper.swift */; };
 		9FA6238B22D37213007ED794 /* BioPortalHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA6238A22D37213007ED794 /* BioPortalHelper.swift */; };
 		9FA6238D22D38AEE007ED794 /* SpotlightHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA6238C22D38AEE007ED794 /* SpotlightHelper.swift */; };
@@ -171,6 +172,7 @@
 		9F92D11E23217FFF00BC0E57 /* SearchFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchFilter.swift; sourceTree = "<group>"; };
 		9F942505238A341E006B0E81 /* UIStoryboardSegueWithCompletion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIStoryboardSegueWithCompletion.swift; sourceTree = "<group>"; };
 		9F9460DE23F5B0460073D709 /* GridView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GridView.swift; sourceTree = "<group>"; };
+		9F9DAFDF242CB7C100713E75 /* DrawingRecognition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrawingRecognition.swift; sourceTree = "<group>"; };
 		9FA6238722CEA7FE007ED794 /* MapHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapHelper.swift; sourceTree = "<group>"; };
 		9FA6238A22D37213007ED794 /* BioPortalHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BioPortalHelper.swift; sourceTree = "<group>"; };
 		9FA6238C22D38AEE007ED794 /* SpotlightHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotlightHelper.swift; sourceTree = "<group>"; };
@@ -608,6 +610,7 @@
 				9F4B38C023EA41C900F87B61 /* ReceivedNotesController.swift */,
 				9F4B38C223EB1E6D00F87B61 /* Notifications.swift */,
 				9F0ABB272412E5D400CA5A4E /* SKCacheManager.swift */,
+				9F9DAFDF242CB7C100713E75 /* DrawingRecognition.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -802,6 +805,7 @@
 				9FD29BA72220524D00CC969A /* AppDelegate.swift in Sources */,
 				9FD29C6422431BFA00CC969A /* DrawnImageClassifier.mlmodel in Sources */,
 				9FC02C1C23EDB6290051C576 /* File.swift in Sources */,
+				9F9DAFE0242CB7C100713E75 /* DrawingRecognition.swift in Sources */,
 				9F92D10E231E95B400BC0E57 /* UICollectionViewExtensions.swift in Sources */,
 				9F9460DF23F5B0460073D709 /* GridView.swift in Sources */,
 				9F5E89F42391CE84002FA8B2 /* DocumentDetailViewController.swift in Sources */,
