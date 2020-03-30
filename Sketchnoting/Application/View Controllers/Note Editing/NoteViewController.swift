@@ -20,6 +20,7 @@ import MaterialComponents.MaterialBottomSheet
 import Connectivity
 import GPUImage
 import PopMenu
+import GPUImage
 
 class NoteViewController: UIViewController, UIPencilInteractionDelegate, UICollectionViewDataSource, UICollectionViewDelegate, NoteXDelegate, PKCanvasViewDelegate, PKToolPickerObserver, UIScreenshotServiceDelegate, NoteOptionsDelegate, DocumentsViewControllerDelegate, NotePagesDelegate, VNDocumentCameraViewControllerDelegate {
     
@@ -196,7 +197,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                 if let destinationViewController = destination.topViewController as? NoteTextViewController {
                     destinationViewController.note = SKFileManager.activeNote!
                 }
-                
             }
             break
         case "ShareNote":
@@ -205,6 +205,9 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                     destinationViewController.note = SKFileManager.activeNote!
                 }
             }
+            break
+        case "NoteInfo":
+            log.info("Showing note information.")
             break
         default:
             log.error("Default segue case triggered.")
@@ -228,7 +231,8 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         let note = SKFileManager.activeNote!
         UITraitCollection(userInterfaceStyle: .light).performAsCurrent {
             let whiteBackground = UIColor.white.image(CGSize(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height))
-            let canvasImage = canvasView.drawing.image(from: UIScreen.main.bounds, scale: 1.0)
+            var canvasImage = canvasView.drawing.image(from: UIScreen.main.bounds, scale: 1.0)
+            canvasImage = canvasImage.blackAndWhite() ?? canvasImage.toGrayscale
             DispatchQueue.main.async {
                 var merged = whiteBackground.mergeWith(topImage: canvasImage)
                 merged = merged.invertedImage() ?? merged

@@ -41,7 +41,6 @@ class NoteXPage: Codable {
         try container.encode(noteTextArray, forKey: .noteTextArray)
         try container.encode(backdropData, forKey: .backdropData)
         try container.encode(backdropIsPDF, forKey: .backdropIsPDF)
-        log.info("Note Page encoded.")
 
     }
     required init(from decoder: Decoder) throws {
@@ -53,7 +52,6 @@ class NoteXPage: Codable {
         noteTextArray = try container.decode([NoteText].self, forKey: .noteTextArray)
         backdropData = try? container.decode(Data.self, forKey: .backdropData)
         backdropIsPDF = try? container.decode(Bool.self, forKey: .backdropIsPDF)
-        log.info("Note page decoded.")
     }
     
     // MARK: drawing recognition

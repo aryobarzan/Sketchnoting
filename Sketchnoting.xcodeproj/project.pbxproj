@@ -34,6 +34,8 @@
 		9F5E89F02391CBA2002FA8B2 /* DocumentViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5E89EF2391CBA2002FA8B2 /* DocumentViewCell.swift */; };
 		9F5E89F42391CE84002FA8B2 /* DocumentDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5E89F32391CE84002FA8B2 /* DocumentDetailViewController.swift */; };
 		9F5F340623AC64E400EB2804 /* Knowledge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5F340523AC64E400EB2804 /* Knowledge.swift */; };
+		9F5F5D1324328B2F00AF79A5 /* NoteInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5F5D1224328B2F00AF79A5 /* NoteInfoViewController.swift */; };
+		9F5F5D1524328CC100AF79A5 /* DateExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5F5D1424328CC100AF79A5 /* DateExtensions.swift */; };
 		9F65983323EDCEA300CDBE0C /* NoteXPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F65983223EDCEA300CDBE0C /* NoteXPage.swift */; };
 		9F65983523EDD09F00CDBE0C /* NoteText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F65983423EDD09F00CDBE0C /* NoteText.swift */; };
 		9F65983723EDD15C00CDBE0C /* NoteTextElement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F65983623EDD15C00CDBE0C /* NoteTextElement.swift */; };
@@ -144,6 +146,8 @@
 		9F5E89EF2391CBA2002FA8B2 /* DocumentViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentViewCell.swift; sourceTree = "<group>"; };
 		9F5E89F32391CE84002FA8B2 /* DocumentDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentDetailViewController.swift; sourceTree = "<group>"; };
 		9F5F340523AC64E400EB2804 /* Knowledge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Knowledge.swift; sourceTree = "<group>"; };
+		9F5F5D1224328B2F00AF79A5 /* NoteInfoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteInfoViewController.swift; sourceTree = "<group>"; };
+		9F5F5D1424328CC100AF79A5 /* DateExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateExtensions.swift; sourceTree = "<group>"; };
 		9F65983223EDCEA300CDBE0C /* NoteXPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteXPage.swift; sourceTree = "<group>"; };
 		9F65983423EDD09F00CDBE0C /* NoteText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteText.swift; sourceTree = "<group>"; };
 		9F65983623EDD15C00CDBE0C /* NoteTextElement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteTextElement.swift; sourceTree = "<group>"; };
@@ -370,6 +374,7 @@
 				9F0FC54823760E7600070FA0 /* NoteOptionsTableViewController.swift */,
 				9FB9E500237F500B00279F3E /* ShareNoteViewController.swift */,
 				9F3424012407197000A92B98 /* HiddenDocumentsViewController.swift */,
+				9F5F5D1224328B2F00AF79A5 /* NoteInfoViewController.swift */,
 			);
 			path = Other;
 			sourceTree = "<group>";
@@ -563,6 +568,7 @@
 				9F4D2337239C22FD0078B364 /* OtherExtensions.swift */,
 				9F00428823E9FB2600961636 /* BadgeHub.swift */,
 				9F9460DE23F5B0460073D709 /* GridView.swift */,
+				9F5F5D1424328CC100AF79A5 /* DateExtensions.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -800,6 +806,7 @@
 				9F65983923EDD23500CDBE0C /* NoteTextLine.swift in Sources */,
 				9FD29BA92220524D00CC969A /* ViewController.swift in Sources */,
 				9FA6239722DE3806007ED794 /* CHEBIDocument.swift in Sources */,
+				9F5F5D1524328CC100AF79A5 /* DateExtensions.swift in Sources */,
 				9F4D2338239C22FD0078B364 /* OtherExtensions.swift in Sources */,
 				9F5E89EC2391AF49002FA8B2 /* DocumentsViewController.swift in Sources */,
 				9FD29BA72220524D00CC969A /* AppDelegate.swift in Sources */,
@@ -838,6 +845,7 @@
 				9FBF6AB622E9F3FE001FD730 /* VisionTextBlockWrapper.swift in Sources */,
 				9F4B38BD23EA3D8500F87B61 /* ReceivedNoteCollectionViewCell.swift in Sources */,
 				9F65983323EDCEA300CDBE0C /* NoteXPage.swift in Sources */,
+				9F5F5D1324328B2F00AF79A5 /* NoteInfoViewController.swift in Sources */,
 				9FA6239E22E66D73007ED794 /* HandwritingRecognizer.swift in Sources */,
 				9F65983523EDD09F00CDBE0C /* NoteText.swift in Sources */,
 				9F65984123EE1EE900CDBE0C /* SKFileManager.swift in Sources */,

@@ -6,7 +6,6 @@ target 'Sketchnoting' do
   pod 'Firebase/MLVision'
   # If using an on-device API:
   pod 'Firebase/MLVisionTextModel'
-  pod 'GPUImage'
   pod 'NewPopMenu'
   pod 'NotificationBannerSwift'
   pod 'NVActivityIndicatorView'

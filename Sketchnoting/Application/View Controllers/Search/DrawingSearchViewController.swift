@@ -9,7 +9,6 @@
 import UIKit
 
 import PencilKit
-import GPUImage
 
 class DrawingSearchViewController: UIViewController, PKCanvasViewDelegate {
 
