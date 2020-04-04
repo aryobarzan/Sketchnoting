@@ -84,6 +84,7 @@
 		9FC02C1C23EDB6290051C576 /* File.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FC02C1B23EDB6290051C576 /* File.swift */; };
 		9FC02C1E23EDB6400051C576 /* NoteX.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FC02C1D23EDB6400051C576 /* NoteX.swift */; };
 		9FC02C2023EDB6520051C576 /* Folder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FC02C1F23EDB6520051C576 /* Folder.swift */; };
+		9FC114D9243919BD004F576A /* ImagePickerHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FC114D8243919BD004F576A /* ImagePickerHelper.swift */; };
 		9FD1ADF123A52C090013C68E /* NoteViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29C182236DCFC00CC969A /* NoteViewController.swift */; };
 		9FD1ADF323A52F7C0013C68E /* NotePagesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD1ADF223A52F7C0013C68E /* NotePagesViewController.swift */; };
 		9FD29BA72220524D00CC969A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29BA62220524D00CC969A /* AppDelegate.swift */; };
@@ -192,6 +193,7 @@
 		9FC02C1B23EDB6290051C576 /* File.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = File.swift; sourceTree = "<group>"; };
 		9FC02C1D23EDB6400051C576 /* NoteX.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteX.swift; sourceTree = "<group>"; };
 		9FC02C1F23EDB6520051C576 /* Folder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Folder.swift; sourceTree = "<group>"; };
+		9FC114D8243919BD004F576A /* ImagePickerHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePickerHelper.swift; sourceTree = "<group>"; };
 		9FCD3D5C23EA0A59005CB98D /* CocoaLumberjack.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = CocoaLumberjack.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		9FD1ADF223A52F7C0013C68E /* NotePagesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotePagesViewController.swift; sourceTree = "<group>"; };
 		9FD29BA32220524D00CC969A /* Sketchnoting.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Sketchnoting.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -614,6 +616,7 @@
 				9F4B38C223EB1E6D00F87B61 /* Notifications.swift */,
 				9F0ABB272412E5D400CA5A4E /* SKCacheManager.swift */,
 				9F9DAFDF242CB7C100713E75 /* DrawingRecognition.swift */,
+				9FC114D8243919BD004F576A /* ImagePickerHelper.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -808,6 +811,7 @@
 				9F5E89EC2391AF49002FA8B2 /* DocumentsViewController.swift in Sources */,
 				9FD29BA72220524D00CC969A /* AppDelegate.swift in Sources */,
 				9FD29C6422431BFA00CC969A /* DrawnImageClassifier.mlmodel in Sources */,
+				9FC114D9243919BD004F576A /* ImagePickerHelper.swift in Sources */,
 				9FC02C1C23EDB6290051C576 /* File.swift in Sources */,
 				9F9DAFE0242CB7C100713E75 /* DrawingRecognition.swift in Sources */,
 				9F92D10E231E95B400BC0E57 /* UICollectionViewExtensions.swift in Sources */,

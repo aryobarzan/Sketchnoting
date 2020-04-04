@@ -1158,6 +1158,11 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             self.present(scannerVC, animated: true)
         })
         popMenu.addAction(scanAction)
+        let imageImportAction = PopMenuDefaultAction(title: "Import Image(s)...", image: UIImage(systemName: "photo"),  didSelect: { action in
+            popMenu.dismiss(animated: true, completion: nil)
+            self.displayImagePicker()
+        })
+        popMenu.addAction(imageImportAction)
         self.present(popMenu, animated: true, completion: nil)
     }
     
@@ -1170,6 +1175,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             SKFileManager.activeNote!.pages.insert(page, at: SKFileManager.activeNote!.activePageIndex + 1)
         }
         self.saveCurrentPage()
+        self.updatePaginationButtons()
     }
     func documentCameraViewControllerDidCancel(_ controller: VNDocumentCameraViewController) {
         controller.dismiss(animated: true, completion: nil)
@@ -1177,6 +1183,18 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     func documentCameraViewController(_ controller: VNDocumentCameraViewController, didFailWithError error: Error) {
         log.error(error)
         controller.dismiss(animated: true, completion: nil)
+    }
+    
+    private func displayImagePicker() {
+        ImagePickerHelper.displayImagePicker(vc: self, completion: { pages in
+            if pages.count > 0 {
+                for page in pages {
+                    SKFileManager.activeNote!.pages.insert(page, at: SKFileManager.activeNote!.activePageIndex + 1)
+                }
+                self.saveCurrentPage()
+                self.updatePaginationButtons()
+            }
+        })
     }
         
     private func updatePaginationButtons() {

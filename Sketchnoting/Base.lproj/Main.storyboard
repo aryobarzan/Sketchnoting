@@ -503,7 +503,7 @@
                                             <preferredSymbolConfiguration key="preferredSymbolConfiguration" configurationType="pointSize" pointSize="15" scale="large"/>
                                         </state>
                                         <connections>
-                                            <segue destination="Bls-f0-zSx" kind="presentation" id="YdG-v0-JSf"/>
+                                            <segue destination="Bls-f0-zSx" kind="presentation" identifier="Settings" id="YdG-v0-JSf"/>
                                         </connections>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="xyG-l9-rRb">
@@ -790,7 +790,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Tag" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="iKP-G7-bdP">
-                                                    <rect key="frame" x="45" y="11.5" width="222" height="20.5"/>
+                                                    <rect key="frame" x="45" y="11.5" width="28" height="20.5"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
@@ -802,32 +802,16 @@
                                                         <constraint firstAttribute="height" constant="21" id="8MZ-Ih-pjA"/>
                                                     </constraints>
                                                 </imageView>
-                                                <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Nke-fo-W7g">
-                                                    <rect key="frame" x="275" y="2.5" width="30" height="39"/>
-                                                    <constraints>
-                                                        <constraint firstAttribute="height" constant="39" id="5eN-Ay-8ID"/>
-                                                        <constraint firstAttribute="width" constant="30" id="EqX-dk-gMP"/>
-                                                    </constraints>
-                                                    <fontDescription key="fontDescription" type="system" pointSize="22"/>
-                                                    <state key="normal" title="×"/>
-                                                    <connections>
-                                                        <action selector="deleteTapped:" destination="gqB-16-aX5" eventType="touchUpInside" id="OUy-Zb-GQJ"/>
-                                                    </connections>
-                                                </button>
                                             </subviews>
                                             <constraints>
-                                                <constraint firstItem="Nke-fo-W7g" firstAttribute="leading" secondItem="iKP-G7-bdP" secondAttribute="trailing" constant="8" id="GuY-DS-2UC"/>
                                                 <constraint firstItem="iKP-G7-bdP" firstAttribute="centerY" secondItem="OX0-z2-Pbj" secondAttribute="centerY" id="WZC-VC-NKA"/>
                                                 <constraint firstItem="CUW-QB-lvc" firstAttribute="centerY" secondItem="OX0-z2-Pbj" secondAttribute="centerY" id="YZB-QJ-08j"/>
                                                 <constraint firstItem="iKP-G7-bdP" firstAttribute="leading" secondItem="CUW-QB-lvc" secondAttribute="trailing" constant="8" id="be4-Mj-dmI"/>
                                                 <constraint firstItem="CUW-QB-lvc" firstAttribute="leading" secondItem="OX0-z2-Pbj" secondAttribute="leadingMargin" id="bxP-57-NCI"/>
-                                                <constraint firstAttribute="trailing" secondItem="Nke-fo-W7g" secondAttribute="trailing" constant="15" id="jEn-Bd-had"/>
-                                                <constraint firstItem="Nke-fo-W7g" firstAttribute="centerY" secondItem="OX0-z2-Pbj" secondAttribute="centerY" id="kju-R5-ori"/>
                                             </constraints>
                                         </tableViewCellContentView>
                                         <connections>
                                             <outlet property="colorView" destination="CUW-QB-lvc" id="oZE-7E-jXF"/>
-                                            <outlet property="deleteButton" destination="Nke-fo-W7g" id="da6-ho-f7I"/>
                                             <outlet property="titleLabel" destination="iKP-G7-bdP" id="C0s-ku-dP1"/>
                                         </connections>
                                     </tableViewCell>
@@ -844,11 +828,6 @@
                         <viewLayoutGuide key="safeArea" id="R9v-QN-QAG"/>
                     </view>
                     <navigationItem key="navigationItem" title="Tags" id="9pi-TX-8IW">
-                        <barButtonItem key="leftBarButtonItem" title="Edit" id="4Dk-Yf-BoB">
-                            <connections>
-                                <action selector="editTapped:" destination="a3r-tD-bMX" id="HdD-kR-LFg"/>
-                            </connections>
-                        </barButtonItem>
                         <barButtonItem key="rightBarButtonItem" systemItem="add" id="JIt-vW-BVT">
                             <connections>
                                 <segue destination="4pt-qn-thR" kind="show" identifier="CreateTag" id="AeQ-cV-goa"/>
@@ -1043,7 +1022,7 @@
                                             <constraint firstAttribute="height" constant="30" id="hUn-GH-EVo"/>
                                         </constraints>
                                         <fontDescription key="fontDescription" type="system" pointSize="13"/>
-                                        <state key="normal" image="arrowshape.turn.up.left" catalog="system">
+                                        <state key="normal" image="arrow.left" catalog="system">
                                             <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="large"/>
                                         </state>
                                         <connections>
@@ -1304,14 +1283,6 @@
                                     <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="oqt-gq-XGG">
                                         <rect key="frame" x="400" y="0.0" width="368" height="984"/>
                                         <subviews>
-                                            <visualEffectView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="S7U-4b-lPQ">
-                                                <rect key="frame" x="0.0" y="0.0" width="368" height="984"/>
-                                                <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="e9U-BZ-xRr">
-                                                    <rect key="frame" x="0.0" y="0.0" width="368" height="984"/>
-                                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                                </view>
-                                                <blurEffect style="systemChromeMaterialDark"/>
-                                            </visualEffectView>
                                             <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" apportionsSegmentWidthsByContent="YES" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="iBa-4h-Hud">
                                                 <rect key="frame" x="64" y="8" width="240" height="32"/>
                                                 <constraints>
@@ -1395,16 +1366,12 @@
                                                 </constraints>
                                             </view>
                                         </subviews>
-                                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <color key="backgroundColor" cocoaTouchSystemColor="viewFlipsideBackgroundColor"/>
                                         <gestureRecognizers/>
                                         <constraints>
                                             <constraint firstItem="6TS-Z2-Ha8" firstAttribute="top" secondItem="oqt-gq-XGG" secondAttribute="top" constant="10" id="2Dc-co-0V2"/>
                                             <constraint firstAttribute="trailing" secondItem="e9c-2t-gvA" secondAttribute="trailing" constant="8" id="3VY-h9-a75"/>
                                             <constraint firstItem="6TS-Z2-Ha8" firstAttribute="leading" secondItem="oqt-gq-XGG" secondAttribute="leading" constant="8" id="BZ3-an-gP8"/>
-                                            <constraint firstAttribute="trailing" secondItem="S7U-4b-lPQ" secondAttribute="trailing" id="GjG-Yp-cOP"/>
-                                            <constraint firstAttribute="bottom" secondItem="S7U-4b-lPQ" secondAttribute="bottom" id="LYb-B1-Aex"/>
-                                            <constraint firstItem="S7U-4b-lPQ" firstAttribute="top" secondItem="oqt-gq-XGG" secondAttribute="top" id="NcC-Yp-TKK"/>
-                                            <constraint firstItem="S7U-4b-lPQ" firstAttribute="leading" secondItem="oqt-gq-XGG" secondAttribute="leading" id="SOO-Qb-HVN"/>
                                             <constraint firstItem="RU1-z1-xzW" firstAttribute="top" secondItem="iBa-4h-Hud" secondAttribute="bottom" constant="5" id="WgT-k0-Ng0"/>
                                             <constraint firstAttribute="bottom" secondItem="RU1-z1-xzW" secondAttribute="bottom" constant="8" id="b1Q-FF-KOB"/>
                                             <constraint firstItem="e9c-2t-gvA" firstAttribute="top" secondItem="iBa-4h-Hud" secondAttribute="bottom" constant="5" id="b7a-vy-6Cr"/>
@@ -1544,7 +1511,7 @@
             <objects>
                 <tableViewController id="dds-Vf-vQc" customClass="NoteOptionsTableViewController" customModule="Sketchnoting" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="9SW-9O-a1g">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="493"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="753"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                         <sections>
@@ -1931,6 +1898,7 @@
                             <outlet property="delegate" destination="dds-Vf-vQc" id="7sJ-5d-gjS"/>
                         </connections>
                     </tableView>
+                    <value key="contentSizeForViewInPopover" type="size" width="320" height="740"/>
                     <connections>
                         <outlet property="dateLabel" destination="dTA-HN-Jlw" id="e8K-Wr-rYW"/>
                         <outlet property="deletePageButton" destination="LS2-4U-7y9" id="gN9-mG-A4H"/>
@@ -2874,7 +2842,6 @@
         <image name="arrow.left.circle" catalog="system" width="128" height="121"/>
         <image name="arrow.right.circle" catalog="system" width="128" height="121"/>
         <image name="arrow.up.arrow.down.circle" catalog="system" width="128" height="121"/>
-        <image name="arrowshape.turn.up.left" catalog="system" width="128" height="106"/>
         <image name="book.circle" catalog="system" width="128" height="121"/>
         <image name="book.circle.fill" catalog="system" width="128" height="121"/>
         <image name="calendar" catalog="system" width="128" height="106"/>

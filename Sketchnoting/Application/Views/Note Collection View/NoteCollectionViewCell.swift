@@ -24,8 +24,6 @@ class NoteCollectionViewCell: UICollectionViewCell {
     }
     
     func setFile(file: File) {
-        self.imageView.layer.borderWidth = 1
-        self.imageView.layer.borderColor = UIColor.black.cgColor
         self.imageView.layer.cornerRadius = 6
         
         self.file = file
@@ -33,12 +31,17 @@ class NoteCollectionViewCell: UICollectionViewCell {
             self.imageView.image = image
         }
         titleLabel.text = file.getName()
-        
         if file is Folder {
             self.imageView.backgroundColor = .clear
+            self.imageView.layer.borderColor = nil
         }
         else {
             self.imageView.backgroundColor = .white
+            self.imageView.layer.borderWidth = 1
+            self.imageView.layer.borderColor = UIColor.black.cgColor
+            if self.traitCollection.userInterfaceStyle == .dark {
+                self.imageView.layer.borderColor = UIColor.gray.cgColor
+            }
         }
     }
 }

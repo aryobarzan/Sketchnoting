@@ -12,10 +12,8 @@ class TagTableViewCell: UITableViewCell {
 
     @IBOutlet weak var colorView: UIImageView!
     @IBOutlet weak var titleLabel: UILabel!
-    @IBOutlet weak var deleteButton: UIButton!
     
     var noteTag: Tag?
-    var delegate: TagTableViewCellDelegate?
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -33,13 +31,4 @@ class TagTableViewCell: UITableViewCell {
 
         // Configure the view for the selected state
     }
-    @IBAction func deleteTapped(_ sender: UIButton) {
-        if let tag = noteTag {
-            delegate?.deleteTagTapped(tag: tag, sender: self)
-        }
-    }
-}
-
-protocol TagTableViewCellDelegate {
-    func deleteTagTapped(tag: Tag, sender: TagTableViewCell)
 }

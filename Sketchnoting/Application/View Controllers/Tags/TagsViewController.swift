@@ -8,7 +8,7 @@
 
 import UIKit
 
-class TagsViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, TagTableViewCellDelegate {
+class TagsViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
    
     @IBOutlet weak var tagsTableView: UITableView!
     
@@ -21,6 +21,8 @@ class TagsViewController: UIViewController, UITableViewDataSource, UITableViewDe
         
         tagsTableView.delegate = self
         tagsTableView.dataSource = self
+        
+        self.navigationItem.leftBarButtonItem = self.editButtonItem
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -41,16 +43,22 @@ class TagsViewController: UIViewController, UITableViewDataSource, UITableViewDe
         }
     }
     
-
-    @IBAction func editTapped(_ sender: UIBarButtonItem) {
-        isEditingTags = !isEditingTags
-        if isEditingTags {
-            sender.title = "Done"
+    override func setEditing(_ editing: Bool, animated: Bool) {
+        super.setEditing(editing, animated: true)
+            tagsTableView.setEditing(editing, animated: true)
+    }
+    
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        if editingStyle == .delete {
+            // Delete the row from the data source
+            let tag = TagsManager.tags[indexPath.row]
+            TagsManager.delete(tag: tag)
+            log.info("Tag deleted.")
+            tableView.deleteRows(at: [indexPath], with: .fade)
+            tagsTableView.reloadData()
+            self.updateTagSelections()
+        } else if editingStyle == .insert {
         }
-        else {
-            sender.title = "Edit"
-        }
-        tagsTableView.reloadData()
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -62,13 +70,6 @@ class TagsViewController: UIViewController, UITableViewDataSource, UITableViewDe
         
         let tag = TagsManager.tags[indexPath.row]
         cell.setTag(tag: tag)
-        cell.delegate = self
-        
-        cell.deleteButton.isHidden = true
-        if isEditingTags {
-            cell.deleteButton.isHidden = false
-        }
-        
         return cell
     }
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
@@ -109,7 +110,6 @@ class TagsViewController: UIViewController, UITableViewDataSource, UITableViewDe
                 }
             }
         }
-        
         if note != nil {
             note!.tags = selectedTags
             SKFileManager.save(file: note!)
@@ -131,11 +131,4 @@ class TagsViewController: UIViewController, UITableViewDataSource, UITableViewDe
         }
         return selectedTags
     }
-    
-    func deleteTagTapped(tag: Tag, sender: TagTableViewCell) {
-        TagsManager.delete(tag: tag)
-        tagsTableView.reloadData()
-        self.updateTagSelections()
-    }
-       
 }

@@ -105,7 +105,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         
         if noteCollectionViewState == .List {
             noteListViewButton.backgroundColor = self.view.tintColor
-            noteListViewButton.tintColor = .white
+            noteListViewButton.tintColor = .black
         }
     }
     
@@ -117,6 +117,11 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         self.updateReceivedNotesButton()
+    }
+    
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+        self.noteCollectionView.reloadData()
     }
     
     func popoverPresentationControllerDidDismissPopover(_ popoverPresentationController: UIPopoverPresentationController) {
@@ -189,6 +194,8 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
                 destination.note = selectedNoteForTagEditing
             }
             break
+        case "Settings":
+            break
         default:
             log.info("Unaccounted-for segue.")
         }
@@ -225,32 +232,9 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     }
     
     private func displayImagePicker() {
-        let imagePicker = ImagePickerController()
-
-        presentImagePicker(imagePicker,
-           select: { (asset) in
-        }, deselect: { (asset) in
-        }, cancel: { (assets) in
-        }, finish: { (assets) in
-            var images = [UIImage]()
-            let option = PHImageRequestOptions()
-            option.version = .original
-            option.isSynchronous = true
-            for asset in assets {
-                PHImageManager.default().requestImage(for: asset, targetSize: UIScreen.main.bounds.size, contentMode: .aspectFit, options: option) { (image, info) in
-                    if let image = image {
-                        images.append(image)
-                    }
-                }
-            }
-            if images.count > 0 {
+        ImagePickerHelper.displayImagePicker(vc: self, completion: { pages in
+            if pages.count > 0 {
                 let note = NoteX(name: "Image Import", parent: SKFileManager.currentFolder?.id, documents: nil)
-                var pages = [NoteXPage]()
-                for image in images {
-                    let page = NoteXPage()
-                    page.setBackdrop(image: image)
-                    pages.append(page)
-                }
                 note.pages = pages
                 _ = SKFileManager.add(note: note)
                 self.updateDisplayedNotes(true)
@@ -374,19 +358,13 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         homeButton.delegate = self
         navigationHierarchyStackView.addArrangedSubview(homeButton)
         folderButtons.append(homeButton)
-        var i = 0
         for f in SKFileManager.currentFoldersHierarchy {
             let folderButton = FolderButton()
             folderButton.frame = CGRect(x: 0, y: 0, width: 100, height: 35)
             folderButton.setFolder(folder: f)
             folderButton.delegate = self
-            if i % 2 == 0 {
-                folderButton.setTitleColor(.systemTeal, for: .normal)
-                folderButton.tintColor = .systemTeal
-            }
             navigationHierarchyStackView.addArrangedSubview(folderButton)
             folderButtons.append(folderButton)
-            i += 1
         }
         spacerView.removeFromSuperview()
         spacerView.setContentHuggingPriority(.defaultLow, for: .horizontal)
@@ -394,9 +372,11 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     }
     
     func onTap(folder: Folder?) {
-        SKFileManager.setCurrentFolder(folder: folder)
-        self.updateDisplayedNotes(false)
-        self.updateFoldersHierarchy()
+        if SKFileManager.currentFolder != folder {
+            SKFileManager.setCurrentFolder(folder: folder)
+            self.updateDisplayedNotes(false)
+            self.updateFoldersHierarchy()
+        }
     }
     
     @IBAction func noteListViewButtonTapped(_ sender: UIButton) {
@@ -405,7 +385,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             self.noteCollectionViewState = .List
             SettingsManager.setFileDisplayLayout(type: .List)
             sender.backgroundColor = self.view.tintColor
-            sender.tintColor = .white
+            sender.tintColor = .black
         case .List:
             self.noteCollectionViewState = .Grid
             SettingsManager.setFileDisplayLayout(type: .Grid)
