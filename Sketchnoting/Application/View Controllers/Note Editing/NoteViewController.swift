@@ -16,7 +16,6 @@ import NVActivityIndicatorView
 import Repeat
 import NotificationBannerSwift
 import ViewAnimator
-import MaterialComponents.MaterialBottomSheet
 import Connectivity
 import GPUImage
 import PopMenu
@@ -186,6 +185,13 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                 log.info("Deleting note.")
             }
             break
+        case "ShowNotePages":
+            if let destination = segue.destination as? UINavigationController {
+                if let destinationViewController = destination.topViewController as? NotePagesViewController {
+                    destinationViewController.delegate = self
+                }
+            }
+            break
         case "NoteOptions":
             if let destination = segue.destination as? NoteOptionsTableViewController {
                 destination.delegate = self
@@ -205,9 +211,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                     destinationViewController.note = SKFileManager.activeNote!
                 }
             }
-            break
-        case "NoteInfo":
-            log.info("Showing note information.")
             break
         default:
             log.error("Default segue case triggered.")
@@ -1280,19 +1283,8 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         bookshelfSegmentedControl.setTitle("Documents (\(SKFileManager.activeNote!.documents.count))", forSegmentAt: 0)
     }
     
-    // Note Pages Bottom Sheet
-    @IBAction func pageBrowserTapped(_ sender: UIButton) {
-        showNotePagesBottomSheet()
-    }
     private func showNotePagesBottomSheet() {
-        let storyboard = UIStoryboard(name: "Main", bundle: Bundle.main)
-        let notePagesViewController = storyboard.instantiateViewController(withIdentifier: "NotePagesViewController") as! NotePagesViewController
-        notePagesViewController.delegate = self
-        
-        let bottomNotePagesSheet = MDCBottomSheetController(contentViewController: notePagesViewController)
-        bottomNotePagesSheet.dismissOnDraggingDownSheet = true
-        bottomNotePagesSheet.trackingScrollView = notePagesViewController.collectionView
-        self.present(bottomNotePagesSheet, animated: true, completion: nil)
+        self.performSegue(withIdentifier: "ShowNotePages", sender: self)
     }
 
     func notePageSelected(index: Int) {

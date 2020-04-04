@@ -13,42 +13,48 @@ class NoteOptionsTableViewController: UITableViewController {
     var delegate: NoteOptionsDelegate?
     var canDeletePage = false
 
+    @IBOutlet weak var nameField: UITextField!
+    @IBOutlet weak var dateLabel: UILabel!
+    @IBOutlet weak var pageLabel: UILabel!
+    @IBOutlet weak var drawingsTextView: UITextView!
     
     @IBOutlet var deletePageButton: UIButton!
     override func viewDidLoad() {
         super.viewDidLoad()
         self.clearsSelectionOnViewWillAppear = false
         deletePageButton.isEnabled = canDeletePage
+        
+        nameField.text = SKFileManager.activeNote!.getName()
+        dateLabel.text = "\(SKFileManager.activeNote!.creationDate.getFormattedDate())"
+        pageLabel.text = "Page: \(SKFileManager.activeNote!.activePageIndex+1)/\(SKFileManager.activeNote!.pages.count)"
+        drawingsTextView.text = "Drawings: \(SKFileManager.activeNote!.getCurrentPage().drawingLabels.joined(separator:" - "))"
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         var option : NoteOption = .Annotate
-        if indexPath.section == 0 {
+        if indexPath.section == 1 {
             if indexPath.row == 0 {
                 option = .Annotate
             }
         }
-        else if indexPath.section == 1 {
+        else if indexPath.section == 2 {
             if indexPath.row == 0 {
-                option = .SetTitle
+                    option = .ViewText
             }
             else if indexPath.row == 1 {
-                    option = .ViewText
-                }
-            else if indexPath.row == 2 {
                     option = .CopyText
             }
-            else if indexPath.row == 3 {
+            else if indexPath.row == 2 {
                         option = .Share
             }
-            else if indexPath.row == 4 {
+            else if indexPath.row == 3 {
                     option = .ClearPage
             }
-            else if indexPath.row == 5 {
+            else if indexPath.row == 4 {
                     option = .DeletePage
             }
         }
-        else if indexPath.section == 2 {
+        else if indexPath.section == 3 {
             if indexPath.row == 0 {
                 option = .ResetDocuments
             }
@@ -61,6 +67,15 @@ class NoteOptionsTableViewController: UITableViewController {
         }
         dismiss(animated: true, completion: nil)
         delegate?.noteOptionSelected(option: option)
+    }
+    @IBAction func nameFieldDone(_ sender: UITextField) {
+        if let newName = sender.text {
+            if newName != SKFileManager.activeNote!.getName() {
+                SKFileManager.activeNote!.setName(name: newName)
+                log.info("Updated note name.")
+                SKFileManager.save(file: SKFileManager.activeNote!)
+            }
+        }
     }
 }
 

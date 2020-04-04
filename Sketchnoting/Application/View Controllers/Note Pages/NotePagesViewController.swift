@@ -125,6 +125,9 @@ class NotePagesViewController: UIViewController, UICollectionViewDelegate, UICol
             }
         }
     }
+    @IBAction func doneTapped(_ sender: UIBarButtonItem) {
+        self.dismiss(animated: true)
+    }
     
     func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
         return UIContextMenuConfiguration(identifier: nil, previewProvider: nil, actionProvider: { suggestedActions in

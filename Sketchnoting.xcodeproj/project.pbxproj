@@ -34,7 +34,6 @@
 		9F5E89F02391CBA2002FA8B2 /* DocumentViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5E89EF2391CBA2002FA8B2 /* DocumentViewCell.swift */; };
 		9F5E89F42391CE84002FA8B2 /* DocumentDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5E89F32391CE84002FA8B2 /* DocumentDetailViewController.swift */; };
 		9F5F340623AC64E400EB2804 /* Knowledge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5F340523AC64E400EB2804 /* Knowledge.swift */; };
-		9F5F5D1324328B2F00AF79A5 /* NoteInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5F5D1224328B2F00AF79A5 /* NoteInfoViewController.swift */; };
 		9F5F5D1524328CC100AF79A5 /* DateExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5F5D1424328CC100AF79A5 /* DateExtensions.swift */; };
 		9F65983323EDCEA300CDBE0C /* NoteXPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F65983223EDCEA300CDBE0C /* NoteXPage.swift */; };
 		9F65983523EDD09F00CDBE0C /* NoteText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F65983423EDD09F00CDBE0C /* NoteText.swift */; };
@@ -146,7 +145,6 @@
 		9F5E89EF2391CBA2002FA8B2 /* DocumentViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentViewCell.swift; sourceTree = "<group>"; };
 		9F5E89F32391CE84002FA8B2 /* DocumentDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentDetailViewController.swift; sourceTree = "<group>"; };
 		9F5F340523AC64E400EB2804 /* Knowledge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Knowledge.swift; sourceTree = "<group>"; };
-		9F5F5D1224328B2F00AF79A5 /* NoteInfoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteInfoViewController.swift; sourceTree = "<group>"; };
 		9F5F5D1424328CC100AF79A5 /* DateExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateExtensions.swift; sourceTree = "<group>"; };
 		9F65983223EDCEA300CDBE0C /* NoteXPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteXPage.swift; sourceTree = "<group>"; };
 		9F65983423EDD09F00CDBE0C /* NoteText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteText.swift; sourceTree = "<group>"; };
@@ -374,7 +372,6 @@
 				9F0FC54823760E7600070FA0 /* NoteOptionsTableViewController.swift */,
 				9FB9E500237F500B00279F3E /* ShareNoteViewController.swift */,
 				9F3424012407197000A92B98 /* HiddenDocumentsViewController.swift */,
-				9F5F5D1224328B2F00AF79A5 /* NoteInfoViewController.swift */,
 			);
 			path = Other;
 			sourceTree = "<group>";
@@ -845,7 +842,6 @@
 				9FBF6AB622E9F3FE001FD730 /* VisionTextBlockWrapper.swift in Sources */,
 				9F4B38BD23EA3D8500F87B61 /* ReceivedNoteCollectionViewCell.swift in Sources */,
 				9F65983323EDCEA300CDBE0C /* NoteXPage.swift in Sources */,
-				9F5F5D1324328B2F00AF79A5 /* NoteInfoViewController.swift in Sources */,
 				9FA6239E22E66D73007ED794 /* HandwritingRecognizer.swift in Sources */,
 				9F65983523EDD09F00CDBE0C /* NoteText.swift in Sources */,
 				9F65984123EE1EE900CDBE0C /* SKFileManager.swift in Sources */,
@@ -929,7 +925,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -984,7 +980,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
@@ -1086,8 +1082,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/onevcat/Kingfisher.git";
 			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 5.8.2;
+				kind = exactVersion;
+				version = 5.13.2;
 			};
 		};
 		9F10EC172347E4B3005340AA /* XCRemoteSwiftPackageReference "SwiftyBeaver" */ = {
