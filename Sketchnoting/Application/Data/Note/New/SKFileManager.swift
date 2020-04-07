@@ -136,11 +136,10 @@ class SKFileManager {
         else if file is Folder {
             path = self.getFoldersDirectory().appendingPathComponent(file.id)
         }
-        let noteURL = self.getNotesDirectory().appendingPathComponent(file.id + ".sketchnote")
         if FileManager.default.fileExists(atPath: path.path) {
-            try? FileManager.default.removeItem(atPath: noteURL.path)
+            try? FileManager.default.removeItem(atPath: path.path)
         }
-        log.info("Deleted note.")
+        log.info("Deleted file.")
 
         if file.parent != nil {
             if let parentFolder = getFolder(id: file.parent!) {
