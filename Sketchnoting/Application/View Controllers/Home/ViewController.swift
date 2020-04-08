@@ -219,22 +219,31 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     
     func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
         if urls.count > 0 {
-            importNote(url: urls[0])
+            if ImportHelper.importItems(urls: urls, n: nil) {
+                let banner = FloatingNotificationBanner(title: "Documents", subtitle: "Imported your selected items.", style: .info)
+                banner.show()
+                self.updateDisplayedNotes(true)
+            }
+            else {
+                let banner = FloatingNotificationBanner(title: "Documents", subtitle: "There was a problem importing your selected items.", style: .info)
+                banner.show()
+            }
         }
     }
     
     private func displayDocumentPicker() {
-        let types: [String] = ["com.sketchnote"]
+        let types: [String] = ["com.sketchnote", String(kUTTypeImage)]
         let documentPicker = UIDocumentPickerViewController(documentTypes: types, in: .import)
         documentPicker.delegate = self
         documentPicker.modalPresentationStyle = .formSheet
+        documentPicker.allowsMultipleSelection = true
         self.present(documentPicker, animated: true, completion: nil)
     }
     
     private func displayImagePicker() {
         ImagePickerHelper.displayImagePicker(vc: self, completion: { pages in
             if pages.count > 0 {
-                let note = NoteX(name: "Image Import", parent: SKFileManager.currentFolder?.id, documents: nil)
+                let note = NoteX(name: "Image Import \(Int.random(in: 1..<200))", parent: SKFileManager.currentFolder?.id, documents: nil)
                 note.pages = pages
                 _ = SKFileManager.add(note: note)
                 self.updateDisplayedNotes(true)
@@ -245,7 +254,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     @IBAction func importDocumentTapped(_ sender: UIButton) {
         let popMenu = PopMenuViewController(sourceView: sender, actions: [PopMenuAction](), appearance: nil)
         popMenu.appearance.popMenuBackgroundStyle = .blurred(.dark)
-        let noteImportAction = PopMenuDefaultAction(title: "Import Note...", image: UIImage(systemName: "doc"),  didSelect: { action in
+        let noteImportAction = PopMenuDefaultAction(title: "Import Note(s)/Image(s)...", image: UIImage(systemName: "doc"),  didSelect: { action in
             popMenu.dismiss(animated: true, completion: nil)
             self.displayDocumentPicker()
         })
@@ -255,7 +264,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             self.showDocumentScanner()
         })
         popMenu.addAction(scanAction)
-        let imageImportAction = PopMenuDefaultAction(title: "Import Image(s)...", image: UIImage(systemName: "photo"),  didSelect: { action in
+        let imageImportAction = PopMenuDefaultAction(title: "Camera Roll...", image: UIImage(systemName: "photo"),  didSelect: { action in
             popMenu.dismiss(animated: true, completion: nil)
             self.displayImagePicker()
         })

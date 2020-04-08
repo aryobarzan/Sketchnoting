@@ -9,6 +9,7 @@
 import UIKit
 import PencilKit
 import VisionKit
+import MobileCoreServices
 
 import Firebase
 import PopMenu
@@ -21,7 +22,7 @@ import GPUImage
 import PopMenu
 import GPUImage
 
-class NoteViewController: UIViewController, UIPencilInteractionDelegate, UICollectionViewDataSource, UICollectionViewDelegate, NoteXDelegate, PKCanvasViewDelegate, PKToolPickerObserver, UIScreenshotServiceDelegate, NoteOptionsDelegate, DocumentsViewControllerDelegate, NotePagesDelegate, VNDocumentCameraViewControllerDelegate {
+class NoteViewController: UIViewController, UIPencilInteractionDelegate, UICollectionViewDataSource, UICollectionViewDelegate, NoteXDelegate, PKCanvasViewDelegate, PKToolPickerObserver, UIScreenshotServiceDelegate, NoteOptionsDelegate, DocumentsViewControllerDelegate, NotePagesDelegate, VNDocumentCameraViewControllerDelegate, UIDocumentPickerDelegate {
     
     private var documentsVC: DocumentsViewController!
     
@@ -1151,14 +1152,19 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             self.updatePaginationButtons()
         })
         popMenu.addAction(newPageAction)
-        let scanAction = PopMenuDefaultAction(title: "Scan Document(s)", image: UIImage(systemName: "doc.text.viewfinder"),  didSelect: { action in
+        let importItemsAction = PopMenuDefaultAction(title: "Import Note(s)/Image(s)...", image: UIImage(systemName: "doc"),  didSelect: { action in
+            popMenu.dismiss(animated: true, completion: nil)
+            self.displayDocumentPicker()
+        })
+        popMenu.addAction(importItemsAction)
+        let scanAction = PopMenuDefaultAction(title: "Scan Document(s)...", image: UIImage(systemName: "doc.text.viewfinder"),  didSelect: { action in
             popMenu.dismiss(animated: true, completion: nil)
             let scannerVC = VNDocumentCameraViewController()
             scannerVC.delegate = self
             self.present(scannerVC, animated: true)
         })
         popMenu.addAction(scanAction)
-        let imageImportAction = PopMenuDefaultAction(title: "Import Image(s)...", image: UIImage(systemName: "photo"),  didSelect: { action in
+        let imageImportAction = PopMenuDefaultAction(title: "Camera Roll...", image: UIImage(systemName: "photo"),  didSelect: { action in
             popMenu.dismiss(animated: true, completion: nil)
             self.displayImagePicker()
         })
@@ -1195,6 +1201,29 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                 self.updatePaginationButtons()
             }
         })
+    }
+    
+    private func displayDocumentPicker() {
+        let types: [String] = ["com.sketchnote", String(kUTTypeImage)]
+        let documentPicker = UIDocumentPickerViewController(documentTypes: types, in: .import)
+        documentPicker.delegate = self
+        documentPicker.modalPresentationStyle = .formSheet
+        documentPicker.allowsMultipleSelection = true
+        self.present(documentPicker, animated: true, completion: nil)
+    }
+    
+    func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
+        if urls.count > 0 {
+            if ImportHelper.importItems(urls: urls, n: SKFileManager.activeNote!) {
+                let banner = FloatingNotificationBanner(title: "Documents", subtitle: "Imported your selected items.", style: .info)
+                banner.show()
+                self.updatePaginationButtons()
+            }
+            else {
+                let banner = FloatingNotificationBanner(title: "Documents", subtitle: "There was a problem importing your selected items.", style: .info)
+                banner.show()
+            }
+        }
     }
         
     private func updatePaginationButtons() {

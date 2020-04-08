@@ -98,6 +98,11 @@
 			<array/>
 			<key>UTTypeIdentifier</key>
 			<string>com.sketchnote</string>
+            <key>public.filename-extension</key>
+                   <array>
+                       <string>sketchnote</string>
+                       <string>SKETCHNOTE</string>
+                   </array>
 		</dict>
 	</array>
 </dict>
