@@ -99,7 +99,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         }
         
         let notificationCentre = NotificationCenter.default
-        notificationCentre.addObserver(self, selector: #selector(self.notifiedImportSketchnote(_:)), name: NSNotification.Name(rawValue: Notifications.NOTIFICATION_IMPORT_NOTE), object: nil)
+        notificationCentre.addObserver(self, selector: #selector(self.notifiedFileImport(_:)), name: NSNotification.Name(rawValue: Notifications.NOTIFICATION_IMPORT_NOTE), object: nil)
         notificationCentre.addObserver(self, selector: #selector(self.notifiedReceiveSketchnote(_:)), name: NSNotification.Name(rawValue: Notifications.NOTIFICATION_RECEIVE_NOTE), object: nil)
         notificationCentre.addObserver(self, selector: #selector(self.notifiedDeviceVisibility(_:)), name: NSNotification.Name(rawValue: Notifications.NOTIFICATION_DEVICE_VISIBILITY), object: nil)
         
@@ -131,10 +131,10 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     }
     
     // Respond to NotificationCenter events
-    @objc func notifiedImportSketchnote(_ noti : Notification)  {
+    @objc func notifiedFileImport(_ noti : Notification)  {
         let importURL = (noti.userInfo as? [String : URL])!["importURL"]!
-        print(importURL)
-        self.importNote(url: importURL)
+        log.info(importURL)
+        self.manageFileImport(urls: [importURL])
     }
     @objc func notifiedReceiveSketchnote(_ noti : Notification)  {
         updateReceivedNotesButton()
@@ -217,7 +217,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         self.tabBarController?.tabBar.isHidden = false
     }
     
-    func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
+    private func manageFileImport(urls: [URL]) {
         if urls.count > 0 {
             if ImportHelper.importItems(urls: urls, n: nil) {
                 let banner = FloatingNotificationBanner(title: "Documents", subtitle: "Imported your selected items.", style: .info)
@@ -229,6 +229,10 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
                 banner.show()
             }
         }
+    }
+    
+    func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
+        self.manageFileImport(urls: urls)
     }
     
     private func displayDocumentPicker() {
