@@ -42,7 +42,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     var topicsBadgeHub: BadgeHub!
     
     @IBOutlet var bookshelf: UIView!
-    @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     @IBOutlet var documentsUnderlyingView: UIView!
         
     @IBOutlet weak var helpLinesButton: UIButton!
@@ -661,7 +660,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                     }
                 }
                 else {
-                    self.activityIndicator.stopAnimating()
                     log.error("Handwriting recognition returned no result.")
                 }
             }
@@ -691,7 +689,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     
     var connectivity: Connectivity?
     func annotateText(text: String) {
-        self.activityIndicator.stopAnimating()
         self.clearConceptHighlights()
         
         connectivity = Connectivity()
@@ -779,7 +776,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             textRecognitionTimer = nil
         }
         textRecognitionTimer = Timer.scheduledTimer(timeInterval: 5.0, target: self, selector: #selector(onRecognitionTimerFires), userInfo: nil, repeats: false)
-        self.activityIndicator.startAnimating()
         log.info("Recognition timer started/reset.")
     }
     @objc func onRecognitionTimerFires()
