@@ -219,15 +219,20 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     
     private func manageFileImport(urls: [URL]) {
         if urls.count > 0 {
-            if ImportHelper.importItems(urls: urls, n: nil) {
-                let banner = FloatingNotificationBanner(title: "Documents", subtitle: "Imported your selected items.", style: .info)
-                banner.show()
-                self.updateDisplayedNotes(true)
+            let (importedNotes, importedImages) = ImportHelper.importItems(urls: urls, n: nil)
+            for note in importedNotes {
+                if SKFileManager.notes.contains(note) {
+                    log.info("Note is already in your library, updating its data.")
+                    SKFileManager.save(file: note)
+                }
+                else {
+                    log.info("Importing new note.")
+                    _ = SKFileManager.add(note: note)
+                }
             }
-            else {
-                let banner = FloatingNotificationBanner(title: "Documents", subtitle: "There was a problem importing your selected items.", style: .info)
-                banner.show()
-            }
+            let banner = FloatingNotificationBanner(title: "Documents", subtitle: "Imported your selected items.", style: .info)
+            banner.show()
+            self.updateDisplayedNotes(true)
         }
     }
     

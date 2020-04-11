@@ -101,6 +101,9 @@
 		9FD29C6422431BFA00CC969A /* DrawnImageClassifier.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29C6322431BFA00CC969A /* DrawnImageClassifier.mlmodel */; };
 		9FD29C6622431C0000CC969A /* labels.txt in Resources */ = {isa = PBXBuildFile; fileRef = 9FD29C6522431C0000CC969A /* labels.txt */; };
 		9FD8BB97243D5BE500542BFA /* ImportHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD8BB96243D5BE500542BFA /* ImportHelper.swift */; };
+		9FF0AC9224412C5200A82BE8 /* DraggableImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FF0AC9124412C5200A82BE8 /* DraggableImageView.swift */; };
+		9FF0AC9424412F4C00A82BE8 /* NoteImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FF0AC9324412F4C00A82BE8 /* NoteImage.swift */; };
+		9FF0AC962441308B00A82BE8 /* CodableExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FF0AC952441308B00A82BE8 /* CodableExtensions.swift */; };
 		9FFE07E6232A5FE500DBD0AC /* TagTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FFE07E5232A5FE500DBD0AC /* TagTableViewCell.swift */; };
 		9FFE07E8232A622A00DBD0AC /* Tag.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FFE07E7232A622A00DBD0AC /* Tag.swift */; };
 		9FFE07EA232A63BA00DBD0AC /* TagsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FFE07E9232A63BA00DBD0AC /* TagsManager.swift */; };
@@ -214,6 +217,9 @@
 		9FD29C6322431BFA00CC969A /* DrawnImageClassifier.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = DrawnImageClassifier.mlmodel; sourceTree = "<group>"; };
 		9FD29C6522431C0000CC969A /* labels.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = labels.txt; sourceTree = "<group>"; };
 		9FD8BB96243D5BE500542BFA /* ImportHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportHelper.swift; sourceTree = "<group>"; };
+		9FF0AC9124412C5200A82BE8 /* DraggableImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DraggableImageView.swift; sourceTree = "<group>"; };
+		9FF0AC9324412F4C00A82BE8 /* NoteImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteImage.swift; sourceTree = "<group>"; };
+		9FF0AC952441308B00A82BE8 /* CodableExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodableExtensions.swift; sourceTree = "<group>"; };
 		9FFE07E5232A5FE500DBD0AC /* TagTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagTableViewCell.swift; sourceTree = "<group>"; };
 		9FFE07E7232A622A00DBD0AC /* Tag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tag.swift; sourceTree = "<group>"; };
 		9FFE07E9232A63BA00DBD0AC /* TagsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagsManager.swift; sourceTree = "<group>"; };
@@ -506,6 +512,7 @@
 				9F65983823EDD23500CDBE0C /* NoteTextLine.swift */,
 				9F65983623EDD15C00CDBE0C /* NoteTextElement.swift */,
 				9F65984023EE1EE900CDBE0C /* SKFileManager.swift */,
+				9FF0AC9324412F4C00A82BE8 /* NoteImage.swift */,
 			);
 			path = New;
 			sourceTree = "<group>";
@@ -570,6 +577,8 @@
 				9F00428823E9FB2600961636 /* BadgeHub.swift */,
 				9F9460DE23F5B0460073D709 /* GridView.swift */,
 				9F5F5D1424328CC100AF79A5 /* DateExtensions.swift */,
+				9FF0AC9124412C5200A82BE8 /* DraggableImageView.swift */,
+				9FF0AC952441308B00A82BE8 /* CodableExtensions.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -801,6 +810,7 @@
 				9F05B5A3232BF0C800983AF2 /* NoteCollectionViewDetailCell.swift in Sources */,
 				9F92D110231E97DF00BC0E57 /* UserDefaultsExtensions.swift in Sources */,
 				9F92D11F23217FFF00BC0E57 /* SearchFilter.swift in Sources */,
+				9FF0AC962441308B00A82BE8 /* CodableExtensions.swift in Sources */,
 				9FA6239522DE3741007ED794 /* BioPortalDocument.swift in Sources */,
 				9FFE07E6232A5FE500DBD0AC /* TagTableViewCell.swift in Sources */,
 				9FC02C2023EDB6520051C576 /* Folder.swift in Sources */,
@@ -843,6 +853,7 @@
 				9F75E448230C368F00488BBD /* NoteSharingViewController.swift in Sources */,
 				9FBF6AB422E9F391001FD730 /* VisionTextWrapper.swift in Sources */,
 				9FC02C1E23EDB6400051C576 /* NoteX.swift in Sources */,
+				9FF0AC9224412C5200A82BE8 /* DraggableImageView.swift in Sources */,
 				9F8551B123A539D9006EB0B1 /* NotePageCollectionViewCell.swift in Sources */,
 				9FBF6ABA22E9F439001FD730 /* VisionTextElementWrapper.swift in Sources */,
 				9FD29BC72224B58600CC969A /* Document.swift in Sources */,
@@ -851,6 +862,7 @@
 				9F4B38BD23EA3D8500F87B61 /* ReceivedNoteCollectionViewCell.swift in Sources */,
 				9F65983323EDCEA300CDBE0C /* NoteXPage.swift in Sources */,
 				9FA6239E22E66D73007ED794 /* HandwritingRecognizer.swift in Sources */,
+				9FF0AC9424412F4C00A82BE8 /* NoteImage.swift in Sources */,
 				9F65983523EDD09F00CDBE0C /* NoteText.swift in Sources */,
 				9F65984123EE1EE900CDBE0C /* SKFileManager.swift in Sources */,
 				9FA6238D22D38AEE007ED794 /* SpotlightHelper.swift in Sources */,

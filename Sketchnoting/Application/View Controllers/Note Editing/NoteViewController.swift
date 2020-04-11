@@ -12,7 +12,6 @@ import VisionKit
 import MobileCoreServices
 
 import Firebase
-import PopMenu
 import NVActivityIndicatorView
 import Repeat
 import NotificationBannerSwift
@@ -22,7 +21,7 @@ import GPUImage
 import PopMenu
 import GPUImage
 
-class NoteViewController: UIViewController, UIPencilInteractionDelegate, UICollectionViewDataSource, UICollectionViewDelegate, NoteXDelegate, PKCanvasViewDelegate, PKToolPickerObserver, UIScreenshotServiceDelegate, NoteOptionsDelegate, DocumentsViewControllerDelegate, NotePagesDelegate, VNDocumentCameraViewControllerDelegate, UIDocumentPickerDelegate {
+class NoteViewController: UIViewController, UIPencilInteractionDelegate, UICollectionViewDataSource, UICollectionViewDelegate, NoteXDelegate, PKCanvasViewDelegate, PKToolPickerObserver, UIScreenshotServiceDelegate, NoteOptionsDelegate, DocumentsViewControllerDelegate, NotePagesDelegate, VNDocumentCameraViewControllerDelegate, UIDocumentPickerDelegate, DraggableImageViewDelegate {
     
     private var documentsVC: DocumentsViewController!
     
@@ -67,6 +66,9 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     
     var conceptHighlightsInitialized = false
     
+    var noteImageViews = [DraggableImageView : NoteImage]()
+    
+    @IBOutlet weak var manageImagesButton: UIButton!
     // This function sets up the page and every element contained within it.
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -129,6 +131,8 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         self.oldDocuments = SKFileManager.activeNote!.documents
         
         NotificationCenter.default.addObserver(self, selector: #selector(self.notifiedReceiveSketchnote(_:)), name: NSNotification.Name(rawValue: Notifications.NOTIFICATION_RECEIVE_NOTE), object: nil)
+        
+        self.setupNoteImages()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -331,6 +335,24 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         if let gridView = gridView {
             gridView.removeFromSuperview()
         }
+    }
+    
+    private func setupNoteImages() {
+        for (view, _) in noteImageViews {
+            view.removeFromSuperview()
+        }
+        noteImageViews = [DraggableImageView : NoteImage]()
+        for image in SKFileManager.activeNote!.getCurrentPage().images {
+            let frame = CGRect(x: image.location.x, y: image.location.y, width: image.size.width, height: image.size.height)
+            let draggableView = DraggableImageView(frame: frame)
+            draggableView.image = image.image
+            draggableView.delegate = self
+            self.canvasView.addSubview(draggableView)
+            self.canvasView.sendSubviewToBack(draggableView)
+            self.noteImageViews[draggableView] = image
+            draggableView.center = image.location
+        }
+        
     }
     
     // MARK: Highlighting recognized concepts/topics on the canvas
@@ -1192,14 +1214,11 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     }
     
     private func displayImagePicker() {
-        ImagePickerHelper.displayImagePicker(vc: self, completion: { pages in
-            if pages.count > 0 {
-                for page in pages {
-                    SKFileManager.activeNote!.pages.insert(page, at: SKFileManager.activeNote!.activePageIndex + 1)
-                }
-                self.saveCurrentPage()
-                self.updatePaginationButtons()
+        ImagePickerHelper.displayImagePickerWithImageOutput(vc: self, completion: { images in
+            for img in images {
+                self.addNoteImage(image: img)
             }
+            self.saveCurrentPage()
         })
     }
     
@@ -1214,18 +1233,78 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     
     func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
         if urls.count > 0 {
-            if ImportHelper.importItems(urls: urls, n: SKFileManager.activeNote!) {
-                let banner = FloatingNotificationBanner(title: "Documents", subtitle: "Imported your selected items.", style: .info)
-                banner.show()
-                self.updatePaginationButtons()
+            let banner = FloatingNotificationBanner(title: "Documents", subtitle: "Imported your selected items.", style: .info)
+            banner.show()
+            let (notes, images) = ImportHelper.importItems(urls: urls, n: SKFileManager.activeNote!)
+            for img in images {
+                self.addNoteImage(image: img)
             }
-            else {
-                let banner = FloatingNotificationBanner(title: "Documents", subtitle: "There was a problem importing your selected items.", style: .info)
-                banner.show()
+            SKFileManager.save(file: SKFileManager.activeNote!)
+        }
+    }
+    
+    private func addNoteImage(image: UIImage) {
+        let noteImage = NoteImage(image: image)
+        SKFileManager.activeNote!.getCurrentPage().images.append(noteImage)
+        let frame = CGRect(x: 50, y: 50, width: 0.25 * image.size.width, height: 0.25 * image.size.height)
+        let draggableView = DraggableImageView(frame: frame)
+        draggableView.lastScale = 1.0
+        draggableView.image = image
+        draggableView.delegate = self
+        self.canvasView.addSubview(draggableView)
+        self.canvasView.sendSubviewToBack(draggableView)
+        self.noteImageViews[draggableView] = noteImage
+    }
+    
+    func draggableImageViewSizeChanged(source: DraggableImageView, scale: CGSize) {
+        if let noteImage = self.noteImageViews[source] {
+            noteImage.size = scale
+            log.info(scale)
+            SKFileManager.activeNote!.getCurrentPage().updateNoteImage(noteImage: noteImage)
+            self.startSaveTimer()
+        }
+    }
+    
+    func draggableImageViewLocationChanged(source: DraggableImageView, location: CGPoint) {
+        if let noteImage = self.noteImageViews[source] {
+            noteImage.location = location
+            SKFileManager.activeNote!.getCurrentPage().updateNoteImage(noteImage: noteImage)
+            self.startSaveTimer()
+        }
+    }
+    
+    func draggableImageViewDelete(source: DraggableImageView) {
+        let popMenu = PopMenuViewController(sourceView: source, actions: [PopMenuAction](), appearance: nil)
+        let closeAction = PopMenuDefaultAction(title: "Close")
+        let action = PopMenuDefaultAction(title: "Delete Image", didSelect: { action in
+            if let noteImage =  self.noteImageViews[source] {
+                SKFileManager.activeNote!.getCurrentPage().deleteImage(noteImage: noteImage)
+                source.removeFromSuperview()
+                self.noteImageViews[source] = nil
+                self.startSaveTimer()
+            }
+            
+        })
+        popMenu.addAction(action)
+        popMenu.addAction(closeAction)
+        self.present(popMenu, animated: true, completion: nil)
+    }
+    @IBAction func manageImagesTapped(_ sender: UIButton) {
+        if sender.tintColor == self.view.tintColor {
+            sender.tintColor = .white
+            
+            for (view, _) in noteImageViews {
+                canvasView.sendSubviewToBack(view)
+            }
+        }
+        else {
+            sender.tintColor = self.view.tintColor
+            for (view, _) in noteImageViews {
+                canvasView.bringSubviewToFront(view)
             }
         }
     }
-        
+    
     private func updatePaginationButtons() {
         previousPageButton.isEnabled = SKFileManager.activeNote!.hasPreviousPage()
         nextPageButton.isEnabled = SKFileManager.activeNote!.hasNextPage()
@@ -1237,6 +1316,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         setupConceptHighlights()
         drawingViews = [UIView]()
         setupDrawingRegions()
+        setupNoteImages()
         if previousStateOfTopicsShown {
             toggleConceptHighlight()
         }

@@ -16,12 +16,14 @@ class NoteXPage: Codable {
     var noteTextArray: [NoteText]
     private var backdropData: Data?
     private var backdropIsPDF: Bool?
+    var images : [NoteImage]
     
     init() {
         self.canvasDrawing = PKDrawing()
         self.drawingLabels = [String]()
         self.drawingViewRects = [CGRect]()
         self.noteTextArray = [NoteText]()
+        self.images = [NoteImage]()
     }
     
     //MARK: Decode / Encode
@@ -32,6 +34,7 @@ class NoteXPage: Codable {
         case noteTextArray = "noteTextArray"
         case backdropData = "backdropData"
         case backdropIsPDF = "backdropIsPDF"
+        case images = "images"
     }
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
@@ -41,7 +44,7 @@ class NoteXPage: Codable {
         try container.encode(noteTextArray, forKey: .noteTextArray)
         try container.encode(backdropData, forKey: .backdropData)
         try container.encode(backdropIsPDF, forKey: .backdropIsPDF)
-
+        try container.encode(images, forKey: .images)
     }
     required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -52,6 +55,7 @@ class NoteXPage: Codable {
         noteTextArray = try container.decode([NoteText].self, forKey: .noteTextArray)
         backdropData = try? container.decode(Data.self, forKey: .backdropData)
         backdropIsPDF = try? container.decode(Bool.self, forKey: .backdropIsPDF)
+        images = try container.decode([NoteImage].self, forKey: .images)
     }
     
     // MARK: drawing recognition
@@ -72,6 +76,24 @@ class NoteXPage: Codable {
     func removeDrawingViewRect(rect: CGRect) {
         if drawingViewRects.contains(rect) {
             drawingViewRects.removeAll{$0 == rect}
+        }
+    }
+    
+    func updateNoteImage(noteImage: NoteImage) {
+        for i in 0..<images.count {
+            if images[i] == noteImage {
+                images[i] = noteImage
+                break
+            }
+        }
+    }
+    
+    func deleteImage(noteImage: NoteImage) {
+        for i in 0..<images.count {
+            if images[i] == noteImage {
+                images.remove(at: i)
+                break
+            }
         }
     }
     
