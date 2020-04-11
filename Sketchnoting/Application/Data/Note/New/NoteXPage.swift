@@ -8,14 +8,14 @@
 
 import UIKit
 import PencilKit
+import PDFKit
 
 class NoteXPage: Codable {
     var canvasDrawing: PKDrawing
     var drawingLabels: [String]
     var drawingViewRects: [CGRect]
     var noteTextArray: [NoteText]
-    private var backdropData: Data?
-    private var backdropIsPDF: Bool?
+    var backdropPDFData: Data?
     var images : [NoteImage]
     
     init() {
@@ -32,8 +32,7 @@ class NoteXPage: Codable {
         case drawingLabels = "drawingLabels"
         case drawingViewRects = "drawingViewRects"
         case noteTextArray = "noteTextArray"
-        case backdropData = "backdropData"
-        case backdropIsPDF = "backdropIsPDF"
+        case backdropPDFData = "backdropPDFData"
         case images = "images"
     }
     func encode(to encoder: Encoder) throws {
@@ -42,8 +41,7 @@ class NoteXPage: Codable {
         try container.encode(drawingLabels, forKey: .drawingLabels)
         try container.encode(drawingViewRects, forKey: .drawingViewRects)
         try container.encode(noteTextArray, forKey: .noteTextArray)
-        try container.encode(backdropData, forKey: .backdropData)
-        try container.encode(backdropIsPDF, forKey: .backdropIsPDF)
+        try container.encode(backdropPDFData, forKey: .backdropPDFData)
         try container.encode(images, forKey: .images)
     }
     required init(from decoder: Decoder) throws {
@@ -53,8 +51,7 @@ class NoteXPage: Codable {
         drawingLabels = try container.decode([String].self, forKey: .drawingLabels)
         drawingViewRects = try container.decode([CGRect].self, forKey: .drawingViewRects)
         noteTextArray = try container.decode([NoteText].self, forKey: .noteTextArray)
-        backdropData = try? container.decode(Data.self, forKey: .backdropData)
-        backdropIsPDF = try? container.decode(Bool.self, forKey: .backdropIsPDF)
+        backdropPDFData = try? container.decode(Data.self, forKey: .backdropPDFData)
         images = try container.decode([NoteImage].self, forKey: .images)
     }
     
@@ -137,11 +134,10 @@ class NoteXPage: Codable {
         while yOrigin < bounds.maxY {
             let imgBounds = CGRect(x: 0, y: yOrigin, width: pdfWidth, height: pdfHeight)
             var image = canvasDrawing.image(from: imgBounds, scale: 2)
-            if let (backdropData, backdropIsPDF) = getBackdrop() {
-                if !backdropIsPDF {
-                    if let backdropImage = UIImage(data: backdropData) {
-                        image = backdropImage.mergeWith(topImage: image)
-                    }
+            if let pdfDocument = getPDFDocument() {
+                if let page = pdfDocument.page(at: 0) {
+                    let pdfImage = page.thumbnail(of: bounds.size, for: .mediaBox)
+                    image = pdfImage.mergeWith(topImage: image)
                 }
             }
             image.draw(in: imgBounds)
@@ -153,41 +149,30 @@ class NoteXPage: Codable {
     
     public func getAsImage(completion: @escaping (UIImage) -> Void) {
         UITraitCollection(userInterfaceStyle: .light).performAsCurrent {
-            var hasBackdrop = false
             var image = canvasDrawing.image(from: UIScreen.main.bounds, scale: 1.0)
             let canvasImage = image
-            if let (backdropData, backdropIsPDF) = getBackdrop() {
-                if !backdropIsPDF {
-                    hasBackdrop = true
-                    DispatchQueue.global(qos: .utility).async {
-                        if let backdropImage = UIImage(data: backdropData) {
-                            image = backdropImage.mergeWith(topImage: canvasImage)
-                        }
-                        DispatchQueue.main.async {
-                            completion(image)
-                        }
-                    }
+            var pdfImage: UIImage?
+            if let pdfDocument = getPDFDocument() {
+                if let page = pdfDocument.page(at: 0) {
+                    pdfImage = page.thumbnail(of: CGSize(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height), for: .mediaBox)
                 }
             }
-            if !hasBackdrop {
-                completion(image)
+            DispatchQueue.global(qos: .utility).async {
+                if let pdfImage = pdfImage {
+                    image = pdfImage.mergeWith(topImage: canvasImage)
+                }
+                DispatchQueue.main.async {
+                    completion(image)
+                }
             }
         }
     }
     
-    public func setBackdrop(image: UIImage) {
-        self.backdropData = image.jpegData(compressionQuality: 1)
-        self.backdropIsPDF = false
-    }
-    
-    public func setBackdrop(data: Data) { // PDF page
-        self.backdropData = data
-        self.backdropIsPDF = true
-    }
-    
-    public func getBackdrop() -> (Data, Bool)? {
-        if backdropData != nil {
-            return (backdropData!, backdropIsPDF!)
+    func getPDFDocument() -> PDFDocument? {
+        if let backdropPDFData = backdropPDFData {
+            if let pdfDocument = PDFDocument(data: backdropPDFData) {
+                return pdfDocument
+            }
         }
         return nil
     }

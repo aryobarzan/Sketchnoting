@@ -32,6 +32,9 @@ class DraggableImageView: UIImageView {
         super.init(frame: frame)
         setUpGestureRecognisers()
         self.isUserInteractionEnabled = true
+        
+        self.layer.borderColor = UIColor.systemGray.cgColor
+        self.layer.borderWidth = 1
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -63,8 +66,8 @@ class DraggableImageView: UIImageView {
         
         if firstX != nil && firstY != nil {
             locationInSuperView = CGPoint(x: firstX!+locationInSuperView.x, y: firstY!+locationInSuperView.y)
-            // Don't let the image be dragged outside the view
-            if locationInSuperView.x > self.frame.size.width/2 && locationInSuperView.y > self.frame.size.height/2 {
+            // Don't let the image be dragged outside the superview
+            if locationInSuperView.x > self.frame.size.width/2 && locationInSuperView.y > self.frame.size.height/2 && locationInSuperView.x/2 < self.superview!.frame.size.width && locationInSuperView.y/2 < self.superview!.frame.size.height {
                 self.center = locationInSuperView
                 delegate?.draggableImageViewLocationChanged(source: self, location: locationInSuperView)
             }

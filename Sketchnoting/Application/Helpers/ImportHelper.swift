@@ -7,23 +7,34 @@
 //
 
 import UIKit
+import PDFKit
 
 class ImportHelper {
-    static func importItems(urls: [URL], n: NoteX?) -> ([NoteX], [UIImage]) {
+    static func importItems(urls: [URL], n: NoteX?) -> ([NoteX], [UIImage], [PDFDocument]) {
         var notes = [NoteX]()
         var images = [UIImage]()
+        var pdfs = [PDFDocument]()
         for url in urls {
-            var isNote = false
             do {
                 let data = try Data(contentsOf: url)
-                if let decodedNote = SKFileManager.decodeNoteFromData(data: data) {
-                    notes.append(decodedNote)
-                    isNote = true
-                }
-                if !isNote {
+                switch url.typeIdentifier {
+                case "public.image", "public.jpeg", "public.jpg", "public.png":
                     if let decodedImage = UIImage(data: data) {
                         images.append(decodedImage)
                     }
+                    break
+                case "com.sketchnote":
+                    if let decodedNote = SKFileManager.decodeNoteFromData(data: data) {
+                        notes.append(decodedNote)
+                    }
+                    break
+                case "com.adobe.pdf":
+                    if let pdfDocument = PDFDocument(url: url) {
+                        pdfs.append(pdfDocument)
+                    }
+                    break
+                default:
+                    log.error("Unrecognized type for URL: \(url.typeIdentifier ?? "No type identifier")")
                 }
             } catch {
                 log.error("Imported URL could not be decoded.")
@@ -46,6 +57,6 @@ class ImportHelper {
             }
             
         }
-        return (notes, images)
+        return (notes, images, pdfs)
     }
 }

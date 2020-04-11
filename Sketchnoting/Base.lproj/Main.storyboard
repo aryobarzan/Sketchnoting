@@ -1256,9 +1256,12 @@
                                         <rect key="frame" x="0.0" y="0.0" width="768" height="984"/>
                                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                                     </view>
-                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="5bL-ct-8xX">
+                                    <view userInteractionEnabled="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="tA3-q0-ddV" customClass="PDFView">
                                         <rect key="frame" x="0.0" y="0.0" width="768" height="984"/>
-                                    </imageView>
+                                        <accessibility key="accessibilityConfiguration">
+                                            <accessibilityTraits key="traits" notEnabled="YES"/>
+                                        </accessibility>
+                                    </view>
                                     <view opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="iDb-Yw-oym" customClass="PKCanvasView">
                                         <rect key="frame" x="0.0" y="0.0" width="768" height="984"/>
                                         <subviews>
@@ -1399,18 +1402,18 @@
                                     <constraint firstAttribute="trailing" secondItem="iDb-Yw-oym" secondAttribute="trailing" id="2U3-y4-Aox"/>
                                     <constraint firstItem="xYD-HR-LX0" firstAttribute="top" secondItem="tz5-2Q-OEW" secondAttribute="top" id="6yN-PR-hFE"/>
                                     <constraint firstItem="oqt-gq-XGG" firstAttribute="top" secondItem="tz5-2Q-OEW" secondAttribute="top" id="BtJ-fp-Oyj"/>
-                                    <constraint firstItem="5bL-ct-8xX" firstAttribute="top" secondItem="xYD-HR-LX0" secondAttribute="top" id="C1h-Bm-P3L"/>
-                                    <constraint firstItem="5bL-ct-8xX" firstAttribute="bottom" secondItem="xYD-HR-LX0" secondAttribute="bottom" id="EBK-Dk-VSW"/>
+                                    <constraint firstItem="tA3-q0-ddV" firstAttribute="trailing" secondItem="xYD-HR-LX0" secondAttribute="trailing" id="CCK-0X-LrB"/>
                                     <constraint firstAttribute="trailing" secondItem="xYD-HR-LX0" secondAttribute="trailing" id="MGa-mC-zBU"/>
                                     <constraint firstItem="iDb-Yw-oym" firstAttribute="leading" secondItem="tz5-2Q-OEW" secondAttribute="leading" id="OHO-eU-Yj7"/>
                                     <constraint firstAttribute="trailing" secondItem="oqt-gq-XGG" secondAttribute="trailing" id="SiT-MD-RCf"/>
                                     <constraint firstAttribute="bottom" secondItem="oqt-gq-XGG" secondAttribute="bottom" id="VbZ-Nx-t1y"/>
                                     <constraint firstItem="oqt-gq-XGG" firstAttribute="leading" secondItem="tz5-2Q-OEW" secondAttribute="leading" constant="400" id="YAl-f6-SsH"/>
-                                    <constraint firstItem="5bL-ct-8xX" firstAttribute="trailing" secondItem="xYD-HR-LX0" secondAttribute="trailing" id="oeW-qT-AXY"/>
+                                    <constraint firstItem="tA3-q0-ddV" firstAttribute="bottom" secondItem="xYD-HR-LX0" secondAttribute="bottom" id="aaP-wH-pnl"/>
+                                    <constraint firstItem="tA3-q0-ddV" firstAttribute="leading" secondItem="xYD-HR-LX0" secondAttribute="leading" id="bo6-Pk-taz"/>
+                                    <constraint firstItem="tA3-q0-ddV" firstAttribute="top" secondItem="xYD-HR-LX0" secondAttribute="top" id="qlK-BK-5VX"/>
                                     <constraint firstItem="iDb-Yw-oym" firstAttribute="top" secondItem="tz5-2Q-OEW" secondAttribute="top" id="rt2-ek-tnV"/>
                                     <constraint firstAttribute="bottom" secondItem="xYD-HR-LX0" secondAttribute="bottom" id="sWw-jM-oo3"/>
                                     <constraint firstAttribute="bottom" secondItem="iDb-Yw-oym" secondAttribute="bottom" id="sfp-kK-Yde"/>
-                                    <constraint firstItem="5bL-ct-8xX" firstAttribute="leading" secondItem="xYD-HR-LX0" secondAttribute="leading" id="tgG-5V-ReK"/>
                                     <constraint firstItem="xYD-HR-LX0" firstAttribute="leading" secondItem="tz5-2Q-OEW" secondAttribute="leading" id="xEB-qk-Wfz"/>
                                 </constraints>
                             </view>
@@ -1442,7 +1445,6 @@
                     <nil key="simulatedTopBarMetrics"/>
                     <nil key="simulatedBottomBarMetrics"/>
                     <connections>
-                        <outlet property="backdropImageView" destination="5bL-ct-8xX" id="eEs-S9-E4t"/>
                         <outlet property="backdropView" destination="xYD-HR-LX0" id="Xef-6P-ivP"/>
                         <outlet property="bookshelf" destination="oqt-gq-XGG" id="T84-7q-c23"/>
                         <outlet property="bookshelfBottomConstraint" destination="VbZ-Nx-t1y" id="hlf-Lh-e0N"/>
@@ -1463,6 +1465,7 @@
                         <outlet property="newPageButton" destination="Q9N-HC-Ppd" id="Kx2-4C-tAi"/>
                         <outlet property="nextPageButton" destination="WzL-oA-wuL" id="ECK-fv-UfO"/>
                         <outlet property="optionsButton" destination="hgu-d3-kvK" id="eHm-5U-EfK"/>
+                        <outlet property="pdfView" destination="tA3-q0-ddV" id="ULi-ad-rst"/>
                         <outlet property="previousPageButton" destination="jEA-WA-cjb" id="1TU-s6-01d"/>
                         <outlet property="relatedNotesButton" destination="u9I-hG-Uoe" id="Ar6-eC-5ue"/>
                         <outlet property="relatedNotesCollectionView" destination="EUr-m2-zMG" id="PMK-XR-oTn"/>

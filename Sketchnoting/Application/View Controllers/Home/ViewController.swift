@@ -219,7 +219,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     
     private func manageFileImport(urls: [URL]) {
         if urls.count > 0 {
-            let (importedNotes, importedImages) = ImportHelper.importItems(urls: urls, n: nil)
+            let (importedNotes, importedImages, importedPDFs) = ImportHelper.importItems(urls: urls, n: nil)
             for note in importedNotes {
                 if SKFileManager.notes.contains(note) {
                     log.info("Note is already in your library, updating its data.")
@@ -230,6 +230,41 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
                     _ = SKFileManager.add(note: note)
                 }
             }
+            if importedImages.count > 0 {
+                let newNote = createNoteFromImages(images: importedImages)
+                log.info("New note from imported images.")
+                _ = SKFileManager.add(note: newNote)
+            }
+            for pdf in importedPDFs {
+                if pdf.pageCount > 0 {
+                    var pdfTitle = "Imported PDF"
+                    if let attributes = pdf.documentAttributes {
+                        if let title = attributes["Title"] as? String {
+                            if !title.isEmpty {
+                                pdfTitle = title
+                            }
+                        }
+                    }
+                    let newNote = NoteX(name: pdfTitle, parent: SKFileManager.currentFolder?.id, documents: nil)
+                    var setPDFForCurrentPage = false
+                    for i in 0..<pdf.pageCount {
+                        if let pdfPage = pdf.page(at: i) {
+                            if !setPDFForCurrentPage {
+                                setPDFForCurrentPage = true
+                                newNote.getCurrentPage().backdropPDFData = pdfPage.dataRepresentation
+                            }
+                            else {
+                                let newPage = NoteXPage()
+                                newPage.backdropPDFData = pdfPage.dataRepresentation
+                                newNote.pages.append(newPage)
+                            }
+                        }
+                    }
+                    log.info("New note from imported pdf.")
+                    _ = SKFileManager.add(note: newNote)
+                }
+            }
+            self.updateDisplayedNotes(true)
             let banner = FloatingNotificationBanner(title: "Documents", subtitle: "Imported your selected items.", style: .info)
             banner.show()
             self.updateDisplayedNotes(true)
@@ -241,7 +276,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     }
     
     private func displayDocumentPicker() {
-        let types: [String] = ["com.sketchnote", String(kUTTypeImage)]
+        let types: [String] = ["com.sketchnote", String(kUTTypeImage), String(kUTTypePDF)]
         let documentPicker = UIDocumentPickerViewController(documentTypes: types, in: .import)
         documentPicker.delegate = self
         documentPicker.modalPresentationStyle = .formSheet
@@ -250,14 +285,23 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     }
     
     private func displayImagePicker() {
-        ImagePickerHelper.displayImagePicker(vc: self, completion: { pages in
-            if pages.count > 0 {
-                let note = NoteX(name: "Image Import \(Int.random(in: 1..<200))", parent: SKFileManager.currentFolder?.id, documents: nil)
-                note.pages = pages
-                _ = SKFileManager.add(note: note)
+        ImagePickerHelper.displayImagePickerWithImageOutput(vc: self, completion: { images in
+            if images.count > 0 {
+                let newNote = self.createNoteFromImages(images: images)
+                log.info("New note from imported images (camera roll).")
+                _ = SKFileManager.add(note: newNote)
                 self.updateDisplayedNotes(true)
             }
         })
+    }
+    
+    private func createNoteFromImages(images: [UIImage]) -> NoteX {
+        let newNote = NoteX(name: "Imported Images", parent: SKFileManager.currentFolder?.id, documents: nil)
+        for image in images {
+            let noteImage = NoteImage(image: image)
+            newNote.getCurrentPage().images.append(noteImage)
+        }
+        return newNote
     }
     
     @IBAction func importDocumentTapped(_ sender: UIButton) {
@@ -290,16 +334,14 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     func documentCameraViewController(_ controller: VNDocumentCameraViewController, didFinishWith scan: VNDocumentCameraScan) {
         controller.dismiss(animated: true, completion: nil)
         
-        let note = NoteX(name: "Scan", parent: SKFileManager.currentFolder?.id, documents: nil)
-        var pages = [NoteXPage]()
+        var images = [UIImage]()
         for i in 0..<scan.pageCount {
             let image = scan.imageOfPage(at: i)
-            let page = NoteXPage()
-            page.setBackdrop(image: image)
-            pages.append(page)
+            images.append(image)
         }
-        note.pages = pages
-        _ = SKFileManager.add(note: note)
+        let newNote = self.createNoteFromImages(images: images)
+        _ = SKFileManager.add(note: newNote)
+        log.info("New note from scanned images.")
         self.updateDisplayedNotes(true)
     }
     func documentCameraViewControllerDidCancel(_ controller: VNDocumentCameraViewController) {

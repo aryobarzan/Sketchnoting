@@ -10,6 +10,7 @@ import UIKit
 import PencilKit
 import VisionKit
 import MobileCoreServices
+import PDFKit
 
 import Firebase
 import NVActivityIndicatorView
@@ -26,7 +27,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     private var documentsVC: DocumentsViewController!
     
     @IBOutlet var backdropView: UIView!
-    @IBOutlet weak var backdropImageView: UIImageView!
     @IBOutlet var canvasView: PKCanvasView!
     
     @IBOutlet weak var topicsButton: UIButton!
@@ -66,6 +66,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     var conceptHighlightsInitialized = false
     
     var noteImageViews = [DraggableImageView : NoteImage]()
+    @IBOutlet weak var pdfView: PDFView!
     
     @IBOutlet weak var manageImagesButton: UIButton!
     // This function sets up the page and every element contained within it.
@@ -85,17 +86,17 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             canvasView.becomeFirstResponder()
         }
         canvasViewLongPressGesture.allowedTouchTypes = [0]
-        if let (backdropData, isPDF) = SKFileManager.activeNote!.getCurrentPage().getBackdrop() {
-            if !isPDF {
-                if let image = UIImage(data: backdropData) {
-                    self.backdropImageView.image = image
-                }
-            }
+        if let backdropPDF = SKFileManager.activeNote!.getCurrentPage().getPDFDocument() {
+            pdfView.document = backdropPDF
         }
         
         let interaction = UIPencilInteraction()
         interaction.delegate = self
         view.addInteraction(interaction)
+        
+        pdfView.autoScales = true
+        pdfView.maxScaleFactor = 4.0
+        pdfView.minScaleFactor = pdfView.scaleFactorForSizeToFit
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
             let storyboard = UIStoryboard(name: "Main", bundle: Bundle.main)
@@ -666,25 +667,9 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         })
     }
     private func generateHandwritingRecognitionImage(completion: @escaping (UIImage) -> Void){
-        UITraitCollection(userInterfaceStyle: .light).performAsCurrent {
-            var hasBackdrop = false
-            var image = canvasView.drawing.image(from: UIScreen.main.bounds, scale: 1.0)
-            let canvasImage = image
-            if let (backdropData, backdropIsPDF) = SKFileManager.activeNote!.getCurrentPage().getBackdrop() {
-                if !backdropIsPDF {
-                    hasBackdrop = true
-                    if let backdropImage = UIImage(data: backdropData) {
-                        image = backdropImage.mergeWith(topImage: canvasImage)
-                    }
-                    DispatchQueue.main.async {
-                        completion(image)
-                    }
-                }
-            }
-            if !hasBackdrop {
-                completion(image)
-            }
-        }
+        SKFileManager.activeNote!.getCurrentPage().getAsImage(completion: { image in
+            completion(image)
+        })
     }
     
     var connectivity: Connectivity?
@@ -1194,12 +1179,9 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         controller.dismiss(animated: true, completion: nil)
         for i in 0..<scan.pageCount {
             let image = scan.imageOfPage(at: i)
-            let page = NoteXPage()
-            page.setBackdrop(image: image)
-            SKFileManager.activeNote!.pages.insert(page, at: SKFileManager.activeNote!.activePageIndex + 1)
+            self.addNoteImage(image: image)
         }
         self.saveCurrentPage()
-        self.updatePaginationButtons()
     }
     func documentCameraViewControllerDidCancel(_ controller: VNDocumentCameraViewController) {
         controller.dismiss(animated: true, completion: nil)
@@ -1219,7 +1201,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     }
     
     private func displayDocumentPicker() {
-        let types: [String] = ["com.sketchnote", String(kUTTypeImage)]
+        let types: [String] = ["com.sketchnote", String(kUTTypeImage), String(kUTTypePDF)]
         let documentPicker = UIDocumentPickerViewController(documentTypes: types, in: .import)
         documentPicker.delegate = self
         documentPicker.modalPresentationStyle = .formSheet
@@ -1231,9 +1213,26 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         if urls.count > 0 {
             let banner = FloatingNotificationBanner(title: "Documents", subtitle: "Imported your selected items.", style: .info)
             banner.show()
-            let (notes, images) = ImportHelper.importItems(urls: urls, n: SKFileManager.activeNote!)
+            let (notes, images, pdfs) = ImportHelper.importItems(urls: urls, n: SKFileManager.activeNote!)
             for img in images {
                 self.addNoteImage(image: img)
+            }
+            var setPDFForCurrentPage = false
+            for pdf in pdfs {
+                for i in 0..<pdf.pageCount {
+                    if let pdfPage = pdf.page(at: i) {
+                        if !setPDFForCurrentPage {
+                            setPDFForCurrentPage = true
+                            SKFileManager.activeNote!.getCurrentPage().backdropPDFData = pdfPage.dataRepresentation
+                            self.pdfView.document = PDFDocument(data: pdfPage.dataRepresentation!)
+                        }
+                        else {
+                            let newPage = NoteXPage()
+                            newPage.backdropPDFData = pdfPage.dataRepresentation
+                            SKFileManager.activeNote!.pages.insert(newPage, at: SKFileManager.activeNote!.activePageIndex + 1)
+                        }
+                    }
+                }
             }
             SKFileManager.save(file: SKFileManager.activeNote!)
         }
@@ -1316,14 +1315,18 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         if previousStateOfTopicsShown {
             toggleConceptHighlight()
         }
-        self.backdropImageView.image = nil
-        if let (backdropData, isPDF) = SKFileManager.activeNote!.getCurrentPage().getBackdrop() {
-            if !isPDF {
-                if let image = UIImage(data: backdropData) {
-                    self.backdropImageView.image = image
-                }
-            }
+        manageImagesButton.tintColor = .white
+        for (view, _) in noteImageViews {
+            canvasView.sendSubviewToBack(view)
         }
+        pdfView.document = nil
+        if let backdropPDF = SKFileManager.activeNote!.getCurrentPage().getPDFDocument() {
+            pdfView.document = backdropPDF
+            pdfView.autoScales = true
+            pdfView.maxScaleFactor = 4.0
+            pdfView.minScaleFactor = pdfView.scaleFactorForSizeToFit
+        }
+        canvasView.becomeFirstResponder()
     }
     
     var previousStateOfTopicsShown = false

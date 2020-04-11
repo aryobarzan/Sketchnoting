@@ -10,6 +10,7 @@
 		9F00428923E9FB2600961636 /* BadgeHub.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F00428823E9FB2600961636 /* BadgeHub.swift */; };
 		9F05B5A1232BE4EC00983AF2 /* NoteCollectionViewDetailCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9F05B59F232BE4EC00983AF2 /* NoteCollectionViewDetailCell.xib */; };
 		9F05B5A3232BF0C800983AF2 /* NoteCollectionViewDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F05B5A2232BF0C800983AF2 /* NoteCollectionViewDetailCell.swift */; };
+		9F06977024427823002DCE47 /* URLExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F06976F24427823002DCE47 /* URLExtensions.swift */; };
 		9F0ABB282412E5D400CA5A4E /* SKCacheManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0ABB272412E5D400CA5A4E /* SKCacheManager.swift */; };
 		9F0D8565242052E600B8BE2F /* BSImagePicker in Frameworks */ = {isa = PBXBuildFile; productRef = 9F0D8564242052E600B8BE2F /* BSImagePicker */; };
 		9F0FC54923760E7600070FA0 /* NoteOptionsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0FC54823760E7600070FA0 /* NoteOptionsTableViewController.swift */; };
@@ -131,6 +132,7 @@
 		9F05B59F232BE4EC00983AF2 /* NoteCollectionViewDetailCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NoteCollectionViewDetailCell.xib; sourceTree = "<group>"; };
 		9F05B5A2232BF0C800983AF2 /* NoteCollectionViewDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteCollectionViewDetailCell.swift; sourceTree = "<group>"; };
 		9F05BC7E23761C4A00D49A88 /* NoteTextViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteTextViewController.swift; sourceTree = "<group>"; };
+		9F06976F24427823002DCE47 /* URLExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLExtensions.swift; sourceTree = "<group>"; };
 		9F0ABB272412E5D400CA5A4E /* SKCacheManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SKCacheManager.swift; sourceTree = "<group>"; };
 		9F0FC54823760E7600070FA0 /* NoteOptionsTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteOptionsTableViewController.swift; sourceTree = "<group>"; };
 		9F18E7A723FB4F1600543D78 /* FolderButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderButton.swift; sourceTree = "<group>"; };
@@ -579,6 +581,7 @@
 				9F5F5D1424328CC100AF79A5 /* DateExtensions.swift */,
 				9FF0AC9124412C5200A82BE8 /* DraggableImageView.swift */,
 				9FF0AC952441308B00A82BE8 /* CodableExtensions.swift */,
+				9F06976F24427823002DCE47 /* URLExtensions.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -835,6 +838,7 @@
 				9F65983D23EDD2FA00CDBE0C /* NoteTextComplete.swift in Sources */,
 				9F92D11C23217D0500BC0E57 /* SearchFilterView.swift in Sources */,
 				9F0FC54923760E7600070FA0 /* NoteOptionsTableViewController.swift in Sources */,
+				9F06977024427823002DCE47 /* URLExtensions.swift in Sources */,
 				9FFE07EA232A63BA00DBD0AC /* TagsManager.swift in Sources */,
 				9F4B38BF23EA3EE200F87B61 /* ReceivedNotesViewController.swift in Sources */,
 				9F65984D23F3227300CDBE0C /* DrawingSearchViewController.swift in Sources */,

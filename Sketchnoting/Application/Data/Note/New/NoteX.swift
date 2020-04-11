@@ -388,11 +388,10 @@ class NoteX: File, DocumentVisitor, DocumentDelegate {
                     let imgBounds = CGRect(x: 0, y: yOrigin, width: pdfWidth, height: pdfHeight)
                     UITraitCollection(userInterfaceStyle: .light).performAsCurrent {
                         var image = page.canvasDrawing.image(from: imgBounds, scale: 2)
-                        if let (backdropData, backdropIsPDF) = page.getBackdrop() {
-                            if !backdropIsPDF {
-                               if let backdropImage = UIImage(data: backdropData) {
-                                    image = backdropImage.mergeWith(topImage: image)
-                                }
+                        if let pdfDocument = page.getPDFDocument() {
+                            if let page = pdfDocument.page(at: 0) {
+                                let pdfImage = page.thumbnail(of: bounds.size, for: .mediaBox)
+                                image = pdfImage.mergeWith(topImage: image)
                             }
                         }
                         image.draw(in: imgBounds)
