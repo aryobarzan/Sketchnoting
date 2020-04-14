@@ -56,6 +56,8 @@
 		9F75E484231419FA00488BBD /* TAGMEDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F75E483231419FA00488BBD /* TAGMEDocument.swift */; };
 		9F77DBCA23FFD619007C8B7D /* AnnotationUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F77DBC923FFD619007C8B7D /* AnnotationUtilities.swift */; };
 		9F8551B123A539D9006EB0B1 /* NotePageCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F8551B023A539D9006EB0B1 /* NotePageCollectionViewCell.swift */; };
+		9F87A47B2445430700F83B12 /* DraggableTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F87A47A2445430700F83B12 /* DraggableTextView.swift */; };
+		9F87A47D2445441500F83B12 /* NoteTypedText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F87A47C2445441500F83B12 /* NoteTypedText.swift */; };
 		9F92D10E231E95B400BC0E57 /* UICollectionViewExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F92D10D231E95B400BC0E57 /* UICollectionViewExtensions.swift */; };
 		9F92D110231E97DF00BC0E57 /* UserDefaultsExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F92D10F231E97DF00BC0E57 /* UserDefaultsExtensions.swift */; };
 		9F92D11523202B9900BC0E57 /* KnowledgeGraphHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F92D11423202B9900BC0E57 /* KnowledgeGraphHelper.swift */; };
@@ -173,6 +175,8 @@
 		9F75E483231419FA00488BBD /* TAGMEDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TAGMEDocument.swift; sourceTree = "<group>"; };
 		9F77DBC923FFD619007C8B7D /* AnnotationUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnnotationUtilities.swift; sourceTree = "<group>"; };
 		9F8551B023A539D9006EB0B1 /* NotePageCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotePageCollectionViewCell.swift; sourceTree = "<group>"; };
+		9F87A47A2445430700F83B12 /* DraggableTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DraggableTextView.swift; sourceTree = "<group>"; };
+		9F87A47C2445441500F83B12 /* NoteTypedText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteTypedText.swift; sourceTree = "<group>"; };
 		9F92D10D231E95B400BC0E57 /* UICollectionViewExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UICollectionViewExtensions.swift; sourceTree = "<group>"; };
 		9F92D10F231E97DF00BC0E57 /* UserDefaultsExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsExtensions.swift; sourceTree = "<group>"; };
 		9F92D11423202B9900BC0E57 /* KnowledgeGraphHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KnowledgeGraphHelper.swift; sourceTree = "<group>"; };
@@ -515,6 +519,7 @@
 				9F65983623EDD15C00CDBE0C /* NoteTextElement.swift */,
 				9F65984023EE1EE900CDBE0C /* SKFileManager.swift */,
 				9FF0AC9324412F4C00A82BE8 /* NoteImage.swift */,
+				9F87A47C2445441500F83B12 /* NoteTypedText.swift */,
 			);
 			path = New;
 			sourceTree = "<group>";
@@ -582,6 +587,7 @@
 				9FF0AC9124412C5200A82BE8 /* DraggableImageView.swift */,
 				9FF0AC952441308B00A82BE8 /* CodableExtensions.swift */,
 				9F06976F24427823002DCE47 /* URLExtensions.swift */,
+				9F87A47A2445430700F83B12 /* DraggableTextView.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -794,6 +800,7 @@
 				9FAD28F623A52AC700F2203E /* NoteTextViewController.swift in Sources */,
 				9FA8C002239B21D500BAA42B /* TagsCreationViewController.swift in Sources */,
 				9F942506238A341E006B0E81 /* UIStoryboardSegueWithCompletion.swift in Sources */,
+				9F87A47D2445441500F83B12 /* NoteTypedText.swift in Sources */,
 				9F4B38C323EB1E6D00F87B61 /* Notifications.swift in Sources */,
 				9F75E451230D8AE100488BBD /* SettingsManager.swift in Sources */,
 				9F75E482231410A100488BBD /* TAGMEHelper.swift in Sources */,
@@ -854,6 +861,7 @@
 				9F75E484231419FA00488BBD /* TAGMEDocument.swift in Sources */,
 				9F92D11523202B9900BC0E57 /* KnowledgeGraphHelper.swift in Sources */,
 				9F75E44C230C583200488BBD /* NoteCollectionViewCell.swift in Sources */,
+				9F87A47B2445430700F83B12 /* DraggableTextView.swift in Sources */,
 				9F75E448230C368F00488BBD /* NoteSharingViewController.swift in Sources */,
 				9FBF6AB422E9F391001FD730 /* VisionTextWrapper.swift in Sources */,
 				9FC02C1E23EDB6400051C576 /* NoteX.swift in Sources */,

@@ -8,12 +8,14 @@
 
 import UIKit
 import PDFKit
+import MobileCoreServices
 
 class ImportHelper {
-    static func importItems(urls: [URL], n: NoteX?) -> ([NoteX], [UIImage], [PDFDocument]) {
+    static func importItems(urls: [URL], n: NoteX?) -> ([NoteX], [UIImage], [PDFDocument], [NoteTypedText]) {
         var notes = [NoteX]()
         var images = [UIImage]()
         var pdfs = [PDFDocument]()
+        var texts = [NoteTypedText]()
         for url in urls {
             do {
                 let data = try Data(contentsOf: url)
@@ -31,6 +33,19 @@ class ImportHelper {
                 case "com.adobe.pdf":
                     if let pdfDocument = PDFDocument(url: url) {
                         pdfs.append(pdfDocument)
+                    }
+                    break
+                case String(kUTTypeText), String(kUTTypeJavaClass), String(kUTTypeCSource), String(kUTTypePlainText), String(kUTTypeSourceCode):
+                    if let content = try? String(contentsOf: url) {
+                        if !content.isEmpty {
+                            let noteTypedText = NoteTypedText(text: content, codeLanguage: "Java")
+                            let fileExtension = url.pathExtension
+                            print(content)
+                            if fileExtension.lowercased() == "c" {
+                                noteTypedText.codeLanguage = "C"
+                            }
+                            texts.append(noteTypedText)
+                        }
                     }
                     break
                 default:
@@ -57,6 +72,6 @@ class ImportHelper {
             }
             
         }
-        return (notes, images, pdfs)
+        return (notes, images, pdfs, texts)
     }
 }

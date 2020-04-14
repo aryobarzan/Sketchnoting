@@ -1192,21 +1192,6 @@
                                             <action selector="previousPageTapped:" destination="lDo-DG-9fX" eventType="touchUpInside" id="8Yw-b3-m8l"/>
                                         </connections>
                                     </button>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="d06-Rx-jwc">
-                                        <rect key="frame" x="417" y="8" width="155" height="24"/>
-                                        <constraints>
-                                            <constraint firstAttribute="height" constant="24" id="Wbe-Jh-ix2"/>
-                                            <constraint firstAttribute="width" constant="155" id="no6-GJ-MXj"/>
-                                        </constraints>
-                                        <fontDescription key="fontDescription" type="system" pointSize="15"/>
-                                        <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                        <state key="normal" title=" Manage Images" image="hand.draw" catalog="system">
-                                            <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="large"/>
-                                        </state>
-                                        <connections>
-                                            <action selector="manageImagesTapped:" destination="lDo-DG-9fX" eventType="touchUpInside" id="nF8-7P-YhY"/>
-                                        </connections>
-                                    </button>
                                 </subviews>
                                 <color key="backgroundColor" cocoaTouchSystemColor="viewFlipsideBackgroundColor"/>
                                 <constraints>
@@ -1222,7 +1207,6 @@
                                     <constraint firstItem="8pq-Hf-1xV" firstAttribute="leading" secondItem="7xW-9Y-mzw" secondAttribute="trailing" constant="8" id="DqH-CA-Pdq"/>
                                     <constraint firstItem="Xyr-WH-2aV" firstAttribute="centerY" secondItem="gne-qG-Zx4" secondAttribute="centerY" id="Fao-7i-2ez"/>
                                     <constraint firstItem="X7t-cI-jkp" firstAttribute="centerY" secondItem="gne-qG-Zx4" secondAttribute="centerY" id="JWg-bt-4Wf"/>
-                                    <constraint firstItem="d06-Rx-jwc" firstAttribute="centerY" secondItem="gne-qG-Zx4" secondAttribute="centerY" id="LnE-Ck-Vgg"/>
                                     <constraint firstItem="RnC-a4-JG6" firstAttribute="centerY" secondItem="gne-qG-Zx4" secondAttribute="centerY" id="N2d-9v-eTa"/>
                                     <constraint firstItem="hgu-d3-kvK" firstAttribute="leading" secondItem="qiG-6C-Pe4" secondAttribute="trailing" constant="8" id="Oq3-U4-CIt"/>
                                     <constraint firstItem="Q9N-HC-Ppd" firstAttribute="leading" secondItem="WzL-oA-wuL" secondAttribute="trailing" constant="8" id="Pg0-M1-64h"/>
@@ -1239,7 +1223,6 @@
                                     <constraint firstItem="YQI-WO-Gvp" firstAttribute="leading" secondItem="gne-qG-Zx4" secondAttribute="leading" constant="8" id="cU4-Jv-M4b"/>
                                     <constraint firstItem="YQI-WO-Gvp" firstAttribute="centerY" secondItem="gne-qG-Zx4" secondAttribute="centerY" id="hID-7z-uad"/>
                                     <constraint firstItem="qbj-Vt-kvI" firstAttribute="centerY" secondItem="gne-qG-Zx4" secondAttribute="centerY" id="mjI-bN-hTX"/>
-                                    <constraint firstItem="d06-Rx-jwc" firstAttribute="leading" secondItem="X7t-cI-jkp" secondAttribute="trailing" constant="8" id="nS4-8m-RBC"/>
                                     <constraint firstItem="7xW-9Y-mzw" firstAttribute="leading" secondItem="Xyr-WH-2aV" secondAttribute="trailing" constant="8" id="oGx-Ie-Shr"/>
                                     <constraint firstItem="qiG-6C-Pe4" firstAttribute="leading" secondItem="Q9N-HC-Ppd" secondAttribute="trailing" constant="8" id="sBg-xq-t9a"/>
                                     <constraint firstItem="qbj-Vt-kvI" firstAttribute="leading" secondItem="jEA-WA-cjb" secondAttribute="trailing" constant="8" id="ulA-SL-fON"/>
@@ -1289,6 +1272,7 @@
                                             <outletCollection property="gestureRecognizers" destination="4NQ-Bq-QzN" appends="YES" id="U2T-6T-Ra0"/>
                                             <outletCollection property="gestureRecognizers" destination="aPW-Rp-zPL" appends="YES" id="VqR-M7-un5"/>
                                             <outletCollection property="gestureRecognizers" destination="jCy-Yh-cxE" appends="YES" id="dug-Xa-sRa"/>
+                                            <outletCollection property="gestureRecognizers" destination="09z-LJ-oQt" appends="YES" id="o9F-bG-rxa"/>
                                         </connections>
                                     </view>
                                     <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="oqt-gq-XGG">
@@ -1461,7 +1445,6 @@
                         <outlet property="drawingsButton" destination="8pq-Hf-1xV" id="Tvc-eK-rQQ"/>
                         <outlet property="helpLinesButton" destination="X7t-cI-jkp" id="G8Z-xq-TYG"/>
                         <outlet property="manageDrawingsButton" destination="g83-cE-vKX" id="6Gn-jZ-s9L"/>
-                        <outlet property="manageImagesButton" destination="d06-Rx-jwc" id="JYo-ri-zng"/>
                         <outlet property="newPageButton" destination="Q9N-HC-Ppd" id="Kx2-4C-tAi"/>
                         <outlet property="nextPageButton" destination="WzL-oA-wuL" id="ECK-fv-UfO"/>
                         <outlet property="optionsButton" destination="hgu-d3-kvK" id="eHm-5U-EfK"/>
@@ -1514,6 +1497,11 @@
                         <action selector="canvasViewLongPressed:" destination="lDo-DG-9fX" id="7Xj-hL-8GS"/>
                     </connections>
                 </pongPressGestureRecognizer>
+                <tapGestureRecognizer id="09z-LJ-oQt">
+                    <connections>
+                        <action selector="canvasTapped:" destination="lDo-DG-9fX" id="b1L-QF-gVc"/>
+                    </connections>
+                </tapGestureRecognizer>
             </objects>
             <point key="canvasLocation" x="2769.53125" y="1000.7812499999999"/>
         </scene>
@@ -2413,7 +2401,7 @@
                     </view>
                     <navigationItem key="navigationItem" title="Note Pages" id="Z6E-zA-nco">
                         <barButtonItem key="leftBarButtonItem" style="plain" id="BbC-Cq-2fu">
-                            <button key="customView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="1M6-ae-ssb">
+                            <button key="customView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="headTruncation" id="1M6-ae-ssb">
                                 <rect key="frame" x="20" y="13" width="46" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <state key="normal" title="Page 1"/>
@@ -2862,7 +2850,6 @@
         <image name="doc.text.viewfinder" catalog="system" width="128" height="114"/>
         <image name="ellipsis" catalog="system" width="128" height="37"/>
         <image name="folder.badge.plus" catalog="system" width="128" height="86"/>
-        <image name="hand.draw" catalog="system" width="128" height="108"/>
         <image name="hand.thumbsdown.fill" catalog="system" width="128" height="124"/>
         <image name="hand.thumbsup.fill" catalog="system" width="128" height="124"/>
         <image name="house.fill" catalog="system" width="128" height="106"/>

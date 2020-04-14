@@ -219,7 +219,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     
     private func manageFileImport(urls: [URL]) {
         if urls.count > 0 {
-            let (importedNotes, importedImages, importedPDFs) = ImportHelper.importItems(urls: urls, n: nil)
+            let (importedNotes, importedImages, importedPDFs, importedTexts) = ImportHelper.importItems(urls: urls, n: nil)
             for note in importedNotes {
                 if SKFileManager.notes.contains(note) {
                     log.info("Note is already in your library, updating its data.")

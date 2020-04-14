@@ -11,7 +11,7 @@ import UIKit
 
 import PopMenu
 
-class DraggableImageView: UIImageView {
+class DraggableTextView: UITextView {
     
     let panGesture = UIPanGestureRecognizer()
     let pinchGesture = UIPinchGestureRecognizer()
@@ -21,22 +21,22 @@ class DraggableImageView: UIImageView {
     var firstY: CGFloat? // For panning
     var lastScale: CGFloat? // For pinching
     
-    var delegate: DraggableImageViewDelegate?
+    var draggableDelegate: DraggableTextViewDelegate?
     
     override func awakeFromNib() {
         setUpGestureRecognisers()
         self.isUserInteractionEnabled = true
     }
     
-    override init(frame: CGRect) {
-        super.init(frame: frame)
+    override init(frame: CGRect, textContainer: NSTextContainer?) {
+        super.init(frame: frame, textContainer: textContainer)
         setUpGestureRecognisers()
         self.isUserInteractionEnabled = true
         
         self.layer.borderColor = UIColor.systemGray.cgColor
         self.layer.borderWidth = 1
     }
-    
+
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
     }
@@ -66,10 +66,10 @@ class DraggableImageView: UIImageView {
         
         if firstX != nil && firstY != nil {
             locationInSuperView = CGPoint(x: firstX!+locationInSuperView.x, y: firstY!+locationInSuperView.y)
-            // Don't let the image be dragged outside the superview
+            // Don't let the textView be dragged outside the superview
             if locationInSuperView.x > self.frame.size.width/2 && locationInSuperView.y > self.frame.size.height/2 && locationInSuperView.x/2 < self.superview!.frame.size.width && locationInSuperView.y/2 < self.superview!.frame.size.height {
                 self.center = locationInSuperView
-                delegate?.draggableImageViewLocationChanged(source: self, location: locationInSuperView)
+                draggableDelegate?.draggableTextViewLocationChanged(source: self, location: locationInSuperView)
             }
         }
     }
@@ -86,15 +86,16 @@ class DraggableImageView: UIImageView {
                                       
             if shouldViewSizeChange(height: self.frame.size.height) {
                 self.transform = newTransform
+                self.textContainer.size = self.frame.size
                 lastScale = pinchGesture.scale
-                delegate?.draggableImageViewSizeChanged(source: self, scale: self.frame.size)
+                draggableDelegate?.draggableTextViewSizeChanged(source: self, scale: self.frame.size)
             }
         }
     }
     
     @objc func longPressGestureTriggered() {
         if longPressGesture.state != .ended {
-            delegate?.draggableImageViewDelete(source: self)
+            draggableDelegate?.draggableTextViewDelete(source: self)
         }
     }
         
@@ -129,8 +130,8 @@ class DraggableImageView: UIImageView {
     }
 }
 
-protocol DraggableImageViewDelegate {
-    func draggableImageViewSizeChanged(source: DraggableImageView, scale: CGSize)
-    func draggableImageViewLocationChanged(source: DraggableImageView, location: CGPoint)
-    func draggableImageViewDelete(source: DraggableImageView)
+protocol DraggableTextViewDelegate {
+    func draggableTextViewSizeChanged(source: DraggableTextView, scale: CGSize)
+    func draggableTextViewLocationChanged(source: DraggableTextView, location: CGPoint)
+    func draggableTextViewDelete(source: DraggableTextView)
 }

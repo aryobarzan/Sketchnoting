@@ -12,4 +12,5 @@ target 'Sketchnoting' do
   pod 'PocketSVG', '~> 2.0'
   pod 'SVGKit'
   pod 'Repeat'
+  pod 'Highlightr'
 end

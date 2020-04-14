@@ -21,8 +21,9 @@ import Connectivity
 import GPUImage
 import PopMenu
 import GPUImage
+import Highlightr
 
-class NoteViewController: UIViewController, UIPencilInteractionDelegate, UICollectionViewDataSource, UICollectionViewDelegate, NoteXDelegate, PKCanvasViewDelegate, PKToolPickerObserver, UIScreenshotServiceDelegate, NoteOptionsDelegate, DocumentsViewControllerDelegate, NotePagesDelegate, VNDocumentCameraViewControllerDelegate, UIDocumentPickerDelegate, DraggableImageViewDelegate {
+class NoteViewController: UIViewController, UIPencilInteractionDelegate, UICollectionViewDataSource, UICollectionViewDelegate, NoteXDelegate, PKCanvasViewDelegate, PKToolPickerObserver, UIScreenshotServiceDelegate, NoteOptionsDelegate, DocumentsViewControllerDelegate, NotePagesDelegate, VNDocumentCameraViewControllerDelegate, UIDocumentPickerDelegate, DraggableImageViewDelegate, DraggableTextViewDelegate {
     
     private var documentsVC: DocumentsViewController!
     
@@ -68,7 +69,8 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     var noteImageViews = [DraggableImageView : NoteImage]()
     @IBOutlet weak var pdfView: PDFView!
     
-    @IBOutlet weak var manageImagesButton: UIButton!
+    var noteTextViews = [DraggableTextView : NoteTypedText]()
+    
     // This function sets up the page and every element contained within it.
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -133,6 +135,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         NotificationCenter.default.addObserver(self, selector: #selector(self.notifiedReceiveSketchnote(_:)), name: NSNotification.Name(rawValue: Notifications.NOTIFICATION_RECEIVE_NOTE), object: nil)
         
         self.setupNoteImages()
+        self.setupNoteTypedTexts()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -351,6 +354,29 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             self.canvasView.sendSubviewToBack(draggableView)
             self.noteImageViews[draggableView] = image
             draggableView.center = image.location
+        }
+    }
+    
+    private func setupNoteTypedTexts() {
+        for (view, _) in noteTextViews {
+            view.removeFromSuperview()
+        }
+        noteTextViews = [DraggableTextView : NoteTypedText]()
+        for typedText in SKFileManager.activeNote!.getCurrentPage().typedTexts {
+            let frame = CGRect(x: typedText.location.x, y: typedText.location.y, width: typedText.size.width, height: typedText.size.height)
+            let textStorage = CodeAttributedString()
+            textStorage.language = typedText.codeLanguage
+            let layoutManager = NSLayoutManager()
+            textStorage.addLayoutManager(layoutManager)
+            let textContainer = NSTextContainer(size: view.bounds.size)
+            layoutManager.addTextContainer(textContainer)
+            let draggableView = DraggableTextView(frame: frame, textContainer: textContainer)
+            draggableView.text = typedText.text
+            draggableView.draggableDelegate = self
+            self.canvasView.addSubview(draggableView)
+            self.canvasView.sendSubviewToBack(draggableView)
+            self.noteTextViews[draggableView] = typedText
+            draggableView.center = typedText.location
         }
         
     }
@@ -1201,7 +1227,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     }
     
     private func displayDocumentPicker() {
-        let types: [String] = ["com.sketchnote", String(kUTTypeImage), String(kUTTypePDF)]
+        let types: [String] = ["com.sketchnote", String(kUTTypeImage), String(kUTTypePDF), String(kUTTypeCSource), String(kUTTypePlainText), String(kUTTypeText), String(kUTTypeSourceCode)]
         let documentPicker = UIDocumentPickerViewController(documentTypes: types, in: .import)
         documentPicker.delegate = self
         documentPicker.modalPresentationStyle = .formSheet
@@ -1213,7 +1239,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         if urls.count > 0 {
             let banner = FloatingNotificationBanner(title: "Documents", subtitle: "Imported your selected items.", style: .info)
             banner.show()
-            let (notes, images, pdfs) = ImportHelper.importItems(urls: urls, n: SKFileManager.activeNote!)
+            let (notes, images, pdfs, texts) = ImportHelper.importItems(urls: urls, n: SKFileManager.activeNote!)
             for img in images {
                 self.addNoteImage(image: img)
             }
@@ -1234,8 +1260,63 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                     }
                 }
             }
+            for text in texts {
+                self.addTypedText(typedText: text)
+            }
             SKFileManager.save(file: SKFileManager.activeNote!)
         }
+    }
+    
+    private func addTypedText(typedText: NoteTypedText) {
+        SKFileManager.activeNote!.getCurrentPage().typedTexts.append(typedText)
+        let frame = CGRect(x: 50, y: 50, width: 200, height: 200)
+        let textStorage = CodeAttributedString()
+        textStorage.language = typedText.codeLanguage
+        let layoutManager = NSLayoutManager()
+        textStorage.addLayoutManager(layoutManager)
+        let textContainer = NSTextContainer(size: view.bounds.size)
+        layoutManager.addTextContainer(textContainer)
+        let draggableView = DraggableTextView(frame: frame, textContainer: textContainer)
+        draggableView.lastScale = 1.0
+        draggableView.text = typedText.text
+        draggableView.draggableDelegate = self
+        self.canvasView.addSubview(draggableView)
+        self.canvasView.sendSubviewToBack(draggableView)
+        self.noteTextViews[draggableView] = typedText
+    }
+    
+    func draggableTextViewSizeChanged(source: DraggableTextView, scale: CGSize) {
+        if let typedText = self.noteTextViews[source] {
+            typedText.size = scale
+            log.info(scale)
+            SKFileManager.activeNote!.getCurrentPage().updateNoteTypedText(typedText: typedText)
+            self.startSaveTimer()
+        }
+    }
+    
+    func draggableTextViewLocationChanged(source: DraggableTextView, location: CGPoint) {
+        if let typedText = self.noteTextViews[source] {
+            typedText.location = location
+            SKFileManager.activeNote!.getCurrentPage().updateNoteTypedText(typedText: typedText)
+            self.startSaveTimer()
+        }
+    }
+    
+    func draggableTextViewDelete(source: DraggableTextView) {
+        let popMenu = PopMenuViewController(sourceView: source, actions: [PopMenuAction](), appearance: nil)
+        let closeAction = PopMenuDefaultAction(title: "Close")
+        let action = PopMenuDefaultAction(title: "Delete Text Box", didSelect: { action in
+            if let typedText =  self.noteTextViews[source] {
+                SKFileManager.activeNote!.getCurrentPage().deleteTypedText(typedText: typedText)
+                source.removeFromSuperview()
+                self.noteTextViews[source] = nil
+                self.startSaveTimer()
+            }
+            
+        })
+        popMenu.addAction(action)
+        popMenu.addAction(closeAction)
+        self.present(popMenu, animated: true, completion: nil)
     }
     
     private func addNoteImage(image: UIImage) {
@@ -1284,21 +1365,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         popMenu.addAction(closeAction)
         self.present(popMenu, animated: true, completion: nil)
     }
-    @IBAction func manageImagesTapped(_ sender: UIButton) {
-        if sender.tintColor == self.view.tintColor {
-            sender.tintColor = .white
-            
-            for (view, _) in noteImageViews {
-                canvasView.sendSubviewToBack(view)
-            }
-        }
-        else {
-            sender.tintColor = self.view.tintColor
-            for (view, _) in noteImageViews {
-                canvasView.bringSubviewToFront(view)
-            }
-        }
-    }
     
     private func updatePaginationButtons() {
         previousPageButton.isEnabled = SKFileManager.activeNote!.hasPreviousPage()
@@ -1314,10 +1380,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         setupNoteImages()
         if previousStateOfTopicsShown {
             toggleConceptHighlight()
-        }
-        manageImagesButton.tintColor = .white
-        for (view, _) in noteImageViews {
-            canvasView.sendSubviewToBack(view)
         }
         pdfView.document = nil
         if let backdropPDF = SKFileManager.activeNote!.getCurrentPage().getPDFDocument() {
@@ -1442,4 +1504,38 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     @IBAction func canvasUpSwiped(_ sender: UISwipeGestureRecognizer) {
         showNotePagesBottomSheet()
     }
+    @IBAction func canvasTapped(_ sender: UITapGestureRecognizer) {
+        if sender.state == .recognized {
+            if let highlightedImage = self.highlightedImage {
+                highlightedImage.setHighlight(isHighlighted: false)
+                canvasView.sendSubviewToBack(highlightedImage)
+                self.highlightedImage = nil
+            }
+            for (view, _) in noteImageViews {
+                if view.frame.contains(sender.location(in: canvasView)) {
+                    self.highlightedImage = view
+                    view.setHighlight(isHighlighted: true)
+                    log.info("Tapped image on canvas.")
+                    canvasView.bringSubviewToFront(view)
+                    break
+                }
+            }
+            if let highlightedTextView = self.highlightedTextView {
+                highlightedTextView.setHighlight(isHighlighted: false)
+                canvasView.sendSubviewToBack(highlightedTextView)
+                self.highlightedTextView = nil
+            }
+            for (view, _) in noteTextViews {
+                if view.frame.contains(sender.location(in: canvasView)) {
+                    self.highlightedTextView = view
+                    view.setHighlight(isHighlighted: true)
+                    log.info("Tapped text box on canvas.")
+                    canvasView.bringSubviewToFront(view)
+                    break
+                }
+            }
+        }
+    }
+    var highlightedImage: DraggableImageView?
+    var highlightedTextView: DraggableTextView?
 }

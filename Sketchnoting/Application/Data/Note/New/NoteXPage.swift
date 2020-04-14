@@ -17,6 +17,7 @@ class NoteXPage: Codable {
     var noteTextArray: [NoteText]
     var backdropPDFData: Data?
     var images : [NoteImage]
+    var typedTexts : [NoteTypedText]
     
     init() {
         self.canvasDrawing = PKDrawing()
@@ -24,6 +25,7 @@ class NoteXPage: Codable {
         self.drawingViewRects = [CGRect]()
         self.noteTextArray = [NoteText]()
         self.images = [NoteImage]()
+        self.typedTexts = [NoteTypedText]()
     }
     
     //MARK: Decode / Encode
@@ -34,6 +36,7 @@ class NoteXPage: Codable {
         case noteTextArray = "noteTextArray"
         case backdropPDFData = "backdropPDFData"
         case images = "images"
+        case typedTexts = "typedTexts"
     }
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
@@ -43,6 +46,7 @@ class NoteXPage: Codable {
         try container.encode(noteTextArray, forKey: .noteTextArray)
         try container.encode(backdropPDFData, forKey: .backdropPDFData)
         try container.encode(images, forKey: .images)
+        try container.encode(typedTexts, forKey: .typedTexts)
     }
     required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -53,6 +57,7 @@ class NoteXPage: Codable {
         noteTextArray = try container.decode([NoteText].self, forKey: .noteTextArray)
         backdropPDFData = try? container.decode(Data.self, forKey: .backdropPDFData)
         images = try container.decode([NoteImage].self, forKey: .images)
+        typedTexts = try container.decode([NoteTypedText].self, forKey: .typedTexts)
     }
     
     // MARK: drawing recognition
@@ -89,6 +94,24 @@ class NoteXPage: Codable {
         for i in 0..<images.count {
             if images[i] == noteImage {
                 images.remove(at: i)
+                break
+            }
+        }
+    }
+    
+    func updateNoteTypedText(typedText: NoteTypedText) {
+        for i in 0..<typedTexts.count {
+            if typedTexts[i] == typedText {
+                typedTexts[i] = typedText
+                break
+            }
+        }
+    }
+    
+    func deleteTypedText(typedText: NoteTypedText) {
+        for i in 0..<typedTexts.count {
+            if typedTexts[i] == typedText {
+                typedTexts.remove(at: i)
                 break
             }
         }
