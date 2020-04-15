@@ -11,7 +11,7 @@ import UIKit
 
 import PopMenu
 
-class DraggableTextView: UITextView {
+class DraggableTextView: UITextView, UITextViewDelegate {
     
     let panGesture = UIPanGestureRecognizer()
     let pinchGesture = UIPinchGestureRecognizer()
@@ -35,6 +35,7 @@ class DraggableTextView: UITextView {
         
         self.layer.borderColor = UIColor.systemGray.cgColor
         self.layer.borderWidth = 1
+        self.delegate = self
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -81,12 +82,11 @@ class DraggableTextView: UITextView {
                
         if lastScale != nil {
             let scale = 1.0 - (lastScale! - pinchGesture.scale)
-                   
             let newTransform: CGAffineTransform = self.transform.scaledBy(x: scale, y: scale)
                                       
             if shouldViewSizeChange(height: self.frame.size.height) {
                 self.transform = newTransform
-                self.textContainer.size = self.frame.size
+                self.frame.size = self.frame.size
                 lastScale = pinchGesture.scale
                 draggableDelegate?.draggableTextViewSizeChanged(source: self, scale: self.frame.size)
             }
@@ -101,7 +101,7 @@ class DraggableTextView: UITextView {
         
     func shouldViewSizeChange (height: CGFloat) -> Bool {
         let maxHeight: CGFloat = self.superview!.frame.size.height
-        let minHeight: CGFloat = 140.0
+        let minHeight: CGFloat = 150.0
         
         if height > minHeight && height < maxHeight {
             return true
@@ -128,10 +128,14 @@ class DraggableTextView: UITextView {
             self.layer.borderWidth = 1
         }
     }
+    func textViewDidChange(_ textView: UITextView) {
+        draggableDelegate?.draggableTextViewTextChanged(source: self, text: textView.text)
+    }
 }
 
 protocol DraggableTextViewDelegate {
     func draggableTextViewSizeChanged(source: DraggableTextView, scale: CGSize)
     func draggableTextViewLocationChanged(source: DraggableTextView, location: CGPoint)
     func draggableTextViewDelete(source: DraggableTextView)
+    func draggableTextViewTextChanged(source: DraggableTextView, text: String)
 }

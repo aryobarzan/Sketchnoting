@@ -1227,7 +1227,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     }
     
     private func displayDocumentPicker() {
-        let types: [String] = ["com.sketchnote", String(kUTTypeImage), String(kUTTypePDF), String(kUTTypeCSource), String(kUTTypePlainText), String(kUTTypeText), String(kUTTypeSourceCode)]
+        let types: [String] = ImportHelper.importUTTypes
         let documentPicker = UIDocumentPickerViewController(documentTypes: types, in: .import)
         documentPicker.delegate = self
         documentPicker.modalPresentationStyle = .formSheet
@@ -1269,7 +1269,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     
     private func addTypedText(typedText: NoteTypedText) {
         SKFileManager.activeNote!.getCurrentPage().typedTexts.append(typedText)
-        let frame = CGRect(x: 50, y: 50, width: 200, height: 200)
+        let frame = CGRect(x: 50, y: 50, width: 300, height: 250)
         let textStorage = CodeAttributedString()
         textStorage.language = typedText.codeLanguage
         let layoutManager = NSLayoutManager()
@@ -1317,6 +1317,14 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         popMenu.addAction(action)
         popMenu.addAction(closeAction)
         self.present(popMenu, animated: true, completion: nil)
+    }
+    
+    func draggableTextViewTextChanged(source: DraggableTextView, text: String) {
+        if let typedText = self.noteTextViews[source] {
+            typedText.text = text
+            SKFileManager.activeNote!.getCurrentPage().updateNoteTypedText(typedText: typedText)
+            self.startSaveTimer()
+        }
     }
     
     private func addNoteImage(image: UIImage) {

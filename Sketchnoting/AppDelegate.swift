@@ -74,7 +74,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var importURL: URL?
     func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any]) -> Bool {
-        log.info("Attempting to import sketchnote file from outside.")
+        log.info("Attempting to import file from outside.")
         importURL = url
         return true
     }

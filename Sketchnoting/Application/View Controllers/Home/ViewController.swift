@@ -235,6 +235,11 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
                 log.info("New note from imported images.")
                 _ = SKFileManager.add(note: newNote)
             }
+            if importedTexts.count > 0 {
+                let newNote = createNoteFromTypedTexts(texts: importedTexts)
+                log.info("New note from imported text files.")
+                _ = SKFileManager.add(note: newNote)
+            }
             for pdf in importedPDFs {
                 if pdf.pageCount > 0 {
                     var pdfTitle = "Imported PDF"
@@ -276,7 +281,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     }
     
     private func displayDocumentPicker() {
-        let types: [String] = ["com.sketchnote", String(kUTTypeImage), String(kUTTypePDF)]
+        let types: [String] = ImportHelper.importUTTypes
         let documentPicker = UIDocumentPickerViewController(documentTypes: types, in: .import)
         documentPicker.delegate = self
         documentPicker.modalPresentationStyle = .formSheet
@@ -301,6 +306,12 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             let noteImage = NoteImage(image: image)
             newNote.getCurrentPage().images.append(noteImage)
         }
+        return newNote
+    }
+    
+    private func createNoteFromTypedTexts(texts: [NoteTypedText]) -> NoteX {
+        let newNote = NoteX(name: "Imported Text Files", parent: SKFileManager.currentFolder?.id, documents: nil)
+        newNote.getCurrentPage().typedTexts = texts
         return newNote
     }
     

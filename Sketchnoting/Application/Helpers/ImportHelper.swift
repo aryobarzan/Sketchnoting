@@ -10,7 +10,10 @@ import UIKit
 import PDFKit
 import MobileCoreServices
 
+import Highlightr
+
 class ImportHelper {
+    static var importUTTypes = ["public.image", "public.jpeg", "public.jpg", "public.png", "com.sketchnote", "com.adobe.pdf", String(kUTTypeText), String(kUTTypeJavaClass), String(kUTTypeCSource), String(kUTTypePlainText), String(kUTTypeSourceCode), "com.sun.java-source"]
     static func importItems(urls: [URL], n: NoteX?) -> ([NoteX], [UIImage], [PDFDocument], [NoteTypedText]) {
         var notes = [NoteX]()
         var images = [UIImage]()
@@ -35,16 +38,11 @@ class ImportHelper {
                         pdfs.append(pdfDocument)
                     }
                     break
-                case String(kUTTypeText), String(kUTTypeJavaClass), String(kUTTypeCSource), String(kUTTypePlainText), String(kUTTypeSourceCode):
+                case String(kUTTypeText), String(kUTTypeJavaClass), String(kUTTypeCSource), String(kUTTypePlainText), String(kUTTypeSourceCode), "com.sun.java-source":
                     if let content = try? String(contentsOf: url) {
                         if !content.isEmpty {
-                            let noteTypedText = NoteTypedText(text: content, codeLanguage: "Java")
-                            let fileExtension = url.pathExtension
-                            print(content)
-                            if fileExtension.lowercased() == "c" {
-                                noteTypedText.codeLanguage = "C"
-                            }
-                            texts.append(noteTypedText)
+                            let typedText = createNoteTypedText(text: content, codeLanguage: nil, fileExtension: url.pathExtension)
+                            texts.append(typedText)
                         }
                     }
                     break
@@ -73,5 +71,17 @@ class ImportHelper {
             
         }
         return (notes, images, pdfs, texts)
+    }
+    
+    private static func createNoteTypedText(text: String, codeLanguage: String?, fileExtension: String?) -> NoteTypedText {
+        let noteTypedText = NoteTypedText(text: text, codeLanguage: "Java")
+        if let codeLanguage = codeLanguage {
+            noteTypedText.codeLanguage = codeLanguage
+        }
+        else if let fileExtension = fileExtension {
+            noteTypedText.codeLanguage = fileExtension.lowercased()
+        }
+        log.info("Text file language: \(noteTypedText.codeLanguage)")
+        return noteTypedText
     }
 }

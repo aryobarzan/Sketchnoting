@@ -100,7 +100,7 @@ class DraggableImageView: UIImageView {
         
     func shouldViewSizeChange (height: CGFloat) -> Bool {
         let maxHeight: CGFloat = self.superview!.frame.size.height
-        let minHeight: CGFloat = 140.0
+        let minHeight: CGFloat = 150.0
         
         if height > minHeight && height < maxHeight {
             return true
