@@ -10,6 +10,7 @@ import Foundation
 import UIKit
 
 import PopMenu
+import Highlightr
 
 class DraggableTextView: UITextView, UITextViewDelegate {
     
@@ -55,16 +56,12 @@ class DraggableTextView: UITextView, UITextViewDelegate {
     }
     
     @objc func panGestureChanged () {
-        
         // 1. Calculate and set the new location
         var locationInSuperView = panGesture.translation(in: self.superview) // Get the location of this view in the super view
-        
         if panGesture.state == UIGestureRecognizer.State.began {
             firstX = self.center.x
             firstY = self.center.y
-
         }
-        
         if firstX != nil && firstY != nil {
             locationInSuperView = CGPoint(x: firstX!+locationInSuperView.x, y: firstY!+locationInSuperView.y)
             // Don't let the textView be dragged outside the superview
@@ -86,16 +83,18 @@ class DraggableTextView: UITextView, UITextViewDelegate {
                                       
             if shouldViewSizeChange(height: self.frame.size.height) {
                 self.transform = newTransform
-                self.frame.size = self.frame.size
                 lastScale = pinchGesture.scale
                 draggableDelegate?.draggableTextViewSizeChanged(source: self, scale: self.frame.size)
             }
+        }
+        if pinchGesture.state == .ended {
+            self.fitTextToBounds()
         }
     }
     
     @objc func longPressGestureTriggered() {
         if longPressGesture.state != .ended {
-            draggableDelegate?.draggableTextViewDelete(source: self)
+            draggableDelegate?.draggableTextViewLongPressed(source: self)
         }
     }
         
@@ -136,6 +135,6 @@ class DraggableTextView: UITextView, UITextViewDelegate {
 protocol DraggableTextViewDelegate {
     func draggableTextViewSizeChanged(source: DraggableTextView, scale: CGSize)
     func draggableTextViewLocationChanged(source: DraggableTextView, location: CGPoint)
-    func draggableTextViewDelete(source: DraggableTextView)
+    func draggableTextViewLongPressed(source: DraggableTextView)
     func draggableTextViewTextChanged(source: DraggableTextView, text: String)
 }

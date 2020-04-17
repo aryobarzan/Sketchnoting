@@ -17,6 +17,8 @@ class NoteOptionsTableViewController: UITableViewController {
     @IBOutlet weak var dateLabel: UILabel!
     @IBOutlet weak var pageLabel: UILabel!
     @IBOutlet weak var drawingsTextView: UITextView!
+    @IBOutlet weak var pdfScaleSlider: UISlider!
+    @IBOutlet weak var clearPDFPageButton: UIButton!
     
     @IBOutlet var deletePageButton: UIButton!
     override func viewDidLoad() {
@@ -28,6 +30,15 @@ class NoteOptionsTableViewController: UITableViewController {
         dateLabel.text = "\(SKFileManager.activeNote!.creationDate.getFormattedDate())"
         pageLabel.text = "Page: \(SKFileManager.activeNote!.activePageIndex+1)/\(SKFileManager.activeNote!.pages.count)"
         drawingsTextView.text = "Drawings: \(SKFileManager.activeNote!.getCurrentPage().drawingLabels.joined(separator:" - "))"
+        
+        if SKFileManager.activeNote!.getCurrentPage().getPDFDocument() != nil {
+            pdfScaleSlider.isEnabled = true
+            clearPDFPageButton.isEnabled = true
+        }
+        else {
+            pdfScaleSlider.isEnabled = false
+            clearPDFPageButton.isEnabled = false
+        }
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -55,6 +66,11 @@ class NoteOptionsTableViewController: UITableViewController {
             }
         }
         else if indexPath.section == 3 {
+            if indexPath.row == 1 {
+                option = .ClearPDFPage
+            }
+        }
+        else if indexPath.section == 4 {
             if indexPath.row == 0 {
                 option = .ResetDocuments
             }
@@ -77,10 +93,18 @@ class NoteOptionsTableViewController: UITableViewController {
             }
         }
     }
+    @IBAction func pdfScaleSliderChanged(_ sender: UISlider) {
+        var scale = sender.value
+        if scale == 0.0 {
+            scale = 0.1
+        }
+        delegate?.pdfScaleChanged(scale: scale)
+    }
 }
 
 protocol NoteOptionsDelegate  {
     func noteOptionSelected(option: NoteOption)
+    func pdfScaleChanged(scale: Float)
 }
 
 enum NoteOption {
@@ -91,6 +115,7 @@ enum NoteOption {
     case ClearPage
     case DeletePage
     case Share
+    case ClearPDFPage
     case ResetDocuments
     case ResetTextRecognition
     case DeleteNote

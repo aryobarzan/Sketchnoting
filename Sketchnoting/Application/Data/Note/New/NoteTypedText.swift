@@ -8,7 +8,7 @@
 
 import UIKit
 class NoteTypedText: Codable, Equatable {
-    
+    static let supportedLanguages = ["C", "Java", "Swift"]
     var text: String
     var codeLanguage: String
     var location: CGPoint

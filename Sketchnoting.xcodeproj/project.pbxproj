@@ -20,6 +20,9 @@
 		9F18E7A823FB4F1600543D78 /* FolderButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F18E7A723FB4F1600543D78 /* FolderButton.swift */; };
 		9F2C00062351123700D53EE9 /* SwiftyJSON in Frameworks */ = {isa = PBXBuildFile; productRef = 9F2C00052351123700D53EE9 /* SwiftyJSON */; };
 		9F2C00092351126800D53EE9 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 9F2C00082351126800D53EE9 /* Alamofire */; };
+		9F318D39244A207300A1B4B5 /* UIFontExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F318D38244A207300A1B4B5 /* UIFontExtensions.swift */; };
+		9F318D3B244A20A000A1B4B5 /* UITextViewExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F318D3A244A20A000A1B4B5 /* UITextViewExtensions.swift */; };
+		9F318D40244A3EAD00A1B4B5 /* Toast in Frameworks */ = {isa = PBXBuildFile; productRef = 9F318D3F244A3EAD00A1B4B5 /* Toast */; };
 		9F3424022407197000A92B98 /* HiddenDocumentsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F3424012407197000A92B98 /* HiddenDocumentsViewController.swift */; };
 		9F4B38BD23EA3D8500F87B61 /* ReceivedNoteCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F4B38BC23EA3D8500F87B61 /* ReceivedNoteCollectionViewCell.swift */; };
 		9F4B38BF23EA3EE200F87B61 /* ReceivedNotesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F4B38BE23EA3EE200F87B61 /* ReceivedNotesViewController.swift */; };
@@ -48,7 +51,6 @@
 		9F65984823F315FE00CDBE0C /* SearchFilterCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F65984723F315FE00CDBE0C /* SearchFilterCollectionViewCell.swift */; };
 		9F65984B23F3175E00CDBE0C /* SearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F65984A23F3175E00CDBE0C /* SearchViewController.swift */; };
 		9F65984D23F3227300CDBE0C /* DrawingSearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F65984C23F3227300CDBE0C /* DrawingSearchViewController.swift */; };
-		9F75E448230C368F00488BBD /* NoteSharingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F75E447230C368F00488BBD /* NoteSharingViewController.swift */; };
 		9F75E44C230C583200488BBD /* NoteCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F75E44A230C583200488BBD /* NoteCollectionViewCell.swift */; };
 		9F75E44D230C583200488BBD /* NoteCollectionViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9F75E44B230C583200488BBD /* NoteCollectionViewCell.xib */; };
 		9F75E44F230D848200488BBD /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F75E44E230D848200488BBD /* SettingsViewController.swift */; };
@@ -140,6 +142,8 @@
 		9F0EC7DC2446A8AE000A28CB /* GestureExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GestureExtensions.swift; sourceTree = "<group>"; };
 		9F0FC54823760E7600070FA0 /* NoteOptionsTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteOptionsTableViewController.swift; sourceTree = "<group>"; };
 		9F18E7A723FB4F1600543D78 /* FolderButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderButton.swift; sourceTree = "<group>"; };
+		9F318D38244A207300A1B4B5 /* UIFontExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIFontExtensions.swift; sourceTree = "<group>"; };
+		9F318D3A244A20A000A1B4B5 /* UITextViewExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UITextViewExtensions.swift; sourceTree = "<group>"; };
 		9F3424012407197000A92B98 /* HiddenDocumentsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HiddenDocumentsViewController.swift; sourceTree = "<group>"; };
 		9F4B38BC23EA3D8500F87B61 /* ReceivedNoteCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceivedNoteCollectionViewCell.swift; sourceTree = "<group>"; };
 		9F4B38BE23EA3EE200F87B61 /* ReceivedNotesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceivedNotesViewController.swift; sourceTree = "<group>"; };
@@ -168,7 +172,6 @@
 		9F65984723F315FE00CDBE0C /* SearchFilterCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchFilterCollectionViewCell.swift; sourceTree = "<group>"; };
 		9F65984A23F3175E00CDBE0C /* SearchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchViewController.swift; sourceTree = "<group>"; };
 		9F65984C23F3227300CDBE0C /* DrawingSearchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrawingSearchViewController.swift; sourceTree = "<group>"; };
-		9F75E447230C368F00488BBD /* NoteSharingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteSharingViewController.swift; sourceTree = "<group>"; };
 		9F75E44A230C583200488BBD /* NoteCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteCollectionViewCell.swift; sourceTree = "<group>"; };
 		9F75E44B230C583200488BBD /* NoteCollectionViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NoteCollectionViewCell.xib; sourceTree = "<group>"; };
 		9F75E44E230D848200488BBD /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
@@ -239,6 +242,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9F318D40244A3EAD00A1B4B5 /* Toast in Frameworks */,
 				9F2C00092351126800D53EE9 /* Alamofire in Frameworks */,
 				9F509144235BE29100853E84 /* DataCompression in Frameworks */,
 				9F560FAA240855F700932A55 /* GPUImage in Frameworks */,
@@ -384,7 +388,6 @@
 		9F7BAFF6239C1D640045CD12 /* Other */ = {
 			isa = PBXGroup;
 			children = (
-				9F75E447230C368F00488BBD /* NoteSharingViewController.swift */,
 				9F75E44E230D848200488BBD /* SettingsViewController.swift */,
 				9F05BC7E23761C4A00D49A88 /* NoteTextViewController.swift */,
 				9F0FC54823760E7600070FA0 /* NoteOptionsTableViewController.swift */,
@@ -591,6 +594,8 @@
 				9F06976F24427823002DCE47 /* URLExtensions.swift */,
 				9F87A47A2445430700F83B12 /* DraggableTextView.swift */,
 				9F0EC7DC2446A8AE000A28CB /* GestureExtensions.swift */,
+				9F318D38244A207300A1B4B5 /* UIFontExtensions.swift */,
+				9F318D3A244A20A000A1B4B5 /* UITextViewExtensions.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -682,6 +687,7 @@
 				9F9460E123F5BAA10073D709 /* Connectivity */,
 				9F560FA9240855F700932A55 /* GPUImage */,
 				9F0D8564242052E600B8BE2F /* BSImagePicker */,
+				9F318D3F244A3EAD00A1B4B5 /* Toast */,
 			);
 			productName = Sketchnoting;
 			productReference = 9FD29BA32220524D00CC969A /* Sketchnoting.app */;
@@ -723,6 +729,7 @@
 				9F9460E023F5BAA10073D709 /* XCRemoteSwiftPackageReference "Connectivity" */,
 				9F560FA8240855F700932A55 /* XCRemoteSwiftPackageReference "GPUImage2" */,
 				9F0D8563242052E600B8BE2F /* XCRemoteSwiftPackageReference "BSImagePicker" */,
+				9F318D3E244A3EAD00A1B4B5 /* XCRemoteSwiftPackageReference "Toast-Swift" */,
 			);
 			productRefGroup = 9FD29BA42220524D00CC969A /* Products */;
 			projectDirPath = "";
@@ -860,14 +867,15 @@
 				9FD8BB97243D5BE500542BFA /* ImportHelper.swift in Sources */,
 				9F5E89EE2391B474002FA8B2 /* DocumentsCollectionReusableView.swift in Sources */,
 				9F5E89F02391CBA2002FA8B2 /* DocumentViewCell.swift in Sources */,
+				9F318D3B244A20A000A1B4B5 /* UITextViewExtensions.swift in Sources */,
 				9F75E44F230D848200488BBD /* SettingsViewController.swift in Sources */,
 				9F75E484231419FA00488BBD /* TAGMEDocument.swift in Sources */,
 				9F92D11523202B9900BC0E57 /* KnowledgeGraphHelper.swift in Sources */,
 				9F75E44C230C583200488BBD /* NoteCollectionViewCell.swift in Sources */,
 				9F87A47B2445430700F83B12 /* DraggableTextView.swift in Sources */,
-				9F75E448230C368F00488BBD /* NoteSharingViewController.swift in Sources */,
 				9FBF6AB422E9F391001FD730 /* VisionTextWrapper.swift in Sources */,
 				9FC02C1E23EDB6400051C576 /* NoteX.swift in Sources */,
+				9F318D39244A207300A1B4B5 /* UIFontExtensions.swift in Sources */,
 				9FF0AC9224412C5200A82BE8 /* DraggableImageView.swift in Sources */,
 				9F8551B123A539D9006EB0B1 /* NotePageCollectionViewCell.swift in Sources */,
 				9FBF6ABA22E9F439001FD730 /* VisionTextElementWrapper.swift in Sources */,
@@ -1146,6 +1154,14 @@
 				minimumVersion = 5.0.2;
 			};
 		};
+		9F318D3E244A3EAD00A1B4B5 /* XCRemoteSwiftPackageReference "Toast-Swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/scalessec/Toast-Swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.0.1;
+			};
+		};
 		9F509142235BE29100853E84 /* XCRemoteSwiftPackageReference "DataCompression" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/mw99/DataCompression.git";
@@ -1213,6 +1229,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 9F2C00072351126800D53EE9 /* XCRemoteSwiftPackageReference "Alamofire" */;
 			productName = Alamofire;
+		};
+		9F318D3F244A3EAD00A1B4B5 /* Toast */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9F318D3E244A3EAD00A1B4B5 /* XCRemoteSwiftPackageReference "Toast-Swift" */;
+			productName = Toast;
 		};
 		9F509143235BE29100853E84 /* DataCompression */ = {
 			isa = XCSwiftPackageProductDependency;

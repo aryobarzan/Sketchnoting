@@ -10,10 +10,10 @@ import UIKit
 
 import PopMenu
 import NVActivityIndicatorView
-import NotificationBannerSwift
 import DataCompression
 import ViewAnimator
 import BSImagePicker
+import Toast
 
 import MultipeerConnectivity
 import Vision
@@ -65,6 +65,8 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         super.viewDidLoad()
         self.navigationController?.setNavigationBarHidden(true, animated: false)
         self.tabBarController?.tabBar.isHidden = false
+        
+        ToastManager.shared.isTapToDismissEnabled = true
         
         activeFiltersBadge = BadgeHub(view: filtersButton)
         activeFiltersBadge.scaleCircleSize(by: 0.45)
@@ -269,9 +271,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
                     _ = SKFileManager.add(note: newNote)
                 }
             }
-            self.updateDisplayedNotes(true)
-            let banner = FloatingNotificationBanner(title: "Documents", subtitle: "Imported your selected items.", style: .info)
-            banner.show()
+            self.view.makeToast("Imported your selected documents.")
             self.updateDisplayedNotes(true)
         }
     }
@@ -549,6 +549,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             menuElements.append(tagsAction)
             let similarNotesAction = UIAction(title: "Similar Notes", image: UIImage(systemName: "link")) { action in
                 self.filterSimilarNotesFor(note)
+                self.view.makeToast("Showing similar notes.", title: note.getName())
             }
             menuElements.append(similarNotesAction)
             let duplicateAction = UIAction(title: "Duplicate", image: UIImage(systemName: "doc.on.doc")) { action in
@@ -558,8 +559,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             menuElements.append(duplicateAction)
             let copyTextAction = UIAction(title: "Copy Text", image: UIImage(systemName: "text.quote")) { action in
                 UIPasteboard.general.string = note.getText()
-                let banner = FloatingNotificationBanner(title: note.getName(), subtitle: "Copied text to clipboard.", style: .info)
-                banner.show()
+                self.view.makeToast("Copied text to Clipboard.")
             }
             menuElements.append(copyTextAction)
             let shareAction = UIAction(title: "Share...", image: UIImage(systemName: "square.and.arrow.up")) { action in
@@ -628,8 +628,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
                     ac.addAction(UIAlertAction(title: "Close", style: .default))
                     present(ac, animated: true)
                 }
-                let banner = FloatingNotificationBanner(title: note.getName(), subtitle: "Note shared with the selected device(s).", style: .success)
-                banner.show()
+                self.view.makeToast("Note shared with the selected device(s).", title: note.getName())
             }
         }
     }
@@ -743,8 +742,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
                 similarNotesTitleLabel.isHidden = false
             }
             else {
-                let banner = FloatingNotificationBanner(title: note.getName(), subtitle: "No similar notes could be found.", style: .info)
-                banner.show()
+                self.view.makeToast("No similar notes could be found.", title: note.getName())
             }
         }
     }
@@ -788,22 +786,19 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         if let imported = SKFileManager.importNoteFile(url: url) {
             if SKFileManager.notes.contains(imported) {
                 log.info("Sketchnote already in your library, updating its data.")
-                let banner = FloatingNotificationBanner(title: imported.getName(), subtitle: "This imported note is already in your library. It has been updated.", style: .info)
-                banner.show()
+                self.view.makeToast("The imported note is already in library: It has been updated.", title: imported.getName())
                 SKFileManager.save(file: imported)
             }
             else {
                 log.info("Importing new sketchnote.")
                 _ = SKFileManager.add(note: imported)
-                let banner = FloatingNotificationBanner(title: imported.getName(), subtitle: "Note imported and added to your library.", style: .info)
-                banner.show()
+                self.view.makeToast("The imported note has been added to your library.", title: imported.getName())
             }
             self.updateDisplayedNotes(false)
         }
         else {
             log.error("Note could not be imported.")
-            let banner = FloatingNotificationBanner(title: "Error", subtitle: "The note could not be imported. It may be corrupted.", style: .warning)
-            banner.show()
+            self.view.makeToast("Sorry, the selected document could not be imported.", title: "Error")
         }
     }
     

@@ -7,8 +7,7 @@
 //
 
 import UIKit
-
-import NotificationBannerSwift
+import Toast
 
 class SettingsViewController: UITableViewController {
 
@@ -86,8 +85,7 @@ class SettingsViewController: UITableViewController {
         let alert = UIAlertController(title: "Clear Data", message: "Are you sure you want to delete all your notes? This is permanent.", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Clear", style: .destructive, handler: { action in
               SKFileManager.wipe()
-              let banner = FloatingNotificationBanner(title: "Data Cleared", subtitle: "All notes and document resources on your device have been wiped.", style: .info)
-              banner.show()
+            self.view.makeToast("All notes and document resources on your device have been wiped.", title: "Data Cleared")
         }))
         alert.addAction(UIAlertAction(title: "Cancel", style: .default, handler: { action in
               log.info("Not clearing data.")

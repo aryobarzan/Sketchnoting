@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import NotificationBannerSwift
 
 class NoteTextViewController: UIViewController {
 
@@ -26,8 +25,7 @@ class NoteTextViewController: UIViewController {
     @IBAction func copyTapped(_ sender: UIBarButtonItem) {
         if let note = note {
             UIPasteboard.general.string = note.getText()
-            let banner = FloatingNotificationBanner(title: note.getName(), subtitle: "Copied text to clipboard.", style: .info)
-            banner.show()
+            self.view.makeToast("Copied text to clipboard.")
         }
     }
     

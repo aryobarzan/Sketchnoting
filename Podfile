@@ -7,7 +7,6 @@ target 'Sketchnoting' do
   # If using an on-device API:
   pod 'Firebase/MLVisionTextModel'
   pod 'NewPopMenu'
-  pod 'NotificationBannerSwift'
   pod 'NVActivityIndicatorView'
   pod 'PocketSVG', '~> 2.0'
   pod 'SVGKit'

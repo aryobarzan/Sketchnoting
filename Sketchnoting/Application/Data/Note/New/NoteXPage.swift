@@ -16,6 +16,7 @@ class NoteXPage: Codable {
     var drawingViewRects: [CGRect]
     var noteTextArray: [NoteText]
     var backdropPDFData: Data?
+    var pdfScale: Float? = 1.0
     var images : [NoteImage]
     var typedTexts : [NoteTypedText]
     
@@ -35,6 +36,7 @@ class NoteXPage: Codable {
         case drawingViewRects = "drawingViewRects"
         case noteTextArray = "noteTextArray"
         case backdropPDFData = "backdropPDFData"
+        case pdfScale = "pdfScale"
         case images = "images"
         case typedTexts = "typedTexts"
     }
@@ -45,6 +47,7 @@ class NoteXPage: Codable {
         try container.encode(drawingViewRects, forKey: .drawingViewRects)
         try container.encode(noteTextArray, forKey: .noteTextArray)
         try container.encode(backdropPDFData, forKey: .backdropPDFData)
+        try container.encode(pdfScale, forKey: .pdfScale)
         try container.encode(images, forKey: .images)
         try container.encode(typedTexts, forKey: .typedTexts)
     }
@@ -56,6 +59,7 @@ class NoteXPage: Codable {
         drawingViewRects = try container.decode([CGRect].self, forKey: .drawingViewRects)
         noteTextArray = try container.decode([NoteText].self, forKey: .noteTextArray)
         backdropPDFData = try? container.decode(Data.self, forKey: .backdropPDFData)
+        pdfScale = try? container.decode(Float.self, forKey: .pdfScale)
         images = try container.decode([NoteImage].self, forKey: .images)
         typedTexts = try container.decode([NoteTypedText].self, forKey: .typedTexts)
     }

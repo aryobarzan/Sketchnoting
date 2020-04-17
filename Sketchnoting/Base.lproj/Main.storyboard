@@ -1805,10 +1805,72 @@
                                     </tableViewCell>
                                 </cells>
                             </tableViewSection>
+                            <tableViewSection headerTitle="PDF" id="Jce-3L-Ny6">
+                                <cells>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" id="t9d-U1-9Ms">
+                                        <rect key="frame" x="0.0" y="631" width="320" height="43.5"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="t9d-U1-9Ms" id="CZ2-90-ZTY">
+                                            <rect key="frame" x="0.0" y="0.0" width="320" height="43.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="aspectratio" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="Lke-YS-aVJ">
+                                                    <rect key="frame" x="282" y="12" width="22" height="19.5"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="width" constant="22" id="6hL-2k-BNg"/>
+                                                        <constraint firstAttribute="height" constant="22" id="bcg-Nl-Ct6"/>
+                                                    </constraints>
+                                                </imageView>
+                                                <slider opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="1" minValue="0.10000000000000001" maxValue="2" translatesAutoresizingMaskIntoConstraints="NO" id="Y5G-uf-D5X">
+                                                    <rect key="frame" x="16" y="7" width="244" height="30"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <connections>
+                                                        <action selector="pdfScaleSliderChanged:" destination="dds-Vf-vQc" eventType="valueChanged" id="7oV-y2-IcH"/>
+                                                    </connections>
+                                                </slider>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstAttribute="trailing" secondItem="Lke-YS-aVJ" secondAttribute="trailing" constant="16" id="303-Ew-Vf2"/>
+                                                <constraint firstItem="Lke-YS-aVJ" firstAttribute="centerY" secondItem="CZ2-90-ZTY" secondAttribute="centerY" id="bQu-qn-cLx"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" id="PyN-Cf-iBf">
+                                        <rect key="frame" x="0.0" y="674.5" width="320" height="43.5"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="PyN-Cf-iBf" id="mwa-Nk-WWu">
+                                            <rect key="frame" x="0.0" y="0.0" width="320" height="43.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="xmark.circle.fill" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="Hoj-g0-8SI">
+                                                    <rect key="frame" x="282" y="11.5" width="22" height="21"/>
+                                                    <color key="tintColor" systemColor="systemRedColor" red="1" green="0.23137254900000001" blue="0.18823529410000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="width" constant="22" id="XY1-JN-mc6"/>
+                                                        <constraint firstAttribute="height" constant="22" id="wTv-ok-2MV"/>
+                                                    </constraints>
+                                                </imageView>
+                                                <button opaque="NO" userInteractionEnabled="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="wuL-bo-kJs">
+                                                    <rect key="frame" x="20" y="6" width="110" height="30"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="15"/>
+                                                    <state key="normal" title="Clear PDF Page">
+                                                        <color key="titleColor" systemColor="systemRedColor" red="1" green="0.23137254900000001" blue="0.18823529410000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    </state>
+                                                </button>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="Hoj-g0-8SI" firstAttribute="centerY" secondItem="mwa-Nk-WWu" secondAttribute="centerY" id="1hZ-ic-qul"/>
+                                                <constraint firstAttribute="trailing" secondItem="Hoj-g0-8SI" secondAttribute="trailing" constant="16" id="9Q1-xi-eOI"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                </cells>
+                            </tableViewSection>
                             <tableViewSection headerTitle="Refresh Note" id="Ikc-h9-UQX">
                                 <cells>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" id="9MH-YU-gAL">
-                                        <rect key="frame" x="0.0" y="631" width="320" height="43.5"/>
+                                        <rect key="frame" x="0.0" y="774" width="320" height="43.5"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="9MH-YU-gAL" id="HOA-Nb-kIj">
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="43.5"/>
@@ -1834,7 +1896,7 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" id="RnY-3m-22q">
-                                        <rect key="frame" x="0.0" y="674.5" width="320" height="43.5"/>
+                                        <rect key="frame" x="0.0" y="817.5" width="320" height="43.5"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="RnY-3m-22q" id="QWk-AI-b0c">
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="43.5"/>
@@ -1860,7 +1922,7 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" id="xOa-b3-fkX">
-                                        <rect key="frame" x="0.0" y="718" width="320" height="43.5"/>
+                                        <rect key="frame" x="0.0" y="861" width="320" height="43.5"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="xOa-b3-fkX" id="zKk-vb-rih">
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="43.5"/>
@@ -1899,11 +1961,13 @@
                     </tableView>
                     <value key="contentSizeForViewInPopover" type="size" width="320" height="740"/>
                     <connections>
+                        <outlet property="clearPDFPageButton" destination="wuL-bo-kJs" id="R6s-VQ-OHs"/>
                         <outlet property="dateLabel" destination="dTA-HN-Jlw" id="e8K-Wr-rYW"/>
                         <outlet property="deletePageButton" destination="LS2-4U-7y9" id="gN9-mG-A4H"/>
                         <outlet property="drawingsTextView" destination="55k-UY-gnr" id="iL8-20-YR0"/>
                         <outlet property="nameField" destination="t1z-i1-dgQ" id="LUx-7U-gGk"/>
                         <outlet property="pageLabel" destination="eTp-HH-EuU" id="pgS-Ut-KKB"/>
+                        <outlet property="pdfScaleSlider" destination="Y5G-uf-D5X" id="iPy-gv-mgV"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="GsK-Xl-i6u" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -2841,6 +2905,7 @@
         <image name="arrow.left.circle" catalog="system" width="128" height="121"/>
         <image name="arrow.right.circle" catalog="system" width="128" height="121"/>
         <image name="arrow.up.arrow.down.circle" catalog="system" width="128" height="121"/>
+        <image name="aspectratio" catalog="system" width="128" height="93"/>
         <image name="book.circle" catalog="system" width="128" height="121"/>
         <image name="book.circle.fill" catalog="system" width="128" height="121"/>
         <image name="calendar" catalog="system" width="128" height="106"/>

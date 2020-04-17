@@ -15,13 +15,13 @@ import PDFKit
 import Firebase
 import NVActivityIndicatorView
 import Repeat
-import NotificationBannerSwift
 import ViewAnimator
 import Connectivity
 import GPUImage
 import PopMenu
 import GPUImage
 import Highlightr
+import Toast
 
 class NoteViewController: UIViewController, UIPencilInteractionDelegate, UICollectionViewDataSource, UICollectionViewDelegate, NoteXDelegate, PKCanvasViewDelegate, PKToolPickerObserver, UIScreenshotServiceDelegate, NoteOptionsDelegate, DocumentsViewControllerDelegate, NotePagesDelegate, VNDocumentCameraViewControllerDelegate, UIDocumentPickerDelegate, DraggableImageViewDelegate, DraggableTextViewDelegate {
     
@@ -70,6 +70,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     @IBOutlet weak var pdfView: PDFView!
     
     var noteTextViews = [DraggableTextView : NoteTypedText]()
+    var initialResizeOfTextViewFonts = false
     
     // This function sets up the page and every element contained within it.
     override func viewDidLoad() {
@@ -96,9 +97,13 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         interaction.delegate = self
         view.addInteraction(interaction)
         
-        pdfView.autoScales = true
+        pdfView.autoScales = false
         pdfView.maxScaleFactor = 4.0
-        pdfView.minScaleFactor = pdfView.scaleFactorForSizeToFit
+        pdfView.minScaleFactor = 0.1
+        pdfView.scaleFactor = 1.0
+        if let pdfScale = SKFileManager.activeNote!.getCurrentPage().pdfScale {
+            pdfView.scaleFactor = CGFloat(pdfScale)
+        }
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
             let storyboard = UIStoryboard(name: "Main", bundle: Bundle.main)
@@ -154,13 +159,17 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                 drawingRegionView.layer.borderColor = UIColor.white.cgColor
             }
         }
-        
+        if !initialResizeOfTextViewFonts {
+            initialResizeOfTextViewFonts = true
+            for (textView, _) in self.noteTextViews {
+                textView.fitTextToBounds()
+            }
+        }
     }
     
     // Notification Center events
     @objc func notifiedReceiveSketchnote(_ noti : Notification)  {
-        let banner = FloatingNotificationBanner(title: "A user has shared a note with you", subtitle: "You can view it on the home page.", style: .info)
-        banner.show()
+        self.view.makeToast("A note has been shared with you: View it on the home page.")
     }
     
     // This function is called when the user closes the page, i.e. stops editing the note, and the app returns to the home page.
@@ -341,9 +350,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     }
     
     private func setupNoteImages() {
-        for (view, _) in noteImageViews {
-            view.removeFromSuperview()
-        }
         noteImageViews = [DraggableImageView : NoteImage]()
         for image in SKFileManager.activeNote!.getCurrentPage().images {
             let frame = CGRect(x: image.location.x, y: image.location.y, width: image.size.width, height: image.size.height)
@@ -358,27 +364,11 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     }
     
     private func setupNoteTypedTexts() {
-        for (view, _) in noteTextViews {
-            view.removeFromSuperview()
-        }
         noteTextViews = [DraggableTextView : NoteTypedText]()
         for typedText in SKFileManager.activeNote!.getCurrentPage().typedTexts {
-            let frame = CGRect(x: typedText.location.x, y: typedText.location.y, width: typedText.size.width, height: typedText.size.height)
-            let textStorage = CodeAttributedString()
-            textStorage.language = typedText.codeLanguage
-            let layoutManager = NSLayoutManager()
-            textStorage.addLayoutManager(layoutManager)
-            let textContainer = NSTextContainer(size: view.bounds.size)
-            layoutManager.addTextContainer(textContainer)
-            let draggableView = DraggableTextView(frame: frame, textContainer: textContainer)
-            draggableView.text = typedText.text
-            draggableView.draggableDelegate = self
-            self.canvasView.addSubview(draggableView)
-            self.canvasView.sendSubviewToBack(draggableView)
-            self.noteTextViews[draggableView] = typedText
-            draggableView.center = typedText.location
+            let textView = self.createNoteTypedTextView(typedText: typedText)
+            self.addTypedTextViewToCanvas(textView: textView, typedText: typedText)
         }
-        
     }
     
     // MARK: Highlighting recognized concepts/topics on the canvas
@@ -609,8 +599,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             break
         case .CopyText:
             UIPasteboard.general.string = SKFileManager.activeNote!.getText()
-            let banner = FloatingNotificationBanner(title: SKFileManager.activeNote!.getName(), subtitle: "Copied text to clipboard.", style: .info)
-            banner.show()
+            self.view.makeToast("Copied text to Clipboard.", title: SKFileManager.activeNote!.getName())
             break
         case .ClearPage:
             SKFileManager.activeNote!.getCurrentPage().clear()
@@ -625,6 +614,10 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         case .Share:
             self.performSegue(withIdentifier: "ShareNote", sender: self)
             break
+        case .ClearPDFPage:
+            SKFileManager.activeNote!.getCurrentPage().backdropPDFData = nil
+            self.pdfView.document = nil
+            SKFileManager.save(file: SKFileManager.activeNote!)
         case .ResetDocuments:
             self.resetDocuments()
             break
@@ -641,6 +634,11 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             SKFileManager.delete(file: SKFileManager.activeNote!)
             self.performSegue(withIdentifier: "CloseNote", sender: self)
         }
+    }
+    func pdfScaleChanged(scale: Float) {
+        pdfView.scaleFactor = CGFloat(scale)
+        SKFileManager.activeNote!.getCurrentPage().pdfScale = scale
+        self.startSaveTimer()
     }
     
     private func undo() {
@@ -801,16 +799,14 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         if saveTimer != nil {
             saveTimer!.invalidate()
             saveTimer = nil
-            log.info("Save timer reset.")
         }
         saveTimer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(onSaveTimerFires), userInfo: nil, repeats: false)
-        log.info("Save timer started.")
     }
     @objc func onSaveTimerFires()
     {
         saveTimer?.invalidate()
         saveTimer = nil
-        log.info("Auto-saving sketchnote strokes and text data.")
+        log.info("Auto-saving note.")
         SKFileManager.activeNote!.getCurrentPage().canvasDrawing = self.canvasView.drawing
         SKFileManager.save(file: SKFileManager.activeNote!)
     }
@@ -1129,18 +1125,8 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     
     func previousPage() {
         if SKFileManager.activeNote!.hasPreviousPage() {
-            UIView.animate(withDuration: 1.0, animations: {
-                let animation = CATransition()
-                animation.duration = 1.2
-                animation.startProgress = 0.0
-                animation.endProgress = 1.0
-                animation.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeOut)
-                animation.type = CATransitionType(rawValue: "pageCurl")
-                animation.subtype = CATransitionSubtype(rawValue: "fromLeft")
-                animation.isRemovedOnCompletion = false
-                animation.fillMode = CAMediaTimingFillMode(rawValue: "extended")
-                self.canvasView.layer.add(animation, forKey: "pageFlipAnimation")
-            })
+            self.clearFloatingViews()
+            self.view.makeToast("Page \(SKFileManager.activeNote!.activePageIndex)/\(SKFileManager.activeNote!.pages.count)", duration: 1.0, position: .center)
         }
         saveCurrentPage()
         SKFileManager.activeNote!.previousPage()
@@ -1149,18 +1135,8 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     }
     func nextPage() {
         if SKFileManager.activeNote!.hasNextPage() {
-            UIView.animate(withDuration: 1.0, animations: {
-                let animation = CATransition()
-                animation.duration = 1.2
-                animation.startProgress = 0.0
-                animation.endProgress = 1.0
-                animation.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeOut)
-                animation.type = CATransitionType(rawValue: "pageCurl")
-                animation.subtype = CATransitionSubtype(rawValue: "fromRight")
-                animation.isRemovedOnCompletion = false
-                animation.fillMode = CAMediaTimingFillMode(rawValue: "extended")
-                self.canvasView.layer.add(animation, forKey: "pageFlipAnimation")
-            })
+            self.clearFloatingViews()
+            self.view.makeToast("Page \(SKFileManager.activeNote!.activePageIndex+2)/\(SKFileManager.activeNote!.pages.count)", duration: 1.0, position: .center)
         }
         saveCurrentPage()
         SKFileManager.activeNote!.nextPage()
@@ -1237,8 +1213,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     
     func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
         if urls.count > 0 {
-            let banner = FloatingNotificationBanner(title: "Documents", subtitle: "Imported your selected items.", style: .info)
-            banner.show()
+            self.view.makeToast("Imported the selected documents.")
             let (notes, images, pdfs, texts) = ImportHelper.importItems(urls: urls, n: SKFileManager.activeNote!)
             for img in images {
                 self.addNoteImage(image: img)
@@ -1261,28 +1236,33 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                 }
             }
             for text in texts {
-                self.addTypedText(typedText: text)
+                SKFileManager.activeNote!.getCurrentPage().typedTexts.append(text)
+                let textView = self.createNoteTypedTextView(typedText: text)
+                self.addTypedTextViewToCanvas(textView: textView, typedText: text)
             }
             SKFileManager.save(file: SKFileManager.activeNote!)
         }
     }
     
-    private func addTypedText(typedText: NoteTypedText) {
-        SKFileManager.activeNote!.getCurrentPage().typedTexts.append(typedText)
-        let frame = CGRect(x: 50, y: 50, width: 300, height: 250)
+    private func createNoteTypedTextView(typedText: NoteTypedText) -> DraggableTextView {
+        let frame = CGRect(x: typedText.location.x, y: typedText.location.y, width: typedText.size.width, height: typedText.size.height)
         let textStorage = CodeAttributedString()
         textStorage.language = typedText.codeLanguage
         let layoutManager = NSLayoutManager()
         textStorage.addLayoutManager(layoutManager)
-        let textContainer = NSTextContainer(size: view.bounds.size)
+        let textContainer = NSTextContainer(size: frame.size)
         layoutManager.addTextContainer(textContainer)
         let draggableView = DraggableTextView(frame: frame, textContainer: textContainer)
-        draggableView.lastScale = 1.0
         draggableView.text = typedText.text
-        draggableView.draggableDelegate = self
-        self.canvasView.addSubview(draggableView)
-        self.canvasView.sendSubviewToBack(draggableView)
-        self.noteTextViews[draggableView] = typedText
+        return draggableView
+    }
+    
+    private func addTypedTextViewToCanvas(textView: DraggableTextView, typedText: NoteTypedText) {
+        textView.draggableDelegate = self
+        self.canvasView.addSubview(textView)
+        self.canvasView.sendSubviewToBack(textView)
+        self.noteTextViews[textView] = typedText
+        textView.center = typedText.location
     }
     
     func draggableTextViewSizeChanged(source: DraggableTextView, scale: CGSize) {
@@ -1302,21 +1282,45 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         }
     }
     
-    func draggableTextViewDelete(source: DraggableTextView) {
-        let popMenu = PopMenuViewController(sourceView: source, actions: [PopMenuAction](), appearance: nil)
-        let closeAction = PopMenuDefaultAction(title: "Close")
-        let action = PopMenuDefaultAction(title: "Delete Text Box", didSelect: { action in
-            if let typedText =  self.noteTextViews[source] {
+    func draggableTextViewLongPressed(source: DraggableTextView) {
+        if let typedText =  self.noteTextViews[source] {
+            let popMenu = PopMenuViewController(sourceView: source, actions: [PopMenuAction](), appearance: nil)
+            let languageOption = PopMenuDefaultAction(title: "Change Language... (\(typedText.codeLanguage))", didSelect: { action in
+                popMenu.dismiss(animated: true, completion: nil)
+                self.showTypedTextLanguageOptions(source: source, typedText: typedText)
+            })
+            popMenu.addAction(languageOption)
+            let copyTextAction = PopMenuDefaultAction(title: "Copy Text", didSelect: { action in
+                UIPasteboard.general.string = typedText.text
+            })
+            popMenu.addAction(copyTextAction)
+            let action = PopMenuDefaultAction(title: "Delete", didSelect: { action in
                 SKFileManager.activeNote!.getCurrentPage().deleteTypedText(typedText: typedText)
                 source.removeFromSuperview()
                 self.noteTextViews[source] = nil
                 self.startSaveTimer()
-            }
-            
-        })
-        popMenu.addAction(action)
-        popMenu.addAction(closeAction)
-        self.present(popMenu, animated: true, completion: nil)
+            })
+            popMenu.addAction(action)
+            let closeAction = PopMenuDefaultAction(title: "Close")
+            popMenu.addAction(closeAction)
+            self.present(popMenu, animated: true, completion: nil)
+        }
+    }
+    
+    private func showTypedTextLanguageOptions(source: DraggableTextView, typedText: NoteTypedText) {
+        let alert = UIAlertController(title: "Code Language (\(typedText.codeLanguage))", message: "Choose the language for the syntax highlight.", preferredStyle: .alert)
+        for lang in NoteTypedText.supportedLanguages {
+            alert.addAction(UIAlertAction(title: NSLocalizedString(lang, comment: ""), style: .default, handler: { _ in
+                typedText.codeLanguage = lang
+                source.removeFromSuperview()
+                self.noteTextViews[source] = nil
+                self.addTypedTextViewToCanvas(textView: self.createNoteTypedTextView(typedText: typedText), typedText: typedText)
+                self.highlightedTextView = nil
+                SKFileManager.activeNote!.getCurrentPage().updateNoteTypedText(typedText: typedText)
+                self.startSaveTimer()
+            }))
+        }
+        self.present(alert, animated: true, completion: nil)
     }
     
     func draggableTextViewTextChanged(source: DraggableTextView, text: String) {
@@ -1385,18 +1389,34 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         setupConceptHighlights()
         drawingViews = [UIView]()
         setupDrawingRegions()
-        setupNoteImages()
         if previousStateOfTopicsShown {
             toggleConceptHighlight()
         }
         pdfView.document = nil
         if let backdropPDF = SKFileManager.activeNote!.getCurrentPage().getPDFDocument() {
             pdfView.document = backdropPDF
-            pdfView.autoScales = true
-            pdfView.maxScaleFactor = 4.0
-            pdfView.minScaleFactor = pdfView.scaleFactorForSizeToFit
+            if let pdfScale = SKFileManager.activeNote!.getCurrentPage().pdfScale {
+                pdfView.scaleFactor = CGFloat(pdfScale)
+            }
+            else {
+                pdfView.scaleFactor = 1.0
+            }
+        }
+        self.setupNoteImages()
+        self.setupNoteTypedTexts()
+        for (v, _) in self.noteTextViews {
+            v.fitTextToBounds()
         }
         canvasView.becomeFirstResponder()
+    }
+    
+    private func clearFloatingViews() {
+        for (view, _) in noteImageViews {
+            view.removeFromSuperview()
+        }
+        for (view, _) in noteTextViews {
+            view.removeFromSuperview()
+        }
     }
     
     var previousStateOfTopicsShown = false
