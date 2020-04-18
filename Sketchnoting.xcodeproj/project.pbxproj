@@ -71,6 +71,7 @@
 		9F9460DF23F5B0460073D709 /* GridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F9460DE23F5B0460073D709 /* GridView.swift */; };
 		9F9460E223F5BAA10073D709 /* Connectivity in Frameworks */ = {isa = PBXBuildFile; productRef = 9F9460E123F5BAA10073D709 /* Connectivity */; };
 		9F9DAFE0242CB7C100713E75 /* DrawingRecognition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F9DAFDF242CB7C100713E75 /* DrawingRecognition.swift */; };
+		9FA5A482244AB14E006D9FB2 /* UILabelExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA5A481244AB14E006D9FB2 /* UILabelExtensions.swift */; };
 		9FA6238822CEA7FE007ED794 /* MapHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA6238722CEA7FE007ED794 /* MapHelper.swift */; };
 		9FA6238B22D37213007ED794 /* BioPortalHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA6238A22D37213007ED794 /* BioPortalHelper.swift */; };
 		9FA6238D22D38AEE007ED794 /* SpotlightHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA6238C22D38AEE007ED794 /* SpotlightHelper.swift */; };
@@ -191,6 +192,7 @@
 		9F942505238A341E006B0E81 /* UIStoryboardSegueWithCompletion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIStoryboardSegueWithCompletion.swift; sourceTree = "<group>"; };
 		9F9460DE23F5B0460073D709 /* GridView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GridView.swift; sourceTree = "<group>"; };
 		9F9DAFDF242CB7C100713E75 /* DrawingRecognition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrawingRecognition.swift; sourceTree = "<group>"; };
+		9FA5A481244AB14E006D9FB2 /* UILabelExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UILabelExtensions.swift; sourceTree = "<group>"; };
 		9FA6238722CEA7FE007ED794 /* MapHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapHelper.swift; sourceTree = "<group>"; };
 		9FA6238A22D37213007ED794 /* BioPortalHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BioPortalHelper.swift; sourceTree = "<group>"; };
 		9FA6238C22D38AEE007ED794 /* SpotlightHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotlightHelper.swift; sourceTree = "<group>"; };
@@ -596,6 +598,7 @@
 				9F0EC7DC2446A8AE000A28CB /* GestureExtensions.swift */,
 				9F318D38244A207300A1B4B5 /* UIFontExtensions.swift */,
 				9F318D3A244A20A000A1B4B5 /* UITextViewExtensions.swift */,
+				9FA5A481244AB14E006D9FB2 /* UILabelExtensions.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -867,6 +870,7 @@
 				9FD8BB97243D5BE500542BFA /* ImportHelper.swift in Sources */,
 				9F5E89EE2391B474002FA8B2 /* DocumentsCollectionReusableView.swift in Sources */,
 				9F5E89F02391CBA2002FA8B2 /* DocumentViewCell.swift in Sources */,
+				9FA5A482244AB14E006D9FB2 /* UILabelExtensions.swift in Sources */,
 				9F318D3B244A20A000A1B4B5 /* UITextViewExtensions.swift in Sources */,
 				9F75E44F230D848200488BBD /* SettingsViewController.swift in Sources */,
 				9F75E484231419FA00488BBD /* TAGMEDocument.swift in Sources */,

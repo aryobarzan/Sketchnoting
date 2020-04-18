@@ -162,7 +162,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         if !initialResizeOfTextViewFonts {
             initialResizeOfTextViewFonts = true
             for (textView, _) in self.noteTextViews {
-                textView.fitTextToBounds()
+                //textView.fitTextToBounds()
             }
         }
     }
@@ -1246,14 +1246,13 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     
     private func createNoteTypedTextView(typedText: NoteTypedText) -> DraggableTextView {
         let frame = CGRect(x: typedText.location.x, y: typedText.location.y, width: typedText.size.width, height: typedText.size.height)
-        let textStorage = CodeAttributedString()
-        textStorage.language = typedText.codeLanguage
-        let layoutManager = NSLayoutManager()
-        textStorage.addLayoutManager(layoutManager)
-        let textContainer = NSTextContainer(size: frame.size)
-        layoutManager.addTextContainer(textContainer)
-        let draggableView = DraggableTextView(frame: frame, textContainer: textContainer)
-        draggableView.text = typedText.text
+        let draggableView = DraggableTextView(frame: frame)
+        let highlightr = Highlightr()!
+        var highlightedText = highlightr.highlight(typedText.text)
+        if !typedText.codeLanguage.isEmpty {
+            highlightedText = highlightr.highlight(typedText.text, as: typedText.codeLanguage)
+        }
+        draggableView.attributedText = highlightedText
         return draggableView
     }
     
@@ -1404,9 +1403,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         }
         self.setupNoteImages()
         self.setupNoteTypedTexts()
-        for (v, _) in self.noteTextViews {
-            v.fitTextToBounds()
-        }
         canvasView.becomeFirstResponder()
     }
     

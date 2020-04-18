@@ -11,8 +11,9 @@ import UIKit
 
 import PopMenu
 import Highlightr
+import RSKGrowingTextView
 
-class DraggableTextView: UITextView, UITextViewDelegate {
+class DraggableTextView: UILabel, UITextViewDelegate {
     
     let panGesture = UIPanGestureRecognizer()
     let pinchGesture = UIPinchGestureRecognizer()
@@ -29,14 +30,18 @@ class DraggableTextView: UITextView, UITextViewDelegate {
         self.isUserInteractionEnabled = true
     }
     
-    override init(frame: CGRect, textContainer: NSTextContainer?) {
-        super.init(frame: frame, textContainer: textContainer)
+    override init(frame: CGRect) {
+        super.init(frame: frame)
         setUpGestureRecognisers()
         self.isUserInteractionEnabled = true
         
         self.layer.borderColor = UIColor.systemGray.cgColor
         self.layer.borderWidth = 1
-        self.delegate = self
+        
+        self.numberOfLines = 0
+        self.adjustsFontSizeToFitWidth = true
+        self.minimumScaleFactor = 0.8
+        self.textAlignment = .left
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -88,7 +93,6 @@ class DraggableTextView: UITextView, UITextViewDelegate {
             }
         }
         if pinchGesture.state == .ended {
-            self.fitTextToBounds()
         }
     }
     

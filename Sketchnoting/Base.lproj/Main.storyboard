@@ -1235,15 +1235,17 @@
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="tz5-2Q-OEW">
                                 <rect key="frame" x="0.0" y="40" width="768" height="984"/>
                                 <subviews>
-                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="xYD-HR-LX0">
+                                    <view opaque="NO" userInteractionEnabled="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="tA3-q0-ddV" customClass="PDFView">
                                         <rect key="frame" x="0.0" y="0.0" width="768" height="984"/>
-                                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
-                                    </view>
-                                    <view userInteractionEnabled="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="tA3-q0-ddV" customClass="PDFView">
-                                        <rect key="frame" x="0.0" y="0.0" width="768" height="984"/>
+                                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <color key="tintColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <accessibility key="accessibilityConfiguration">
                                             <accessibilityTraits key="traits" notEnabled="YES"/>
                                         </accessibility>
+                                    </view>
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="xYD-HR-LX0">
+                                        <rect key="frame" x="0.0" y="0.0" width="768" height="984"/>
+                                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                     </view>
                                     <view opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="iDb-Yw-oym" customClass="PKCanvasView">
                                         <rect key="frame" x="0.0" y="0.0" width="768" height="984"/>
@@ -2894,7 +2896,7 @@
     </scenes>
     <inferredMetricsTieBreakers>
         <segue reference="yvs-ei-HRy"/>
-        <segue reference="OAt-q3-0jJ"/>
+        <segue reference="58e-4d-iJp"/>
         <segue reference="ct4-u7-KZY"/>
     </inferredMetricsTieBreakers>
     <resources>
