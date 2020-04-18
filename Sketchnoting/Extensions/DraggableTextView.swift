@@ -11,7 +11,6 @@ import UIKit
 
 import PopMenu
 import Highlightr
-import RSKGrowingTextView
 
 class DraggableTextView: UILabel, UITextViewDelegate {
     
