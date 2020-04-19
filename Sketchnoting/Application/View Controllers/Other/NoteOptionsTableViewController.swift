@@ -17,8 +17,11 @@ class NoteOptionsTableViewController: UITableViewController {
     @IBOutlet weak var dateLabel: UILabel!
     @IBOutlet weak var pageLabel: UILabel!
     @IBOutlet weak var drawingsTextView: UITextView!
-    @IBOutlet weak var pdfScaleSlider: UISlider!
     @IBOutlet weak var clearPDFPageButton: UIButton!
+    @IBOutlet weak var clearPDFPageView: UIView!
+    @IBOutlet weak var pdfScaleLabel: UILabel!
+    @IBOutlet weak var pdfScaleStepper: UIStepper!
+    @IBOutlet weak var resetPDFScaleButton: UIButton!
     
     @IBOutlet var deletePageButton: UIButton!
     override func viewDidLoad() {
@@ -32,12 +35,20 @@ class NoteOptionsTableViewController: UITableViewController {
         drawingsTextView.text = "Drawings: \(SKFileManager.activeNote!.getCurrentPage().drawingLabels.joined(separator:" - "))"
         
         if SKFileManager.activeNote!.getCurrentPage().getPDFDocument() != nil {
-            pdfScaleSlider.isEnabled = true
+            pdfScaleStepper.isEnabled = true
             clearPDFPageButton.isEnabled = true
+            clearPDFPageView.isUserInteractionEnabled = true
+            resetPDFScaleButton.isEnabled = true
+            var currentScale = SKFileManager.activeNote!.getCurrentPage().pdfScale ?? 10.0
+            currentScale = currentScale / 10
+            pdfScaleLabel.text = "Scale: \(currentScale)"
+            pdfScaleStepper.value = Double(currentScale)
         }
         else {
-            pdfScaleSlider.isEnabled = false
+            pdfScaleStepper.isEnabled = false
             clearPDFPageButton.isEnabled = false
+            clearPDFPageView.isUserInteractionEnabled = false
+            resetPDFScaleButton.isEnabled = false
         }
     }
     
@@ -84,6 +95,7 @@ class NoteOptionsTableViewController: UITableViewController {
         dismiss(animated: true, completion: nil)
         delegate?.noteOptionSelected(option: option)
     }
+    
     @IBAction func nameFieldDone(_ sender: UITextField) {
         if let newName = sender.text {
             if newName != SKFileManager.activeNote!.getName() {
@@ -93,12 +105,21 @@ class NoteOptionsTableViewController: UITableViewController {
             }
         }
     }
-    @IBAction func pdfScaleSliderChanged(_ sender: UISlider) {
-        var scale = sender.value
+
+    @IBAction func pdfScaleStepperChanged(_ sender: UIStepper) {
+        var scale = Float(sender.value / 10)
         if scale == 0.0 {
             scale = 0.1
         }
+        pdfScaleLabel.text = "Scale: \(scale)"
         delegate?.pdfScaleChanged(scale: scale)
+    }
+    @IBAction func resetPDFScaleTapped(_ sender: UIButton) {
+        if pdfScaleStepper.value != 1.0 {
+            pdfScaleLabel.text = "Scale: 1.0"
+            pdfScaleStepper.value = 10.0
+            delegate?.pdfScaleChanged(scale: 1.0)
+        }
     }
 }
 

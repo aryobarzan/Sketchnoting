@@ -32,7 +32,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     
     @IBOutlet weak var topicsButton: UIButton!
     @IBOutlet weak var bookshelfButton: UIButton!
-    @IBOutlet weak var drawingsButton: UIButton!
     @IBOutlet weak var manageDrawingsButton: UIButton!
     @IBOutlet weak var optionsButton: UIButton!
     @IBOutlet weak var previousPageButton: UIButton!
@@ -70,7 +69,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     @IBOutlet weak var pdfView: PDFView!
     
     var noteTextViews = [DraggableTextView : NoteTypedText]()
-    var initialResizeOfTextViewFonts = false
     
     // This function sets up the page and every element contained within it.
     override func viewDidLoad() {
@@ -157,12 +155,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         if traitCollection.userInterfaceStyle == .dark {
             for drawingRegionView in drawingViews {
                 drawingRegionView.layer.borderColor = UIColor.white.cgColor
-            }
-        }
-        if !initialResizeOfTextViewFonts {
-            initialResizeOfTextViewFonts = true
-            for (textView, _) in self.noteTextViews {
-                //textView.fitTextToBounds()
             }
         }
     }
@@ -658,18 +650,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         }
     }
     
-    @IBAction func drawingsTapped(_ sender: UIButton) {
-        drawingViewsShown = !drawingViewsShown
-        if drawingViewsShown {
-            toggleDrawingRegions(isHidden: false, canInteract: false)
-            drawingsButton.tintColor = self.view.tintColor
-        }
-        else {
-            toggleDrawingRegions(isHidden: true, canInteract: false)
-            drawingsButton.tintColor = .white
-        }
-    }
-    
     //MARK: Handwriting recognition process
     let handwritingRecognizer = HandwritingRecognizer()
     
@@ -1029,7 +1009,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     private func toggleManageDrawings() {
         isManageDrawings = !isManageDrawings
         if isManageDrawings {
-            drawingsButton.isEnabled = false
+            self.view.makeToast("Draw a square around your drawing(s).", duration: 1.5, position: .center)
             topicsButton.isEnabled = false
             toggleDrawingRegions(isHidden: false, canInteract: true)
             canvasView.resignFirstResponder()
@@ -1041,7 +1021,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             manageDrawingsButton.tintColor = self.view.tintColor
         }
         else {
-            drawingsButton.isEnabled = true
             topicsButton.isEnabled = true
             if drawingViewsShown {
                 toggleDrawingRegions(isHidden: false, canInteract: false)
@@ -1253,6 +1232,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             highlightedText = highlightr.highlight(typedText.text, as: typedText.codeLanguage)
         }
         draggableView.attributedText = highlightedText
+        draggableView.adjustFontSize()
         return draggableView
     }
     
@@ -1284,7 +1264,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     func draggableTextViewLongPressed(source: DraggableTextView) {
         if let typedText =  self.noteTextViews[source] {
             let popMenu = PopMenuViewController(sourceView: source, actions: [PopMenuAction](), appearance: nil)
-            let languageOption = PopMenuDefaultAction(title: "Change Language... (\(typedText.codeLanguage))", didSelect: { action in
+            let languageOption = PopMenuDefaultAction(title: "Change Language... (\(typedText.codeLanguage.lowercased().capitalizingFirstLetter()))", didSelect: { action in
                 popMenu.dismiss(animated: true, completion: nil)
                 self.showTypedTextLanguageOptions(source: source, typedText: typedText)
             })
@@ -1298,6 +1278,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                 source.removeFromSuperview()
                 self.noteTextViews[source] = nil
                 self.startSaveTimer()
+                self.view.makeToast("Deleted text box.", duration: 1, position: .center)
             })
             popMenu.addAction(action)
             let closeAction = PopMenuDefaultAction(title: "Close")
@@ -1307,9 +1288,9 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     }
     
     private func showTypedTextLanguageOptions(source: DraggableTextView, typedText: NoteTypedText) {
-        let alert = UIAlertController(title: "Code Language (\(typedText.codeLanguage))", message: "Choose the language for the syntax highlight.", preferredStyle: .alert)
+        let alert = UIAlertController(title: "Code Language (\(typedText.codeLanguage.lowercased().capitalizingFirstLetter()))", message: "Choose the language for the syntax highlight.", preferredStyle: .alert)
         for lang in NoteTypedText.supportedLanguages {
-            alert.addAction(UIAlertAction(title: NSLocalizedString(lang, comment: ""), style: .default, handler: { _ in
+            alert.addAction(UIAlertAction(title: NSLocalizedString(lang.lowercased().capitalizingFirstLetter(), comment: ""), style: .default, handler: { _ in
                 typedText.codeLanguage = lang
                 source.removeFromSuperview()
                 self.noteTextViews[source] = nil
@@ -1317,8 +1298,12 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                 self.highlightedTextView = nil
                 SKFileManager.activeNote!.getCurrentPage().updateNoteTypedText(typedText: typedText)
                 self.startSaveTimer()
+                self.view.makeToast("Changed code language to \(lang.lowercased().capitalizingFirstLetter()).", duration: 1, position: .center)
             }))
         }
+        alert.addAction(UIAlertAction(title: NSLocalizedString("Cancel", comment: ""), style: .default, handler: { _ in
+            log.info("Cancelled: changing code language of text box.")
+        }))
         self.present(alert, animated: true, completion: nil)
     }
     

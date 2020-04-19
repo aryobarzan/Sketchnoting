@@ -8,7 +8,7 @@
 
 import UIKit
 class NoteTypedText: Codable, Equatable {
-    static let supportedLanguages = ["C", "Java", "Swift"]
+    static let supportedLanguages = ["C", "Java", "Python", "Swift"]
     var text: String
     var codeLanguage: String
     var location: CGPoint
@@ -17,7 +17,7 @@ class NoteTypedText: Codable, Equatable {
     init(text: String, codeLanguage: String) {
         self.text = text
         self.codeLanguage = codeLanguage
-        location = CGPoint(x: 50, y: 50)
+        location = CGPoint(x: 150, y: 150)
         size = CGSize(width: 200, height: 200)
         id = UUID().uuidString
     }

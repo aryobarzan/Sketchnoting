@@ -1045,14 +1045,6 @@
                                             <constraint firstAttribute="height" constant="25" id="H1Q-bQ-7BI"/>
                                         </constraints>
                                     </view>
-                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="TGv-gD-axJ">
-                                        <rect key="frame" x="375" y="7.5" width="2" height="25"/>
-                                        <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                        <constraints>
-                                            <constraint firstAttribute="width" constant="2" id="BdC-4c-y9C"/>
-                                            <constraint firstAttribute="height" constant="25" id="HOe-Em-NwZ"/>
-                                        </constraints>
-                                    </view>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="KuJ-PR-Rao">
                                         <rect key="frame" x="0.0" y="38" width="768" height="2"/>
                                         <color key="backgroundColor" cocoaTouchSystemColor="viewFlipsideBackgroundColor"/>
@@ -1074,49 +1066,6 @@
                                             <segue destination="dds-Vf-vQc" kind="popoverPresentation" identifier="NoteOptions" popoverAnchorView="hgu-d3-kvK" id="nKC-FE-OVv">
                                                 <popoverArrowDirection key="popoverArrowDirection" up="YES" down="YES" left="YES" right="YES"/>
                                             </segue>
-                                        </connections>
-                                    </button>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="X7t-cI-jkp">
-                                        <rect key="frame" x="385" y="8" width="24" height="24"/>
-                                        <constraints>
-                                            <constraint firstAttribute="width" constant="24" id="61m-rv-l8z"/>
-                                            <constraint firstAttribute="height" constant="24" id="KcG-jJ-Zez"/>
-                                        </constraints>
-                                        <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                        <state key="normal" image="line.horizontal.3" catalog="system">
-                                            <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="large"/>
-                                        </state>
-                                        <connections>
-                                            <action selector="helpLinesButtonTapped:" destination="lDo-DG-9fX" eventType="touchUpInside" id="tAH-Xq-ZcJ"/>
-                                        </connections>
-                                    </button>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="8pq-Hf-1xV">
-                                        <rect key="frame" x="180" y="9" width="24" height="22"/>
-                                        <constraints>
-                                            <constraint firstAttribute="height" constant="22" id="JdC-b5-QRd"/>
-                                            <constraint firstAttribute="width" constant="24" id="sFA-ec-PC3"/>
-                                        </constraints>
-                                        <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                        <state key="normal" image="square" catalog="system">
-                                            <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="large"/>
-                                        </state>
-                                        <connections>
-                                            <action selector="drawingsTapped:" destination="lDo-DG-9fX" eventType="touchUpInside" id="FYm-L0-bq3"/>
-                                        </connections>
-                                    </button>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="g83-cE-vKX">
-                                        <rect key="frame" x="212" y="8" width="155" height="24"/>
-                                        <constraints>
-                                            <constraint firstAttribute="width" constant="155" id="IrT-DQ-xFF"/>
-                                            <constraint firstAttribute="height" constant="24" id="dP9-IB-i91"/>
-                                        </constraints>
-                                        <fontDescription key="fontDescription" type="system" pointSize="15"/>
-                                        <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                        <state key="normal" title=" Manage Drawings" image="scribble" catalog="system">
-                                            <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="large"/>
-                                        </state>
-                                        <connections>
-                                            <action selector="manageDrawingsTapped:" destination="lDo-DG-9fX" eventType="touchUpInside" id="Ywf-n2-UKm"/>
                                         </connections>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="RnC-a4-JG6">
@@ -1192,31 +1141,57 @@
                                             <action selector="previousPageTapped:" destination="lDo-DG-9fX" eventType="touchUpInside" id="8Yw-b3-m8l"/>
                                         </connections>
                                     </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="g83-cE-vKX">
+                                        <rect key="frame" x="180" y="8" width="26" height="24"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="24" id="dP9-IB-i91"/>
+                                        </constraints>
+                                        <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                        <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <state key="normal" image="scribble" catalog="system">
+                                            <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="large"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="manageDrawingsTapped:" destination="lDo-DG-9fX" eventType="touchUpInside" id="Ywf-n2-UKm"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="X7t-cI-jkp">
+                                        <rect key="frame" x="214" y="8" width="24" height="24"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="24" id="61m-rv-l8z"/>
+                                            <constraint firstAttribute="height" constant="24" id="KcG-jJ-Zez"/>
+                                        </constraints>
+                                        <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <state key="normal" image="line.horizontal.3" catalog="system">
+                                            <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="large"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="helpLinesButtonTapped:" destination="lDo-DG-9fX" eventType="touchUpInside" id="tAH-Xq-ZcJ"/>
+                                        </connections>
+                                    </button>
                                 </subviews>
                                 <color key="backgroundColor" cocoaTouchSystemColor="viewFlipsideBackgroundColor"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="40" id="20h-xc-IL8"/>
                                     <constraint firstItem="jEA-WA-cjb" firstAttribute="centerY" secondItem="gne-qG-Zx4" secondAttribute="centerY" id="24q-s3-XNb"/>
                                     <constraint firstItem="Xyr-WH-2aV" firstAttribute="leading" secondItem="RnC-a4-JG6" secondAttribute="trailing" constant="8" id="2q6-hM-OwD"/>
-                                    <constraint firstItem="8pq-Hf-1xV" firstAttribute="centerY" secondItem="gne-qG-Zx4" secondAttribute="centerY" id="35w-Rx-If1"/>
                                     <constraint firstAttribute="trailing" secondItem="KuJ-PR-Rao" secondAttribute="trailing" id="7P1-fl-qgB"/>
                                     <constraint firstItem="SiY-ox-qPY" firstAttribute="centerY" secondItem="gne-qG-Zx4" secondAttribute="centerY" id="9Ku-Hq-PeH"/>
                                     <constraint firstItem="hgu-d3-kvK" firstAttribute="centerY" secondItem="gne-qG-Zx4" secondAttribute="centerY" id="B0N-nk-nMt"/>
                                     <constraint firstItem="KuJ-PR-Rao" firstAttribute="width" secondItem="gne-qG-Zx4" secondAttribute="width" id="Cs4-KW-0SG"/>
-                                    <constraint firstItem="g83-cE-vKX" firstAttribute="leading" secondItem="8pq-Hf-1xV" secondAttribute="trailing" constant="8" id="Dkg-sf-MfX"/>
-                                    <constraint firstItem="8pq-Hf-1xV" firstAttribute="leading" secondItem="7xW-9Y-mzw" secondAttribute="trailing" constant="8" id="DqH-CA-Pdq"/>
                                     <constraint firstItem="Xyr-WH-2aV" firstAttribute="centerY" secondItem="gne-qG-Zx4" secondAttribute="centerY" id="Fao-7i-2ez"/>
+                                    <constraint firstItem="g83-cE-vKX" firstAttribute="leading" secondItem="7xW-9Y-mzw" secondAttribute="trailing" constant="8" id="Ifj-8v-YtT"/>
                                     <constraint firstItem="X7t-cI-jkp" firstAttribute="centerY" secondItem="gne-qG-Zx4" secondAttribute="centerY" id="JWg-bt-4Wf"/>
                                     <constraint firstItem="RnC-a4-JG6" firstAttribute="centerY" secondItem="gne-qG-Zx4" secondAttribute="centerY" id="N2d-9v-eTa"/>
                                     <constraint firstItem="hgu-d3-kvK" firstAttribute="leading" secondItem="qiG-6C-Pe4" secondAttribute="trailing" constant="8" id="Oq3-U4-CIt"/>
                                     <constraint firstItem="Q9N-HC-Ppd" firstAttribute="leading" secondItem="WzL-oA-wuL" secondAttribute="trailing" constant="8" id="Pg0-M1-64h"/>
                                     <constraint firstItem="SiY-ox-qPY" firstAttribute="leading" secondItem="YQI-WO-Gvp" secondAttribute="trailing" constant="8" id="QRi-KA-kF6"/>
                                     <constraint firstItem="g83-cE-vKX" firstAttribute="centerY" secondItem="gne-qG-Zx4" secondAttribute="centerY" id="T5T-zx-FOX"/>
+                                    <constraint firstItem="X7t-cI-jkp" firstAttribute="leading" secondItem="g83-cE-vKX" secondAttribute="trailing" constant="8" id="TRb-ZL-MXh"/>
                                     <constraint firstItem="WzL-oA-wuL" firstAttribute="leading" secondItem="qbj-Vt-kvI" secondAttribute="trailing" constant="8" id="UhK-EE-Qx9"/>
                                     <constraint firstItem="qiG-6C-Pe4" firstAttribute="centerY" secondItem="gne-qG-Zx4" secondAttribute="centerY" id="VTk-94-VDr"/>
                                     <constraint firstAttribute="trailing" secondItem="hgu-d3-kvK" secondAttribute="trailing" constant="8" id="Wsp-J5-3YY"/>
                                     <constraint firstItem="KuJ-PR-Rao" firstAttribute="leading" secondItem="gne-qG-Zx4" secondAttribute="leading" id="Y8X-z3-Cdv"/>
-                                    <constraint firstItem="X7t-cI-jkp" firstAttribute="leading" secondItem="TGv-gD-axJ" secondAttribute="trailing" constant="8" id="Ytf-hA-yY5"/>
                                     <constraint firstAttribute="bottom" secondItem="KuJ-PR-Rao" secondAttribute="bottom" id="Z1W-7h-bvP"/>
                                     <constraint firstItem="Q9N-HC-Ppd" firstAttribute="centerY" secondItem="gne-qG-Zx4" secondAttribute="centerY" id="ZDI-wJ-aa1"/>
                                     <constraint firstItem="WzL-oA-wuL" firstAttribute="centerY" secondItem="gne-qG-Zx4" secondAttribute="centerY" id="alH-t3-Gf2"/>
@@ -1226,10 +1201,8 @@
                                     <constraint firstItem="7xW-9Y-mzw" firstAttribute="leading" secondItem="Xyr-WH-2aV" secondAttribute="trailing" constant="8" id="oGx-Ie-Shr"/>
                                     <constraint firstItem="qiG-6C-Pe4" firstAttribute="leading" secondItem="Q9N-HC-Ppd" secondAttribute="trailing" constant="8" id="sBg-xq-t9a"/>
                                     <constraint firstItem="qbj-Vt-kvI" firstAttribute="leading" secondItem="jEA-WA-cjb" secondAttribute="trailing" constant="8" id="ulA-SL-fON"/>
-                                    <constraint firstItem="TGv-gD-axJ" firstAttribute="centerY" secondItem="gne-qG-Zx4" secondAttribute="centerY" id="wGd-BF-8ac"/>
                                     <constraint firstItem="RnC-a4-JG6" firstAttribute="leading" secondItem="SiY-ox-qPY" secondAttribute="trailing" constant="8" id="yhS-X4-qB3"/>
                                     <constraint firstItem="7xW-9Y-mzw" firstAttribute="centerY" secondItem="gne-qG-Zx4" secondAttribute="centerY" id="zIg-ND-whV"/>
-                                    <constraint firstItem="TGv-gD-axJ" firstAttribute="leading" secondItem="g83-cE-vKX" secondAttribute="trailing" constant="8" id="zb3-QY-AFt"/>
                                 </constraints>
                             </view>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="tz5-2Q-OEW">
@@ -1444,7 +1417,6 @@
                         <outlet property="closeButton" destination="YQI-WO-Gvp" id="6So-lp-acO"/>
                         <outlet property="documentsUnderlyingView" destination="e9c-2t-gvA" id="Ur2-b5-yN7"/>
                         <outlet property="drawingInsertionCanvas" destination="P5Z-5P-6jH" id="XXi-nc-F0V"/>
-                        <outlet property="drawingsButton" destination="8pq-Hf-1xV" id="Tvc-eK-rQQ"/>
                         <outlet property="helpLinesButton" destination="X7t-cI-jkp" id="G8Z-xq-TYG"/>
                         <outlet property="manageDrawingsButton" destination="g83-cE-vKX" id="6Gn-jZ-s9L"/>
                         <outlet property="newPageButton" destination="Q9N-HC-Ppd" id="Kx2-4C-tAi"/>
@@ -1816,25 +1788,32 @@
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="43.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="aspectratio" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="Lke-YS-aVJ">
-                                                    <rect key="frame" x="282" y="12" width="22" height="19.5"/>
-                                                    <constraints>
-                                                        <constraint firstAttribute="width" constant="22" id="6hL-2k-BNg"/>
-                                                        <constraint firstAttribute="height" constant="22" id="bcg-Nl-Ct6"/>
-                                                    </constraints>
-                                                </imageView>
-                                                <slider opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="1" minValue="0.10000000000000001" maxValue="2" translatesAutoresizingMaskIntoConstraints="NO" id="Y5G-uf-D5X">
-                                                    <rect key="frame" x="16" y="7" width="244" height="30"/>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Scale: 1.0" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ea8-gJ-NYV">
+                                                    <rect key="frame" x="20" y="12" width="103" height="21"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <stepper opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="10" maximumValue="20" translatesAutoresizingMaskIntoConstraints="NO" id="qjF-ow-N4n">
+                                                    <rect key="frame" x="210" y="6" width="94" height="32"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                     <connections>
-                                                        <action selector="pdfScaleSliderChanged:" destination="dds-Vf-vQc" eventType="valueChanged" id="7oV-y2-IcH"/>
+                                                        <action selector="pdfScaleStepperChanged:" destination="dds-Vf-vQc" eventType="valueChanged" id="LQI-14-yUt"/>
                                                     </connections>
-                                                </slider>
+                                                </stepper>
+                                                <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="W6E-SM-Zjx">
+                                                    <rect key="frame" x="176" y="9" width="26" height="25"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="18"/>
+                                                    <state key="normal" image="arrow.clockwise.circle" catalog="system">
+                                                        <preferredSymbolConfiguration key="preferredSymbolConfiguration" configurationType="pointSize" pointSize="22" scale="medium"/>
+                                                    </state>
+                                                    <connections>
+                                                        <action selector="resetPDFScaleTapped:" destination="dds-Vf-vQc" eventType="touchUpInside" id="cH0-hg-Zxh"/>
+                                                    </connections>
+                                                </button>
                                             </subviews>
-                                            <constraints>
-                                                <constraint firstAttribute="trailing" secondItem="Lke-YS-aVJ" secondAttribute="trailing" constant="16" id="303-Ew-Vf2"/>
-                                                <constraint firstItem="Lke-YS-aVJ" firstAttribute="centerY" secondItem="CZ2-90-ZTY" secondAttribute="centerY" id="bQu-qn-cLx"/>
-                                            </constraints>
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" id="PyN-Cf-iBf">
@@ -1964,12 +1943,15 @@
                     <value key="contentSizeForViewInPopover" type="size" width="320" height="740"/>
                     <connections>
                         <outlet property="clearPDFPageButton" destination="wuL-bo-kJs" id="R6s-VQ-OHs"/>
+                        <outlet property="clearPDFPageView" destination="mwa-Nk-WWu" id="WNB-1u-wps"/>
                         <outlet property="dateLabel" destination="dTA-HN-Jlw" id="e8K-Wr-rYW"/>
                         <outlet property="deletePageButton" destination="LS2-4U-7y9" id="gN9-mG-A4H"/>
                         <outlet property="drawingsTextView" destination="55k-UY-gnr" id="iL8-20-YR0"/>
                         <outlet property="nameField" destination="t1z-i1-dgQ" id="LUx-7U-gGk"/>
                         <outlet property="pageLabel" destination="eTp-HH-EuU" id="pgS-Ut-KKB"/>
-                        <outlet property="pdfScaleSlider" destination="Y5G-uf-D5X" id="iPy-gv-mgV"/>
+                        <outlet property="pdfScaleLabel" destination="Ea8-gJ-NYV" id="PJ9-aJ-gQc"/>
+                        <outlet property="pdfScaleStepper" destination="qjF-ow-N4n" id="h8f-pT-O0D"/>
+                        <outlet property="resetPDFScaleButton" destination="W6E-SM-Zjx" id="zIJ-VI-FIa"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="GsK-Xl-i6u" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -2896,18 +2878,18 @@
     </scenes>
     <inferredMetricsTieBreakers>
         <segue reference="yvs-ei-HRy"/>
-        <segue reference="58e-4d-iJp"/>
+        <segue reference="OAt-q3-0jJ"/>
         <segue reference="ct4-u7-KZY"/>
     </inferredMetricsTieBreakers>
     <resources>
         <image name="antenna.radiowaves.left.and.right" catalog="system" width="128" height="109"/>
         <image name="arrow.clockwise" catalog="system" width="115" height="128"/>
+        <image name="arrow.clockwise.circle" catalog="system" width="128" height="121"/>
         <image name="arrow.down.doc" catalog="system" width="115" height="128"/>
         <image name="arrow.left" catalog="system" width="128" height="98"/>
         <image name="arrow.left.circle" catalog="system" width="128" height="121"/>
         <image name="arrow.right.circle" catalog="system" width="128" height="121"/>
         <image name="arrow.up.arrow.down.circle" catalog="system" width="128" height="121"/>
-        <image name="aspectratio" catalog="system" width="128" height="93"/>
         <image name="book.circle" catalog="system" width="128" height="121"/>
         <image name="book.circle.fill" catalog="system" width="128" height="121"/>
         <image name="calendar" catalog="system" width="128" height="106"/>
@@ -2934,7 +2916,6 @@
         <image name="plus.square" catalog="system" width="128" height="114"/>
         <image name="scribble" catalog="system" width="128" height="109"/>
         <image name="slider.horizontal.3" catalog="system" width="128" height="100"/>
-        <image name="square" catalog="system" width="128" height="114"/>
         <image name="square.and.arrow.down" catalog="system" width="121" height="128"/>
         <image name="square.and.arrow.up" catalog="system" width="115" height="128"/>
         <image name="square.stack.3d.down.right.fill" catalog="system" width="124" height="128"/>

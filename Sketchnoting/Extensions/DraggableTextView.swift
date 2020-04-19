@@ -12,7 +12,7 @@ import UIKit
 import PopMenu
 import Highlightr
 
-class DraggableTextView: UILabel, UITextViewDelegate {
+class DraggableTextView: FittableFontLabel, UITextViewDelegate {
     
     let panGesture = UIPanGestureRecognizer()
     let pinchGesture = UIPinchGestureRecognizer()
@@ -35,12 +35,17 @@ class DraggableTextView: UILabel, UITextViewDelegate {
         self.isUserInteractionEnabled = true
         
         self.layer.borderColor = UIColor.systemGray.cgColor
-        self.layer.borderWidth = 1
+        self.layer.borderWidth = 0.5
+        
+        self.leftInset = 1
+        self.topInset = 1
+        self.rightInset = 1
+        self.bottomInset = 1
         
         self.numberOfLines = 0
-        self.adjustsFontSizeToFitWidth = true
-        self.minimumScaleFactor = 0.8
         self.textAlignment = .left
+        self.lineBreakMode = .byWordWrapping
+        self.backgroundColor = .systemBackground
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -92,6 +97,7 @@ class DraggableTextView: UILabel, UITextViewDelegate {
             }
         }
         if pinchGesture.state == .ended {
+            self.adjustFontSize()
         }
     }
     

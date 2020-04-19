@@ -38,7 +38,7 @@ class ImportHelper {
                         pdfs.append(pdfDocument)
                     }
                     break
-                case String(kUTTypeText), String(kUTTypeJavaClass), String(kUTTypeCSource), String(kUTTypePlainText), String(kUTTypeSourceCode), "com.sun.java-source":
+                case String(kUTTypeText), String(kUTTypeJavaClass), String(kUTTypeCSource), String(kUTTypePlainText), String(kUTTypeSourceCode), "com.sun.java-source", String(kUTTypePythonScript), String(kUTTypeShellScript):
                     if let content = try? String(contentsOf: url) {
                         if !content.isEmpty {
                             let typedText = createNoteTypedText(text: content, codeLanguage: nil, fileExtension: url.pathExtension)

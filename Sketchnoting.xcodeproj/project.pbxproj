@@ -82,6 +82,8 @@
 		9FA8C000239B18BA00BAA42B /* TagsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA8BFFF239B18BA00BAA42B /* TagsViewController.swift */; };
 		9FA8C002239B21D500BAA42B /* TagsCreationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA8C001239B21D500BAA42B /* TagsCreationViewController.swift */; };
 		9FAA827E236DD45200B2004F /* ViewAnimator in Frameworks */ = {isa = PBXBuildFile; productRef = 9FAA827D236DD45200B2004F /* ViewAnimator */; };
+		9FAB4B7C244BEF2700DEA46F /* FittableFontLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FAB4B7B244BEF2700DEA46F /* FittableFontLabel.swift */; };
+		9FAB4B7E244BEF2F00DEA46F /* UILabelExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FAB4B7D244BEF2E00DEA46F /* UILabelExtension.swift */; };
 		9FAD28F623A52AC700F2203E /* NoteTextViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F05BC7E23761C4A00D49A88 /* NoteTextViewController.swift */; };
 		9FB9E501237F500B00279F3E /* ShareNoteViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB9E500237F500B00279F3E /* ShareNoteViewController.swift */; };
 		9FBF6AB422E9F391001FD730 /* VisionTextWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FBF6AB322E9F391001FD730 /* VisionTextWrapper.swift */; };
@@ -202,6 +204,8 @@
 		9FA6239D22E66D73007ED794 /* HandwritingRecognizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandwritingRecognizer.swift; sourceTree = "<group>"; };
 		9FA8BFFF239B18BA00BAA42B /* TagsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagsViewController.swift; sourceTree = "<group>"; };
 		9FA8C001239B21D500BAA42B /* TagsCreationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagsCreationViewController.swift; sourceTree = "<group>"; };
+		9FAB4B7B244BEF2700DEA46F /* FittableFontLabel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FittableFontLabel.swift; sourceTree = "<group>"; };
+		9FAB4B7D244BEF2E00DEA46F /* UILabelExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UILabelExtension.swift; sourceTree = "<group>"; };
 		9FB9E500237F500B00279F3E /* ShareNoteViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareNoteViewController.swift; sourceTree = "<group>"; };
 		9FBF6AB322E9F391001FD730 /* VisionTextWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisionTextWrapper.swift; sourceTree = "<group>"; };
 		9FBF6AB522E9F3FE001FD730 /* VisionTextBlockWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisionTextBlockWrapper.swift; sourceTree = "<group>"; };
@@ -578,6 +582,8 @@
 		9FD29C452239587D00CC969A /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				9FAB4B7B244BEF2700DEA46F /* FittableFontLabel.swift */,
+				9FAB4B7D244BEF2E00DEA46F /* UILabelExtension.swift */,
 				9FD29C462239588E00CC969A /* UIViewExtensions.swift */,
 				9FD29C4D223998BC00CC969A /* UIViewControllerExtensions.swift */,
 				9FD29C55223C3C3900CC969A /* StringExtensions.swift */,
@@ -833,6 +839,7 @@
 				9F05B5A3232BF0C800983AF2 /* NoteCollectionViewDetailCell.swift in Sources */,
 				9F92D110231E97DF00BC0E57 /* UserDefaultsExtensions.swift in Sources */,
 				9F92D11F23217FFF00BC0E57 /* SearchFilter.swift in Sources */,
+				9FAB4B7E244BEF2F00DEA46F /* UILabelExtension.swift in Sources */,
 				9FF0AC962441308B00A82BE8 /* CodableExtensions.swift in Sources */,
 				9FA6239522DE3741007ED794 /* BioPortalDocument.swift in Sources */,
 				9FFE07E6232A5FE500DBD0AC /* TagTableViewCell.swift in Sources */,
@@ -850,6 +857,7 @@
 				9FC114D9243919BD004F576A /* ImagePickerHelper.swift in Sources */,
 				9FC02C1C23EDB6290051C576 /* File.swift in Sources */,
 				9F9DAFE0242CB7C100713E75 /* DrawingRecognition.swift in Sources */,
+				9FAB4B7C244BEF2700DEA46F /* FittableFontLabel.swift in Sources */,
 				9F92D10E231E95B400BC0E57 /* UICollectionViewExtensions.swift in Sources */,
 				9F9460DF23F5B0460073D709 /* GridView.swift in Sources */,
 				9F5E89F42391CE84002FA8B2 /* DocumentDetailViewController.swift in Sources */,
