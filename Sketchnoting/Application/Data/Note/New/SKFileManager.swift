@@ -72,6 +72,12 @@ class SKFileManager {
         }
     }
     
+    public static func saveCurrentNote() {
+        if let activeNote = activeNote {
+            self.save(file: activeNote)
+        }
+    }
+    
     private static func loadNotes() -> [NoteX] {
         var notes = [NoteX]()
         do {

@@ -485,4 +485,44 @@ class NoteX: File, DocumentVisitor, DocumentDelegate {
             }
         }
     }
+    
+    public func getDocuments(forCurrentPage: Bool = false) -> [Document] {
+        if forCurrentPage {
+            var docs = [Document]()
+            for doc in documents {
+                var documentTitle = doc.title.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+                if let TAGMEdocument = doc as? TAGMEDocument {
+                    if let spot = TAGMEdocument.spot {
+                        documentTitle = spot.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+                    }
+                }
+                if self.getCurrentPage().getText().contains(documentTitle) && !docs.contains(doc) {
+                    docs.append(doc)
+                }
+            }
+            return docs
+        }
+        return self.documents
+    }
+    
+    public func cleanup() -> Bool {
+        var requiresSave = false
+        var docs = [Document]()
+        for doc in documents {
+            var documentTitle = doc.title.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+            if let TAGMEdocument = doc as? TAGMEDocument {
+                if let spot = TAGMEdocument.spot {
+                    documentTitle = spot.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+                }
+            }
+            if !self.getText().contains(documentTitle) {
+                docs.append(doc)
+            }
+        }
+        if docs.count > 0 {
+            requiresSave = true
+        }
+        self.documents = self.documents.filter { !docs.contains($0) }
+        return requiresSave
+    }
 }

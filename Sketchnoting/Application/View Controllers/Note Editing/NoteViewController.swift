@@ -76,6 +76,11 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         self.navigationController?.setNavigationBarHidden(true, animated: false)
         self.tabBarController?.tabBar.isHidden = true
         
+        let saveNote = SKFileManager.activeNote!.cleanup()
+        if saveNote {
+            SKFileManager.saveCurrentNote()
+        }
+        
         self.canvasView.drawing = SKFileManager.activeNote!.getCurrentPage().canvasDrawing
         canvasView.allowsFingerDrawing = false
         canvasView.delegate = self
@@ -122,7 +127,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         self.topicsBadgeHub = BadgeHub(view: topicsButton)
         self.topicsBadgeHub.scaleCircleSize(by: 0.55)
         self.topicsBadgeHub.moveCircleBy(x: 4, y: -6)
-        self.topicsBadgeHub.setCount(SKFileManager.activeNote!.documents.count)
+        self.topicsBadgeHub.setCount(SKFileManager.activeNote!.getDocuments(forCurrentPage: true).count)
         
         spotlightHelper = SpotlightHelper()
         bioportalHelper = BioPortalHelper()
@@ -174,13 +179,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             break
         case "CloseNote":
             if !isDeletingNote {
-                if textRecognitionTimer != nil {
-                    textRecognitionTimer!.invalidate()
-                }
-                if saveTimer != nil {
-                    saveTimer!.invalidate()
-                }
-                documentsVC.bookshelfUpdateTimer?.reset(nil)
+                self.stopTimers()
                 if topicsShown {
                     toggleConceptHighlight()
                 }
@@ -754,9 +753,16 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         }
     }
     
+    var pageChanged = false
     func canvasViewDrawingDidChange(_ canvasView: PKCanvasView) {
         self.resetHandwritingRecognition = true
-        self.startSaveTimer()
+        if pageChanged {
+            pageChanged = false
+        }
+        else {
+            SKFileManager.activeNote!.getCurrentPage().canvasDrawing = self.canvasView.drawing
+            self.startSaveTimer()
+        }
     }
     
     private func startRecognitionTimer() {
@@ -787,8 +793,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         saveTimer?.invalidate()
         saveTimer = nil
         log.info("Auto-saving note.")
-        SKFileManager.activeNote!.getCurrentPage().canvasDrawing = self.canvasView.drawing
-        SKFileManager.save(file: SKFileManager.activeNote!)
+        SKFileManager.saveCurrentNote()
     }
     
     //MARK: Bookshelf resize
@@ -1102,12 +1107,29 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         nextPage()
     }
     
+    var previousStateOfTopicsShown = false
+    private func saveCurrentPage() {
+        self.stopTimers()
+        previousStateOfTopicsShown = topicsShown
+        if topicsShown {
+            self.toggleConceptHighlight()
+        }
+        self.processDrawingRecognition()
+        SKFileManager.activeNote!.setUpdateDate()
+        SKFileManager.activeNote!.getCurrentPage().canvasDrawing = self.canvasView.drawing
+        SKFileManager.save(file: SKFileManager.activeNote!)
+        log.info("Saved note for current page.")
+    }
+    
     func previousPage() {
         if SKFileManager.activeNote!.hasPreviousPage() {
             self.clearFloatingViews()
             self.view.makeToast("Page \(SKFileManager.activeNote!.activePageIndex)/\(SKFileManager.activeNote!.pages.count)", duration: 1.0, position: .center)
+            self.pageChanged = true
         }
-        saveCurrentPage()
+        if self.saveTimer != nil {
+            self.saveCurrentPage()
+        }
         SKFileManager.activeNote!.previousPage()
         updatePage()
         updatePaginationButtons()
@@ -1116,8 +1138,11 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         if SKFileManager.activeNote!.hasNextPage() {
             self.clearFloatingViews()
             self.view.makeToast("Page \(SKFileManager.activeNote!.activePageIndex+2)/\(SKFileManager.activeNote!.pages.count)", duration: 1.0, position: .center)
+            self.pageChanged = true
         }
-        saveCurrentPage()
+        if self.saveTimer != nil {
+            self.saveCurrentPage()
+        }
         SKFileManager.activeNote!.nextPage()
         updatePage()
         updatePaginationButtons()
@@ -1371,6 +1396,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         self.canvasView.drawing = SKFileManager.activeNote!.getCurrentPage().canvasDrawing
         clearConceptHighlights()
         setupConceptHighlights()
+        self.updateTopicsCount()
         drawingViews = [UIView]()
         setupDrawingRegions()
         if previousStateOfTopicsShown {
@@ -1400,24 +1426,15 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         }
     }
     
-    var previousStateOfTopicsShown = false
-    private func saveCurrentPage() {
+    private func stopTimers() {
         if textRecognitionTimer != nil {
             textRecognitionTimer!.invalidate()
         }
         if saveTimer != nil {
             saveTimer!.invalidate()
+            saveTimer = nil
         }
         documentsVC.bookshelfUpdateTimer?.reset(nil)
-        previousStateOfTopicsShown = topicsShown
-        if topicsShown {
-            self.toggleConceptHighlight()
-        }
-        self.processDrawingRecognition()
-        SKFileManager.activeNote!.setUpdateDate()
-        SKFileManager.activeNote!.getCurrentPage().canvasDrawing = self.canvasView.drawing
-        SKFileManager.save(file: SKFileManager.activeNote!)
-        log.info("Saved note for current page.")
     }
     
     // MARK : Related Notes collection view
@@ -1468,11 +1485,12 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         self.clearConceptHighlights()
         SKFileManager.activeNote!.documents = [Document]()
         documentsVC.clear()
+        SKFileManager.save(file: SKFileManager.activeNote!)
         self.annotateText(text: SKFileManager.activeNote!.getText())
     }
     var oldDocuments: [Document]!
     func updateTopicsCount() {
-        self.topicsBadgeHub.setCount(SKFileManager.activeNote!.documents.count)
+        self.topicsBadgeHub.setCount(SKFileManager.activeNote!.getDocuments(forCurrentPage: true).count)
         let differences = zip(oldDocuments, SKFileManager.activeNote!.documents).map {$0.0 == $0.1}
         if differences.count > 0 {
             setupConceptHighlights()
@@ -1486,7 +1504,9 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
 
     func notePageSelected(index: Int) {
         if SKFileManager.activeNote!.activePageIndex != index {
-            self.saveCurrentPage()
+            if self.saveTimer != nil {
+                self.saveCurrentPage()
+            }
             SKFileManager.activeNote!.activePageIndex = index
             self.updatePage()
             self.updatePaginationButtons()
