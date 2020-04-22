@@ -14,6 +14,7 @@
 		9F0ABB282412E5D400CA5A4E /* SKCacheManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0ABB272412E5D400CA5A4E /* SKCacheManager.swift */; };
 		9F0D8565242052E600B8BE2F /* BSImagePicker in Frameworks */ = {isa = PBXBuildFile; productRef = 9F0D8564242052E600B8BE2F /* BSImagePicker */; };
 		9F0EC7DD2446A8AE000A28CB /* GestureExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0EC7DC2446A8AE000A28CB /* GestureExtensions.swift */; };
+		9F0F0566244FF0D700318604 /* DraggableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0F0565244FF0D700318604 /* DraggableView.swift */; };
 		9F0FC54923760E7600070FA0 /* NoteOptionsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0FC54823760E7600070FA0 /* NoteOptionsTableViewController.swift */; };
 		9F10EC162347D64C005340AA /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 9F10EC152347D64C005340AA /* Kingfisher */; };
 		9F10EC192347E4B4005340AA /* SwiftyBeaver in Frameworks */ = {isa = PBXBuildFile; productRef = 9F10EC182347E4B4005340AA /* SwiftyBeaver */; };
@@ -143,6 +144,7 @@
 		9F06976F24427823002DCE47 /* URLExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLExtensions.swift; sourceTree = "<group>"; };
 		9F0ABB272412E5D400CA5A4E /* SKCacheManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SKCacheManager.swift; sourceTree = "<group>"; };
 		9F0EC7DC2446A8AE000A28CB /* GestureExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GestureExtensions.swift; sourceTree = "<group>"; };
+		9F0F0565244FF0D700318604 /* DraggableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DraggableView.swift; sourceTree = "<group>"; };
 		9F0FC54823760E7600070FA0 /* NoteOptionsTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteOptionsTableViewController.swift; sourceTree = "<group>"; };
 		9F18E7A723FB4F1600543D78 /* FolderButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderButton.swift; sourceTree = "<group>"; };
 		9F318D38244A207300A1B4B5 /* UIFontExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIFontExtensions.swift; sourceTree = "<group>"; };
@@ -605,6 +607,7 @@
 				9F318D38244A207300A1B4B5 /* UIFontExtensions.swift */,
 				9F318D3A244A20A000A1B4B5 /* UITextViewExtensions.swift */,
 				9FA5A481244AB14E006D9FB2 /* UILabelExtensions.swift */,
+				9F0F0565244FF0D700318604 /* DraggableView.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -884,6 +887,7 @@
 				9F75E484231419FA00488BBD /* TAGMEDocument.swift in Sources */,
 				9F92D11523202B9900BC0E57 /* KnowledgeGraphHelper.swift in Sources */,
 				9F75E44C230C583200488BBD /* NoteCollectionViewCell.swift in Sources */,
+				9F0F0566244FF0D700318604 /* DraggableView.swift in Sources */,
 				9F87A47B2445430700F83B12 /* DraggableTextView.swift in Sources */,
 				9FBF6AB422E9F391001FD730 /* VisionTextWrapper.swift in Sources */,
 				9FC02C1E23EDB6400051C576 /* NoteX.swift in Sources */,

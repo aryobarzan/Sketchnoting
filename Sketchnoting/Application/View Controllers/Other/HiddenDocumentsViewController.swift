@@ -13,7 +13,6 @@ class HiddenDocumentsViewController: UITableViewController {
     var note: NoteX!
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.navigationItem.rightBarButtonItem = self.editButtonItem
     }
 
     // MARK: - Table view data source
@@ -43,6 +42,9 @@ class HiddenDocumentsViewController: UITableViewController {
             tableView.deleteRows(at: [indexPath], with: .fade)
         } else if editingStyle == .insert {
         }
+    }
+    @IBAction func doneTapped(_ sender: UIBarButtonItem) {
+        self.dismiss(animated: true, completion: nil)
     }
 }
 

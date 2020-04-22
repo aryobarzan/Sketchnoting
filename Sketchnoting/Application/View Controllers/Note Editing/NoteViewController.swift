@@ -186,7 +186,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                 self.processDrawingRecognition()
                 SKFileManager.activeNote!.setUpdateDate()
                 SKFileManager.activeNote!.getCurrentPage().canvasDrawing = self.canvasView.drawing
-                SKFileManager.save(file: SKFileManager.activeNote!)
+                SKFileManager.saveCurrentNote()
                 log.info("Closing & saving note.")
             }
             else {
@@ -1210,7 +1210,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         let types: [String] = ImportHelper.importUTTypes
         let documentPicker = UIDocumentPickerViewController(documentTypes: types, in: .import)
         documentPicker.delegate = self
-        documentPicker.modalPresentationStyle = .formSheet
+        documentPicker.modalPresentationStyle = .pageSheet
         documentPicker.allowsMultipleSelection = true
         self.present(documentPicker, animated: true, completion: nil)
     }
@@ -1345,7 +1345,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         SKFileManager.activeNote!.getCurrentPage().images.append(noteImage)
         let frame = CGRect(x: 50, y: 50, width: 0.25 * image.size.width, height: 0.25 * image.size.height)
         let draggableView = DraggableImageView(frame: frame)
-        draggableView.lastScale = 1.0
+        draggableView.draggableView.lastScale = 1.0
         draggableView.image = image
         draggableView.delegate = self
         self.canvasView.addSubview(draggableView)
@@ -1429,6 +1429,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     private func stopTimers() {
         if textRecognitionTimer != nil {
             textRecognitionTimer!.invalidate()
+            textRecognitionTimer = nil
         }
         if saveTimer != nil {
             saveTimer!.invalidate()

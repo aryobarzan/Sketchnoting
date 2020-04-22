@@ -34,13 +34,17 @@ class NoteOptionsTableViewController: UITableViewController {
         pageLabel.text = "Page: \(SKFileManager.activeNote!.activePageIndex+1)/\(SKFileManager.activeNote!.pages.count)"
         drawingsTextView.text = "Drawings: \(SKFileManager.activeNote!.getCurrentPage().drawingLabels.joined(separator:" - "))"
         
+        pdfScaleStepper.minimumValue = 0.1
+        pdfScaleStepper.maximumValue = 2.0
+        pdfScaleStepper.stepValue = 0.1
+        pdfScaleStepper.value = 1.0
+        
         if SKFileManager.activeNote!.getCurrentPage().getPDFDocument() != nil {
             pdfScaleStepper.isEnabled = true
             clearPDFPageButton.isEnabled = true
             clearPDFPageView.isUserInteractionEnabled = true
             resetPDFScaleButton.isEnabled = true
-            var currentScale = SKFileManager.activeNote!.getCurrentPage().pdfScale ?? 10.0
-            currentScale = currentScale / 10
+            let currentScale = SKFileManager.activeNote!.getCurrentPage().pdfScale ?? 1.0
             pdfScaleLabel.text = "Scale: \(currentScale)"
             pdfScaleStepper.value = Double(currentScale)
         }
@@ -107,7 +111,7 @@ class NoteOptionsTableViewController: UITableViewController {
     }
 
     @IBAction func pdfScaleStepperChanged(_ sender: UIStepper) {
-        var scale = Float(sender.value / 10)
+        var scale = Float(sender.value)
         if scale == 0.0 {
             scale = 0.1
         }
@@ -117,7 +121,7 @@ class NoteOptionsTableViewController: UITableViewController {
     @IBAction func resetPDFScaleTapped(_ sender: UIButton) {
         if pdfScaleStepper.value != 1.0 {
             pdfScaleLabel.text = "Scale: 1.0"
-            pdfScaleStepper.value = 10.0
+            pdfScaleStepper.value = 1.0
             delegate?.pdfScaleChanged(scale: 1.0)
         }
     }

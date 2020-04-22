@@ -51,7 +51,8 @@ class DocumentsViewController: UICollectionViewController{
         switch(segue.identifier ?? "") {
         case "ManageHiddenDocuments":
             log.info("Managing hidden documents.")
-            let destinationVC = segue.destination as! HiddenDocumentsViewController
+            let destinationNC = segue.destination as! UINavigationController
+            let destinationVC = destinationNC.topViewController as! HiddenDocumentsViewController
             destinationVC.note = self.note
             destinationVC.tableView.setEditing(true, animated: true)
             break
@@ -270,13 +271,11 @@ class DocumentsViewController: UICollectionViewController{
     func noteHasNewDocument(note: NoteX, document: Document) { // Sketchnote delegate
         DispatchQueue.main.async {
             if self.bookshelfState == .All && self.documentTypeMatchesBookshelfFilter(type: document.documentType) {
-                CATransaction.begin()
-                CATransaction.setDisableActions(true)
                 self.items.append(document)
-                let indexPath = IndexPath(row: self.items.count - 1, section: 0)
-                self.collectionView.insertItems(at: [indexPath])
-                CATransaction.commit()
-                self.collectionView.scrollToItem(at: indexPath, at: .bottom , animated: true)
+                let indexPath = IndexPath(item: self.items.count - 1, section: 0)
+                self.collectionView.performBatchUpdates({ () -> Void in
+                    self.collectionView.insertItems(at: [indexPath])
+                }, completion: nil)
             }
             self.delegate?.updateTopicsCount()
         }

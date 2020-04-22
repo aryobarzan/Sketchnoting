@@ -2,7 +2,7 @@
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="16096" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="c3X-aa-9QU">
     <device id="ipad9_7" orientation="portrait" layout="fullscreen" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16086"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16087"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="collection view cell content view" minToolsVersion="11.0"/>
@@ -2632,9 +2632,7 @@
                     </collectionView>
                     <navigationItem key="navigationItem" id="ekg-wk-mak"/>
                     <connections>
-                        <segue destination="WZz-EP-bxy" kind="popoverPresentation" identifier="ManageHiddenDocuments" popoverAnchorView="CS9-2K-czh" id="SiB-1A-RHr">
-                            <popoverArrowDirection key="popoverArrowDirection" up="YES" down="YES" left="YES" right="YES"/>
-                        </segue>
+                        <segue destination="YZf-CK-cSN" kind="presentation" identifier="ManageHiddenDocuments" id="SiB-1A-RHr"/>
                     </connections>
                 </collectionViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="pgG-l1-zuE" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -2764,15 +2762,15 @@
             <objects>
                 <tableViewController storyboardIdentifier="HiddenDocumentsViewController" modalPresentationStyle="formSheet" id="WZz-EP-bxy" customClass="HiddenDocumentsViewController" customModule="Sketchnoting" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" allowsSelection="NO" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="f86-du-Meg">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="493"/>
+                        <rect key="frame" x="0.0" y="0.0" width="712" height="984"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                         <prototypes>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="HiddenDocumentTableCell" id="pgJ-4i-a3S" customClass="HiddenDocumentTableCell" customModule="Sketchnoting" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="28" width="320" height="43.5"/>
+                                <rect key="frame" x="0.0" y="28" width="712" height="43.5"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="pgJ-4i-a3S" id="yVr-dR-0KT">
-                                    <rect key="frame" x="0.0" y="0.0" width="320" height="43.5"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="712" height="43.5"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Document Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ecS-5j-1aU">
@@ -2796,11 +2794,16 @@
                     </tableView>
                     <navigationItem key="navigationItem" title="Hidden Documents" id="XlV-kO-L0d">
                         <barButtonItem key="backBarButtonItem" title="Settings" id="k9l-N2-lzd"/>
+                        <barButtonItem key="rightBarButtonItem" style="done" systemItem="done" id="5h7-Gq-dbV">
+                            <connections>
+                                <action selector="doneTapped:" destination="WZz-EP-bxy" id="w5z-gP-1S8"/>
+                            </connections>
+                        </barButtonItem>
                     </navigationItem>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="zJh-xr-X3n" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2285" y="3086"/>
+            <point key="canvasLocation" x="3050" y="3085.546875"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="com-Ei-8ib">
@@ -2874,6 +2877,24 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="W9g-Ns-5hx" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="4146.875" y="200.9765625"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="2og-jP-n0g">
+            <objects>
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="YZf-CK-cSN" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="Fdd-BY-gjD">
+                        <rect key="frame" x="0.0" y="0.0" width="712" height="56"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="WZz-EP-bxy" kind="relationship" relationship="rootViewController" id="5Gf-Ja-pC1"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="DFx-eg-jFN" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2284.375" y="3085.546875"/>
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>
