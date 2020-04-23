@@ -181,13 +181,11 @@ class NoteXPage: Codable {
             var pdfImage: UIImage?
             if let pdfDocument = getPDFDocument() {
                 if let page = pdfDocument.page(at: 0) {
-                    
                     pdfImage = page.thumbnail(of: page.bounds(for: .cropBox).size, for: .cropBox)
                 }
             }
             DispatchQueue.global(qos: .utility).async {
                 if let pdfImage = pdfImage {
-                    
                     image = pdfImage.mergeWith2(withImage: canvasImage)
                 }
                 DispatchQueue.main.async {
