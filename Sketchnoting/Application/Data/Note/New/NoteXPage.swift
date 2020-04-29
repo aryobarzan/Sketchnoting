@@ -14,7 +14,7 @@ class NoteXPage: Codable {
     var canvasDrawing: PKDrawing
     var drawingLabels: [String]
     var drawingViewRects: [CGRect]
-    var noteTextArray: [NoteText]
+    private var noteText: NoteText?
     var backdropPDFData: Data?
     var pdfScale: Float? = 1.0
     var images : [NoteImage]
@@ -24,7 +24,6 @@ class NoteXPage: Codable {
         self.canvasDrawing = PKDrawing()
         self.drawingLabels = [String]()
         self.drawingViewRects = [CGRect]()
-        self.noteTextArray = [NoteText]()
         self.images = [NoteImage]()
         self.typedTexts = [NoteTypedText]()
     }
@@ -34,7 +33,7 @@ class NoteXPage: Codable {
         case canvasDrawing = "canvasDrawing"
         case drawingLabels = "drawingLabels"
         case drawingViewRects = "drawingViewRects"
-        case noteTextArray = "noteTextArray"
+        case noteText = "noteText"
         case backdropPDFData = "backdropPDFData"
         case pdfScale = "pdfScale"
         case images = "images"
@@ -45,7 +44,7 @@ class NoteXPage: Codable {
         try container.encode(canvasDrawing, forKey: .canvasDrawing)
         try container.encode(drawingLabels, forKey: .drawingLabels)
         try container.encode(drawingViewRects, forKey: .drawingViewRects)
-        try container.encode(noteTextArray, forKey: .noteTextArray)
+        try container.encode(noteText, forKey: .noteText)
         try container.encode(backdropPDFData, forKey: .backdropPDFData)
         try container.encode(pdfScale, forKey: .pdfScale)
         try container.encode(images, forKey: .images)
@@ -57,7 +56,7 @@ class NoteXPage: Codable {
         canvasDrawing = try container.decode(PKDrawing.self, forKey: .canvasDrawing)
         drawingLabels = try container.decode([String].self, forKey: .drawingLabels)
         drawingViewRects = try container.decode([CGRect].self, forKey: .drawingViewRects)
-        noteTextArray = try container.decode([NoteText].self, forKey: .noteTextArray)
+        noteText = try? container.decode(NoteText.self, forKey: .noteText)
         backdropPDFData = try? container.decode(Data.self, forKey: .backdropPDFData)
         pdfScale = try? container.decode(Float.self, forKey: .pdfScale)
         images = try container.decode([NoteImage].self, forKey: .images)
@@ -121,31 +120,38 @@ class NoteXPage: Codable {
         }
     }
     
+    func setNoteText(noteText: NoteText) {
+        self.noteText = noteText
+    }
+    
+    func getNoteText() -> NoteText? {
+        return self.noteText
+    }
+    
+    func clearNoteText() {
+        self.noteText = nil
+    }
+    
     //MARK: recognized text
     public func getText(raw: Bool = false) -> String {
         var text: String = ""
-        if !raw {
-            for textData in noteTextArray {
-                text = text + " " + textData.spellchecked
+        if let noteText = self.noteText {
+            if !raw {
+                text = noteText.spellchecked
+            }
+            else {
+                text = noteText.text
             }
         }
-        else {
-            for textData in noteTextArray {
-                text = text + " " + textData.text
-            }
-        }
+        
         return text
-    }
-    
-    public func clearTextData() {
-        self.noteTextArray = [NoteText]()
     }
     
     public func clear() {
         self.drawingLabels = [String]()
         self.drawingViewRects = [CGRect]()
         self.canvasDrawing = PKDrawing()
-        self.noteTextArray = [NoteText]()
+        self.noteText = nil
     }
     
     func createPDF() -> Data? {

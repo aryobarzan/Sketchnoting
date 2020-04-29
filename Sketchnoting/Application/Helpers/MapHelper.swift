@@ -10,6 +10,7 @@ import UIKit
 import Alamofire
 
 class MapHelper {
+    private static let mapQuestAPIKey = "bAELaFV3A8vNwICyhbziI7tNeSfYdUvr"
     static func fetchMap(location: String, document: Document, note: NoteX) {
         let parameters: Parameters = ["q": location, "maxRows": 1, "username": "aryo"]
         let headers: HTTPHeaders = [
@@ -21,8 +22,7 @@ class MapHelper {
             switch responseResult {
             case .success(let res):
                 json = res as! [String: Any]
-            case .failure(let error):
-                print(error.localizedDescription)
+            case .failure( _):
                 return
             }
             log.info("GeoNames Coordinates: API call successful.")
@@ -42,8 +42,8 @@ class MapHelper {
         }
     }
     static func fetchMapImage(latitude: String, longitude: String, document: Document, note: NoteX) {
-        DispatchQueue.global().async {
-            if let url = URL(string: "https://www.mapquestapi.com/staticmap/v5/map?key=bAELaFV3A8vNwICyhbziI7tNeSfYdUvr&center=" + latitude + "," + longitude + "&size=800,600") {
+        DispatchQueue.global(qos: .utility).async {
+            if let url = URL(string: "https://www.mapquestapi.com/staticmap/v5/map?key=" + mapQuestAPIKey + "&center=" + latitude + "," + longitude + "&size=800,600") {
                 document.downloadImage(url: url, type: .Map)
                 log.info("Map image could be found for document \(document.title).")
             }

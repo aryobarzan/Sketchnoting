@@ -151,7 +151,7 @@ class TAGMEHelper {
                                 json = JSON(res)
                                 
                                 if let imageURL = json["query"]["pages"][String(format: "%.0f", document.wikiPageID!)]["original"]["source"].string {
-                                    DispatchQueue.global().async {
+                                    DispatchQueue.global(qos: .utility).async {
                                         if let url = URL(string: imageURL) {
                                             log.info("Found Wikipedia preview image for: \(document.title)")
                                             document.downloadImage(url: url, type: .Standard)

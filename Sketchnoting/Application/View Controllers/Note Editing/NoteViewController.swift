@@ -109,7 +109,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         pdfView.maxScaleFactor = 4.0
         pdfView.minScaleFactor = 0.1
         pdfView.scaleFactor = 1.0
-
+        
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
             let storyboard = UIStoryboard(name: "Main", bundle: Bundle.main)
             self.documentsVC = storyboard.instantiateViewController(withIdentifier: "DocumentsViewController") as? DocumentsViewController
@@ -315,7 +315,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         let transform = self.transformMatrix(recognitionImageSize)
 
         let documents = SKFileManager.activeNote!.documents
-        for textData in SKFileManager.activeNote!.getCurrentPage().noteTextArray {
+        if let textData = SKFileManager.activeNote!.getCurrentPage().getNoteText() {
             for document in documents {
                 var documentTitle = document.title.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
                 if let TAGMEdocument = document as? TAGMEDocument {
@@ -354,6 +354,19 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                 }
             }
         }
+//        let page = SKFileManager.activeNote!.getCurrentPage().getPDFDocument()!.page(at: 0)!
+//        //let f = page.selectionForWord(at: CGPoint(x: 100, y: 100))?.bounds(for: page)
+//        let sel = SKFileManager.activeNote!.getCurrentPage().getPDFDocument()!.findString("Cryptography", withOptions: .caseInsensitive)
+//        let f = sel[0].bounds(for: sel[0].pages[0])
+//        let test = UIView(frame: f)
+//        test.frame = test.convert(test.bounds, to: pdfView.documentView!)
+//        test.backgroundColor = .blue
+//        pdfView.addSubview(test)
+//        print(sel)
+//        print(f)
+//        let transform2 = self.transformMatrix2(pdfView.documentView!.frame.size)
+//        let v = drawFrame(f, in: .blue, transform: transform2)
+//        self.addTopicFrame(topicFrame: v, document: SKFileManager.activeNote!.documents[0])
     }
     private func addTopicFrame(topicFrame: UIView, document: Document) {
         if let existingTopicAnnotation = conceptHighlightExists(new: topicFrame.frame) {
@@ -391,6 +404,27 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
       transform = transform.scaledBy(x: scale, y: scale)
       return transform
     }
+//    private func transformMatrix2(_ recognitionImageSize: CGSize) -> CGAffineTransform {
+//      let imageViewWidth = pdfView.frame.size.width
+//      let imageViewHeight = pdfView.frame.size.height
+//      let imageWidth = recognitionImageSize.width
+//      let imageHeight = recognitionImageSize.height
+//
+//      let imageViewAspectRatio = imageViewWidth / imageViewHeight
+//      let imageAspectRatio = imageWidth / imageHeight
+//      let scale = (imageViewAspectRatio > imageAspectRatio) ?
+//        imageViewHeight / imageHeight :
+//        imageViewWidth / imageWidth
+//
+//      let scaledImageWidth = imageWidth * scale
+//      let scaledImageHeight = imageHeight * scale
+//      let xValue = (imageViewWidth - scaledImageWidth) / CGFloat(2.0)
+//      let yValue = (imageViewHeight - scaledImageHeight) / CGFloat(2.0)
+//
+//      var transform = CGAffineTransform.identity.translatedBy(x: xValue, y: yValue)
+//      transform = transform.scaledBy(x: scale, y: scale)
+//      return transform
+//    }
     
     func pencilInteractionDidTap(_ interaction: UIPencilInteraction) {
         switch SettingsManager.pencilSideButton() {
@@ -663,9 +697,9 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         self.generateHandwritingRecognitionImage(completion: { image in
             self.handwritingRecognizer.recognize(spellcheck: false, image: image) { (success, noteText) in
                 if success {
-                    SKFileManager.activeNote!.getCurrentPage().clearTextData()
+                    SKFileManager.activeNote!.getCurrentPage().clearNoteText()
                     if let noteText = noteText {
-                        SKFileManager.activeNote!.getCurrentPage().noteTextArray.append(noteText)
+                        SKFileManager.activeNote!.getCurrentPage().setNoteText(noteText: noteText)
                         self.startSaveTimer()
                         if self.topicsShown {
                             self.setupTopicAnnotations(recognitionImageSize: image.size)

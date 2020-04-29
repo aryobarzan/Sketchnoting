@@ -1361,19 +1361,19 @@
                                     <constraint firstAttribute="trailing" secondItem="iDb-Yw-oym" secondAttribute="trailing" id="2U3-y4-Aox"/>
                                     <constraint firstItem="xYD-HR-LX0" firstAttribute="top" secondItem="tz5-2Q-OEW" secondAttribute="top" id="6yN-PR-hFE"/>
                                     <constraint firstItem="oqt-gq-XGG" firstAttribute="top" secondItem="tz5-2Q-OEW" secondAttribute="top" id="BtJ-fp-Oyj"/>
-                                    <constraint firstItem="tA3-q0-ddV" firstAttribute="trailing" secondItem="xYD-HR-LX0" secondAttribute="trailing" id="CCK-0X-LrB"/>
                                     <constraint firstAttribute="trailing" secondItem="xYD-HR-LX0" secondAttribute="trailing" id="MGa-mC-zBU"/>
                                     <constraint firstItem="iDb-Yw-oym" firstAttribute="leading" secondItem="tz5-2Q-OEW" secondAttribute="leading" id="OHO-eU-Yj7"/>
                                     <constraint firstAttribute="trailing" secondItem="oqt-gq-XGG" secondAttribute="trailing" id="SiT-MD-RCf"/>
                                     <constraint firstAttribute="bottom" secondItem="oqt-gq-XGG" secondAttribute="bottom" id="VbZ-Nx-t1y"/>
+                                    <constraint firstItem="tA3-q0-ddV" firstAttribute="leading" secondItem="tz5-2Q-OEW" secondAttribute="leading" id="XFM-O6-0FK"/>
                                     <constraint firstItem="oqt-gq-XGG" firstAttribute="leading" secondItem="tz5-2Q-OEW" secondAttribute="leading" constant="400" id="YAl-f6-SsH"/>
-                                    <constraint firstItem="tA3-q0-ddV" firstAttribute="bottom" secondItem="xYD-HR-LX0" secondAttribute="bottom" id="aaP-wH-pnl"/>
-                                    <constraint firstItem="tA3-q0-ddV" firstAttribute="leading" secondItem="xYD-HR-LX0" secondAttribute="leading" id="bo6-Pk-taz"/>
-                                    <constraint firstItem="tA3-q0-ddV" firstAttribute="top" secondItem="xYD-HR-LX0" secondAttribute="top" id="qlK-BK-5VX"/>
+                                    <constraint firstAttribute="trailing" secondItem="tA3-q0-ddV" secondAttribute="trailing" id="hWF-cG-vo3"/>
+                                    <constraint firstItem="tA3-q0-ddV" firstAttribute="top" secondItem="tz5-2Q-OEW" secondAttribute="top" id="mvl-EH-dDS"/>
                                     <constraint firstItem="iDb-Yw-oym" firstAttribute="top" secondItem="tz5-2Q-OEW" secondAttribute="top" id="rt2-ek-tnV"/>
                                     <constraint firstAttribute="bottom" secondItem="xYD-HR-LX0" secondAttribute="bottom" id="sWw-jM-oo3"/>
                                     <constraint firstAttribute="bottom" secondItem="iDb-Yw-oym" secondAttribute="bottom" id="sfp-kK-Yde"/>
                                     <constraint firstItem="xYD-HR-LX0" firstAttribute="leading" secondItem="tz5-2Q-OEW" secondAttribute="leading" id="xEB-qk-Wfz"/>
+                                    <constraint firstAttribute="bottom" secondItem="tA3-q0-ddV" secondAttribute="bottom" id="xMI-b8-ObU"/>
                                 </constraints>
                             </view>
                         </subviews>
@@ -2448,15 +2448,10 @@
                         <viewLayoutGuide key="safeArea" id="LSc-VW-p0l"/>
                     </view>
                     <navigationItem key="navigationItem" title="Note Pages" id="Z6E-zA-nco">
-                        <barButtonItem key="leftBarButtonItem" style="plain" id="BbC-Cq-2fu">
-                            <button key="customView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="headTruncation" id="1M6-ae-ssb">
-                                <rect key="frame" x="20" y="13" width="46" height="30"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <state key="normal" title="Page 1"/>
-                                <connections>
-                                    <action selector="pageButtonTapped:" destination="oax-zI-aHM" eventType="touchUpInside" id="giN-WK-FTA"/>
-                                </connections>
-                            </button>
+                        <barButtonItem key="leftBarButtonItem" title="Page 1" id="lYn-Ft-kbi">
+                            <connections>
+                                <action selector="pageButtonTapped:" destination="oax-zI-aHM" id="9Be-PL-Wyx"/>
+                            </connections>
                         </barButtonItem>
                         <barButtonItem key="rightBarButtonItem" systemItem="done" id="Mgw-ic-lhu">
                             <connections>
@@ -2468,7 +2463,7 @@
                     <nil key="simulatedBottomBarMetrics"/>
                     <connections>
                         <outlet property="collectionView" destination="SCj-TA-b7V" id="d3Z-VX-Q4F"/>
-                        <outlet property="pageButton" destination="1M6-ae-ssb" id="36Z-pz-4mF"/>
+                        <outlet property="pageButton" destination="lYn-Ft-kbi" id="vVc-Vl-3MA"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="PcT-BJ-JPT" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
