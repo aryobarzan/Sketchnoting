@@ -1,61 +1,51 @@
 //
-//  TAGMEHelper.swift
+//  WATHelper.swift
 //  Sketchnoting
 //
-//  Created by Aryobarzan on 26/08/2019.
-//  Copyright © 2019 Aryobarzan. All rights reserved.
+//  Created by Aryobarzan on 03/05/2020.
+//  Copyright © 2020 Aryobarzan. All rights reserved.
 //
 
 import UIKit
 import Alamofire
 import SwiftyJSON
 
-class TAGMEHelper {
-    static var shared = TAGMEHelper()
-    //var requestDelay: Double = 0
-    private let tagmeQueue = DispatchQueue(label: "TAGMEQueue", qos: .background)
-    func fetch(text: String, note: NoteX, parentConcept: TAGMEDocument? = nil) {
-        let chunks = text.split(by: 6000)
-        for chunk in chunks {
-            let parameters: Parameters = ["text": chunk, "lang": "en", "include_abstract": "true", "include_categories": "true", "gcube-token": "5f57008b-3114-47e9-9ee2-742c877d37b2-843339462", "epsilon": note.tagmeEpsilon]
-            let headers: HTTPHeaders = [
-                "Accept": "application/json"
-            ]
+class WATHelper {
+    static var shared = WATHelper()
+    private let gcube_token = "5f57008b-3114-47e9-9ee2-742c877d37b2-843339462"
+    private let watQueue = DispatchQueue(label: "WATQueue", qos: .background)
+    
+    func fetch(text: String, note: NoteX, parentConcept: WATDocument? = nil) {
+        let parameters: Parameters = ["text": text, "lang": "en", "tokenizer": "opennlp", "gcube-token": gcube_token]
+        let headers: HTTPHeaders = [
+            "Accept": "application/json"
+        ]
 
-            AF.request("http://tagme.d4science.org/tagme/tag", parameters: parameters, headers: headers).responseJSON { response in
-                self.tagmeQueue.async {
-                    let responseResult = response.result
-                    var json = JSON()
-                    switch responseResult {
-                    case .success(let res):
-                        json = JSON(res)
-                    case .failure(let error):
-                        log.error(error.localizedDescription)
-                        return
-                    }
-                    log.info("TAGME: API call successful.")
-                    var results = [String: String]()
-                    if let annotations = json["annotations"].array {
-                        for annotation in annotations {
-                            if let spot = annotation["spot"].string, let id = annotation["id"].double, let abstract = annotation["abstract"].string, let title = annotation["title"].string, let rho = annotation["rho"].double {
-                                if !spot.isEmpty && !abstract.isEmpty && results[spot] == nil {
-                                    results[spot] = spot
-                                    var categories = [String]()
-                                    if let categoriesArray = annotation["dbpedia_categories"].array {
-                                        for category in categoriesArray {
-                                            if let cat = category.string {
-                                                categories.append(cat)
-                                            }
+        AF.request("https://wat.d4science.org/wat/tag/tag", parameters: parameters, headers: headers).responseJSON { response in
+            self.watQueue.async {
+                let responseResult = response.result
+                var json = JSON()
+                switch responseResult {
+                case .success(let res):
+                    json = JSON(res)
+                case .failure(let error):
+                    log.error(error.localizedDescription)
+                    return
+                }
+                log.info("WAT: API call successful.")
+                var results = [String: String]()
+                if let annotations = json["annotations"].array {
+                    for annotation in annotations {
+                        if let spot = annotation["spot"].string, let id = annotation["id"].double, let title = annotation["title"].string, let rho = annotation["rho"].double {
+                            if !spot.isEmpty && results[spot] == nil {
+                                results[spot] = spot
+                                if rho > 0.1 {
+                                    if let document = WATDocument(title: title, description: "Missing description.", URL: "https://sobigdata.d4science.org/web/tagme/wat-api", type: .TAGME, spot: spot, wikiPageID: id) {
+                                        if let parentConcept = parentConcept {
+                                            self.checkRelatedness(doc_one: parentConcept, doc_two: document, note: note)
                                         }
-                                    }
-                                    if rho > 0.1 {
-                                        if let document = TAGMEDocument(title: title, description: abstract, URL: "tagme.d4science.org/tagme", type: .TAGME, spot: spot, categories: categories, wikiPageID: id) {
-                                            if let parentConcept = parentConcept {
-                                                self.checkRelatedness(doc_one: parentConcept, doc_two: document, note: note)
-                                            }
-                                            else {
-                                                self.performAdditionalSteps(document: document, note: note)
-                                            }
+                                        else {
+                                            self.performAdditionalSteps(document: document, note: note)
                                         }
                                     }
                                 }
@@ -66,13 +56,13 @@ class TAGMEHelper {
             }
         }
     }
-    
-    private func performAdditionalSteps(document: TAGMEDocument, note: NoteX) {
+    // to update
+    private func performAdditionalSteps(document: WATDocument, note: NoteX) {
         DispatchQueue.main.async {
             if !note.documents.contains(document) {
-                log.info("TAGME: new document added - \(document.title)")
+                log.info("WAT: new document added - \(document.title)")
                 note.addDocument(document: document)
-                self.tagmeQueue.async {
+                self.watQueue.async {
                     self.fetchWikipediaIntroText(document: document)
                     self.fetchWikipediaImage(document: document, completion: {foundImage in
                         if !foundImage {
@@ -98,8 +88,8 @@ class TAGMEHelper {
             }
         }
     }
-    
-    private func fetchWikipediaIntroText(document: TAGMEDocument) {
+    // To update
+    private func fetchWikipediaIntroText(document: WATDocument) {
         if document.wikiPageID != nil {
             let parameters: Parameters = ["action": "query", "prop": "extracts", "exintro": "", "explaintext": "", "pageids": Int(document.wikiPageID!), "format": "json"]
             let headers: HTTPHeaders = [
@@ -126,8 +116,8 @@ class TAGMEHelper {
             }
         }
     }
-    
-    private func fetchWikipediaImage(document: TAGMEDocument, completion:@escaping (Bool) -> ()) {
+    // To update
+    private func fetchWikipediaImage(document: WATDocument, completion:@escaping (Bool) -> ()) {
         if document.wikiPageID != nil {
             let parameters: Parameters = ["action": "query", "prop": "info", "pageids": Int(document.wikiPageID!), "inprop": "url", "format": "json"]
             let headers: HTTPHeaders = [
@@ -186,9 +176,9 @@ class TAGMEHelper {
             completion(false)
         }
     }
-    
-    func checkForSubconcepts(document: TAGMEDocument, note: NoteX) {
-        self.tagmeQueue.async {
+    // To update
+    func checkForSubconcepts(document: WATDocument, note: NoteX) {
+        self.watQueue.async {
             let text = document.title.lowercased().replacingOccurrences(of: "\n", with: " ")
             var words = text.components(separatedBy: " ")
             var wordsToRemove = [String]()
@@ -201,17 +191,17 @@ class TAGMEHelper {
             if words.count > 1 {
                 for word in words {
                     self.fetch(text: word, note: note, parentConcept: document)
-                    log.info("Fetching TAGME document for subconcept: \(word)")
+                    log.info("Fetching WAT document for subconcept: \(word)")
                 }
             }
         }
     }
-    
-    func checkRelatedness(doc_one: TAGMEDocument, doc_two: TAGMEDocument, note: NoteX) {
-        self.tagmeQueue.async {
+    // To update
+    func checkRelatedness(doc_one: WATDocument, doc_two: WATDocument, note: NoteX) {
+        self.watQueue.async {
             if doc_one != doc_two {
                 if let id_one = doc_one.wikiPageID, let id_two = doc_two.wikiPageID {
-                    let parameters: Parameters = ["id": "\(Int(id_one)) \(Int(id_two))", "lang": "en", "gcube-token": "5f57008b-3114-47e9-9ee2-742c877d37b2-843339462"]
+                    let parameters: Parameters = ["id": "\(Int(id_one)) \(Int(id_two))", "lang": "en", "gcube-token": self.gcube_token]
                     let headers: HTTPHeaders = [
                         "Accept": "application/json"
                     ]
@@ -225,7 +215,7 @@ class TAGMEHelper {
                             log.error(error.localizedDescription)
                             return
                         }
-                        log.info("TAGME: API call successful.")
+                        log.info("WAT: API call successful.")
                         log.info(json)
                         if let result = json["result"].array {
                             for res in result {

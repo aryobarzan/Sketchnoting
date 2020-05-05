@@ -2664,7 +2664,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="bXr-Fm-yqm">
-                                <rect key="frame" x="20" y="185.5" width="728" height="290.5"/>
+                                <rect key="frame" x="20" y="185.5" width="728" height="560.5"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
                                     <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="250" id="vWu-pt-Ox7"/>
@@ -2675,9 +2675,10 @@
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                             </textView>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="99K-EA-brf">
-                                <rect key="frame" x="20" y="484" width="728" height="520"/>
+                                <rect key="frame" x="259" y="754" width="250" height="250"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="520" id="FR2-MO-KSr"/>
+                                    <constraint firstAttribute="width" constant="250" id="4ez-Uy-tyu"/>
+                                    <constraint firstAttribute="height" constant="250" id="FR2-MO-KSr"/>
                                 </constraints>
                             </imageView>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Hei-Db-AU3">
@@ -2716,13 +2717,12 @@
                             <constraint firstItem="qVg-oA-y7M" firstAttribute="trailing" secondItem="Cmp-Ij-aav" secondAttribute="trailing" id="0PM-Gt-Et5"/>
                             <constraint firstItem="Cmp-Ij-aav" firstAttribute="bottom" secondItem="qVg-oA-y7M" secondAttribute="bottom" id="7FY-yq-eYf"/>
                             <constraint firstItem="qVg-oA-y7M" firstAttribute="top" secondItem="Cmp-Ij-aav" secondAttribute="top" id="AFQ-yk-RP7"/>
-                            <constraint firstItem="Cmp-Ij-aav" firstAttribute="trailing" secondItem="99K-EA-brf" secondAttribute="trailing" constant="20" id="BCG-t5-Ruq"/>
                             <constraint firstItem="bXr-Fm-yqm" firstAttribute="top" secondItem="b0n-j5-YVQ" secondAttribute="bottom" constant="9" id="J9s-r7-hah"/>
+                            <constraint firstItem="99K-EA-brf" firstAttribute="centerX" secondItem="yfm-2a-Rfb" secondAttribute="centerX" id="Jl3-EY-lit"/>
                             <constraint firstItem="M8Y-4n-umI" firstAttribute="centerX" secondItem="yfm-2a-Rfb" secondAttribute="centerX" id="LGf-sh-aru"/>
                             <constraint firstItem="qVg-oA-y7M" firstAttribute="leading" secondItem="Cmp-Ij-aav" secondAttribute="leading" id="Mjl-wJ-rXp"/>
                             <constraint firstItem="Bgo-e0-QcY" firstAttribute="leading" secondItem="Cmp-Ij-aav" secondAttribute="leading" constant="20" id="RWd-M1-k7u"/>
                             <constraint firstItem="Cmp-Ij-aav" firstAttribute="trailing" secondItem="Hei-Db-AU3" secondAttribute="trailing" constant="20" id="VHF-fq-eAU"/>
-                            <constraint firstItem="99K-EA-brf" firstAttribute="leading" secondItem="Cmp-Ij-aav" secondAttribute="leading" constant="20" id="WNv-X2-FKP"/>
                             <constraint firstItem="Cmp-Ij-aav" firstAttribute="bottom" secondItem="99K-EA-brf" secondAttribute="bottom" constant="20" id="b5Q-gm-ntQ"/>
                             <constraint firstItem="Cmp-Ij-aav" firstAttribute="trailing" secondItem="bXr-Fm-yqm" secondAttribute="trailing" constant="20" id="f2N-hr-Loj"/>
                             <constraint firstItem="99K-EA-brf" firstAttribute="top" secondItem="bXr-Fm-yqm" secondAttribute="bottom" constant="8" id="fMt-MF-Meo"/>

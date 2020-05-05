@@ -39,7 +39,7 @@ class DocumentDetailViewController: UIViewController, DocumentVisitor {
     func setDocument(document: Document) {
         titleLabel.text = document.title
         typeLabel.text = "Document"
-        previewImage.image = nil
+        previewImage.image = UIImage(systemName: "book.circle.fill")
         bottomImageView.image = nil
         document.retrieveImage(type: .Standard, completion: { result in
             switch result {

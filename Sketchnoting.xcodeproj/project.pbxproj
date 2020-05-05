@@ -36,6 +36,8 @@
 		9F509144235BE29100853E84 /* DataCompression in Frameworks */ = {isa = PBXBuildFile; productRef = 9F509143235BE29100853E84 /* DataCompression */; };
 		9F560FAA240855F700932A55 /* GPUImage in Frameworks */ = {isa = PBXBuildFile; productRef = 9F560FA9240855F700932A55 /* GPUImage */; };
 		9F5D80F02332D32600552D58 /* SVGImageProcessorExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5D80EF2332D32600552D58 /* SVGImageProcessorExtension.swift */; };
+		9F5D8A30246113DC00934C0E /* WATHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5D8A2F246113DC00934C0E /* WATHelper.swift */; };
+		9F5D8A322461157200934C0E /* WATDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5D8A312461157200934C0E /* WATDocument.swift */; };
 		9F5E89EC2391AF49002FA8B2 /* DocumentsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5E89EB2391AF49002FA8B2 /* DocumentsViewController.swift */; };
 		9F5E89EE2391B474002FA8B2 /* DocumentsCollectionReusableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5E89ED2391B474002FA8B2 /* DocumentsCollectionReusableView.swift */; };
 		9F5E89F02391CBA2002FA8B2 /* DocumentViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5E89EF2391CBA2002FA8B2 /* DocumentViewCell.swift */; };
@@ -160,6 +162,8 @@
 		9F4D2335239C1FDB0078B364 /* UIColorExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIColorExtensions.swift; sourceTree = "<group>"; };
 		9F4D2337239C22FD0078B364 /* OtherExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OtherExtensions.swift; sourceTree = "<group>"; };
 		9F5D80EF2332D32600552D58 /* SVGImageProcessorExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SVGImageProcessorExtension.swift; sourceTree = "<group>"; };
+		9F5D8A2F246113DC00934C0E /* WATHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WATHelper.swift; sourceTree = "<group>"; };
+		9F5D8A312461157200934C0E /* WATDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WATDocument.swift; sourceTree = "<group>"; };
 		9F5D8B2B228B9D7000F56FEC /* CREDITS.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CREDITS.md; sourceTree = "<group>"; };
 		9F5D8B2C228B9EF800F56FEC /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		9F5E89EB2391AF49002FA8B2 /* DocumentsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentsViewController.swift; sourceTree = "<group>"; };
@@ -316,6 +320,14 @@
 			path = Models;
 			sourceTree = "<group>";
 		};
+		9F5D8A2E246113C900934C0E /* WAT */ = {
+			isa = PBXGroup;
+			children = (
+				9F5D8A2F246113DC00934C0E /* WATHelper.swift */,
+			);
+			path = WAT;
+			sourceTree = "<group>";
+		};
 		9F5E89EA2391AF1B002FA8B2 /* View Controllers */ = {
 			isa = PBXGroup;
 			children = (
@@ -445,6 +457,7 @@
 		9FA6238922D371F1007ED794 /* Semantic Annotation */ = {
 			isa = PBXGroup;
 			children = (
+				9F5D8A2E246113C900934C0E /* WAT */,
 				9F92D11323202B8600BC0E57 /* Knowledge Graph */,
 				9F75E4802314108500488BBD /* TAGME */,
 				9FA6239922DE3ACD007ED794 /* BioPortal */,
@@ -478,6 +491,7 @@
 				9FA6239422DE3741007ED794 /* BioPortalDocument.swift */,
 				9FA6239622DE3806007ED794 /* CHEBIDocument.swift */,
 				9F75E483231419FA00488BBD /* TAGMEDocument.swift */,
+				9F5D8A312461157200934C0E /* WATDocument.swift */,
 			);
 			path = Documents;
 			sourceTree = "<group>";
@@ -844,12 +858,14 @@
 				9FA6238822CEA7FE007ED794 /* MapHelper.swift in Sources */,
 				9F4B38C123EA41C900F87B61 /* ReceivedNotesController.swift in Sources */,
 				9F05B5A3232BF0C800983AF2 /* NoteCollectionViewDetailCell.swift in Sources */,
+				9F5D8A322461157200934C0E /* WATDocument.swift in Sources */,
 				9F92D110231E97DF00BC0E57 /* UserDefaultsExtensions.swift in Sources */,
 				9F92D11F23217FFF00BC0E57 /* SearchFilter.swift in Sources */,
 				9FAB4B7E244BEF2F00DEA46F /* UILabelExtension.swift in Sources */,
 				9FF0AC962441308B00A82BE8 /* CodableExtensions.swift in Sources */,
 				9FA6239522DE3741007ED794 /* BioPortalDocument.swift in Sources */,
 				9FFE07E6232A5FE500DBD0AC /* TagTableViewCell.swift in Sources */,
+				9F5D8A30246113DC00934C0E /* WATHelper.swift in Sources */,
 				9FC02C2023EDB6520051C576 /* Folder.swift in Sources */,
 				9F5D80F02332D32600552D58 /* SVGImageProcessorExtension.swift in Sources */,
 				9F4D2336239C1FDB0078B364 /* UIColorExtensions.swift in Sources */,
