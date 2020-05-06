@@ -69,7 +69,7 @@ class TAGMEHelper {
     
     private func performAdditionalSteps(document: TAGMEDocument, note: NoteX) {
         DispatchQueue.main.async {
-            if !note.documents.contains(document) {
+            if !note.getDocuments().contains(document) {
                 log.info("TAGME: new document added - \(document.title)")
                 note.addDocument(document: document)
                 self.tagmeQueue.async {

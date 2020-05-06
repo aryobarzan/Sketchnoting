@@ -19,6 +19,7 @@ protocol DocumentVisitor {
     func process(document: BioPortalDocument)
     func process(document: CHEBIDocument)
     func process(document: TAGMEDocument)
+    func process(document: WATDocument)
 }
 
 protocol DocumentDelegate {
@@ -28,6 +29,7 @@ protocol DocumentDelegate {
 enum DocumentType: String, Codable {
     case Spotlight
     case TAGME
+    case WAT
     case BioPortal
     case Chemistry
     case Other
@@ -78,8 +80,8 @@ class Document: Codable, Visitable, Equatable {
         do {
             description = try container.decode(String.self, forKey: .description)
         } catch {
-            print(error)
-            print("Note description decoding failed.")
+            log.error(error)
+            log.error("Note description decoding failed.")
             description = ""
         }
         URL = try container.decode(String.self, forKey: .URL)

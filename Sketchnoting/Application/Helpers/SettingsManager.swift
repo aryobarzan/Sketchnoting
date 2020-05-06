@@ -88,6 +88,7 @@ public enum FileDisplayLayout: String {
 }
 public enum Annotator: String {
     case TAGME = "TAGME"
+    case WAT = "WAT"
     case BioPortal = "BioPortal"
     case CHEBI = "CHEBI"
 }

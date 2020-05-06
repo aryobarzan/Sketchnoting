@@ -19,7 +19,7 @@ protocol NoteXDelegate {
 
 class NoteX: File, DocumentVisitor, DocumentDelegate {
     var pages: [NoteXPage]
-    var documents: [Document]
+    private var documents: [Document]
     var hiddenDocuments: [Document]
     var tags: [Tag]
     var activePageIndex = 0
@@ -59,6 +59,7 @@ class NoteX: File, DocumentVisitor, DocumentDelegate {
         case bioportal = "BioPortal"
         case chebi = "CHEBI"
         case tagme = "TAGME"
+        case wat = "WAT"
     }
     override func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)
@@ -78,7 +79,7 @@ class NoteX: File, DocumentVisitor, DocumentDelegate {
     required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: NoteCodingKeys.self)
         var docsArrayForType = try container.nestedUnkeyedContainer(forKey: .documents)
-        documents = [Document]()
+        var docs = [Document]()
         var docsArray = docsArrayForType
         do {
             while(!docsArrayForType.isAtEnd) {
@@ -86,19 +87,21 @@ class NoteX: File, DocumentVisitor, DocumentDelegate {
                 let t = try doc.decode(DocumentType.self, forKey: DocumentTypeKey.type)
                 switch t {
                 case .Spotlight:
-                    documents.append(try docsArray.decode(SpotlightDocument.self))
+                    docs.append(try docsArray.decode(SpotlightDocument.self))
                     break
                 case .BioPortal:
-                    documents.append(try docsArray.decode(BioPortalDocument.self))
+                    docs.append(try docsArray.decode(BioPortalDocument.self))
                     break
                 case .Chemistry:
-                    documents.append(try docsArray.decode(CHEBIDocument.self))
+                    docs.append(try docsArray.decode(CHEBIDocument.self))
                     break
                 case .TAGME:
-                    documents.append(try docsArray.decode(TAGMEDocument.self))
+                    docs.append(try docsArray.decode(TAGMEDocument.self))
                     break
+                case .WAT:
+                    docs.append(try docsArray.decode(WATDocument.self))
                 case .Other:
-                    documents.append(try docsArray.decode(Document.self))
+                    docs.append(try docsArray.decode(Document.self))
                     break
                 }
             }
@@ -106,6 +109,7 @@ class NoteX: File, DocumentVisitor, DocumentDelegate {
             log.error("Decoding a note's documents failed.")
             log.error(error)
         }
+        documents = docs
         hiddenDocuments = [Document]()
         do {
             var hiddenDocsArrayForType = try container.nestedUnkeyedContainer(forKey: .hiddenDocuments)
@@ -125,6 +129,9 @@ class NoteX: File, DocumentVisitor, DocumentDelegate {
                         break
                 case .TAGME:
                         hiddenDocuments.append(try docsArray.decode(TAGMEDocument.self))
+                        break
+                case .WAT:
+                        hiddenDocuments.append(try docsArray.decode(WATDocument.self))
                         break
                 case .Other:
                         hiddenDocuments.append(try docsArray.decode(Document.self))
@@ -187,6 +194,7 @@ class NoteX: File, DocumentVisitor, DocumentDelegate {
             documents.append(document)
             document.delegate = self
             self.delegate?.noteHasNewDocument(note: self, document: document)
+            SKFileManager.save(file: self)
         }
     }
     
@@ -210,6 +218,10 @@ class NoteX: File, DocumentVisitor, DocumentDelegate {
             documents.removeAll{$0 == document}
             self.delegate?.noteHasRemovedDocument(note: self, document: document)
         }
+    }
+    
+    func clearDocuments() {
+        self.documents = [Document]()
     }
     
     func setDocumentPreviewImage(document: Document, image: UIImage) {
@@ -343,6 +355,16 @@ class NoteX: File, DocumentVisitor, DocumentDelegate {
                         matchesSearch = true
                         break
                     }
+                }
+            }
+        }
+    }
+    
+    func process(document: WATDocument) {
+        if !processBaseDocumentSearch(document: document) {
+            if let spot = document.spot {
+                if spot.lowercased().contains(currentSearchFilter!.term) {
+                    matchesSearch = true
                 }
             }
         }
@@ -491,12 +513,17 @@ class NoteX: File, DocumentVisitor, DocumentDelegate {
             var docs = [Document]()
             for doc in documents {
                 var documentTitle = doc.title.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-                if let TAGMEdocument = doc as? TAGMEDocument {
-                    if let spot = TAGMEdocument.spot {
+                if let TAGMEDocument = doc as? TAGMEDocument {
+                    if let spot = TAGMEDocument.spot {
                         documentTitle = spot.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
                     }
                 }
-                if self.getCurrentPage().getText().contains(documentTitle) && !docs.contains(doc) {
+                else if let watDocument = doc as? WATDocument {
+                    if let spot = watDocument.spot {
+                        documentTitle = spot.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+                    }
+                }
+                if self.getCurrentPage().getText().lowercased().contains(documentTitle) && !docs.contains(doc) {
                     docs.append(doc)
                 }
             }

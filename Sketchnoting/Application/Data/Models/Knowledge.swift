@@ -26,7 +26,7 @@ class Knowledge {
                     bag.append(t)
                 }
             }
-            for d in note.documents {
+            for d in note.getDocuments() {
                 for t in d.title.components(separatedBy: " ") {
                     if !bag.contains(t) {
                         bag.append(t)

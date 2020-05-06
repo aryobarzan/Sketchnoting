@@ -88,6 +88,18 @@ class DocumentDetailViewController: UIViewController, DocumentVisitor {
         }
     }
     
+    func process(document: WATDocument) {
+        typeBackView.backgroundColor = #colorLiteral(red: 0.8549019694, green: 0.250980407, blue: 0.4784313738, alpha: 1)
+        typeLabel.text = "WAT"
+        titleLabel.text = document.title
+        if let description = document.description {
+            self.setDetailDescription(text: description)
+        }
+        if let mapImage = document.mapImage {
+            bottomImageView.image = mapImage
+        }
+    }
+    
     func process(document: BioPortalDocument) {
         typeBackView.backgroundColor = #colorLiteral(red: 0.3411764801, green: 0.6235294342, blue: 0.1686274558, alpha: 1)
         typeLabel.text = "BioPortal"

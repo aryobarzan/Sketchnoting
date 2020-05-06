@@ -139,7 +139,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         relatedNotesCollectionView.delegate = self
         relatedNotesCollectionView.dataSource = self
         
-        self.oldDocuments = SKFileManager.activeNote!.documents
+        self.oldDocuments = SKFileManager.activeNote!.getDocuments()
         
         NotificationCenter.default.addObserver(self, selector: #selector(self.notifiedReceiveSketchnote(_:)), name: NSNotification.Name(rawValue: Notifications.NOTIFICATION_RECEIVE_NOTE), object: nil)
         
@@ -314,12 +314,17 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         self.removeDetectionAnnotations()
         let transform = self.transformMatrix(recognitionImageSize)
 
-        let documents = SKFileManager.activeNote!.documents
+        let documents = SKFileManager.activeNote!.getDocuments()
         if let textData = SKFileManager.activeNote!.getCurrentPage().getNoteText() {
             for document in documents {
                 var documentTitle = document.title.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-                if let TAGMEdocument = document as? TAGMEDocument {
-                    if let spot = TAGMEdocument.spot {
+                if let tagmeDocument = document as? TAGMEDocument {
+                    if let spot = tagmeDocument.spot {
+                        documentTitle = spot.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+                    }
+                }
+                else if let watDocument = document as? WATDocument {
+                    if let spot = watDocument.spot {
                         documentTitle = spot.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
                     }
                 }
@@ -654,7 +659,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             self.resetDocuments()
             break
         case .ResetTextRecognition:
-            SKFileManager.activeNote!.documents = [Document]()
+            SKFileManager.activeNote!.clearDocuments()
             documentsVC.items = [Document]()
             self.clearConceptHighlights()
             documentsVC.updateBookshelfState(state: .All)
@@ -748,6 +753,9 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                     DispatchQueue.global(qos: .background).async {
                         if SettingsManager.getAnnotatorStatus(annotator: .TAGME) {
                             TAGMEHelper.shared.fetch(text: text, note: SKFileManager.activeNote!)
+                        }
+                        if SettingsManager.getAnnotatorStatus(annotator: .WAT) {
+                            WATHelper.shared.fetch(text: text, note: SKFileManager.activeNote!)
                         }
                         if SettingsManager.getAnnotatorStatus(annotator: .BioPortal) {
                             self.bioportalHelper.fetch(text: text, note: SKFileManager.activeNote!)
@@ -998,14 +1006,15 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     // MARK: NoteXDelegate
     func noteHasNewDocument(note: NoteX, document: Document) {
         documentsVC.noteHasNewDocument(note: note, document: document)
-        startSaveTimer()
+        SKFileManager.saveCurrentNote()
     }
     func noteHasRemovedDocument(note: NoteX, document: Document) {
         documentsVC.noteDocumentHasChanged(note: note, document: document)
-        startSaveTimer()
+        SKFileManager.saveCurrentNote()
     }
     func noteDocumentHasChanged(note: NoteX, document: Document) {
         documentsVC.noteDocumentHasChanged(note: note, document: document)
+        SKFileManager.saveCurrentNote()
     }
     func noteHasChanged(note: NoteX) {
     }
@@ -1515,21 +1524,21 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     // MARK: Documents View Controller delegate
     func resetDocuments() {
         self.clearConceptHighlights()
-        SKFileManager.activeNote!.documents = [Document]()
+        SKFileManager.activeNote!.clearDocuments()
         documentsVC.clear()
-        SKFileManager.save(file: SKFileManager.activeNote!)
+        SKFileManager.saveCurrentNote()
         self.annotateText(text: SKFileManager.activeNote!.getText())
     }
     var oldDocuments: [Document]!
     func updateTopicsCount() {
         self.topicsBadgeHub.setCount(SKFileManager.activeNote!.getDocuments(forCurrentPage: true).count)
-        let differences = zip(oldDocuments, SKFileManager.activeNote!.documents).map {$0.0 == $0.1}
+        let differences = zip(oldDocuments, SKFileManager.activeNote!.getDocuments()).map {$0.0 == $0.1}
         if differences.count > 0 {
             if self.topicsShown {
                 self.setupTopicAnnotations(recognitionImageSize: canvasView.frame.size)
             }
         }
-        bookshelfSegmentedControl.setTitle("Documents (\(SKFileManager.activeNote!.documents.count))", forSegmentAt: 0)
+        bookshelfSegmentedControl.setTitle("Documents (\(SKFileManager.activeNote!.getDocuments().count))", forSegmentAt: 0)
     }
     
     private func showNotePagesBottomSheet() {

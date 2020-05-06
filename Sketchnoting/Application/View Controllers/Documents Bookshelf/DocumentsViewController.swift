@@ -63,13 +63,13 @@ class DocumentsViewController: UICollectionViewController{
     
     public func setNote(note: NoteX) {
         self.note = note
-        self.items = note.documents
+        self.items = note.getDocuments()
         self.updateBookshelf()
     }
     
     public func clear() {
-        self.note.documents = [Document]()
-        self.items = self.note.documents
+        self.note.clearDocuments()
+        self.items = self.note.getDocuments()
         self.updateBookshelf()
     }
     
@@ -126,6 +126,9 @@ class DocumentsViewController: UICollectionViewController{
         case .TAGME:
             cell.previewImage.layer.borderColor = #colorLiteral(red: 0.1764705926, green: 0.4980392158, blue: 0.7568627596, alpha: 1)
             break
+        case .WAT:
+            cell.previewImage.layer.borderColor = #colorLiteral(red: 0.8549019694, green: 0.250980407, blue: 0.4784313738, alpha: 1)
+            break
         case .BioPortal:
             cell.previewImage.layer.borderColor = #colorLiteral(red: 0.3411764801, green: 0.6235294342, blue: 0.1686274558, alpha: 1)
             break
@@ -160,7 +163,7 @@ class DocumentsViewController: UICollectionViewController{
             if self.bookshelfState == .All {
                 log.info("Updating Bookshelf.")
                 self.header?.clearFilterButton.isHidden = true
-                self.items = self.getFilteredDocuments(documents: self.note.documents)
+                self.items = self.getFilteredDocuments(documents: self.note.getDocuments())
                 self.collectionView.reloadData()
             }
             else if self.bookshelfState == .Topic {
@@ -195,6 +198,8 @@ class DocumentsViewController: UICollectionViewController{
             return documents
         case .TAGME:
             return documents.filter{ $0.documentType == .TAGME }
+        case .WAT:
+            return documents.filter{ $0.documentType == .WAT }
         case .Spotlight:
             return documents.filter{ $0.documentType == .Spotlight }
         case .BioPortal:
@@ -294,6 +299,10 @@ class DocumentsViewController: UICollectionViewController{
             if self.bookshelfFilter == .TAGME {
                 return true
             }
+        case .WAT:
+            if self.bookshelfFilter == .WAT {
+                return true
+            }
         case .BioPortal:
             if self.bookshelfFilter == .BioPortal {
                 return true
@@ -348,7 +357,7 @@ class DocumentsViewController: UICollectionViewController{
     }
     
     private func resetDocuments() {
-        self.note.documents = [Document]()
+        self.note.clearDocuments()
         self.updateBookshelfState(state: .All)
         self.bookshelfFilter = .All
         self.updateBookshelf()
@@ -410,6 +419,7 @@ class DocumentsViewController: UICollectionViewController{
         var allImage: UIImage? = nil
         var spotlightImage: UIImage? = nil
         var tagmeImage: UIImage? = nil
+        var watImage: UIImage? = nil
         var bioportalImage: UIImage? = nil
         var chebiImage: UIImage? = nil
         switch self.bookshelfFilter {
@@ -418,6 +428,9 @@ class DocumentsViewController: UICollectionViewController{
             break
         case .TAGME:
             tagmeImage = UIImage(systemName: "checkmark.circle.fill")
+            break
+        case .WAT:
+            watImage = UIImage(systemName: "checkmark.circle.fill")
             break
         case .Spotlight:
             spotlightImage = UIImage(systemName: "checkmark.circle.fill")
@@ -446,6 +459,11 @@ class DocumentsViewController: UICollectionViewController{
             self.updateBookshelf()
         })
         popMenu.addAction(tagmeAction)
+        let watAction = PopMenuDefaultAction(title: "WAT", image: watImage, didSelect: { action in
+            self.bookshelfFilter = .WAT
+            self.updateBookshelf()
+        })
+        popMenu.addAction(watAction)
         let bioportalAction = PopMenuDefaultAction(title: "BioPortal", image: bioportalImage, didSelect: { action in
             self.bookshelfFilter = .BioPortal
             self.updateBookshelf()
@@ -465,6 +483,7 @@ class DocumentsViewController: UICollectionViewController{
 public enum BookshelfFilter {
     case All
     case TAGME
+    case WAT
     case Spotlight
     case BioPortal
     case CHEBI

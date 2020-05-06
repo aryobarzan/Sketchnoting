@@ -40,7 +40,7 @@ class WATHelper {
                             if !spot.isEmpty && results[spot] == nil {
                                 results[spot] = spot
                                 if rho > 0.1 {
-                                    if let document = WATDocument(title: title, description: "Missing description.", URL: "https://sobigdata.d4science.org/web/tagme/wat-api", type: .TAGME, spot: spot, wikiPageID: id) {
+                                    if let document = WATDocument(title: title, description: "Missing description.", URL: "https://sobigdata.d4science.org/web/tagme/wat-api", type: .WAT, spot: spot, wikiPageID: id) {
                                         if let parentConcept = parentConcept {
                                             self.checkRelatedness(doc_one: parentConcept, doc_two: document, note: note)
                                         }
@@ -59,7 +59,7 @@ class WATHelper {
     // to update
     private func performAdditionalSteps(document: WATDocument, note: NoteX) {
         DispatchQueue.main.async {
-            if !note.documents.contains(document) {
+            if !note.getDocuments().contains(document) {
                 log.info("WAT: new document added - \(document.title)")
                 note.addDocument(document: document)
                 self.watQueue.async {
@@ -72,16 +72,6 @@ class WATHelper {
                     KnowledgeGraphHelper.isPlace(name: document.title, completionHandler: { isPlace in
                         if isPlace {
                             MapHelper.fetchMap(location: document.title, document: document, note: note)
-                        }
-                        else {
-                            let placeTerms = ["place", "city", "populated", "country", "capital", "location", "state", "village"]
-                            for term in placeTerms {
-                                if document.description?.lowercased().contains(term) ?? false {
-                                    MapHelper.fetchMap(location: document.title, document: document, note: note)
-                                    break
-                                }
-                            }
-                            
                         }
                     })
                 }

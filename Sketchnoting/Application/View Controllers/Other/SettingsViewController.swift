@@ -16,6 +16,7 @@ class SettingsViewController: UITableViewController {
     @IBOutlet var textRecognitionSegmentedControl: UISegmentedControl!
     @IBOutlet var tagmeSwitch: UISwitch!
     @IBOutlet var bioportalSwitch: UISwitch!
+    @IBOutlet weak var watSwitch: UISwitch!
     @IBOutlet var chebiSwitch: UISwitch!
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -23,6 +24,7 @@ class SettingsViewController: UITableViewController {
         
         automaticAnnotationSwitch.setOn(SettingsManager.automaticAnnotation(), animated: false)
         tagmeSwitch.setOn(SettingsManager.getAnnotatorStatus(annotator: .TAGME), animated: false)
+        watSwitch.setOn(SettingsManager.getAnnotatorStatus(annotator: .WAT), animated: false)
         bioportalSwitch.setOn(SettingsManager.getAnnotatorStatus(annotator: .BioPortal), animated: false)
         chebiSwitch.setOn(SettingsManager.getAnnotatorStatus(annotator: .CHEBI), animated: false)
         pencilSideButtonSegmentedControl.selectedSegmentIndex = UserDefaults.settings.integer(forKey: SettingsKeys.PencilSideButtonDoubleTap.rawValue)
@@ -51,6 +53,9 @@ class SettingsViewController: UITableViewController {
     }
     @IBAction func tagmeSwitchChanged(_ sender: UISwitch) {
         SettingsManager.setAnnotatorStatus(annotator: .TAGME, status: sender.isOn)
+    }
+    @IBAction func watSwitchChanged(_ sender: UISwitch) {
+        SettingsManager.setAnnotatorStatus(annotator: .WAT, status: sender.isOn)
     }
     @IBAction func bioportalSwitchChanged(_ sender: UISwitch) {
         SettingsManager.setAnnotatorStatus(annotator: .BioPortal, status: sender.isOn)
