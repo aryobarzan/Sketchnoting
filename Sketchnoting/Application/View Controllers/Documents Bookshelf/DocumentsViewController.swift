@@ -104,7 +104,8 @@ class DocumentsViewController: UICollectionViewController{
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath as IndexPath) as! DocumentViewCell
         let document = self.items[indexPath.item]
         cell.titleLabel.text = document.title
-        cell.previewImage.image = UIImage(systemName: "book.circle.fill")
+        cell.descriptionLabel.text = document.description
+        cell.previewImage.image = UIImage(systemName: "questionmark.circle.fill")
         document.retrieveImage(type: .Standard, completion: { result in
             switch result {
             case .success(let value):
@@ -117,30 +118,28 @@ class DocumentsViewController: UICollectionViewController{
                 log.error("No preview image found for document \(document.title).")
             }
         })
-        cell.previewImage.layer.masksToBounds = true
-        cell.previewImage.layer.cornerRadius = 90
         switch document.documentType {
         case .Spotlight:
-            cell.previewImage.layer.borderColor = #colorLiteral(red: 0.1764705926, green: 0.01176470611, blue: 0.5607843399, alpha: 1)
+            cell.typeImage.tintColor = #colorLiteral(red: 0.1764705926, green: 0.01176470611, blue: 0.5607843399, alpha: 1)
             break
         case .TAGME:
-            cell.previewImage.layer.borderColor = #colorLiteral(red: 0.1764705926, green: 0.4980392158, blue: 0.7568627596, alpha: 1)
+            cell.typeImage.tintColor = #colorLiteral(red: 0.1764705926, green: 0.4980392158, blue: 0.7568627596, alpha: 1)
             break
         case .WAT:
-            cell.previewImage.layer.borderColor = #colorLiteral(red: 0.8549019694, green: 0.250980407, blue: 0.4784313738, alpha: 1)
+            cell.typeImage.tintColor = #colorLiteral(red: 0.8549019694, green: 0.250980407, blue: 0.4784313738, alpha: 1)
             break
         case .BioPortal:
-            cell.previewImage.layer.borderColor = #colorLiteral(red: 0.3411764801, green: 0.6235294342, blue: 0.1686274558, alpha: 1)
+            cell.typeImage.tintColor = #colorLiteral(red: 0.3411764801, green: 0.6235294342, blue: 0.1686274558, alpha: 1)
             break
         case .Chemistry:
-            cell.previewImage.layer.borderColor = #colorLiteral(red: 0.9529411793, green: 0.6862745285, blue: 0.1333333403, alpha: 1)
+            cell.typeImage.tintColor = #colorLiteral(red: 0.9529411793, green: 0.6862745285, blue: 0.1333333403, alpha: 1)
             break
         case .Other:
-            cell.previewImage.layer.borderColor = #colorLiteral(red: 0.6000000238, green: 0.6000000238, blue: 0.6000000238, alpha: 1)
+            cell.typeImage.tintColor = #colorLiteral(red: 0.6000000238, green: 0.6000000238, blue: 0.6000000238, alpha: 1)
             break
         }
-        cell.previewImage.layer.borderWidth = 3
-        cell.layer.cornerRadius = 2
+        cell.layer.borderColor = UIColor.lightGray.cgColor
+        cell.layer.borderWidth = 1
         return cell
     }
 
@@ -155,7 +154,7 @@ class DocumentsViewController: UICollectionViewController{
    func collectionView(_ collectionView: UICollectionView,
                         layout collectionViewLayout: UICollectionViewLayout,
                         sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: CGFloat(220), height: CGFloat(240))
+        return CGSize(width: CGFloat(333), height: CGFloat(274))
     }
 
     func updateBookshelf() {

@@ -67,7 +67,9 @@ class NoteX: File, DocumentVisitor, DocumentDelegate {
         do {
             try container.encode(documents, forKey: .documents)
             try container.encode(hiddenDocuments, forKey: .hiddenDocuments)
+            log.info("Encoded note documents.")
         } catch {
+            log.error("Error while encoding documents of note.")
         }
         try container.encode(tags, forKey: .tags)
         try container.encode(activePageIndex, forKey: .activePageIndex)
@@ -530,26 +532,5 @@ class NoteX: File, DocumentVisitor, DocumentDelegate {
             return docs
         }
         return self.documents
-    }
-    
-    public func cleanup() -> Bool {
-        var requiresSave = false
-        var docs = [Document]()
-        for doc in documents {
-            var documentTitle = doc.title.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-            if let TAGMEdocument = doc as? TAGMEDocument {
-                if let spot = TAGMEdocument.spot {
-                    documentTitle = spot.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-                }
-            }
-            if !self.getText().contains(documentTitle) {
-                docs.append(doc)
-            }
-        }
-        if docs.count > 0 {
-            requiresSave = true
-        }
-        self.documents = self.documents.filter { !docs.contains($0) }
-        return requiresSave
     }
 }

@@ -74,6 +74,7 @@
 		9F942506238A341E006B0E81 /* UIStoryboardSegueWithCompletion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F942505238A341E006B0E81 /* UIStoryboardSegueWithCompletion.swift */; };
 		9F9460DF23F5B0460073D709 /* GridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F9460DE23F5B0460073D709 /* GridView.swift */; };
 		9F9460E223F5BAA10073D709 /* Connectivity in Frameworks */ = {isa = PBXBuildFile; productRef = 9F9460E123F5BAA10073D709 /* Connectivity */; };
+		9F96895724679D4000D02F81 /* NoteDoc.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F96895624679D4000D02F81 /* NoteDoc.swift */; };
 		9F9DAFE0242CB7C100713E75 /* DrawingRecognition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F9DAFDF242CB7C100713E75 /* DrawingRecognition.swift */; };
 		9FA5A482244AB14E006D9FB2 /* UILabelExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA5A481244AB14E006D9FB2 /* UILabelExtensions.swift */; };
 		9FA6238822CEA7FE007ED794 /* MapHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA6238722CEA7FE007ED794 /* MapHelper.swift */; };
@@ -201,6 +202,7 @@
 		9F92D11E23217FFF00BC0E57 /* SearchFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchFilter.swift; sourceTree = "<group>"; };
 		9F942505238A341E006B0E81 /* UIStoryboardSegueWithCompletion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIStoryboardSegueWithCompletion.swift; sourceTree = "<group>"; };
 		9F9460DE23F5B0460073D709 /* GridView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GridView.swift; sourceTree = "<group>"; };
+		9F96895624679D4000D02F81 /* NoteDoc.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteDoc.swift; sourceTree = "<group>"; };
 		9F9DAFDF242CB7C100713E75 /* DrawingRecognition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrawingRecognition.swift; sourceTree = "<group>"; };
 		9FA5A481244AB14E006D9FB2 /* UILabelExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UILabelExtensions.swift; sourceTree = "<group>"; };
 		9FA6238722CEA7FE007ED794 /* MapHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapHelper.swift; sourceTree = "<group>"; };
@@ -492,6 +494,7 @@
 				9FA6239622DE3806007ED794 /* CHEBIDocument.swift */,
 				9F75E483231419FA00488BBD /* TAGMEDocument.swift */,
 				9F5D8A312461157200934C0E /* WATDocument.swift */,
+				9F96895624679D4000D02F81 /* NoteDoc.swift */,
 			);
 			path = Documents;
 			sourceTree = "<group>";
@@ -886,6 +889,7 @@
 				9F5E89F42391CE84002FA8B2 /* DocumentDetailViewController.swift in Sources */,
 				9FD29C56223C3C3900CC969A /* StringExtensions.swift in Sources */,
 				9F65983F23EDD80B00CDBE0C /* HelpLinesType.swift in Sources */,
+				9F96895724679D4000D02F81 /* NoteDoc.swift in Sources */,
 				9F65983D23EDD2FA00CDBE0C /* NoteTextComplete.swift in Sources */,
 				9F92D11C23217D0500BC0E57 /* SearchFilterView.swift in Sources */,
 				9F0FC54923760E7600070FA0 /* NoteOptionsTableViewController.swift in Sources */,

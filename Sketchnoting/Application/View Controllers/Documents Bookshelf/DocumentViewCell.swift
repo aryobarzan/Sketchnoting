@@ -11,4 +11,6 @@ import UIKit
 class DocumentViewCell: UICollectionViewCell {
     @IBOutlet weak var previewImage: UIImageView!
     @IBOutlet weak var titleLabel: UILabel!
+    @IBOutlet weak var typeImage: UIImageView!
+    @IBOutlet weak var descriptionLabel: UILabel!
 }

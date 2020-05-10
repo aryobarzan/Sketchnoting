@@ -54,7 +54,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     var drawingViews = [UIView]()
     var drawingViewsShown = false
     
-    var spotlightHelper: SpotlightHelper!
     var bioportalHelper: BioPortalHelper!
     
     var conceptHighlights = [UIView : [Document]]()
@@ -84,11 +83,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         super.viewDidLoad()
         self.navigationController?.setNavigationBarHidden(true, animated: false)
         self.tabBarController?.tabBar.isHidden = true
-        
-        let saveNote = SKFileManager.activeNote!.cleanup()
-        if saveNote {
-            SKFileManager.saveCurrentNote()
-        }
         
         self.canvasView.allowsFingerDrawing = false
         self.canvasView.delegate = self
@@ -130,7 +124,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         self.topicsBadgeHub.scaleCircleSize(by: 0.55)
         self.topicsBadgeHub.moveCircleBy(x: 4, y: -6)
         
-        spotlightHelper = SpotlightHelper()
         bioportalHelper = BioPortalHelper()
         
         canvasView.bringSubviewToFront(drawingInsertionCanvas)
@@ -793,13 +786,13 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         }
         bookshelfButton.tintColor = self.view.tintColor
         self.bookshelf.isHidden = false
-        let animation = AnimationType.from(direction: .right, offset: 400.0)
+        let animation = AnimationType.from(direction: .right, offset: 500)
         bookshelf.animate(animations: [animation])
     }
     
     private func closeBookshelf() {
         bookshelfButton.tintColor = .white
-        bookshelfLeftConstraint.constant = UIScreen.main.bounds.maxX - 400
+        bookshelfLeftConstraint.constant = UIScreen.main.bounds.maxX - 500
         self.isBookshelfDraggedOut = true
         UIView.animate(withDuration: 0.25, delay: 0, options: UIView.AnimationOptions.curveEaseIn, animations: {
             self.view.layoutIfNeeded()
@@ -887,7 +880,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         if let touch = touches.first{
             let touchStart = touch.location(in: self.view)
-            
             resizeRect.topTouch = false
             resizeRect.leftTouch = false
             resizeRect.rightTouch = false
@@ -903,15 +895,11 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         if let touch = touches.first{
             let currentTouchPoint = touch.location(in: self.view)
             let previousTouchPoint = touch.previousLocation(in: self.view)
-            
             let deltaX = currentTouchPoint.x - previousTouchPoint.x
-            
             if resizeRect.leftTouch {
                 if (bookshelfLeftConstraint.constant + deltaX) >= 0 && UIScreen.main.bounds.maxX - currentTouchPoint.x >= 400 {
                     bookshelfLeftConstraint.constant += deltaX
                 }
-                
-                
                 if UIScreen.main.bounds.maxX - currentTouchPoint.x <= 400 {
                     bookshelf.alpha = 0.4
                 }
@@ -919,8 +907,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                     bookshelf.alpha = 1.0
                 }
             }
-            
-            
             UIView.animate(withDuration: 0.25, delay: 0, options: UIView.AnimationOptions.curveEaseIn, animations: {
                 self.view.layoutIfNeeded()
             }, completion: { (ended) in
@@ -930,7 +916,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         if let touch = touches.first{
             let currentTouchPoint = touch.location(in: self.view)
-            
             if resizeRect.leftTouch {
                 if UIScreen.main.bounds.maxX - currentTouchPoint.x <= 400 {
                     self.closeBookshelf()
@@ -945,7 +930,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                 self.showBookshelf()
             }
         }
-        
     }
     
     // MARK: Documents Collection View
