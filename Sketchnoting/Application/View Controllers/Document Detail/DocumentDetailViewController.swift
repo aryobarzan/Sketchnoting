@@ -29,7 +29,8 @@ class DocumentDetailViewController: UIViewController, DocumentVisitor {
         previewImage.layer.masksToBounds = true
         previewImage.layer.cornerRadius = 64
         previewImage.layer.borderWidth = 1
-        previewImage.layer.borderColor = UIColor.black.cgColor
+        previewImage.layer.borderColor = UIColor.white.cgColor
+        previewImage.tintColor = .white
         typeBackView.layer.masksToBounds = true
         typeBackView.layer.cornerRadius = 15
         backgroundBlurEffect.layer.masksToBounds = true
@@ -39,7 +40,7 @@ class DocumentDetailViewController: UIViewController, DocumentVisitor {
     func setDocument(document: Document) {
         titleLabel.text = document.title
         typeLabel.text = "Document"
-        previewImage.image = UIImage(systemName: "book.circle.fill")
+        previewImage.image = UIImage(systemName: "questionmark.circle.fill")
         bottomImageView.image = nil
         document.retrieveImage(type: .Standard, completion: { result in
             switch result {

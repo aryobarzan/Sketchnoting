@@ -140,6 +140,14 @@ class DocumentsViewController: UICollectionViewController{
         }
         cell.layer.borderColor = UIColor.lightGray.cgColor
         cell.layer.borderWidth = 1
+        cell.layer.cornerRadius = 20.0
+        cell.layer.shadowColor = UIColor.black.cgColor
+        cell.layer.shadowOffset = .zero
+        cell.layer.shadowRadius = 12.0
+        cell.layer.shadowOpacity = 0.7
+        cell.layer.shadowPath = UIBezierPath(rect: cell.bounds).cgPath
+        cell.layer.shouldRasterize = true
+        cell.layer.rasterizationScale = UIScreen.main.scale
         return cell
     }
 

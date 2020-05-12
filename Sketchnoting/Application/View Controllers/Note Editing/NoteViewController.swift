@@ -23,7 +23,7 @@ import GPUImage
 import Highlightr
 import Toast
 
-class NoteViewController: UIViewController, UIPencilInteractionDelegate, UICollectionViewDataSource, UICollectionViewDelegate, NoteXDelegate, PKCanvasViewDelegate, PKToolPickerObserver, UIScreenshotServiceDelegate, NoteOptionsDelegate, DocumentsViewControllerDelegate, NotePagesDelegate, VNDocumentCameraViewControllerDelegate, UIDocumentPickerDelegate, DraggableImageViewDelegate, DraggableTextViewDelegate {
+class NoteViewController: UIViewController, UIPencilInteractionDelegate, UICollectionViewDataSource, UICollectionViewDelegate, NoteXDelegate, PKCanvasViewDelegate, PKToolPickerObserver, UIScreenshotServiceDelegate, NoteOptionsDelegate, DocumentsViewControllerDelegate, NotePagesDelegate, VNDocumentCameraViewControllerDelegate, UIDocumentPickerDelegate, DraggableImageViewDelegate, DraggableTextViewDelegate, RelatedNotesVCDelegate {
     
     private var documentsVC: DocumentsViewController!
     
@@ -68,6 +68,8 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     @IBOutlet weak var pdfView: PDFView!
     
     var noteTextViews = [DraggableTextView : NoteTypedText]()
+    
+    var noteForRelatedNotes: NoteX?
     
     private lazy var topicsOverlayView: UIView = {
       precondition(isViewLoaded)
@@ -210,6 +212,17 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             if let destination = segue.destination as? UINavigationController {
                 if let destinationViewController = destination.topViewController as? ShareNoteViewController {
                     destinationViewController.note = SKFileManager.activeNote!
+                }
+            }
+            break
+        case "showRelatedNoteEditing":
+            if let destination = segue.destination as? UINavigationController {
+                if let destinationViewController = destination.topViewController as? RelatedNotesViewController {
+                    if let n = noteForRelatedNotes {
+                        destinationViewController.delegate = self
+                        destinationViewController.note = n
+                        destinationViewController.context = .NoteEditing
+                    }
                 }
             }
             break
@@ -608,6 +621,10 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         switch option {
         case .Annotate:
             self.processHandwritingRecognition()
+            break
+        case .RelatedNotes:
+            self.noteForRelatedNotes = SKFileManager.activeNote!
+            self.performSegue(withIdentifier: "showRelatedNoteEditing", sender: self)
             break
         case .SetTitle:
             let alertController = UIAlertController(title: "Rename Note", message: nil, preferredStyle: .alert)
@@ -1029,6 +1046,23 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             SKFileManager.save(file: SKFileManager.activeNote!)
         }
         return UIMenu(title: note.getName(), children: [mergeAction, mergeTagsAction])
+    }
+    
+    // Related Notes VC delegate
+    func openRelatedNote(note: NoteX) {
+        self.openNote = note
+        self.saveCurrentPage()
+        if self.textRecognitionTimer != nil {
+            self.textRecognitionTimer!.invalidate()
+        }
+        if self.saveTimer != nil {
+            self.saveTimer!.invalidate()
+        }
+        self.documentsVC.bookshelfUpdateTimer?.reset(nil)
+        self.performSegue(withIdentifier: "CloseNote", sender: self)
+    }
+    func mergedNotes(note1: NoteX, note2: NoteX) {
+        self.updatePaginationButtons()
     }
     
     private func showTopicDocuments(documents: [Document]) {

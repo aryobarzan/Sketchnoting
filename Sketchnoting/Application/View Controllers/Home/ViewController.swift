@@ -22,7 +22,7 @@ import MobileCoreServices
 import VisionKit
 import Photos
 
-class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextFieldDelegate, MCSessionDelegate, MCBrowserViewControllerDelegate, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UIApplicationDelegate, UIPopoverPresentationControllerDelegate, UIDocumentPickerDelegate, VNDocumentCameraViewControllerDelegate, UICollectionViewDragDelegate, UICollectionViewDropDelegate, FolderButtonDelegate {
+class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextFieldDelegate, MCSessionDelegate, MCBrowserViewControllerDelegate, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UIApplicationDelegate, UIPopoverPresentationControllerDelegate, UIDocumentPickerDelegate, VNDocumentCameraViewControllerDelegate, UICollectionViewDragDelegate, UICollectionViewDropDelegate, FolderButtonDelegate, RelatedNotesVCDelegate {
     
     @IBOutlet weak var navigationHierarchyScrollView: UIScrollView!
     @IBOutlet weak var navigationHierarchyStackView: UIStackView!
@@ -196,6 +196,17 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
                 destination.note = selectedNoteForTagEditing
             }
             break
+        case "showRelatedHomePage":
+            if let destination = segue.destination as? UINavigationController {
+                if let destinationViewController = destination.topViewController as? RelatedNotesViewController {
+                    if let n = noteForRelatedNotes {
+                        destinationViewController.delegate = self
+                        destinationViewController.note = n
+                        destinationViewController.context = .HomePage
+                    }
+                }
+            }
+            break
         case "Settings":
             break
         default:
@@ -366,7 +377,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     // MARK: Note display management
     private func updateDisplayedNotes(_ animated: Bool) {
         self.items = SKFileManager.getCurrentFiles()
-        if let noteForSimilarityFilter = noteForSimilarityFilter, let similarNotes = similarNotes {
+        if let noteForSimilarityFilter = noteForRelatedNotes, let similarNotes = similarNotes {
             self.items = [File]()
             self.items.append(noteForSimilarityFilter)
             self.items.append(contentsOf: similarNotes.map { $0.0 })
@@ -480,9 +491,18 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         performSegue(withIdentifier: "NewSketchnote", sender: self)
     }
     @IBAction func newFolderButtonTapped(_ sender: UIButton) {
-        let newFolder = Folder(name: "Untitled", parent: SKFileManager.currentFolder?.id)
-        _ = SKFileManager.add(folder: newFolder)
-        self.updateDisplayedNotes(false)
+        self.showInputDialog(title: "New Folder:", subtitle: nil, actionTitle: "Create", cancelTitle: "Cancel", inputPlaceholder: "Folder Name...", inputKeyboardType: .default, cancelHandler: nil)
+        { (input:String?) in
+            var name = "Untitled"
+            if let input = input {
+                if !input.isEmpty {
+                    name = input
+                }
+            }
+            let newFolder = Folder(name: name, parent: SKFileManager.currentFolder?.id)
+            _ = SKFileManager.add(folder: newFolder)
+            self.updateDisplayedNotes(false)
+        }
     }
     
     @IBAction func noteSortingTapped(_ sender: UIButton) {
@@ -547,9 +567,9 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
                 self.editNoteTags(note: note, cell: self.noteCollectionView.cellForItem(at: cellIndexPath))
             }
             menuElements.append(tagsAction)
-            let similarNotesAction = UIAction(title: "Similar Notes", image: UIImage(systemName: "link")) { action in
-                self.filterSimilarNotesFor(note)
-                self.view.makeToast("Showing similar notes.", title: note.getName())
+            let similarNotesAction = UIAction(title: "Related Notes", image: UIImage(systemName: "link")) { action in
+                self.showRelatedNotesFor(note)
+                self.view.makeToast("Showing related notes.", title: note.getName())
             }
             menuElements.append(similarNotesAction)
             let duplicateAction = UIAction(title: "Duplicate", image: UIImage(systemName: "doc.on.doc")) { action in
@@ -728,30 +748,25 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         self.present(alertController, animated: true, completion: nil)
     }
     
-    var noteForSimilarityFilter: NoteX?
+    var noteForRelatedNotes: NoteX?
     var similarNotes: [(NoteX, Float)]?
-    private func filterSimilarNotesFor(_ note: NoteX) {
-        Knowledge.setupSimilarityMatrix()
-        similarNotes = Knowledge.similarNotesFor(note: note)
-        if let similarNotes = similarNotes {
-            if similarNotes.count > 1 {
-                self.noteForSimilarityFilter = note
-                self.updateDisplayedNotes(true)
-                clearSimilarNotesButton.isHidden = false
-                similarNotesTitleLabel.text = "Showing similar notes for: " + note.getName()
-                similarNotesTitleLabel.isHidden = false
-            }
-            else {
-                self.view.makeToast("No similar notes could be found.", title: note.getName())
-            }
-        }
+    private func showRelatedNotesFor(_ note: NoteX) {
+        self.noteForRelatedNotes = note
+        self.performSegue(withIdentifier: "showRelatedHomePage", sender: self)
     }
+    // Related Notes VC delegate
+    func openRelatedNote(note: NoteX) {
+        self.open(note: note)
+    }
+    func mergedNotes(note1: NoteX, note2: NoteX) {
+    }
+    
     @IBAction func clearSimilarNotesTapped(_ sender: UIButton) {
         clearSimilarNotes()
     }
     
     private func clearSimilarNotes() {
-        noteForSimilarityFilter = nil
+        noteForRelatedNotes = nil
         similarNotes = nil
         self.updateDisplayedNotes(false)
         clearSimilarNotesButton.isHidden = true

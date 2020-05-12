@@ -9,6 +9,8 @@
 import UIKit
 
 class DocumentViewCell: UICollectionViewCell {
+    //@IBOutlet var contentView: UIView?
+    @IBOutlet weak var backdrop: UIView!
     @IBOutlet weak var previewImage: UIImageView!
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var typeImage: UIImageView!

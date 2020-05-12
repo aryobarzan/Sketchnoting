@@ -62,6 +62,9 @@ class NoteOptionsTableViewController: UITableViewController {
             if indexPath.row == 0 {
                 option = .Annotate
             }
+            else if indexPath.row == 1 {
+                option = .RelatedNotes
+            }
         }
         else if indexPath.section == 2 {
             if indexPath.row == 0 {
@@ -134,6 +137,7 @@ protocol NoteOptionsDelegate  {
 
 enum NoteOption {
     case Annotate
+    case RelatedNotes
     case SetTitle
     case ViewText
     case CopyText
