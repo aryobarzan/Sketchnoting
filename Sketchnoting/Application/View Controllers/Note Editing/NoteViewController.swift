@@ -23,7 +23,8 @@ import GPUImage
 import Highlightr
 import Toast
 
-class NoteViewController: UIViewController, UIPencilInteractionDelegate, UICollectionViewDataSource, UICollectionViewDelegate, NoteXDelegate, PKCanvasViewDelegate, PKToolPickerObserver, UIScreenshotServiceDelegate, NoteOptionsDelegate, DocumentsViewControllerDelegate, NotePagesDelegate, VNDocumentCameraViewControllerDelegate, UIDocumentPickerDelegate, DraggableImageViewDelegate, DraggableTextViewDelegate, RelatedNotesVCDelegate {
+class NoteViewController: UIViewController, UIPencilInteractionDelegate, UICollectionViewDelegate, NoteXDelegate, PKCanvasViewDelegate, PKToolPickerObserver, UIScreenshotServiceDelegate, NoteOptionsDelegate, DocumentsViewControllerDelegate, NotePagesDelegate, VNDocumentCameraViewControllerDelegate, UIDocumentPickerDelegate, DraggableImageViewDelegate, DraggableTextViewDelegate, RelatedNotesVCDelegate, TextBoxViewControllerDelegate {
+    
     
     private var documentsVC: DocumentsViewController!
     
@@ -45,10 +46,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     @IBOutlet var documentsUnderlyingView: UIView!
         
     @IBOutlet weak var helpLinesButton: UIButton!
-    
-    @IBOutlet weak var bookshelfSegmentedControl: UISegmentedControl!
-    @IBOutlet weak var relatedNotesSimilaritySlider: UISlider!
-    
     
     @IBOutlet var canvasViewLongPressGesture: UILongPressGestureRecognizer!
     var drawingViews = [UIView]()
@@ -96,7 +93,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             canvasView.becomeFirstResponder()
         }
         canvasViewLongPressGesture.allowedTouchTypes = [0]
-        
+                
         let interaction = UIPencilInteraction()
         interaction.delegate = self
         view.addInteraction(interaction)
@@ -106,7 +103,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         pdfView.minScaleFactor = 0.1
         pdfView.scaleFactor = 1.0
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             let storyboard = UIStoryboard(name: "Main", bundle: Bundle.main)
             self.documentsVC = storyboard.instantiateViewController(withIdentifier: "DocumentsViewController") as? DocumentsViewController
             self.documentsVC.delegate = self
@@ -129,10 +126,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         bioportalHelper = BioPortalHelper()
         
         canvasView.bringSubviewToFront(drawingInsertionCanvas)
-        
-        relatedNotesCollectionView.register(UINib(nibName: "NoteCollectionViewCell", bundle: nil), forCellWithReuseIdentifier: reuseSimilarNoteIdentifier)
-        relatedNotesCollectionView.delegate = self
-        relatedNotesCollectionView.dataSource = self
         
         self.oldDocuments = SKFileManager.activeNote!.getDocuments()
         
@@ -222,6 +215,18 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                         destinationViewController.delegate = self
                         destinationViewController.note = n
                         destinationViewController.context = .NoteEditing
+                    }
+                }
+            }
+            break
+        case "ShowTextBoxVC":
+            if let destination = segue.destination as? UINavigationController {
+                if let destinationViewController = destination.topViewController as? TextBoxViewController {
+                    if let textView = self.draggableTextViewBeingEdited {
+                        if let typedText = self.noteTextViews[textView] {
+                            destinationViewController.delegate = self
+                            destinationViewController.noteTypedText = typedText
+                        }
                     }
                 }
             }
@@ -794,13 +799,8 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         }
     }
     
-    var relatedNotesLoadedFirstTime = false
     
     private func showBookshelf() {
-        if !relatedNotesLoadedFirstTime {
-            relatedNotesLoadedFirstTime = true
-            self.refreshRelatedNotes()
-        }
         bookshelfButton.tintColor = self.view.tintColor
         self.bookshelf.isHidden = false
         let animation = AnimationType.from(direction: .right, offset: 500)
@@ -952,39 +952,9 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     // MARK: Documents Collection View
     let reuseSimilarNoteIdentifier = "NoteCollectionViewCell"
     
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return self.relatedNotes.count
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseSimilarNoteIdentifier, for: indexPath as IndexPath) as! NoteCollectionViewCell
-        cell.setFile(file: self.relatedNotes[indexPath.item])
-        return cell
-    }
-    
     // MARK: - UICollectionViewDelegate protocol
     
     var openNote : NoteX?
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let note = self.relatedNotes[indexPath.item]
-        let alert = UIAlertController(title: "Open Note", message: "Close this note and open the note " + note.getName() + "?", preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "Open", style: .default, handler: { action in
-            self.openNote = note
-            self.saveCurrentPage()
-            if self.textRecognitionTimer != nil {
-                self.textRecognitionTimer!.invalidate()
-            }
-            if self.saveTimer != nil {
-                self.saveTimer!.invalidate()
-            }
-            self.documentsVC.bookshelfUpdateTimer?.reset(nil)
-            self.performSegue(withIdentifier: "CloseNote", sender: self)
-        }))
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in
-                log.info("Not opening note.")
-        }))
-        self.present(alert, animated: true, completion: nil)
-    }
     
     func collectionView(_ collectionView: UICollectionView,
                         layout collectionViewLayout: UICollectionViewLayout,
@@ -1018,34 +988,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         SKFileManager.saveCurrentNote()
     }
     func noteHasChanged(note: NoteX) {
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
-        return UIContextMenuConfiguration(identifier: nil, previewProvider: nil, actionProvider: { suggestedActions in
-            return self.makeRelatedNoteContextMenu(note: self.relatedNotes[indexPath.row])
-        })
-    }
-    private func makeRelatedNoteContextMenu(note: NoteX) -> UIMenu {
-        let mergeAction = UIAction(title: "Merge", image: UIImage(systemName: "arrow.merge")) { action in
-            let alert = UIAlertController(title: "Merge Note", message: "Are you sure you want to merge this note with the related note? This will delete the related note.", preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: "Merge", style: .destructive, handler: { action in
-                SKFileManager.activeNote!.mergeWith(note: note)
-                SKFileManager.save(file: SKFileManager.activeNote!)
-                if SKFileManager.activeNote! != note {
-                    SKFileManager.delete(file: note)
-                }
-                log.info("Merged notes.")
-            }))
-            alert.addAction(UIAlertAction(title: "Cancel", style: .default, handler: { action in
-                  log.info("Not merging note.")
-            }))
-            self.present(alert, animated: true, completion: nil)
-        }
-        let mergeTagsAction = UIAction(title: "Merge Tags", image: UIImage(systemName: "tag.fill")) { action in
-            SKFileManager.activeNote!.mergeTagsWith(note: note)
-            SKFileManager.save(file: SKFileManager.activeNote!)
-        }
-        return UIMenu(title: note.getName(), children: [mergeAction, mergeTagsAction])
     }
     
     // Related Notes VC delegate
@@ -1367,9 +1309,16 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         }
     }
     
+    var draggableTextViewBeingEdited: DraggableTextView?
     func draggableTextViewLongPressed(source: DraggableTextView) {
         if let typedText =  self.noteTextViews[source] {
             let popMenu = PopMenuViewController(sourceView: source, actions: [PopMenuAction](), appearance: nil)
+            let editOption = PopMenuDefaultAction(title: "Edit...", didSelect: { action in
+                popMenu.dismiss(animated: true, completion: nil)
+                self.draggableTextViewBeingEdited = source
+                self.performSegue(withIdentifier: "ShowTextBoxVC", sender: self)
+            })
+            popMenu.addAction(editOption)
             let languageOption = PopMenuDefaultAction(title: "Change Language... (\(typedText.codeLanguage.lowercased().capitalizingFirstLetter()))", didSelect: { action in
                 popMenu.dismiss(animated: true, completion: nil)
                 self.showTypedTextLanguageOptions(source: source, typedText: typedText)
@@ -1418,6 +1367,22 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             typedText.text = text
             SKFileManager.activeNote!.getCurrentPage().updateNoteTypedText(typedText: typedText)
             self.startSaveTimer()
+        }
+    }
+    
+    // TextBoxViewControllerDelegate
+    func noteTypedTextSaveTriggered(typedText: NoteTypedText) {
+        if let textView = draggableTextViewBeingEdited {
+            if self.noteTextViews[textView] != nil {
+                draggableTextViewTextChanged(source: textView, text: typedText.text)
+                let highlightr = Highlightr()!
+                var highlightedText = highlightr.highlight(typedText.text)
+                if !typedText.codeLanguage.isEmpty {
+                    highlightedText = highlightr.highlight(typedText.text, as: typedText.codeLanguage)
+                }
+                textView.attributedText = highlightedText
+                textView.adjustFontSize()
+            }
         }
     }
     
@@ -1496,49 +1461,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         documentsVC.bookshelfUpdateTimer?.reset(nil)
     }
     
-    // MARK : Related Notes collection view
-    @IBOutlet var relatedNotesView: UIView!
-    @IBOutlet var relatedNotesCollectionView: UICollectionView!
-    @IBOutlet var relatedNotesButton: UIButton!
-    var relatedNotes = [NoteX]()
-    
-    var similarityThreshold: Float = 0.5
-    @IBAction func documentsRelatedNotesSegmentChanged(_ sender: UISegmentedControl) {
-        if sender.selectedSegmentIndex == 0 {
-            relatedNotesView.isHidden = true
-            documentsUnderlyingView.isHidden = false
-        }
-        else {
-            documentsUnderlyingView.isHidden = true
-            relatedNotesView.isHidden = false
-        }
-    }
-    @IBAction func similaritySliderEditedOutside(_ sender: UISlider) {
-        refreshRelatedNotes()
-    }
-    @IBAction func similaritySliderEditedInside(_ sender: UISlider) {
-        refreshRelatedNotes()
-    }
-    
-    @IBAction func lookForRelatedNotesTapped(_ sender: UIButton) {
-        refreshRelatedNotes()
-    }
-    
-    private func refreshRelatedNotes() {
-        Knowledge.setupSimilarityMatrix()
-        let foundNotes = Knowledge.similarNotesFor(note: SKFileManager.activeNote!)
-        self.relatedNotes = [NoteX]()
-        for (note, score) in foundNotes {
-            if score > relatedNotesSimilaritySlider.value {
-                self.relatedNotes.append(note)
-            }
-           
-        }
-        relatedNotesCollectionView.reloadData()
-        
-        bookshelfSegmentedControl.setTitle("Related Notes (\(relatedNotes.count))", forSegmentAt: 1)
-    }
-    
     // MARK: Documents View Controller delegate
     func resetDocuments() {
         self.clearConceptHighlights()
@@ -1556,7 +1478,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                 self.setupTopicAnnotations(recognitionImageSize: canvasView.frame.size)
             }
         }
-        bookshelfSegmentedControl.setTitle("Documents (\(SKFileManager.activeNote!.getDocuments().count))", forSegmentAt: 0)
     }
     
     private func showNotePagesBottomSheet() {

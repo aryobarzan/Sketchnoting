@@ -41,9 +41,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     
     @IBOutlet var noteSortingButton: UIButton!
     
-    @IBOutlet weak var clearSimilarNotesButton: UIButton!
-    @IBOutlet weak var similarNotesTitleLabel: UILabel!
-    
     var activeFiltersBadge: BadgeHub!
     var activeSearchFiltersBadge: BadgeHub!
         
@@ -377,11 +374,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     // MARK: Note display management
     private func updateDisplayedNotes(_ animated: Bool) {
         self.items = SKFileManager.getCurrentFiles()
-        if let noteForSimilarityFilter = noteForRelatedNotes, let similarNotes = similarNotes {
-            self.items = [File]()
-            self.items.append(noteForSimilarityFilter)
-            self.items.append(contentsOf: similarNotes.map { $0.0 })
-        }
         
         var filteredNotesToRemove = [File]()
         if TagsManager.filterTags.count > 0 {
@@ -567,7 +559,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
                 self.editNoteTags(note: note, cell: self.noteCollectionView.cellForItem(at: cellIndexPath))
             }
             menuElements.append(tagsAction)
-            let similarNotesAction = UIAction(title: "Related Notes", image: UIImage(systemName: "link")) { action in
+            let similarNotesAction = UIAction(title: "Related Notes...", image: UIImage(systemName: "link")) { action in
                 self.showRelatedNotesFor(note)
                 self.view.makeToast("Showing related notes.", title: note.getName())
             }
@@ -749,7 +741,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     }
     
     var noteForRelatedNotes: NoteX?
-    var similarNotes: [(NoteX, Float)]?
     private func showRelatedNotesFor(_ note: NoteX) {
         self.noteForRelatedNotes = note
         self.performSegue(withIdentifier: "showRelatedHomePage", sender: self)
@@ -759,18 +750,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         self.open(note: note)
     }
     func mergedNotes(note1: NoteX, note2: NoteX) {
-    }
-    
-    @IBAction func clearSimilarNotesTapped(_ sender: UIButton) {
-        clearSimilarNotes()
-    }
-    
-    private func clearSimilarNotes() {
-        noteForRelatedNotes = nil
-        similarNotes = nil
-        self.updateDisplayedNotes(false)
-        clearSimilarNotesButton.isHidden = true
-        similarNotesTitleLabel.isHidden = true
     }
     
     var selectedCellForTagEditing: UICollectionViewCell?
