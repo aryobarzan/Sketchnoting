@@ -415,7 +415,7 @@ class NoteX: File, DocumentVisitor, DocumentDelegate {
                         if let pdfDocument = page.getPDFDocument() {
                             if let page = pdfDocument.page(at: 0) {
                                 let pdfImage = page.thumbnail(of: bounds.size, for: .mediaBox)
-                                image = pdfImage.mergeWith(topImage: image)
+                                image = pdfImage.mergeWith(withImage: image)
                             }
                         }
                         image.draw(in: imgBounds)

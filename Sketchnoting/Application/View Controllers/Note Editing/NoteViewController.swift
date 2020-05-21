@@ -461,7 +461,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             var canvasImage = canvasView.drawing.image(from: UIScreen.main.bounds, scale: 1.0)
             canvasImage = canvasImage.blackAndWhite() ?? canvasImage.toGrayscale
             DispatchQueue.main.async {
-                var merged = whiteBackground.mergeWith(topImage: canvasImage)
+                var merged = whiteBackground.mergeWith(withImage: canvasImage)
                 merged = merged.invertedImage() ?? merged
                 for region in self.drawingViews {
                     let image = UIImage(cgImage: merged.cgImage!.cropping(to: region.frame)!)

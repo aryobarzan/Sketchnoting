@@ -118,7 +118,7 @@ extension UIImage {
         guard let outputImageCopy = context.createCGImage(outputImage, from: outputImage.extent) else { return nil }
         return UIImage(cgImage: outputImageCopy, scale: self.scale, orientation: .up)
     }
-    func mergeWith(topImage: UIImage) -> UIImage {
+    func mergeWith(withImage topImage: UIImage) -> UIImage {
       let bottomImage = self
 
       UIGraphicsBeginImageContext(size)
@@ -155,5 +155,41 @@ extension UIImage {
         UIGraphicsEndImageContext()
         
         return image
+    }
+    
+    func mergeWith3(withImage secondImage: NoteImage) -> UIImage {
+        let image = self
+        UIGraphicsBeginImageContext(size)
+       
+        let areaSize = CGRect(x: 0, y: 0, width: image.size.width, height: image.size.height)
+        image.draw(in: areaSize)
+        secondImage.image.draw(in: CGRect(x: secondImage.location.x-secondImage.size.width/2, y: secondImage.location.y-secondImage.size.height/2, width: secondImage.size.width, height: secondImage.size.height))
+
+        let mergedImage = UIGraphicsGetImageFromCurrentImageContext()!
+        UIGraphicsEndImageContext()
+        
+        return mergedImage
+    }
+    
+    func addText(drawText text: NoteTypedText) -> UIImage {
+        let textColor = UIColor.black
+        let textFont = UIFont(name: "Helvetica Bold", size: 10)!
+        let image = self
+        let scale = UIScreen.main.scale
+        UIGraphicsBeginImageContextWithOptions(image.size, false, scale)
+
+        let textFontAttributes = [
+            NSAttributedString.Key.font: textFont,
+            NSAttributedString.Key.foregroundColor: textColor,
+            ] as [NSAttributedString.Key : Any]
+        image.draw(in: CGRect(origin: CGPoint.zero, size: image.size))
+
+        let rect = CGRect(origin: CGPoint(x: text.location.x-text.size.width/2, y: text.location.y-text.size.height/2), size: text.size)
+        text.text.draw(in: rect, withAttributes: textFontAttributes)
+
+        let newImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+
+        return newImage!
     }
 }

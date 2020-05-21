@@ -170,7 +170,7 @@ class NoteXPage: Codable {
             if let pdfDocument = getPDFDocument() {
                 if let page = pdfDocument.page(at: 0) {
                     let pdfImage = page.thumbnail(of: bounds.size, for: .mediaBox)
-                    image = pdfImage.mergeWith(topImage: image)
+                    image = pdfImage.mergeWith(withImage: image)
                 }
             }
             image.draw(in: imgBounds)
@@ -193,6 +193,12 @@ class NoteXPage: Codable {
             DispatchQueue.global(qos: .utility).async {
                 if let pdfImage = pdfImage {
                     image = pdfImage.mergeWith2(withImage: canvasImage)
+                }
+                for noteImage in self.images {
+                    image = image.mergeWith3(withImage: noteImage)
+                }
+                for noteTypedText in self.typedTexts {
+                    image = image.addText(drawText: noteTypedText)
                 }
                 DispatchQueue.main.async {
                     completion(image)
