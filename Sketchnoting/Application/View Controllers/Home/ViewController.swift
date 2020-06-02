@@ -22,7 +22,7 @@ import MobileCoreServices
 import VisionKit
 import Photos
 
-class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextFieldDelegate, MCSessionDelegate, MCBrowserViewControllerDelegate, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UIApplicationDelegate, UIPopoverPresentationControllerDelegate, UIDocumentPickerDelegate, VNDocumentCameraViewControllerDelegate, UICollectionViewDragDelegate, UICollectionViewDropDelegate, FolderButtonDelegate, RelatedNotesVCDelegate {
+class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextFieldDelegate, MCSessionDelegate, MCBrowserViewControllerDelegate, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UIApplicationDelegate, UIPopoverPresentationControllerDelegate, UIDocumentPickerDelegate, VNDocumentCameraViewControllerDelegate, UICollectionViewDragDelegate, UICollectionViewDropDelegate, FolderButtonDelegate, RelatedNotesVCDelegate, MoveFileViewControllerDelegate {
     
     @IBOutlet weak var navigationHierarchyScrollView: UIScrollView!
     @IBOutlet weak var navigationHierarchyStackView: UIStackView!
@@ -200,6 +200,16 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
                         destinationViewController.delegate = self
                         destinationViewController.note = n
                         destinationViewController.context = .HomePage
+                    }
+                }
+            }
+            break
+        case "MoveFileHome":
+            if let destination = segue.destination as? UINavigationController {
+                if let destinationViewController = destination.topViewController as? MoveFileViewController {
+                    if let f = fileToMove {
+                        destinationViewController.delegate = self
+                        destinationViewController.file = f
                     }
                 }
             }
@@ -554,6 +564,10 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             self.renameFile(file: file)
         }
         menuElements.append(renameAction)
+        let moveAction = UIAction(title: "Move...", image: UIImage(systemName: "folder")) { action in
+            self.moveFile(file: file)
+        }
+        menuElements.append(moveAction)
         if let note = file as? NoteX {
             let tagsAction = UIAction(title: "Manage Tags...", image: UIImage(systemName: "tag.fill")) { action in
                 self.editNoteTags(note: note, cell: self.noteCollectionView.cellForItem(at: cellIndexPath))
@@ -744,6 +758,17 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     private func showRelatedNotesFor(_ note: NoteX) {
         self.noteForRelatedNotes = note
         self.performSegue(withIdentifier: "showRelatedHomePage", sender: self)
+    }
+    
+    var fileToMove: File?
+    private func moveFile(file: File) {
+        self.fileToMove = file
+        self.performSegue(withIdentifier: "MoveFileHome", sender: self)
+        
+    }
+    // MoveFileViewControllerDelegate
+    func movedFile(file: File) {
+        self.updateDisplayedNotes(true)
     }
     // Related Notes VC delegate
     func openRelatedNote(note: NoteX) {

@@ -23,7 +23,7 @@ import GPUImage
 import Highlightr
 import Toast
 
-class NoteViewController: UIViewController, UIPencilInteractionDelegate, UICollectionViewDelegate, NoteXDelegate, PKCanvasViewDelegate, PKToolPickerObserver, UIScreenshotServiceDelegate, NoteOptionsDelegate, DocumentsViewControllerDelegate, NotePagesDelegate, VNDocumentCameraViewControllerDelegate, UIDocumentPickerDelegate, DraggableImageViewDelegate, DraggableTextViewDelegate, RelatedNotesVCDelegate, TextBoxViewControllerDelegate {
+class NoteViewController: UIViewController, UIPencilInteractionDelegate, UICollectionViewDelegate, NoteXDelegate, PKCanvasViewDelegate, PKToolPickerObserver, UIScreenshotServiceDelegate, NoteOptionsDelegate, DocumentsViewControllerDelegate, NotePagesDelegate, VNDocumentCameraViewControllerDelegate, UIDocumentPickerDelegate, DraggableImageViewDelegate, DraggableTextViewDelegate, RelatedNotesVCDelegate, TextBoxViewControllerDelegate, MoveFileViewControllerDelegate {
     
     
     private var documentsVC: DocumentsViewController!
@@ -228,6 +228,14 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                             destinationViewController.noteTypedText = typedText
                         }
                     }
+                }
+            }
+            break
+        case "MoveFileNoteEditing":
+            if let destination = segue.destination as? UINavigationController {
+                if let destinationViewController = destination.topViewController as? MoveFileViewController {
+                    destinationViewController.delegate = self
+                    destinationViewController.file = SKFileManager.activeNote!
                 }
             }
             break
@@ -653,6 +661,9 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             UIPasteboard.general.string = SKFileManager.activeNote!.getText()
             self.view.makeToast("Copied text to Clipboard.", title: SKFileManager.activeNote!.getName())
             break
+        case .MoveFile:
+            self.performSegue(withIdentifier: "MoveFileNoteEditing", sender: self)
+            break
         case .ClearPage:
             SKFileManager.activeNote!.getCurrentPage().clear()
             self.load()
@@ -687,6 +698,12 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             self.performSegue(withIdentifier: "CloseNote", sender: self)
         }
     }
+    
+    // MoveFileViewControllerDelegate
+    func movedFile(file: File) {
+        self.view.makeToast("Note moved.", duration: 1.0, position: .center)
+    }
+    
     func pdfScaleChanged(scale: Float) {
         pdfView.scaleFactor = CGFloat(scale)
         SKFileManager.activeNote!.getCurrentPage().pdfScale = scale

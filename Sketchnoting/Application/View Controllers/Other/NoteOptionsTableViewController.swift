@@ -74,12 +74,15 @@ class NoteOptionsTableViewController: UITableViewController {
                     option = .CopyText
             }
             else if indexPath.row == 2 {
-                        option = .Share
+                    option = .MoveFile
             }
             else if indexPath.row == 3 {
-                    option = .ClearPage
+                        option = .Share
             }
             else if indexPath.row == 4 {
+                    option = .ClearPage
+            }
+            else if indexPath.row == 5 {
                     option = .DeletePage
             }
         }
@@ -141,6 +144,7 @@ enum NoteOption {
     case SetTitle
     case ViewText
     case CopyText
+    case MoveFile
     case ClearPage
     case DeletePage
     case Share

@@ -169,11 +169,14 @@ class SKFileManager {
         self.folders = loadFolders()
     }
     
-    public static func getFolder(id: String) -> Folder? {
-        for f in folders {
-            if f.id == id {
-                return f
+    public static func getFolder(id: String?) -> Folder? {
+        if let id = id {
+            for f in folders {
+                if f.id == id {
+                    return f
+                }
             }
+            return nil
         }
         return nil
     }
@@ -185,6 +188,22 @@ class SKFileManager {
             }
         }
         return nil
+    }
+    
+    public static func getFolderFiles(folder: Folder?, foldersOnly: Bool = false) -> [File] {
+        let id = folder?.id ?? nil
+        var files = [File]()
+        for n in notes {
+            if n.parent == id && !foldersOnly {
+                files.append(n)
+            }
+        }
+        for f in folders {
+            if f.parent == id {
+                files.append(f)
+            }
+        }
+        return files
     }
     
     public static func add(note: NoteX) -> Bool {
@@ -288,8 +307,8 @@ class SKFileManager {
         currentFoldersHierarchy = currentFoldersHierarchy.reversed()
     }
     
-    public static func move(file: File, toFolder folder: Folder) {
-        if file.parent == folder.id {
+    public static func move(file: File, toFolder folder: Folder?) {
+        if file.parent == folder?.id {
             return
         }
         if let previousParentFolderID = file.parent {
@@ -298,9 +317,16 @@ class SKFileManager {
                 self.save(file: previousParentFolder)
             }
         }
-        folder.addChild(file: file)
+        
+        if let folder = folder {
+            folder.addChild(file: file)
+            self.save(file: folder)
+        }
+        else { // Move to Home
+            file.parent = nil
+        }
         self.save(file: file)
-        self.save(file: folder)
+        
     }
 }
 
