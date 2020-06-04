@@ -31,7 +31,7 @@ class MoveFileViewController: UIViewController, UITableViewDataSource, UITableVi
     func updateItems() {
         self.title = currentFolder != nil ? currentFolder!.getName() : "Home"
         items = [Folder]()
-        for item in SKFileManager.getFolderFiles(folder: currentFolder, foldersOnly: true) {
+        for item in DataManager.getFolderFiles(folder: currentFolder, foldersOnly: true) {
             if let f = item as? Folder {
                 items.append(f)
             }
@@ -83,12 +83,12 @@ class MoveFileViewController: UIViewController, UITableViewDataSource, UITableVi
                 }
             }
             let newFolder = Folder(name: name, parent: self.currentFolder?.id)
-            _ = SKFileManager.add(folder: newFolder)
+            _ = DataManager.add(folder: newFolder)
             self.updateItems()
         }
     }
     @IBAction func backButtonTapped(_ sender: UIButton) {
-        self.currentFolder = SKFileManager.getFolder(id: currentFolder?.parent)
+        self.currentFolder = DataManager.getFolder(id: currentFolder?.parent)
         self.updateItems()
         
     }
@@ -96,7 +96,7 @@ class MoveFileViewController: UIViewController, UITableViewDataSource, UITableVi
         self.dismiss(animated: true, completion: nil)
     }
     @IBAction func moveTapped(_ sender: UIBarButtonItem) {
-        SKFileManager.move(file: file, toFolder: currentFolder)
+        DataManager.move(file: file, toFolder: currentFolder)
         self.delegate?.movedFile(file: file)
         self.dismiss(animated: true, completion: nil)
     }

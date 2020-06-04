@@ -143,13 +143,13 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     }
     
     private func updateReceivedNotesButton() {
-        if SKFileManager.receivedNotesController.mcAdvertiserAssistant != nil {
+        if DataManager.receivedNotesController.mcAdvertiserAssistant != nil {
             receivedNotesButton.tintColor = UIColor.systemBlue
         }
         else {
             receivedNotesButton.tintColor = UIColor.systemGray
         }
-        receivedNotesBadge.setCount(SKFileManager.receivedNotesController.receivedNotes.count)
+        receivedNotesBadge.setCount(DataManager.receivedNotesController.receivedNotes.count)
     }
     
     private func loadData() {
@@ -241,24 +241,24 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         if urls.count > 0 {
             let (importedNotes, importedImages, importedPDFs, importedTexts) = ImportHelper.importItems(urls: urls, n: nil)
             for note in importedNotes {
-                if SKFileManager.notes.contains(note) {
+                if DataManager.notes.contains(note) {
                     log.info("Note is already in your library, updating its data.")
-                    SKFileManager.save(file: note)
+                    DataManager.save(file: note)
                 }
                 else {
                     log.info("Importing new note.")
-                    _ = SKFileManager.add(note: note)
+                    _ = DataManager.add(note: note)
                 }
             }
             if importedImages.count > 0 {
                 let newNote = createNoteFromImages(images: importedImages)
                 log.info("New note from imported images.")
-                _ = SKFileManager.add(note: newNote)
+                _ = DataManager.add(note: newNote)
             }
             if importedTexts.count > 0 {
                 let newNote = createNoteFromTypedTexts(texts: importedTexts)
                 log.info("New note from imported text files.")
-                _ = SKFileManager.add(note: newNote)
+                _ = DataManager.add(note: newNote)
             }
             for pdf in importedPDFs {
                 if pdf.pageCount > 0 {
@@ -270,7 +270,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
                             }
                         }
                     }
-                    let newNote = NoteX(name: pdfTitle, parent: SKFileManager.currentFolder?.id, documents: nil)
+                    let newNote = NoteX(name: pdfTitle, parent: DataManager.currentFolder?.id, documents: nil)
                     var setPDFForCurrentPage = false
                     for i in 0..<pdf.pageCount {
                         if let pdfPage = pdf.page(at: i) {
@@ -286,7 +286,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
                         }
                     }
                     log.info("New note from imported pdf.")
-                    _ = SKFileManager.add(note: newNote)
+                    _ = DataManager.add(note: newNote)
                 }
             }
             self.view.makeToast("Imported your selected documents.")
@@ -312,14 +312,14 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             if images.count > 0 {
                 let newNote = self.createNoteFromImages(images: images)
                 log.info("New note from imported images (camera roll).")
-                _ = SKFileManager.add(note: newNote)
+                _ = DataManager.add(note: newNote)
                 self.updateDisplayedNotes(true)
             }
         })
     }
     
     private func createNoteFromImages(images: [UIImage]) -> NoteX {
-        let newNote = NoteX(name: "Imported Images", parent: SKFileManager.currentFolder?.id, documents: nil)
+        let newNote = NoteX(name: "Imported Images", parent: DataManager.currentFolder?.id, documents: nil)
         for image in images {
             let noteImage = NoteImage(image: image)
             newNote.getCurrentPage().images.append(noteImage)
@@ -328,7 +328,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     }
     
     private func createNoteFromTypedTexts(texts: [NoteTypedText]) -> NoteX {
-        let newNote = NoteX(name: "Imported Text Files", parent: SKFileManager.currentFolder?.id, documents: nil)
+        let newNote = NoteX(name: "Imported Text Files", parent: DataManager.currentFolder?.id, documents: nil)
         newNote.getCurrentPage().typedTexts = texts
         return newNote
     }
@@ -369,7 +369,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             images.append(image)
         }
         let newNote = self.createNoteFromImages(images: images)
-        _ = SKFileManager.add(note: newNote)
+        _ = DataManager.add(note: newNote)
         log.info("New note from scanned images.")
         self.updateDisplayedNotes(true)
     }
@@ -383,7 +383,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     
     // MARK: Note display management
     private func updateDisplayedNotes(_ animated: Bool) {
-        self.items = SKFileManager.getCurrentFiles()
+        self.items = DataManager.getCurrentFiles()
         
         var filteredNotesToRemove = [File]()
         if TagsManager.filterTags.count > 0 {
@@ -442,7 +442,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         homeButton.delegate = self
         navigationHierarchyStackView.addArrangedSubview(homeButton)
         folderButtons.append(homeButton)
-        for f in SKFileManager.currentFoldersHierarchy {
+        for f in DataManager.currentFoldersHierarchy {
             let folderButton = FolderButton()
             folderButton.frame = CGRect(x: 0, y: 0, width: 100, height: 35)
             folderButton.setFolder(folder: f)
@@ -456,8 +456,8 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     }
     
     func onTap(folder: Folder?) {
-        if SKFileManager.currentFolder != folder {
-            SKFileManager.setCurrentFolder(folder: folder)
+        if DataManager.currentFolder != folder {
+            DataManager.setCurrentFolder(folder: folder)
             self.updateDisplayedNotes(false)
             self.updateFoldersHierarchy()
         }
@@ -487,9 +487,9 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     }
 
     @IBAction func newNoteButtonTapped(_ sender: UIButton) {
-        let newNote = NoteX(name: "Untitled", parent: SKFileManager.currentFolder?.id, documents: nil)
-        _ = SKFileManager.add(note: newNote)
-        SKFileManager.activeNote = newNote
+        let newNote = NoteX(name: "Untitled", parent: DataManager.currentFolder?.id, documents: nil)
+        _ = DataManager.add(note: newNote)
+        DataManager.activeNote = newNote
         performSegue(withIdentifier: "NewSketchnote", sender: self)
     }
     @IBAction func newFolderButtonTapped(_ sender: UIButton) {
@@ -501,8 +501,8 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
                     name = input
                 }
             }
-            let newFolder = Folder(name: name, parent: SKFileManager.currentFolder?.id)
-            _ = SKFileManager.add(folder: newFolder)
+            let newFolder = Folder(name: name, parent: DataManager.currentFolder?.id)
+            _ = DataManager.add(folder: newFolder)
             self.updateDisplayedNotes(false)
         }
     }
@@ -579,7 +579,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             }
             menuElements.append(similarNotesAction)
             let duplicateAction = UIAction(title: "Duplicate", image: UIImage(systemName: "doc.on.doc")) { action in
-                _ = SKFileManager.add(note: note.duplicate())
+                _ = DataManager.add(note: note.duplicate())
                 self.updateDisplayedNotes(false)
             }
             menuElements.append(duplicateAction)
@@ -718,13 +718,13 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     }
     
     public func open(note: NoteX) {
-        SKFileManager.activeNote = note
+        DataManager.activeNote = note
         self.performSegue(withIdentifier: "EditSketchnote", sender: self)
         log.info("Opening note.")
     }
     
     private func open(folder: Folder) {
-        SKFileManager.setCurrentFolder(folder: folder)
+        DataManager.setCurrentFolder(folder: folder)
         self.updateDisplayedNotes(false)
         self.updateFoldersHierarchy()
         log.info("Opening folder.")
@@ -738,7 +738,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             let name = alertController.textFields?[0].text
             
             file.setName(name: name ?? "Untitled")
-            SKFileManager.save(file: file)
+            DataManager.save(file: file)
             self.updateDisplayedNotes(false)
         }
         let cancelAction = UIAlertAction(title: "Cancel", style: .cancel) { (_) in }
@@ -789,7 +789,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             for t in looseTagsToRemove {
                 note.tags.removeAll{$0 == t}
             }
-            SKFileManager.save(file: note)
+            DataManager.save(file: note)
         }
         self.selectedNoteForTagEditing = note
         self.selectedCellForTagEditing = cell
@@ -802,15 +802,15 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     
     // TO UPDATE
     func importNote(url: URL) {
-        if let imported = SKFileManager.importNoteFile(url: url) {
-            if SKFileManager.notes.contains(imported) {
+        if let imported = DataManager.importNoteFile(url: url) {
+            if DataManager.notes.contains(imported) {
                 log.info("Sketchnote already in your library, updating its data.")
                 self.view.makeToast("The imported note is already in library: It has been updated.", title: imported.getName())
-                SKFileManager.save(file: imported)
+                DataManager.save(file: imported)
             }
             else {
                 log.info("Importing new sketchnote.")
-                _ = SKFileManager.add(note: imported)
+                _ = DataManager.add(note: imported)
                 self.view.makeToast("The imported note has been added to your library.", title: imported.getName())
             }
             self.updateDisplayedNotes(false)
@@ -832,7 +832,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         let alert = UIAlertController(title: "Delete File", message: "Are you sure you want to delete this file?", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Delete", style: .destructive, handler: { action in
               self.items.removeAll{$0 == file}
-              SKFileManager.delete(file: file)
+              DataManager.delete(file: file)
               self.noteCollectionView.reloadData()
         }))
         alert.addAction(UIAlertAction(title: "Cancel", style: .default, handler: { action in
@@ -866,7 +866,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             
             if let folderDestination = self.items[destinationIndexPath.item] as? Folder {
                 log.info("Moving file to folder.")
-                SKFileManager.move(file: sourceFile, toFolder: folderDestination)
+                DataManager.move(file: sourceFile, toFolder: folderDestination)
                 self.updateDisplayedNotes(false)
             }
           }, completion: nil)

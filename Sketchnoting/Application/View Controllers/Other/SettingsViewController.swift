@@ -89,7 +89,7 @@ class SettingsViewController: UITableViewController {
     @IBAction func clearDataTapped(_ sender: UIButton) {
         let alert = UIAlertController(title: "Clear Data", message: "Are you sure you want to delete all your notes? This is permanent.", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Clear", style: .destructive, handler: { action in
-              SKFileManager.wipe()
+              DataManager.wipe()
             self.view.makeToast("All notes and document resources on your device have been wiped.", title: "Data Cleared")
         }))
         alert.addAction(UIAlertAction(title: "Cancel", style: .default, handler: { action in

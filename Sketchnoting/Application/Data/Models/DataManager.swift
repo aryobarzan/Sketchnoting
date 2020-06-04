@@ -10,7 +10,7 @@ import UIKit
 
 import Kingfisher
 
-class SKFileManager {
+class DataManager {
     static var currentFolder: Folder?
     static var currentFoldersHierarchy = [Folder]()
     static var folders = loadFolders()

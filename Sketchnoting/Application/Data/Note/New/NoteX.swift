@@ -196,7 +196,7 @@ class NoteX: File, DocumentVisitor, DocumentDelegate {
             documents.append(document)
             document.delegate = self
             self.delegate?.noteHasNewDocument(note: self, document: document)
-            SKFileManager.save(file: self)
+            DataManager.save(file: self)
         }
     }
     

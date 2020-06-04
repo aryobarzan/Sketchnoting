@@ -12,4 +12,5 @@ target 'Sketchnoting' do
   pod 'SVGKit'
   pod 'Repeat'
   pod 'Highlightr'
+  pod 'DropDown'
 end

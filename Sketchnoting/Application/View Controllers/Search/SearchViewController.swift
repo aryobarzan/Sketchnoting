@@ -140,7 +140,7 @@ class SearchViewController: UIViewController, UICollectionViewDelegate, UICollec
     
     private func updateResults() {
         if searchFilters.count > 0 {
-            self.notes = SKFileManager.notes
+            self.notes = DataManager.notes
             var searchedNotesToRemove = [NoteX]()
             for note in notes {
                 if !note.applySearchFilters(filters: searchFilters) {

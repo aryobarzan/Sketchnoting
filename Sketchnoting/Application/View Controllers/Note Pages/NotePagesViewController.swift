@@ -23,7 +23,7 @@ class NotePagesViewController: UIViewController, UICollectionViewDelegate, UICol
         collectionView.dropDelegate = self
         collectionView.dragInteractionEnabled = true
         
-        pageButton.title = "Page \(SKFileManager.activeNote!.activePageIndex+1)"
+        pageButton.title = "Page \(DataManager.activeNote!.activePageIndex+1)"
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -32,19 +32,19 @@ class NotePagesViewController: UIViewController, UICollectionViewDelegate, UICol
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return SKFileManager.activeNote!.pages.count
+        return DataManager.activeNote!.pages.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "NotePageCell", for: indexPath as IndexPath) as! NotePageCollectionViewCell
-        let page = SKFileManager.activeNote!.pages[indexPath.item]
+        let page = DataManager.activeNote!.pages[indexPath.item]
         page.getAsImage() { image in
             cell.imageView.image = image
         }
         cell.pageIndexLabel.text = "\(indexPath.item + 1)"
         cell.imageView.layer.cornerRadius = 4
         cell.imageView.layer.borderWidth = 2
-        if indexPath.item == SKFileManager.activeNote!.activePageIndex {
+        if indexPath.item == DataManager.activeNote!.activePageIndex {
             cell.imageView.layer.borderColor = UIColor.systemBlue.cgColor
         }
         else {
@@ -67,7 +67,7 @@ class NotePagesViewController: UIViewController, UICollectionViewDelegate, UICol
     
     // Drag and drop delegates for re-ordering
     func collectionView(_ collectionView: UICollectionView, itemsForBeginning session: UIDragSession, at indexPath: IndexPath) -> [UIDragItem] {
-        let item = SKFileManager.activeNote!.pages[indexPath.row]
+        let item = DataManager.activeNote!.pages[indexPath.row]
         let itemProvider = NSItemProvider(object: item.getText() as NSString)
         let dragItem = UIDragItem(itemProvider: itemProvider)
         return [dragItem]
@@ -89,15 +89,15 @@ class NotePagesViewController: UIViewController, UICollectionViewDelegate, UICol
           }
 
           collectionView.performBatchUpdates({
-            let page = SKFileManager.activeNote!.pages[sourceIndexPath.item]
-            if SKFileManager.activeNote!.activePageIndex == sourceIndexPath.item {
-                SKFileManager.activeNote!.activePageIndex = destinationIndexPath.item
+            let page = DataManager.activeNote!.pages[sourceIndexPath.item]
+            if DataManager.activeNote!.activePageIndex == sourceIndexPath.item {
+                DataManager.activeNote!.activePageIndex = destinationIndexPath.item
             }
-            SKFileManager.activeNote!.removePage(at: sourceIndexPath)
-            SKFileManager.activeNote!.insertPage(page, at: destinationIndexPath)
+            DataManager.activeNote!.removePage(at: sourceIndexPath)
+            DataManager.activeNote!.insertPage(page, at: destinationIndexPath)
             collectionView.deleteItems(at: [sourceIndexPath])
             collectionView.insertItems(at: [destinationIndexPath])
-            SKFileManager.save(file: SKFileManager.activeNote!)
+            DataManager.save(file: DataManager.activeNote!)
           }, completion: { _ in
             coordinator.drop(dropItem.dragItem,
                               toItemAt: destinationIndexPath)
@@ -117,7 +117,7 @@ class NotePagesViewController: UIViewController, UICollectionViewDelegate, UICol
         { (input:String?) in
             if input != nil && Int(input!) != nil {
                 if let pageNumber = Int(input!) {
-                    if (pageNumber - 1) >= 0 && (pageNumber - 1) < SKFileManager.activeNote!.pages.count && (pageNumber - 1) != SKFileManager.activeNote!.activePageIndex {
+                    if (pageNumber - 1) >= 0 && (pageNumber - 1) < DataManager.activeNote!.pages.count && (pageNumber - 1) != DataManager.activeNote!.activePageIndex {
                         self.delegate?.notePageSelected(index: pageNumber - 1)
                         self.dismiss(animated: true, completion: nil)
                     }
@@ -137,7 +137,7 @@ class NotePagesViewController: UIViewController, UICollectionViewDelegate, UICol
     }
     private func makeDocumentContextMenu(pageIndex: Int) -> UIMenu {
         let deleteAction = UIAction(title: "Delete", image: UIImage(systemName: "trash")) { action in
-            let isDeleted = SKFileManager.activeNote!.deletePage(index: pageIndex)
+            let isDeleted = DataManager.activeNote!.deletePage(index: pageIndex)
             if isDeleted {
                 self.delegate?.notePageDeleted()
             }

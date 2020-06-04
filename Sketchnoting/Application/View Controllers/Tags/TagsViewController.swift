@@ -112,7 +112,7 @@ class TagsViewController: UIViewController, UITableViewDataSource, UITableViewDe
         }
         if note != nil {
             note!.tags = selectedTags
-            SKFileManager.save(file: note!)
+            DataManager.save(file: note!)
         }
         else if isFiltering {
             TagsManager.filterTags = selectedTags

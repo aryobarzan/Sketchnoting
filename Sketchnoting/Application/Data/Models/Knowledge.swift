@@ -18,7 +18,7 @@ class Knowledge {
         var termIDFs = Dictionary<String, Float>()
         var uniqueTerms = [String]()
         
-        for note in SKFileManager.notes {
+        for note in DataManager.notes {
             var bag = [String]()
             bag = note.getText().components(separatedBy: " ")
             for t in note.getName().components(separatedBy: " ") {
@@ -38,7 +38,7 @@ class Knowledge {
             uniqueTerms = uniqueTerms + bag
             uniqueTerms = Array(Set(uniqueTerms))
         }
-        for note in SKFileManager.notes {
+        for note in DataManager.notes {
             var frequencies = Dictionary<String, Int>()
             for t in uniqueTerms {
                 frequencies[t] = 0
@@ -52,7 +52,7 @@ class Knowledge {
             }
             termFrequencies[note] = frequencies
         }
-        for note in SKFileManager.notes {
+        for note in DataManager.notes {
             var tfs = Dictionary<String, Float>()
             if let bag = termBags[note] {
                 for (t, c) in termFrequencies[note]! {
@@ -64,19 +64,19 @@ class Knowledge {
         for t in uniqueTerms {
             termIDFs[t] = Float(0)
         }
-        for note in SKFileManager.notes {
+        for note in DataManager.notes {
             for t in uniqueTerms {
                 if termBags[note]!.contains(t) {
                     termIDFs[t] = termIDFs[t]! + 1
                 }
             }
         }
-        let N = Float(SKFileManager.notes.count)
+        let N = Float(DataManager.notes.count)
          for (t, f) in termIDFs {
             let division = N / f
             termIDFs[t] = log10(division)
         }
-        for note in SKFileManager.notes {
+        for note in DataManager.notes {
             var noteIDFs = Dictionary<String, Float>()
             for (t, f) in termTFs[note]! {
                 noteIDFs[t] = f * termIDFs[t]!
@@ -88,7 +88,7 @@ class Knowledge {
     
     static func similarNotesFor(note: NoteX) -> [(NoteX, Float)] {
         var similarNotes = [NoteX : Float]()
-        for n in SKFileManager.notes {
+        for n in DataManager.notes {
             if n != note {
                 similarNotes[n] = self.calculateTFIDFSimilarity(n1: note, n2: n)
             }

@@ -17,7 +17,7 @@ class ReceivedNotesViewController: UIViewController, UICollectionViewDelegate, U
 
         collectionView.delegate = self
         collectionView.dataSource = self
-        if SKFileManager.receivedNotesController.mcAdvertiserAssistant != nil {
+        if DataManager.receivedNotesController.mcAdvertiserAssistant != nil {
             visibilitySwitch.setOn(true, animated: true)
         }
         
@@ -45,21 +45,21 @@ class ReceivedNotesViewController: UIViewController, UICollectionViewDelegate, U
     */
     @IBAction func visibilitySwitchChanged(_ sender: UISwitch) {
         if sender.isOn {
-            SKFileManager.receivedNotesController.startHosting()
+            DataManager.receivedNotesController.startHosting()
         }
         else {
-            SKFileManager.receivedNotesController.stopHosting()
+            DataManager.receivedNotesController.stopHosting()
         }
         Notifications.announceDeviceVisibility()
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return SKFileManager.receivedNotesController.receivedNotes.count
+        return DataManager.receivedNotesController.receivedNotes.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "ReceivedNoteCell", for: indexPath as IndexPath) as! ReceivedNoteCollectionViewCell
-        let note = SKFileManager.receivedNotesController.receivedNotes[indexPath.item]
+        let note = DataManager.receivedNotesController.receivedNotes[indexPath.item]
         cell.setNote(note: note)
         cell.delegate = self
         return cell
@@ -73,15 +73,15 @@ class ReceivedNotesViewController: UIViewController, UICollectionViewDelegate, U
     
     func acceptReceivedNote(note: NoteX) {
         log.info("Accepted shared note")
-        SKFileManager.receivedNotesController.receivedNotes.removeAll(where: { $0 == note } )
-        _ = SKFileManager.add(note: note)
+        DataManager.receivedNotesController.receivedNotes.removeAll(where: { $0 == note } )
+        _ = DataManager.add(note: note)
         self.collectionView.reloadData()
         Notifications.announceDeviceVisibility()
     }
        
     func rejectReceivedNote(note: NoteX) {
         log.info("Rejected shared note")
-        SKFileManager.receivedNotesController.receivedNotes.removeAll(where: { $0 == note } )
+        DataManager.receivedNotesController.receivedNotes.removeAll(where: { $0 == note } )
         self.collectionView.reloadData()
         Notifications.announceDeviceVisibility()
     }

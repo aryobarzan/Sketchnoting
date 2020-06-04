@@ -29,7 +29,7 @@ class ImportHelper {
                     }
                     break
                 case "com.sketchnote":
-                    if let decodedNote = SKFileManager.decodeNoteFromData(data: data) {
+                    if let decodedNote = DataManager.decodeNoteFromData(data: data) {
                         notes.append(decodedNote)
                     }
                     break
@@ -59,13 +59,13 @@ class ImportHelper {
                 n.pages += note.pages
             }
             else {
-                if SKFileManager.notes.contains(note) {
+                if DataManager.notes.contains(note) {
                     log.info("Note is already in your library, updating its data.")
-                    SKFileManager.save(file: note)
+                    DataManager.save(file: note)
                 }
                 else {
                     log.info("Importing new note.")
-                    _ = SKFileManager.add(note: note)
+                    _ = DataManager.add(note: note)
                 }
             }
             

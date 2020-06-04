@@ -29,22 +29,22 @@ class NoteOptionsTableViewController: UITableViewController {
         self.clearsSelectionOnViewWillAppear = false
         deletePageButton.isEnabled = canDeletePage
         
-        nameField.text = SKFileManager.activeNote!.getName()
-        dateLabel.text = "\(SKFileManager.activeNote!.creationDate.getFormattedDate())"
-        pageLabel.text = "Page: \(SKFileManager.activeNote!.activePageIndex+1)/\(SKFileManager.activeNote!.pages.count)"
-        drawingsTextView.text = "Drawings: \(SKFileManager.activeNote!.getCurrentPage().drawingLabels.joined(separator:" - "))"
+        nameField.text = DataManager.activeNote!.getName()
+        dateLabel.text = "\(DataManager.activeNote!.creationDate.getFormattedDate())"
+        pageLabel.text = "Page: \(DataManager.activeNote!.activePageIndex+1)/\(DataManager.activeNote!.pages.count)"
+        drawingsTextView.text = "Drawings: \(DataManager.activeNote!.getCurrentPage().drawingLabels.joined(separator:" - "))"
         
         pdfScaleStepper.minimumValue = 0.1
         pdfScaleStepper.maximumValue = 2.0
         pdfScaleStepper.stepValue = 0.1
         pdfScaleStepper.value = 1.0
         
-        if SKFileManager.activeNote!.getCurrentPage().getPDFDocument() != nil {
+        if DataManager.activeNote!.getCurrentPage().getPDFDocument() != nil {
             pdfScaleStepper.isEnabled = true
             clearPDFPageButton.isEnabled = true
             clearPDFPageView.isUserInteractionEnabled = true
             resetPDFScaleButton.isEnabled = true
-            let currentScale = SKFileManager.activeNote!.getCurrentPage().pdfScale ?? 1.0
+            let currentScale = DataManager.activeNote!.getCurrentPage().pdfScale ?? 1.0
             pdfScaleLabel.text = "Scale: \(currentScale)"
             pdfScaleStepper.value = Double(currentScale)
         }
@@ -108,10 +108,10 @@ class NoteOptionsTableViewController: UITableViewController {
     
     @IBAction func nameFieldDone(_ sender: UITextField) {
         if let newName = sender.text {
-            if newName != SKFileManager.activeNote!.getName() {
-                SKFileManager.activeNote!.setName(name: newName)
+            if newName != DataManager.activeNote!.getName() {
+                DataManager.activeNote!.setName(name: newName)
                 log.info("Updated note name.")
-                SKFileManager.save(file: SKFileManager.activeNote!)
+                DataManager.save(file: DataManager.activeNote!)
             }
         }
     }

@@ -91,9 +91,9 @@ class RelatedNotesViewController: UIViewController, UICollectionViewDataSource, 
             let alert = UIAlertController(title: "Merge Note", message: "Are you sure you want to merge this note with the related note? This will delete the related note.", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "Merge", style: .destructive, handler: { action in
                 self.note.mergeWith(note: n)
-                SKFileManager.save(file: self.note)
+                DataManager.save(file: self.note)
                 if self.note != n {
-                    SKFileManager.delete(file: n)
+                    DataManager.delete(file: n)
                 }
                 log.info("Merged notes.")
                 self.refreshRelatedNotes()
@@ -106,7 +106,7 @@ class RelatedNotesViewController: UIViewController, UICollectionViewDataSource, 
         }
         let mergeTagsAction = UIAction(title: "Merge Tags", image: UIImage(systemName: "tag.fill")) { action in
             self.note.mergeTagsWith(note: n)
-            SKFileManager.save(file: self.note)
+            DataManager.save(file: self.note)
         }
         return UIMenu(title: note.getName(), children: [mergeAction, mergeTagsAction])
     }
