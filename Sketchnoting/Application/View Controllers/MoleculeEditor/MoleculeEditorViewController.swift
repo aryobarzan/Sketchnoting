@@ -8,20 +8,41 @@
 
 import UIKit
 import DropDown
+import SwiftyJSON
 
 class MoleculeEditorViewController: UIViewController, DirectionalAtomDelegate {
+    
+    static let PERIODIC_TABLE_ELEMENTS: [String] = setupPeriodicTableElements()
+    
+    static private func setupPeriodicTableElements() -> [String] {
+        var elements = [String]()
+        if let filePath = Bundle.main.url(forResource: "Periodic_Table", withExtension: "json") {
+            if let data = try? Data(contentsOf: filePath, options: .mappedIfSafe) {
+                let json = JSON(data)
+                for element in json["elements"].array! {
+                    if let symbol = element["symbol"].string {
+                        elements.append(symbol)
+                    }
+                }
+            }
+        }
+        return elements
+    }
     
     @IBOutlet weak var atomDropDownButton: UIButton!
     @IBOutlet weak var directionDropDownButton: UIButton!
     @IBOutlet weak var bondSegmentedControl: UISegmentedControl!
     @IBOutlet weak var addAtomButton: UIButton!
     @IBOutlet weak var boardViewContainer: UIView!
+    @IBOutlet weak var firstElementLabel: UILabel!
+    @IBOutlet weak var atomSelectionIndicator: UIView!
     
     var atomDropDown: DropDown!
     var directionDropDown: DropDown!
     var heisenberg: HeisenbergDirectionalStructure<String>!
     var atoms = [String : DirectionalAtom<String>]()
     var firstAtom: DirectionalAtom<String>?
+    var boardView: UIView?
     
     var currentAtom: DirectionalAtom<String>!
     override func viewDidLoad() {
@@ -29,65 +50,63 @@ class MoleculeEditorViewController: UIViewController, DirectionalAtomDelegate {
         
         atomDropDown = DropDown()
         atomDropDown.anchorView = atomDropDownButton
-        atomDropDown.dataSource = ["C", "H"]
+        atomDropDown.dataSource = MoleculeEditorViewController.PERIODIC_TABLE_ELEMENTS
         atomDropDown.selectionAction = { [unowned self] (index: Int, item: String) in
-            self.atomDropDownButton.setTitle("Atom: " + item, for: .normal)
+            self.atomDropDownButton.setTitle(" Atom: " + item, for: .normal)
         }
         atomDropDown.selectRow(0)
+        self.atomDropDownButton.setTitle(" Atom: " + atomDropDown.selectedItem!, for: .normal)
         directionDropDown = DropDown()
         directionDropDown.anchorView = directionDropDownButton
-        directionDropDown.dataSource = ["Next", "Downward"]
+        directionDropDown.dataSource = ["Next", "Downward", "Upward", "Cross-Down-Forward", "Cross-Up-Forward", "Cross-Down-Backward", "Cross-Up-Backward"]
         directionDropDown.selectionAction = { [unowned self] (index: Int, item: String) in
-            self.directionDropDownButton.setTitle("Direction: " + item, for: .normal)
+            self.directionDropDownButton.setTitle(" Direction: " + item, for: .normal)
         }
         directionDropDown.selectRow(0)
         
-        // Do any additional setup after loading the view.
+        atomSelectionIndicator.layer.borderColor = UIColor.systemYellow.cgColor
+        atomSelectionIndicator.layer.borderWidth = 2
+        atomSelectionIndicator.layer.cornerRadius = 25
     }
     
     @IBAction func addAtomButtonTapped(_ sender: UIButton) {
         if firstAtom == nil {
             firstAtom = DirectionalAtom(with: atomDropDown.selectedItem!, color: .black, textColor: .white)
             firstAtom!.delegate = self
-            self.view.makeToast("First atom registered. Add a second atom to initialize the structure!", duration: 5.0, position: .center)
+            atoms[firstAtom!.id] = firstAtom!
+            firstElementLabel.text = "First atom is '" + atomDropDown.selectedItem! + "'. Add a second atom to initialize the structure."
+            firstElementLabel.isHidden = false
+            bondSegmentedControl.isHidden = false
+            currentAtom = firstAtom
         }
         else {
-            if atoms.count == 0 {
-                let secondAtom = DirectionalAtom(with: atomDropDown.selectedItem!, color: .black, textColor: .white)
-                secondAtom.delegate = self
+            firstElementLabel.isHidden = true
+            if atoms.count == 1 {
                 heisenberg = HeisenbergDirectionalStructure(with: firstAtom!, itemSize: 40)
-                heisenberg.linkWith(from: firstAtom!, to: secondAtom, way: getLinkWay(), bond: getBondSelection())
-                atoms[firstAtom!.id] = firstAtom!
-                atoms[secondAtom.id] = secondAtom
-                let board = HeisenbergBoard<String>.init(with: heisenberg, with: .lightGray)
-                let boardView = board.drawBoard()
-                boardViewContainer.subviews.forEach { $0.removeFromSuperview() }
-                boardViewContainer.addSubview(boardView)
-                boardView.center = boardViewContainer.center
-                
-                currentAtom = secondAtom
-                self.view.makeToast("Strucuture initialized.", duration: 1.0, position: .center)
             }
-            else {
-                let atom = DirectionalAtom(with: atomDropDown.selectedItem!, color: .black, textColor: .white)
-                atom.delegate = self
-                heisenberg.linkWith(from: currentAtom, to: atom, way: getLinkWay(), bond: getBondSelection())
-                atoms[atom.id] = atom
-                let board = HeisenbergBoard<String>.init(with: heisenberg, with: .lightGray)
-                let boardView = board.drawBoard()
-                boardViewContainer.subviews.forEach { $0.removeFromSuperview() }
-                boardViewContainer.addSubview(boardView)
-                boardView.center = boardViewContainer.center
-                
-                currentAtom = atom
+            let atom = DirectionalAtom(with: atomDropDown.selectedItem!, color: .black, textColor: .white)
+            atom.delegate = self
+            heisenberg.linkWith(from: currentAtom, to: atom, way: getLinkWay(), bond: getBondSelection())
+            atoms[atom.id] = atom
+            let board = HeisenbergBoard<String>.init(with: heisenberg, with: .clear)
+            if let boardView = boardView {
+                boardView.removeFromSuperview()
             }
+            boardView = board.drawBoard()
+            boardViewContainer.addSubview(boardView!)
+            boardView!.center = boardViewContainer.center
+            atomSelectionIndicator.removeFromSuperview()
+            boardView!.addSubview(atomSelectionIndicator)
         }
     }
     
-    func tappedAtom(id: String) {
+    func tappedAtom(id: String, view: CGPoint?) {
         if let atom = atoms[id] {
             currentAtom = atom
-            self.view.makeToast("Atom selected.", duration: 1.0, position: .center)
+            if let v = view {
+                atomSelectionIndicator.center = v
+                atomSelectionIndicator.isHidden = false
+            }
         }
     }
     
@@ -113,6 +132,16 @@ class MoleculeEditorViewController: UIViewController, DirectionalAtomDelegate {
             return StructuralWay.next
         case "Downward":
             return StructuralWay.downward
+        case "Upward":
+            return StructuralWay.upward
+        case "Cross-Down-Forward":
+            return StructuralWay.crossDownForward
+        case "Cross-Up-Forward":
+            return StructuralWay.crossUpForward
+        case "Cross-Down-Backward":
+            return StructuralWay.crossDownBackward
+        case "Cross-Up-Backward":
+            return StructuralWay.crossUpBackward
         default:
             return StructuralWay.next
         }

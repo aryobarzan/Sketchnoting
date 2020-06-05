@@ -8,7 +8,7 @@
 import UIKit
 
 protocol DirectionalAtomDelegate {
-    func tappedAtom(id: String)
+    func tappedAtom(id: String, view: CGPoint?)
 }
 
 
@@ -48,8 +48,8 @@ open class DirectionalAtom<Value>: Atomable where Value: Equatable{
         self.textColor = textColor ?? .black
     }
     
-    @objc func handleTap(_ sender: UITapGestureRecognizer? = nil) {
-        delegate?.tappedAtom(id: self.id)
+    @objc func handleTap(_ sender: UITapGestureRecognizer) {
+        delegate?.tappedAtom(id: self.id, view: sender.view?.center)
     }
     
 }
@@ -100,7 +100,7 @@ extension DirectionalAtom: CustomViewConvertible{
         subView.addSubview(label)
         label.center = subView.center
         
-        let tap = UITapGestureRecognizer(target: self, action: #selector(self.handleTap(_:)))
+        let tap = UITapGestureRecognizer(target: self, action: #selector(DirectionalAtom.handleTap(_:)))
         atomView.addGestureRecognizer(tap)
         atomView.isUserInteractionEnabled = true
 

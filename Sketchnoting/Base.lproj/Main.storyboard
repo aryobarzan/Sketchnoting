@@ -2978,7 +2978,6 @@
         <!--Molecular Structure-->
         <scene sceneID="bsy-70-0UB">
             <objects>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="Nzv-IC-r4v" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
                 <viewController id="0Gg-tq-D7y" customClass="MoleculeEditorViewController" customModule="Sketchnoting" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="0Fs-vb-fzD">
                         <rect key="frame" x="0.0" y="0.0" width="712" height="984"/>
@@ -2987,41 +2986,38 @@
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="4Hz-re-22o">
                                 <rect key="frame" x="0.0" y="56" width="712" height="53"/>
                                 <subviews>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="E1g-QV-Bfd">
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="E1g-QV-Bfd">
                                         <rect key="frame" x="636" y="11.5" width="68" height="30"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="68" id="6hA-XF-2cd"/>
                                             <constraint firstAttribute="height" constant="30" id="QhP-ML-paW"/>
                                         </constraints>
-                                        <state key="normal" title="Add Atom"/>
+                                        <fontDescription key="fontDescription" type="boldSystem" pointSize="18"/>
+                                        <state key="normal" title=" Add" image="plus" catalog="system">
+                                            <color key="titleColor" systemColor="linkColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                            <preferredSymbolConfiguration key="preferredSymbolConfiguration" weight="bold"/>
+                                        </state>
                                         <connections>
                                             <action selector="addAtomButtonTapped:" destination="0Gg-tq-D7y" eventType="touchUpInside" id="WM1-rl-DiR"/>
                                         </connections>
                                     </button>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="NqW-bC-Y1d">
-                                        <rect key="frame" x="18" y="11" width="80" height="30"/>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="NqW-bC-Y1d">
+                                        <rect key="frame" x="18" y="11" width="110" height="30"/>
                                         <constraints>
-                                            <constraint firstAttribute="width" constant="80" id="84K-7c-Zf9"/>
+                                            <constraint firstAttribute="width" constant="110" id="84K-7c-Zf9"/>
                                             <constraint firstAttribute="height" constant="30" id="8fC-iK-irp"/>
                                         </constraints>
-                                        <state key="normal" title="Atom: C"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                        <state key="normal" title=" Atom: C" image="arrow.down" catalog="system">
+                                            <color key="titleColor" systemColor="linkColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                            <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="small"/>
+                                        </state>
                                         <connections>
                                             <action selector="atomDropDownButtonTapped:" destination="0Gg-tq-D7y" eventType="touchUpInside" id="PkR-uN-8tb"/>
                                         </connections>
                                     </button>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="PJW-kg-Lje">
-                                        <rect key="frame" x="106" y="11" width="200" height="30"/>
-                                        <constraints>
-                                            <constraint firstAttribute="height" constant="30" id="hf2-Rx-ZmG"/>
-                                            <constraint firstAttribute="width" constant="200" id="yvY-JX-jlG"/>
-                                        </constraints>
-                                        <state key="normal" title="Direction: Next"/>
-                                        <connections>
-                                            <action selector="directionDropDownButtonTapped:" destination="0Gg-tq-D7y" eventType="touchUpInside" id="mRt-CS-9KQ"/>
-                                        </connections>
-                                    </button>
-                                    <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="v2T-HJ-EVh">
-                                        <rect key="frame" x="314" y="11" width="170" height="32"/>
+                                    <segmentedControl hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="v2T-HJ-EVh">
+                                        <rect key="frame" x="375" y="11" width="170" height="32"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="170" id="cFF-eX-6Ao"/>
                                             <constraint firstAttribute="height" constant="31" id="q21-Jy-uyf"/>
@@ -3035,6 +3031,21 @@
                                             <action selector="bondSegmentedControlChanged:" destination="0Gg-tq-D7y" eventType="valueChanged" id="cX9-vz-0eM"/>
                                         </connections>
                                     </segmentedControl>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="PJW-kg-Lje">
+                                        <rect key="frame" x="136" y="11" width="231" height="30"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="30" id="hf2-Rx-ZmG"/>
+                                            <constraint firstAttribute="width" constant="231" id="yvY-JX-jlG"/>
+                                        </constraints>
+                                        <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                        <state key="normal" title=" Direction: Next" image="arrow.down" catalog="system">
+                                            <color key="titleColor" systemColor="linkColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                            <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="small"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="directionDropDownButtonTapped:" destination="0Gg-tq-D7y" eventType="touchUpInside" id="mRt-CS-9KQ"/>
+                                        </connections>
+                                    </button>
                                 </subviews>
                                 <constraints>
                                     <constraint firstItem="NqW-bC-Y1d" firstAttribute="top" secondItem="4Hz-re-22o" secondAttribute="top" constant="11" id="9Yw-Qj-LmA"/>
@@ -3050,6 +3061,20 @@
                             </view>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="3X9-HZ-Le2">
                                 <rect key="frame" x="8" y="117" width="696" height="847"/>
+                                <subviews>
+                                    <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="First element is &quot;C&quot;. Add a second element to initialize the structure." textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="2UP-ot-Pyz">
+                                        <rect key="frame" x="89" y="413" width="518" height="21"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <view hidden="YES" contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="yVA-IT-4nb">
+                                        <rect key="frame" x="323" y="677" width="50" height="50"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    </view>
+                                </subviews>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                             </view>
                         </subviews>
@@ -3080,11 +3105,14 @@
                     <connections>
                         <outlet property="addAtomButton" destination="E1g-QV-Bfd" id="PUj-aT-WC2"/>
                         <outlet property="atomDropDownButton" destination="NqW-bC-Y1d" id="lVn-OP-c9A"/>
+                        <outlet property="atomSelectionIndicator" destination="yVA-IT-4nb" id="4xb-Db-p4B"/>
                         <outlet property="boardViewContainer" destination="3X9-HZ-Le2" id="DC9-DA-3V1"/>
                         <outlet property="bondSegmentedControl" destination="v2T-HJ-EVh" id="noy-LN-1QC"/>
                         <outlet property="directionDropDownButton" destination="PJW-kg-Lje" id="a7V-EB-2ay"/>
+                        <outlet property="firstElementLabel" destination="2UP-ot-Pyz" id="Qhg-eb-77s"/>
                     </connections>
                 </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Nzv-IC-r4v" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="4181.25" y="3771.6796874999995"/>
         </scene>
@@ -3361,6 +3389,7 @@
         <image name="antenna.radiowaves.left.and.right" catalog="system" width="128" height="109"/>
         <image name="arrow.clockwise" catalog="system" width="115" height="128"/>
         <image name="arrow.clockwise.circle" catalog="system" width="128" height="121"/>
+        <image name="arrow.down" catalog="system" width="120" height="128"/>
         <image name="arrow.down.doc" catalog="system" width="115" height="128"/>
         <image name="arrow.left" catalog="system" width="128" height="98"/>
         <image name="arrow.left.circle" catalog="system" width="128" height="121"/>

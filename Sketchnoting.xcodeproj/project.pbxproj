@@ -77,6 +77,7 @@
 		9F96895724679D4000D02F81 /* NoteDoc.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F96895624679D4000D02F81 /* NoteDoc.swift */; };
 		9F9898312470DC2700E62CD1 /* TextBoxViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F9898302470DC2700E62CD1 /* TextBoxViewController.swift */; };
 		9F9DAFE0242CB7C100713E75 /* DrawingRecognition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F9DAFDF242CB7C100713E75 /* DrawingRecognition.swift */; };
+		9FA09CE7248AB9A200B4B9D1 /* Periodic_Table.json in Resources */ = {isa = PBXBuildFile; fileRef = 9FA09CE6248AB9A100B4B9D1 /* Periodic_Table.json */; };
 		9FA5A482244AB14E006D9FB2 /* UILabelExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA5A481244AB14E006D9FB2 /* UILabelExtensions.swift */; };
 		9FA6238822CEA7FE007ED794 /* MapHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA6238722CEA7FE007ED794 /* MapHelper.swift */; };
 		9FA6238B22D37213007ED794 /* BioPortalHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA6238A22D37213007ED794 /* BioPortalHelper.swift */; };
@@ -221,6 +222,7 @@
 		9F96895624679D4000D02F81 /* NoteDoc.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteDoc.swift; sourceTree = "<group>"; };
 		9F9898302470DC2700E62CD1 /* TextBoxViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextBoxViewController.swift; sourceTree = "<group>"; };
 		9F9DAFDF242CB7C100713E75 /* DrawingRecognition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrawingRecognition.swift; sourceTree = "<group>"; };
+		9FA09CE6248AB9A100B4B9D1 /* Periodic_Table.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = Periodic_Table.json; sourceTree = "<group>"; };
 		9FA5A481244AB14E006D9FB2 /* UILabelExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UILabelExtensions.swift; sourceTree = "<group>"; };
 		9FA6238722CEA7FE007ED794 /* MapHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapHelper.swift; sourceTree = "<group>"; };
 		9FA6238A22D37213007ED794 /* BioPortalHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BioPortalHelper.swift; sourceTree = "<group>"; };
@@ -667,6 +669,7 @@
 				9FD29C452239587D00CC969A /* Extensions */,
 				9F5D8B2B228B9D7000F56FEC /* CREDITS.md */,
 				9F5D8B2C228B9EF800F56FEC /* README.md */,
+				9FA09CE6248AB9A100B4B9D1 /* Periodic_Table.json */,
 			);
 			path = Sketchnoting;
 			sourceTree = "<group>";
@@ -861,6 +864,7 @@
 				9FD29BB12220525000CC969A /* LaunchScreen.storyboard in Resources */,
 				9FD29BAE2220525000CC969A /* Assets.xcassets in Resources */,
 				9F05B5A1232BE4EC00983AF2 /* NoteCollectionViewDetailCell.xib in Resources */,
+				9FA09CE7248AB9A200B4B9D1 /* Periodic_Table.json in Resources */,
 				9FD29BAC2220524D00CC969A /* Main.storyboard in Resources */,
 				9F92D11A23217CFA00BC0E57 /* SearchFilterView.xib in Resources */,
 				9FD29C6622431C0000CC969A /* labels.txt in Resources */,

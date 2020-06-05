@@ -36,7 +36,7 @@ class WATHelper {
                 var results = [String: String]()
                 if let annotations = json["annotations"].array {
                     for annotation in annotations {
-                        if let spot = annotation["spot"].string, let id = annotation["id"].double, let title = annotation["title"].string, let rho = annotation["rho"].double {
+                        if let spot = annotation["spot"].string, let id = annotation["id"].double, let title = annotation["title"].string?.replacingOccurrences(of: "_", with: " "), let rho = annotation["rho"].double {
                             if !spot.isEmpty && results[spot] == nil {
                                 results[spot] = spot
                                 if rho > 0.1 {
