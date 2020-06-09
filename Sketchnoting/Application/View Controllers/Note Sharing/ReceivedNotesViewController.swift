@@ -71,7 +71,7 @@ class ReceivedNotesViewController: UIViewController, UICollectionViewDelegate, U
         return CGSize(width: CGFloat(150), height: CGFloat(200))
     }*/
     
-    func acceptReceivedNote(note: NoteX) {
+    func acceptReceivedNote(note: Note) {
         log.info("Accepted shared note")
         DataManager.receivedNotesController.receivedNotes.removeAll(where: { $0 == note } )
         _ = DataManager.add(note: note)
@@ -79,7 +79,7 @@ class ReceivedNotesViewController: UIViewController, UICollectionViewDelegate, U
         Notifications.announceDeviceVisibility()
     }
        
-    func rejectReceivedNote(note: NoteX) {
+    func rejectReceivedNote(note: Note) {
         log.info("Rejected shared note")
         DataManager.receivedNotesController.receivedNotes.removeAll(where: { $0 == note } )
         self.collectionView.reloadData()

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="15705" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="16096" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15706"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16087"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -22,12 +22,22 @@
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="V13-sv-1Ta">
                                 <rect key="frame" x="0.0" y="0.0" width="200" height="270"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <color key="tintColor" systemColor="systemIndigoColor" red="0.34509803919999998" green="0.33725490200000002" blue="0.83921568629999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            </imageView>
+                            <imageView hidden="YES" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="checkmark.circle" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="sbb-Dx-HUl">
+                                <rect key="frame" x="75" y="110.5" width="50" height="49"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="50" id="ELG-SN-uDm"/>
+                                    <constraint firstAttribute="height" constant="50" id="Hf7-Ke-Htm"/>
+                                </constraints>
                             </imageView>
                         </subviews>
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstAttribute="trailing" secondItem="V13-sv-1Ta" secondAttribute="trailing" id="9cJ-VG-jq7"/>
+                            <constraint firstItem="sbb-Dx-HUl" firstAttribute="centerX" secondItem="V13-sv-1Ta" secondAttribute="centerX" id="E3a-Uc-fcw"/>
                             <constraint firstAttribute="height" constant="300" id="FJ6-Uk-jv2"/>
+                            <constraint firstItem="sbb-Dx-HUl" firstAttribute="centerY" secondItem="V13-sv-1Ta" secondAttribute="centerY" id="SbA-g6-Ejx"/>
                             <constraint firstAttribute="width" constant="200" id="Xca-ae-8vc"/>
                             <constraint firstItem="V13-sv-1Ta" firstAttribute="leading" secondItem="RM6-OH-sTu" secondAttribute="leading" id="ayg-PS-InK"/>
                             <constraint firstItem="V13-sv-1Ta" firstAttribute="top" secondItem="RM6-OH-sTu" secondAttribute="top" id="zTd-9V-vEA"/>
@@ -69,10 +79,14 @@
             <size key="customSize" width="220" height="320"/>
             <connections>
                 <outlet property="imageView" destination="V13-sv-1Ta" id="Gn7-Pi-pdf"/>
+                <outlet property="selectedImage" destination="sbb-Dx-HUl" id="2ez-q9-Oav"/>
                 <outlet property="titleBackgroundView" destination="lwh-05-4wr" id="d9V-Ps-H1c"/>
                 <outlet property="titleLabel" destination="afa-LH-hYC" id="o9d-Ae-bBp"/>
             </connections>
             <point key="canvasLocation" x="-126.08695652173914" y="180.13392857142856"/>
         </collectionViewCell>
     </objects>
+    <resources>
+        <image name="checkmark.circle" catalog="system" width="128" height="121"/>
+    </resources>
 </document>

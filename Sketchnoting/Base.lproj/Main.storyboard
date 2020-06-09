@@ -700,23 +700,122 @@
                                         <viewLayoutGuide key="contentLayoutGuide" id="FQo-gF-fBI"/>
                                         <viewLayoutGuide key="frameLayoutGuide" id="LT3-Ih-Ccu"/>
                                     </scrollView>
+                                    <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="OkZ-qt-G8e">
+                                        <rect key="frame" x="8" y="42" width="752" height="42"/>
+                                        <subviews>
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="leading" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Hdy-fw-B6W">
+                                                <rect key="frame" x="8" y="8.5" width="70" height="25"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="height" constant="25" id="N8p-c3-SiW"/>
+                                                    <constraint firstAttribute="width" constant="70" id="Ur3-8y-q0I"/>
+                                                </constraints>
+                                                <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                                <state key="normal" title="Select All">
+                                                    <color key="titleColor" red="0.26875244110000002" green="0.49985405119999998" blue="0.82210710099999995" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="large"/>
+                                                </state>
+                                                <connections>
+                                                    <action selector="selectAllButtonTapped:" destination="BYZ-38-t0r" eventType="touchUpInside" id="dHq-lJ-Aha"/>
+                                                </connections>
+                                            </button>
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="leading" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Is9-l7-CB7">
+                                                <rect key="frame" x="666" y="12" width="78" height="18"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="height" constant="18" id="Ly3-yn-eTH"/>
+                                                    <constraint firstAttribute="width" constant="78" id="ouU-3b-uMf"/>
+                                                </constraints>
+                                                <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                                <color key="tintColor" systemColor="systemRedColor" red="1" green="0.23137254900000001" blue="0.18823529410000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                <state key="normal" title=" Delete..." image="xmark.circle.fill" catalog="system">
+                                                    <color key="titleColor" systemColor="systemRedColor" red="1" green="0.23137254900000001" blue="0.18823529410000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="small"/>
+                                                </state>
+                                                <connections>
+                                                    <action selector="deleteSelectedButtonTapped:" destination="BYZ-38-t0r" eventType="touchUpInside" id="QDQ-Ww-plb"/>
+                                                </connections>
+                                            </button>
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="leading" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Ysg-uh-uEX">
+                                                <rect key="frame" x="86" y="8.5" width="90" height="25"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="height" constant="25" id="Ud5-by-dq9"/>
+                                                    <constraint firstAttribute="width" constant="90" id="uas-Xt-Ajy"/>
+                                                </constraints>
+                                                <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                                <state key="normal" title="Deselect All">
+                                                    <color key="titleColor" red="0.26875244110000002" green="0.49985405119999998" blue="0.82210710099999995" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="large"/>
+                                                </state>
+                                                <connections>
+                                                    <action selector="deselectAllButtonTapped:" destination="BYZ-38-t0r" eventType="touchUpInside" id="pun-18-cfA"/>
+                                                </connections>
+                                            </button>
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="leading" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="wHb-fC-SNw">
+                                                <rect key="frame" x="584" y="12" width="74" height="18"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="height" constant="18" id="3H1-Ha-4FS"/>
+                                                    <constraint firstAttribute="width" constant="74" id="cmi-xu-weR"/>
+                                                </constraints>
+                                                <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                                <state key="normal" title=" Move..." image="folder" catalog="system">
+                                                    <color key="titleColor" red="0.26875244110000002" green="0.49985405119999998" blue="0.82210710099999995" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="small"/>
+                                                </state>
+                                                <connections>
+                                                    <action selector="moveSelectedButtonTapped:" destination="BYZ-38-t0r" eventType="touchUpInside" id="Z39-BT-QEP"/>
+                                                </connections>
+                                            </button>
+                                        </subviews>
+                                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                        <constraints>
+                                            <constraint firstItem="wHb-fC-SNw" firstAttribute="centerY" secondItem="OkZ-qt-G8e" secondAttribute="centerY" id="3P2-LD-QoP"/>
+                                            <constraint firstItem="Ysg-uh-uEX" firstAttribute="centerY" secondItem="OkZ-qt-G8e" secondAttribute="centerY" id="6PP-x6-Wiq"/>
+                                            <constraint firstItem="Is9-l7-CB7" firstAttribute="centerY" secondItem="OkZ-qt-G8e" secondAttribute="centerY" id="AOG-HU-N5l"/>
+                                            <constraint firstItem="Hdy-fw-B6W" firstAttribute="leading" secondItem="OkZ-qt-G8e" secondAttribute="leading" constant="8" id="ISC-mH-E8Q"/>
+                                            <constraint firstItem="Hdy-fw-B6W" firstAttribute="centerY" secondItem="OkZ-qt-G8e" secondAttribute="centerY" id="a3K-IL-saR"/>
+                                            <constraint firstAttribute="trailing" secondItem="Is9-l7-CB7" secondAttribute="trailing" constant="8" id="ftH-gX-MCS"/>
+                                            <constraint firstAttribute="height" constant="42" id="gwS-zk-pyi"/>
+                                            <constraint firstItem="Is9-l7-CB7" firstAttribute="leading" secondItem="wHb-fC-SNw" secondAttribute="trailing" constant="8" id="iAE-Ib-pKQ"/>
+                                            <constraint firstItem="Ysg-uh-uEX" firstAttribute="leading" secondItem="Hdy-fw-B6W" secondAttribute="trailing" constant="8" id="qXT-GK-Q6N"/>
+                                        </constraints>
+                                    </view>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="leading" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="lgv-jf-NTo">
+                                        <rect key="frame" x="702" y="5" width="25" height="25"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="25" id="G5N-0a-BMg"/>
+                                            <constraint firstAttribute="height" constant="25" id="V0O-bL-i43"/>
+                                        </constraints>
+                                        <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                        <state key="normal" image="checkmark.square" catalog="system">
+                                            <color key="titleColor" red="0.26875244110000002" green="0.49985405119999998" blue="0.82210710099999995" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                            <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="large"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="selectionModeButtonTapped:" destination="BYZ-38-t0r" eventType="touchUpInside" id="aR3-2m-kwf"/>
+                                        </connections>
+                                    </button>
                                 </subviews>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                                 <constraints>
                                     <constraint firstItem="khA-pa-wBN" firstAttribute="top" secondItem="4x9-Nc-HFb" secondAttribute="bottom" constant="5" id="0qC-n3-5OC"/>
                                     <constraint firstItem="sHd-m9-c4G" firstAttribute="centerX" secondItem="hut-mJ-mJj" secondAttribute="centerX" id="2iA-iP-5h0"/>
+                                    <constraint firstItem="OkZ-qt-G8e" firstAttribute="leading" secondItem="hut-mJ-mJj" secondAttribute="leading" constant="8" id="30H-A1-dYX"/>
                                     <constraint firstItem="vgL-tn-nRc" firstAttribute="top" secondItem="hut-mJ-mJj" secondAttribute="top" constant="5" id="CUe-JV-3Kx"/>
                                     <constraint firstAttribute="trailing" secondItem="khA-pa-wBN" secondAttribute="trailing" id="D8W-Hb-YF9"/>
                                     <constraint firstItem="4x9-Nc-HFb" firstAttribute="leading" secondItem="hut-mJ-mJj" secondAttribute="leading" constant="8" id="FQt-t3-UQA"/>
                                     <constraint firstAttribute="bottom" secondItem="khA-pa-wBN" secondAttribute="bottom" id="Hrv-Xf-kaF"/>
                                     <constraint firstAttribute="trailing" secondItem="4x9-Nc-HFb" secondAttribute="trailing" constant="8" id="J91-q7-BPI"/>
+                                    <constraint firstItem="lgv-jf-NTo" firstAttribute="top" secondItem="hut-mJ-mJj" secondAttribute="top" constant="5" id="KWh-qZ-eop"/>
+                                    <constraint firstItem="OkZ-qt-G8e" firstAttribute="top" secondItem="QAN-3k-yxQ" secondAttribute="bottom" constant="9" id="Q8v-zJ-pbw"/>
+                                    <constraint firstItem="vgL-tn-nRc" firstAttribute="leading" secondItem="lgv-jf-NTo" secondAttribute="trailing" constant="8" id="RPM-49-m4F"/>
                                     <constraint firstItem="QAN-3k-yxQ" firstAttribute="leading" secondItem="IRa-tg-YTc" secondAttribute="trailing" constant="8" id="bjc-oT-WOl"/>
                                     <constraint firstItem="QAN-3k-yxQ" firstAttribute="top" secondItem="hut-mJ-mJj" secondAttribute="top" constant="1" id="d4x-E6-vbk"/>
+                                    <constraint firstAttribute="trailing" secondItem="OkZ-qt-G8e" secondAttribute="trailing" constant="8" id="dwa-Mo-wzz"/>
                                     <constraint firstItem="IRa-tg-YTc" firstAttribute="leading" secondItem="hut-mJ-mJj" secondAttribute="leading" constant="8" id="gCO-xa-ccc"/>
                                     <constraint firstItem="sHd-m9-c4G" firstAttribute="centerY" secondItem="hut-mJ-mJj" secondAttribute="centerY" id="hGF-da-dfx"/>
                                     <constraint firstAttribute="trailing" secondItem="vgL-tn-nRc" secondAttribute="trailing" constant="8" id="hPl-4B-cfM"/>
                                     <constraint firstItem="4x9-Nc-HFb" firstAttribute="top" secondItem="QAN-3k-yxQ" secondAttribute="bottom" constant="9" id="hVa-9p-XzF"/>
                                     <constraint firstItem="khA-pa-wBN" firstAttribute="leading" secondItem="hut-mJ-mJj" secondAttribute="leading" id="rrk-Ek-z9e"/>
+                                    <constraint firstItem="khA-pa-wBN" firstAttribute="top" secondItem="OkZ-qt-G8e" secondAttribute="bottom" constant="5" id="yUl-dk-2dh"/>
                                     <constraint firstItem="IRa-tg-YTc" firstAttribute="top" secondItem="hut-mJ-mJj" secondAttribute="top" constant="5" id="zxs-4P-mxB"/>
                                 </constraints>
                             </view>
@@ -736,7 +835,10 @@
                     <navigationItem key="navigationItem" title="Sketchnoting" id="fQM-d5-dnH"/>
                     <nil key="simulatedTopBarMetrics"/>
                     <connections>
+                        <outlet property="deleteSelectedButton" destination="Is9-l7-CB7" id="cgW-zl-cyz"/>
+                        <outlet property="deselectAllButton" destination="Ysg-uh-uEX" id="Qb4-p9-dvW"/>
                         <outlet property="filtersButton" destination="QAN-3k-yxQ" id="66B-EJ-JR9"/>
+                        <outlet property="moveSelectedButton" destination="wHb-fC-SNw" id="UGK-aa-euB"/>
                         <outlet property="navigationHierarchyScrollView" destination="4x9-Nc-HFb" id="mxf-aA-F9W"/>
                         <outlet property="navigationHierarchyStackView" destination="80o-Gw-p38" id="je1-GP-kJJ"/>
                         <outlet property="newNoteButton" destination="UAF-TK-CJG" id="BJS-Sr-u5U"/>
@@ -745,6 +847,9 @@
                         <outlet property="noteLoadingIndicator" destination="sHd-m9-c4G" id="mVH-2C-P8E"/>
                         <outlet property="noteSortingButton" destination="IRa-tg-YTc" id="AT7-Iy-uvD"/>
                         <outlet property="receivedNotesButton" destination="xyG-l9-rRb" id="cg8-Qg-5Hb"/>
+                        <outlet property="selectAllButton" destination="Hdy-fw-B6W" id="7k2-vN-3fI"/>
+                        <outlet property="selectionControlsView" destination="OkZ-qt-G8e" id="ttK-CA-JwT"/>
+                        <outlet property="selectionModeButton" destination="lgv-jf-NTo" id="iA0-hj-klJ"/>
                         <segue destination="lDo-DG-9fX" kind="show" identifier="NewSketchnote" id="ct4-u7-KZY"/>
                         <segue destination="lDo-DG-9fX" kind="show" identifier="EditSketchnote" id="lta-QB-BHq"/>
                         <segue destination="riE-Ei-xpK" kind="presentation" identifier="ShareNote" id="58e-4d-iJp"/>
@@ -3379,10 +3484,10 @@
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>
-        <segue reference="RAn-aJ-7TA"/>
-        <segue reference="b6T-Lb-KBp"/>
+        <segue reference="fmI-KU-Ur1"/>
+        <segue reference="ig0-q1-Lq9"/>
         <segue reference="yvs-ei-HRy"/>
-        <segue reference="OAt-q3-0jJ"/>
+        <segue reference="58e-4d-iJp"/>
         <segue reference="ct4-u7-KZY"/>
     </inferredMetricsTieBreakers>
     <resources>
@@ -3398,6 +3503,7 @@
         <image name="book.circle" catalog="system" width="128" height="121"/>
         <image name="book.circle.fill" catalog="system" width="128" height="121"/>
         <image name="calendar" catalog="system" width="128" height="106"/>
+        <image name="checkmark.square" catalog="system" width="128" height="114"/>
         <image name="clear.fill" catalog="system" width="128" height="114"/>
         <image name="doc.plaintext" catalog="system" width="115" height="128"/>
         <image name="doc.richtext" catalog="system" width="115" height="128"/>

@@ -16,7 +16,7 @@ class ShareNoteViewController: UIViewController {
     @IBOutlet var pdfButton: UIButton!
     @IBOutlet var imageButton: UIButton!
     
-    var note: NoteX!
+    var note: Note!
     override func viewDidLoad() {
         super.viewDidLoad()
         fileButton.layer.borderColor = UIColor.white.cgColor

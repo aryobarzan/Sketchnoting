@@ -19,7 +19,7 @@ class SearchViewController: UIViewController, UICollectionViewDelegate, UICollec
     @IBOutlet weak var notesCollectionView: UICollectionView!
     
     var searchFilters = [SearchFilter]()
-    var notes = [NoteX]()
+    var notes = [Note]()
     var currentSearchType = SearchType.All
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -141,7 +141,7 @@ class SearchViewController: UIViewController, UICollectionViewDelegate, UICollec
     private func updateResults() {
         if searchFilters.count > 0 {
             self.notes = DataManager.notes
-            var searchedNotesToRemove = [NoteX]()
+            var searchedNotesToRemove = [Note]()
             for note in notes {
                 if !note.applySearchFilters(filters: searchFilters) {
                         searchedNotesToRemove.append(note)
@@ -150,14 +150,14 @@ class SearchViewController: UIViewController, UICollectionViewDelegate, UICollec
             self.notes = self.notes.filter { !searchedNotesToRemove.contains($0) }
         }
         else {
-            self.notes = [NoteX]()
+            self.notes = [Note]()
         }
         notesCollectionView.reloadData()
         resultsLabel.text = "Notes: \(self.notes.count) results"
     }
     
-    var noteToOpen: NoteX?
-    func openNote(note: NoteX) {
+    var noteToOpen: Note?
+    func openNote(note: Note) {
         noteToOpen = note
         Timer.scheduledTimer(timeInterval: 0.2, target: self, selector: #selector(switchToHomeTab), userInfo: nil, repeats: false)
     }

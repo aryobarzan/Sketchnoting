@@ -10,15 +10,15 @@ import UIKit
 import PDFKit
 import PencilKit
 
-protocol NoteXDelegate {
-    func noteHasNewDocument(note: NoteX, document: Document)
-    func noteHasRemovedDocument(note: NoteX, document: Document)
-    func noteDocumentHasChanged(note: NoteX, document: Document)
-    func noteHasChanged(note: NoteX)
+protocol NoteDelegate {
+    func noteHasNewDocument(note: Note, document: Document)
+    func noteHasRemovedDocument(note: Note, document: Document)
+    func noteDocumentHasChanged(note: Note, document: Document)
+    func noteHasChanged(note: Note)
 }
 
-class NoteX: File, DocumentVisitor, DocumentDelegate {
-    var pages: [NoteXPage]
+class Note: File, DocumentVisitor, DocumentDelegate {
+    var pages: [NotePage]
     private var documents: [Document]
     var hiddenDocuments: [Document]
     var tags: [Tag]
@@ -28,15 +28,15 @@ class NoteX: File, DocumentVisitor, DocumentDelegate {
     
     var sharedByDevice: String?
     
-    var delegate: NoteXDelegate?
+    var delegate: NoteDelegate?
     
     init(name: String, parent: String?, documents: [Document]?) {
         self.documents = documents ?? [Document]()
         self.hiddenDocuments = [Document]()
-        self.pages = [NoteXPage]()
+        self.pages = [NotePage]()
         self.tags = [Tag]()
         self.helpLinesType = .None
-        let firstPage = NoteXPage()
+        let firstPage = NotePage()
         self.pages.append(firstPage)
         super.init(name: name, parent: parent)
     }
@@ -148,7 +148,7 @@ class NoteX: File, DocumentVisitor, DocumentDelegate {
         tags = (try? container.decode([Tag].self, forKey: .tags)) ?? [Tag]()
         activePageIndex = try container.decode(Int.self, forKey: .activePageIndex)
         helpLinesType = (try? container.decode(HelpLinesType.self, forKey: .helpLinesType)) ?? .None
-        pages = try container.decode([NoteXPage].self, forKey: .pages)
+        pages = try container.decode([NotePage].self, forKey: .pages)
         tagmeEpsilon = (try? container.decode(Float.self, forKey: .tagmeEpsilon)) ?? 0.3
         try super.init(from: decoder)
         for doc in documents {
@@ -157,9 +157,9 @@ class NoteX: File, DocumentVisitor, DocumentDelegate {
         log.info("Note " + self.getName() + " decoded.")
     }
     
-    public func duplicate() -> NoteX {
+    public func duplicate() -> Note {
         let documents = self.documents
-        let duplicate = NoteX(name: self.getName(), parent: self.parent, documents: documents)
+        let duplicate = Note(name: self.getName(), parent: self.parent, documents: documents)
         duplicate.setName(name: self.getName() + " #2")
         duplicate.tags = self.tags
         return duplicate
@@ -430,12 +430,12 @@ class NoteX: File, DocumentVisitor, DocumentDelegate {
     }
     
     // MARK: Page helper functions
-    public func getCurrentPage() -> NoteXPage {
+    public func getCurrentPage() -> NotePage {
         if activePageIndex >= pages.count {
             activePageIndex = 0
         }
         if pages.count == 0 {
-            pages.append(NoteXPage())
+            pages.append(NotePage())
         }
         return pages[activePageIndex]
     }
@@ -488,11 +488,11 @@ class NoteX: File, DocumentVisitor, DocumentDelegate {
       pages.remove(at: indexPath.row)
     }
       
-    func insertPage(_ notePage: NoteXPage, at indexPath: IndexPath) {
+    func insertPage(_ notePage: NotePage, at indexPath: IndexPath) {
       pages.insert(notePage, at: indexPath.row)
     }
     
-    public func mergeWith(note: NoteX) {
+    public func mergeWith(note: Note) {
         if note != self {
             for page in note.pages {
                 self.pages.append(page)
@@ -502,7 +502,7 @@ class NoteX: File, DocumentVisitor, DocumentDelegate {
         }
     }
     
-    public func mergeTagsWith(note: NoteX) {
+    public func mergeTagsWith(note: Note) {
         for tag in note.tags {
             if !self.tags.contains(tag) {
                 self.tags.append(tag)

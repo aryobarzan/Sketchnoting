@@ -15,7 +15,7 @@ class TagsViewController: UIViewController, UITableViewDataSource, UITableViewDe
     var isEditingTags: Bool = false
     var isFiltering: Bool = false
     
-    var note: NoteX?
+    var note: Note?
     override func viewDidLoad() {
         super.viewDidLoad()
         

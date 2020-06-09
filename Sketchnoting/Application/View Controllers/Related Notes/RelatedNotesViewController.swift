@@ -14,19 +14,19 @@ enum RelatedNotesContext {
 }
 
 protocol RelatedNotesVCDelegate {
-    func openRelatedNote(note: NoteX)
-    func mergedNotes(note1: NoteX, note2: NoteX)
+    func openRelatedNote(note: Note)
+    func mergedNotes(note1: Note, note2: Note)
 }
 
 class RelatedNotesViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate {
     
-    var note: NoteX!
+    var note: Note!
     var context: RelatedNotesContext! = .HomePage
     
-    var relatedNotes = [NoteX]()
+    var relatedNotes = [Note]()
      var similarityThreshold: Float = 0.5
     
-    var openNote: NoteX?
+    var openNote: Note?
     var delegate: RelatedNotesVCDelegate?
 
     @IBOutlet weak var countLabel: UILabel!
@@ -86,7 +86,7 @@ class RelatedNotesViewController: UIViewController, UICollectionViewDataSource, 
         })
     }
     
-    private func makeNoteContextMenu(n: NoteX, point: CGPoint, cellIndexPath: IndexPath) -> UIMenu {
+    private func makeNoteContextMenu(n: Note, point: CGPoint, cellIndexPath: IndexPath) -> UIMenu {
         let mergeAction = UIAction(title: "Merge", image: UIImage(systemName: "arrow.merge")) { action in
             let alert = UIAlertController(title: "Merge Note", message: "Are you sure you want to merge this note with the related note? This will delete the related note.", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "Merge", style: .destructive, handler: { action in
@@ -114,7 +114,7 @@ class RelatedNotesViewController: UIViewController, UICollectionViewDataSource, 
     private func refreshRelatedNotes() {
         Knowledge.setupSimilarityMatrix()
         let foundNotes = Knowledge.similarNotesFor(note: note)
-        self.relatedNotes = [NoteX]()
+        self.relatedNotes = [Note]()
         for (note, score) in foundNotes {
             if score > similaritySlider.value {
                 self.relatedNotes.append(note)

@@ -12,7 +12,7 @@ class NoteTextViewController: UIViewController {
 
     
     @IBOutlet var textView: UITextView!
-    var note: NoteX?
+    var note: Note?
     override func viewDidLoad() {
         super.viewDidLoad()
 

@@ -15,7 +15,7 @@ class MoveFileViewController: UIViewController, UITableViewDataSource, UITableVi
     
     var delegate: MoveFileViewControllerDelegate?
     
-    var file: File!
+    var filesToMove = [File]()
     var currentFolder: Folder?
     var items = [Folder]()
     override func viewDidLoad() {
@@ -96,13 +96,18 @@ class MoveFileViewController: UIViewController, UITableViewDataSource, UITableVi
         self.dismiss(animated: true, completion: nil)
     }
     @IBAction func moveTapped(_ sender: UIBarButtonItem) {
-        DataManager.move(file: file, toFolder: currentFolder)
-        self.delegate?.movedFile(file: file)
+        for file in filesToMove {
+            if file != currentFolder {
+                DataManager.move(file: file, toFolder: currentFolder)
+                
+            }
+        }
+        self.delegate?.movedFiles(files: filesToMove)
         self.dismiss(animated: true, completion: nil)
     }
 }
 
 
 protocol MoveFileViewControllerDelegate {
-    func movedFile(file: File)
+    func movedFiles(files: [File])
 }

@@ -14,8 +14,8 @@ import Highlightr
 
 class ImportHelper {
     static var importUTTypes = ["public.image", "public.jpeg", "public.jpg", "public.png", "com.sketchnote", "com.adobe.pdf", String(kUTTypeText), String(kUTTypeJavaClass), String(kUTTypeCSource), String(kUTTypePlainText), String(kUTTypeSourceCode), "com.sun.java-source"]
-    static func importItems(urls: [URL], n: NoteX?) -> ([NoteX], [UIImage], [PDFDocument], [NoteTypedText]) {
-        var notes = [NoteX]()
+    static func importItems(urls: [URL], n: Note?) -> ([Note], [UIImage], [PDFDocument], [NoteTypedText]) {
+        var notes = [Note]()
         var images = [UIImage]()
         var pdfs = [PDFDocument]()
         var texts = [NoteTypedText]()

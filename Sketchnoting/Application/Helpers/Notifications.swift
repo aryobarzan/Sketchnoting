@@ -21,7 +21,7 @@ class Notifications {
             NotificationCenter.default.post(name: NSNotification.Name(rawValue: NOTIFICATION_IMPORT_NOTE), object: self, userInfo: info)
         }
     }
-    static func announce(receivedNote: NoteX?) {
+    static func announce(receivedNote: Note?) {
         if receivedNote != nil {
             NotificationCenter.default.post(name: NSNotification.Name(rawValue: NOTIFICATION_RECEIVE_NOTE), object: self)
         }

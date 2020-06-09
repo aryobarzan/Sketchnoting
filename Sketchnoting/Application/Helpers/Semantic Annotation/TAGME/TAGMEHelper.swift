@@ -14,7 +14,7 @@ class TAGMEHelper {
     static var shared = TAGMEHelper()
     //var requestDelay: Double = 0
     private let tagmeQueue = DispatchQueue(label: "TAGMEQueue", qos: .background)
-    func fetch(text: String, note: NoteX, parentConcept: TAGMEDocument? = nil) {
+    func fetch(text: String, note: Note, parentConcept: TAGMEDocument? = nil) {
         let chunks = text.split(by: 6000)
         for chunk in chunks {
             let parameters: Parameters = ["text": chunk, "lang": "en", "include_abstract": "true", "include_categories": "true", "gcube-token": "5f57008b-3114-47e9-9ee2-742c877d37b2-843339462", "epsilon": note.tagmeEpsilon]
@@ -67,7 +67,7 @@ class TAGMEHelper {
         }
     }
     
-    private func performAdditionalSteps(document: TAGMEDocument, note: NoteX) {
+    private func performAdditionalSteps(document: TAGMEDocument, note: Note) {
         DispatchQueue.main.async {
             if !note.getDocuments().contains(document) {
                 log.info("TAGME: new document added - \(document.title)")
@@ -187,7 +187,7 @@ class TAGMEHelper {
         }
     }
     
-    func checkForSubconcepts(document: TAGMEDocument, note: NoteX) {
+    func checkForSubconcepts(document: TAGMEDocument, note: Note) {
         self.tagmeQueue.async {
             let text = document.title.lowercased().replacingOccurrences(of: "\n", with: " ")
             var words = text.components(separatedBy: " ")
@@ -207,7 +207,7 @@ class TAGMEHelper {
         }
     }
     
-    func checkRelatedness(doc_one: TAGMEDocument, doc_two: TAGMEDocument, note: NoteX) {
+    func checkRelatedness(doc_one: TAGMEDocument, doc_two: TAGMEDocument, note: Note) {
         self.tagmeQueue.async {
             if doc_one != doc_two {
                 if let id_one = doc_one.wikiPageID, let id_two = doc_two.wikiPageID {

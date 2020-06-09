@@ -9,12 +9,12 @@
 import UIKit
 
 class Knowledge {
-    static var tf_idfs: Dictionary<NoteX, Dictionary<String, Float>>?
+    static var tf_idfs: Dictionary<Note, Dictionary<String, Float>>?
     public static func setupSimilarityMatrix() {
-        tf_idfs = Dictionary<NoteX, Dictionary<String, Float>>()
-        var termBags = Dictionary<NoteX, [String]>()
-        var termFrequencies = Dictionary<NoteX, Dictionary<String, Int>>()
-        var termTFs = Dictionary<NoteX, Dictionary<String, Float>>()
+        tf_idfs = Dictionary<Note, Dictionary<String, Float>>()
+        var termBags = Dictionary<Note, [String]>()
+        var termFrequencies = Dictionary<Note, Dictionary<String, Int>>()
+        var termTFs = Dictionary<Note, Dictionary<String, Float>>()
         var termIDFs = Dictionary<String, Float>()
         var uniqueTerms = [String]()
         
@@ -86,8 +86,8 @@ class Knowledge {
         log.info("Setup similarity matrix.")
     }
     
-    static func similarNotesFor(note: NoteX) -> [(NoteX, Float)] {
-        var similarNotes = [NoteX : Float]()
+    static func similarNotesFor(note: Note) -> [(Note, Float)] {
+        var similarNotes = [Note : Float]()
         for n in DataManager.notes {
             if n != note {
                 similarNotes[n] = self.calculateTFIDFSimilarity(n1: note, n2: n)
@@ -97,7 +97,7 @@ class Knowledge {
         return similarNotesSorted
     }
     
-    private static func calculateTFIDFSimilarity(n1: NoteX, n2: NoteX) -> Float {
+    private static func calculateTFIDFSimilarity(n1: Note, n2: Note) -> Float {
         var score = Float(0)
         for t in tf_idfs![n1]!.keys {
             score = score + (tf_idfs![n1]![t]! * tf_idfs![n2]![t]!)

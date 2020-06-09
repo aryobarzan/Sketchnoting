@@ -10,7 +10,7 @@ import UIKit
 import PencilKit
 import PDFKit
 
-class NoteXPage: Codable {
+class NotePage: Codable {
     var canvasDrawing: PKDrawing
     var drawingLabels: [String]
     var drawingViewRects: [CGRect]

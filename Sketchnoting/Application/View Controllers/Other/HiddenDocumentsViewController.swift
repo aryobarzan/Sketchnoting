@@ -10,7 +10,7 @@ import UIKit
 
 class HiddenDocumentsViewController: UITableViewController {
     
-    var note: NoteX!
+    var note: Note!
     override func viewDidLoad() {
         super.viewDidLoad()
     }

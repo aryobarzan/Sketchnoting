@@ -16,7 +16,7 @@ private let reuseIdentifier = "cell"
 class DocumentsViewController: UICollectionViewController{
     
     var items : [Document]!
-    var note: NoteX!
+    var note: Note!
     
     private var header: DocumentsCollectionReusableView?
         
@@ -61,7 +61,7 @@ class DocumentsViewController: UICollectionViewController{
         }
     }
     
-    public func setNote(note: NoteX) {
+    public func setNote(note: Note) {
         self.note = note
         self.items = note.getDocuments()
         self.updateBookshelf()
@@ -280,7 +280,7 @@ class DocumentsViewController: UICollectionViewController{
         self.updateBookshelf()
     }
     
-    func noteHasNewDocument(note: NoteX, document: Document) { // Sketchnote delegate
+    func noteHasNewDocument(note: Note, document: Document) { // Sketchnote delegate
         DispatchQueue.main.async {
             if self.bookshelfState == .All && self.documentTypeMatchesBookshelfFilter(type: document.documentType) {
                 self.items.append(document)
@@ -324,15 +324,15 @@ class DocumentsViewController: UICollectionViewController{
         return false
     }
     
-    func noteHasRemovedDocument(note: NoteX, document: Document) { // Sketchnote delegate
+    func noteHasRemovedDocument(note: Note, document: Document) { // Sketchnote delegate
         self.startBookshelfUpdateTimer()
     }
     
-    func noteDocumentHasChanged(note: NoteX, document: Document) { // Sketchnote delegate
+    func noteDocumentHasChanged(note: Note, document: Document) { // Sketchnote delegate
         self.startBookshelfUpdateTimer()
     }
     
-    func noteHasChanged(note: NoteX) { // Sketchnote delegate
+    func noteHasChanged(note: Note) { // Sketchnote delegate
     }
     
     func setFilter(option: BookshelfOption) {

@@ -15,7 +15,7 @@ class DataManager {
     static var currentFoldersHierarchy = [Folder]()
     static var folders = loadFolders()
     static var notes = loadNotes()
-    static var activeNote: NoteX?
+    static var activeNote: Note?
     
     static var receivedNotesController = ReceivedNotesController()
     
@@ -55,7 +55,7 @@ class DataManager {
     
     public static func save(file: File) {
         serializationQueue.async {
-            if let note = file as? NoteX {
+            if let note = file as? Note {
                 if let encoded = file.encodeFileAsData() {
                     try? encoded.write(to: self.getNotesDirectory().appendingPathComponent(file.id + ".sketchnote"))
                     log.info("Note \(note.getName()) saved.")
@@ -78,8 +78,8 @@ class DataManager {
         }
     }
     
-    private static func loadNotes() -> [NoteX] {
-        var notes = [NoteX]()
+    private static func loadNotes() -> [Note] {
+        var notes = [Note]()
         do {
             let fileURLs = try FileManager.default.contentsOfDirectory(at: getNotesDirectory(), includingPropertiesForKeys: nil)
             for url in fileURLs {
@@ -136,7 +136,7 @@ class DataManager {
     
     public static func delete(file: File) {
         var path = self.getNotesDirectory()
-        if file is NoteX {
+        if file is Note {
             path = self.getNotesDirectory().appendingPathComponent(file.id + ".sketchnote")
         }
         else if file is Folder {
@@ -181,7 +181,7 @@ class DataManager {
         return nil
     }
     
-    public static func getNote(id: String) -> NoteX? {
+    public static func getNote(id: String) -> Note? {
         for n in notes {
             if n.id == id {
                 return n
@@ -206,7 +206,7 @@ class DataManager {
         return files
     }
     
-    public static func add(note: NoteX) -> Bool {
+    public static func add(note: Note) -> Bool {
         if self.notes.contains(note) {
             return false
         }
@@ -224,7 +224,7 @@ class DataManager {
         return true
     }
     
-    public static func importNoteFile(url: URL) -> NoteX? {
+    public static func importNoteFile(url: URL) -> Note? {
         do {
             let data = try Data(contentsOf: url)
             if let decodedNote = decodeNoteFromData(data: data) {
@@ -236,11 +236,11 @@ class DataManager {
         return nil
     }
     
-    public static func decodeNoteFromData(data: Data) -> NoteX? {
+    public static func decodeNoteFromData(data: Data) -> Note? {
         if let decodedDataArray = try? NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(data) as? [Data] {
             if decodedDataArray.count >= 1 {
                 let jsonDecoder = JSONDecoder()
-                if let note = try? jsonDecoder.decode(NoteX.self, from: decodedDataArray[0]) {
+                if let note = try? jsonDecoder.decode(Note.self, from: decodedDataArray[0]) {
                     return note
                 }
             }
@@ -267,7 +267,7 @@ class DataManager {
             }
             log.info("Deleted note.")
         }
-        self.notes = [NoteX]()
+        self.notes = [Note]()
         for folder in self.folders {
             let folderURL = self.getFoldersDirectory().appendingPathComponent(folder.id)
             if FileManager.default.fileExists(atPath: folderURL.path) {
@@ -275,7 +275,7 @@ class DataManager {
             }
             log.info("Deleted folder.")
         }
-        self.notes = [NoteX]()
+        self.notes = [Note]()
         log.info("All notes cleared.")
 
         

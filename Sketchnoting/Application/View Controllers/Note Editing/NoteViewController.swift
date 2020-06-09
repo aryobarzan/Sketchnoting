@@ -23,7 +23,7 @@ import GPUImage
 import Highlightr
 import Toast
 
-class NoteViewController: UIViewController, UIPencilInteractionDelegate, UICollectionViewDelegate, NoteXDelegate, PKCanvasViewDelegate, PKToolPickerObserver, UIScreenshotServiceDelegate, NoteOptionsDelegate, DocumentsViewControllerDelegate, NotePagesDelegate, VNDocumentCameraViewControllerDelegate, UIDocumentPickerDelegate, DraggableImageViewDelegate, DraggableTextViewDelegate, RelatedNotesVCDelegate, TextBoxViewControllerDelegate, MoveFileViewControllerDelegate {
+class NoteViewController: UIViewController, UIPencilInteractionDelegate, UICollectionViewDelegate, NoteDelegate, PKCanvasViewDelegate, PKToolPickerObserver, UIScreenshotServiceDelegate, NoteOptionsDelegate, DocumentsViewControllerDelegate, NotePagesDelegate, VNDocumentCameraViewControllerDelegate, UIDocumentPickerDelegate, DraggableImageViewDelegate, DraggableTextViewDelegate, RelatedNotesVCDelegate, TextBoxViewControllerDelegate, MoveFileViewControllerDelegate {
     
     
     private var documentsVC: DocumentsViewController!
@@ -66,7 +66,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     
     var noteTextViews = [DraggableTextView : NoteTypedText]()
     
-    var noteForRelatedNotes: NoteX?
+    var noteForRelatedNotes: Note?
     
     private lazy var topicsOverlayView: UIView = {
       precondition(isViewLoaded)
@@ -239,7 +239,9 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             if let destination = segue.destination as? UINavigationController {
                 if let destinationViewController = destination.topViewController as? MoveFileViewController {
                     destinationViewController.delegate = self
-                    destinationViewController.file = DataManager.activeNote!
+                    var temp = [File]()
+                    temp.append(DataManager.activeNote!)
+                    destinationViewController.filesToMove = temp
                 }
             }
             break
@@ -276,7 +278,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     }
     
     // ----------------
-    func load(page: NoteXPage = DataManager.activeNote!.getCurrentPage()) {
+    func load(page: NotePage = DataManager.activeNote!.getCurrentPage()) {
         // Load canvas
         self.canvasView.drawing = page.canvasDrawing
         
@@ -704,7 +706,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     }
     
     // MoveFileViewControllerDelegate
-    func movedFile(file: File) {
+    func movedFiles(files: [File]) {
         self.view.makeToast("Note moved.", duration: 1.0, position: .center)
     }
     
@@ -975,7 +977,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     
     // MARK: - UICollectionViewDelegate protocol
     
-    var openNote : NoteX?
+    var openNote : Note?
     
     func collectionView(_ collectionView: UICollectionView,
                         layout collectionViewLayout: UICollectionViewLayout,
@@ -996,23 +998,23 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     }
     
     // MARK: NoteXDelegate
-    func noteHasNewDocument(note: NoteX, document: Document) {
+    func noteHasNewDocument(note: Note, document: Document) {
         documentsVC.noteHasNewDocument(note: note, document: document)
         DataManager.saveCurrentNote()
     }
-    func noteHasRemovedDocument(note: NoteX, document: Document) {
+    func noteHasRemovedDocument(note: Note, document: Document) {
         documentsVC.noteDocumentHasChanged(note: note, document: document)
         DataManager.saveCurrentNote()
     }
-    func noteDocumentHasChanged(note: NoteX, document: Document) {
+    func noteDocumentHasChanged(note: Note, document: Document) {
         documentsVC.noteDocumentHasChanged(note: note, document: document)
         DataManager.saveCurrentNote()
     }
-    func noteHasChanged(note: NoteX) {
+    func noteHasChanged(note: Note) {
     }
     
     // Related Notes VC delegate
-    func openRelatedNote(note: NoteX) {
+    func openRelatedNote(note: Note) {
         self.openNote = note
         self.saveCurrentPage()
         if self.textRecognitionTimer != nil {
@@ -1024,7 +1026,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         self.documentsVC.bookshelfUpdateTimer?.reset(nil)
         self.performSegue(withIdentifier: "CloseNote", sender: self)
     }
-    func mergedNotes(note1: NoteX, note2: NoteX) {
+    func mergedNotes(note1: Note, note2: Note) {
         self.updatePaginationButtons()
     }
     
@@ -1197,7 +1199,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         let popMenu = PopMenuViewController(sourceView: sender, actions: [PopMenuAction](), appearance: nil)
         popMenu.appearance.popMenuBackgroundStyle = .blurred(.dark)
         let newPageAction = PopMenuDefaultAction(title: "New Page", image: UIImage(systemName: "plus.circle"),  didSelect: { action in
-            let newPage = NoteXPage()
+            let newPage = NotePage()
             DataManager.activeNote!.pages.insert(newPage, at: DataManager.activeNote!.activePageIndex + 1)
             self.saveCurrentPage()
             DataManager.activeNote!.nextPage()
@@ -1276,7 +1278,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                             self.pdfView.document = PDFDocument(data: pdfPage.dataRepresentation!)
                         }
                         else {
-                            let newPage = NoteXPage()
+                            let newPage = NotePage()
                             newPage.backdropPDFData = pdfPage.dataRepresentation
                             DataManager.activeNote!.pages.insert(newPage, at: DataManager.activeNote!.activePageIndex + 1)
                         }

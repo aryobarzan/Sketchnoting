@@ -18,7 +18,7 @@ class ReceivedNoteCollectionViewCell: UICollectionViewCell {
     
     var delegate: ReceivedNoteCellDelegate?
     
-    var note: NoteX!
+    var note: Note!
     override func awakeFromNib() {
         super.awakeFromNib()
     }
@@ -26,7 +26,7 @@ class ReceivedNoteCollectionViewCell: UICollectionViewCell {
            super.init(coder: aDecoder)
     }
        
-    func setNote(note: NoteX) {
+    func setNote(note: Note) {
         self.note = note
            
         note.getPreviewImage() { image in
@@ -49,6 +49,6 @@ class ReceivedNoteCollectionViewCell: UICollectionViewCell {
 }
 
 protocol ReceivedNoteCellDelegate {
-    func acceptReceivedNote(note: NoteX)
-    func rejectReceivedNote(note: NoteX)
+    func acceptReceivedNote(note: Note)
+    func rejectReceivedNote(note: Note)
 }

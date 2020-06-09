@@ -15,7 +15,7 @@ class WATHelper {
     private let gcube_token = "5f57008b-3114-47e9-9ee2-742c877d37b2-843339462"
     private let watQueue = DispatchQueue(label: "WATQueue", qos: .background)
     
-    func fetch(text: String, note: NoteX, parentConcept: WATDocument? = nil) {
+    func fetch(text: String, note: Note, parentConcept: WATDocument? = nil) {
         let parameters: Parameters = ["text": text, "lang": "en", "tokenizer": "opennlp", "gcube-token": gcube_token]
         let headers: HTTPHeaders = [
             "Accept": "application/json"
@@ -57,7 +57,7 @@ class WATHelper {
         }
     }
     // to update
-    private func performAdditionalSteps(document: WATDocument, note: NoteX) {
+    private func performAdditionalSteps(document: WATDocument, note: Note) {
         DispatchQueue.main.async {
             if !note.getDocuments().contains(document) {
                 log.info("WAT: new document added - \(document.title)")
@@ -167,7 +167,7 @@ class WATHelper {
         }
     }
     // To update
-    func checkForSubconcepts(document: WATDocument, note: NoteX) {
+    func checkForSubconcepts(document: WATDocument, note: Note) {
         self.watQueue.async {
             let text = document.title.lowercased().replacingOccurrences(of: "\n", with: " ")
             var words = text.components(separatedBy: " ")
@@ -187,7 +187,7 @@ class WATHelper {
         }
     }
     // To update
-    func checkRelatedness(doc_one: WATDocument, doc_two: WATDocument, note: NoteX) {
+    func checkRelatedness(doc_one: WATDocument, doc_two: WATDocument, note: Note) {
         self.watQueue.async {
             if doc_one != doc_two {
                 if let id_one = doc_one.wikiPageID, let id_two = doc_two.wikiPageID {

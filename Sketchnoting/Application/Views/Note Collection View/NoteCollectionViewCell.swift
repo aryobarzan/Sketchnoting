@@ -12,6 +12,7 @@ class NoteCollectionViewCell: UICollectionViewCell {
     @IBOutlet weak var imageView: UIImageView!
     @IBOutlet weak var titleBackgroundView: UIView!
     @IBOutlet weak var titleLabel: UILabel!
+    @IBOutlet weak var selectedImage: UIImageView!
     
     var file: File?
         
@@ -23,7 +24,7 @@ class NoteCollectionViewCell: UICollectionViewCell {
         super.init(coder: aDecoder)
     }
     
-    func setFile(file: File) {
+    func setFile(file: File, isInSelectionMode: Bool = false, isFileSelected: Bool = false) {
         self.imageView.layer.cornerRadius = 6
         
         self.file = file
@@ -42,6 +43,23 @@ class NoteCollectionViewCell: UICollectionViewCell {
             if self.traitCollection.userInterfaceStyle == .dark {
                 self.imageView.layer.borderColor = UIColor.gray.cgColor
             }
+        }
+        if isInSelectionMode {
+            self.selectedImage.isHidden = false
+        }
+        else {
+            self.selectedImage.isHidden = true
+        }
+        self.toggleSelected(isFileSelected: isFileSelected)
+            
+    }
+    
+    func toggleSelected(isFileSelected: Bool) {
+        if isFileSelected {
+            self.selectedImage.image = UIImage(systemName: "checkmark.circle.fill")
+        }
+        else {
+            self.selectedImage.image = UIImage(systemName: "checkmark.circle")
         }
     }
 }

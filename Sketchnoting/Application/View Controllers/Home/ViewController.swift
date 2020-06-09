@@ -29,7 +29,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     private var folderButtons = [FolderButton]()
     private var spacerView = UIView()
     
-    private var selectedNoteForTagEditing: NoteX?
+    private var selectedNoteForTagEditing: Note?
     
     @IBOutlet var newNoteButton: UIButton!
     @IBOutlet var noteLoadingIndicator: NVActivityIndicatorView!
@@ -53,10 +53,16 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     var mcAdvertiserAssistant: MCAdvertiserAssistant!
     
     // The note the user has selected to send to other devices is stored here.
-    var sketchnoteToShare: NoteX?
+    var sketchnoteToShare: Note?
     // The two above variables are added to this following array and this array is sent to the receiving device(s)
     var dataToShare = [Data]()
     
+    @IBOutlet weak var selectionModeButton: UIButton!
+    @IBOutlet weak var selectAllButton: UIButton!
+    @IBOutlet weak var deselectAllButton: UIButton!
+    @IBOutlet weak var moveSelectedButton: UIButton!
+    @IBOutlet weak var deleteSelectedButton: UIButton!
+    @IBOutlet weak var selectionControlsView: UIView!
     // This function initializes the home page view.
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -207,10 +213,8 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         case "MoveFileHome":
             if let destination = segue.destination as? UINavigationController {
                 if let destinationViewController = destination.topViewController as? MoveFileViewController {
-                    if let f = fileToMove {
-                        destinationViewController.delegate = self
-                        destinationViewController.file = f
-                    }
+                    destinationViewController.delegate = self
+                    destinationViewController.filesToMove = self.filesToMove
                 }
             }
             break
@@ -270,7 +274,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
                             }
                         }
                     }
-                    let newNote = NoteX(name: pdfTitle, parent: DataManager.currentFolder?.id, documents: nil)
+                    let newNote = Note(name: pdfTitle, parent: DataManager.currentFolder?.id, documents: nil)
                     var setPDFForCurrentPage = false
                     for i in 0..<pdf.pageCount {
                         if let pdfPage = pdf.page(at: i) {
@@ -279,7 +283,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
                                 newNote.getCurrentPage().backdropPDFData = pdfPage.dataRepresentation
                             }
                             else {
-                                let newPage = NoteXPage()
+                                let newPage = NotePage()
                                 newPage.backdropPDFData = pdfPage.dataRepresentation
                                 newNote.pages.append(newPage)
                             }
@@ -318,8 +322,8 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         })
     }
     
-    private func createNoteFromImages(images: [UIImage]) -> NoteX {
-        let newNote = NoteX(name: "Imported Images", parent: DataManager.currentFolder?.id, documents: nil)
+    private func createNoteFromImages(images: [UIImage]) -> Note {
+        let newNote = Note(name: "Imported Images", parent: DataManager.currentFolder?.id, documents: nil)
         for image in images {
             let noteImage = NoteImage(image: image)
             newNote.getCurrentPage().images.append(noteImage)
@@ -327,8 +331,8 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         return newNote
     }
     
-    private func createNoteFromTypedTexts(texts: [NoteTypedText]) -> NoteX {
-        let newNote = NoteX(name: "Imported Text Files", parent: DataManager.currentFolder?.id, documents: nil)
+    private func createNoteFromTypedTexts(texts: [NoteTypedText]) -> Note {
+        let newNote = Note(name: "Imported Text Files", parent: DataManager.currentFolder?.id, documents: nil)
         newNote.getCurrentPage().typedTexts = texts
         return newNote
     }
@@ -391,7 +395,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
                 if file is Folder {
                     filteredNotesToRemove.append(file)
                 }
-                else if let note = file as? NoteX {
+                else if let note = file as? Note {
                     for tag in TagsManager.filterTags {
                         if !note.tags.contains(tag) {
                             filteredNotesToRemove.append(note)
@@ -487,7 +491,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     }
 
     @IBAction func newNoteButtonTapped(_ sender: UIButton) {
-        let newNote = NoteX(name: "Untitled", parent: DataManager.currentFolder?.id, documents: nil)
+        let newNote = Note(name: "Untitled", parent: DataManager.currentFolder?.id, documents: nil)
         _ = DataManager.add(note: newNote)
         DataManager.activeNote = newNote
         performSegue(withIdentifier: "NewSketchnote", sender: self)
@@ -557,7 +561,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         })
     }
     
-    var shareNoteObject: NoteX?
+    var shareNoteObject: Note?
     private func makeNoteContextMenu(file: File, point: CGPoint, cellIndexPath: IndexPath) -> UIMenu {
         var menuElements = [UIMenuElement]()
         let renameAction = UIAction(title: "Rename...", image: UIImage(systemName: "text.cursor")) { action in
@@ -568,7 +572,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             self.moveFile(file: file)
         }
         menuElements.append(moveAction)
-        if let note = file as? NoteX {
+        if let note = file as? Note {
             let tagsAction = UIAction(title: "Manage Tags...", image: UIImage(systemName: "tag.fill")) { action in
                 self.editNoteTags(note: note, cell: self.noteCollectionView.cellForItem(at: cellIndexPath))
             }
@@ -644,7 +648,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         }
     }
     
-    private func sendNoteInternal(note: NoteX) {
+    private func sendNoteInternal(note: Note) {
         if mcSession.connectedPeers.count > 0 {
             if let noteData = note.encodeFileAsData() {
                 do {
@@ -686,11 +690,11 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         switch self.noteCollectionViewState {
         case .Grid:
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath as IndexPath) as! NoteCollectionViewCell
-            cell.setFile(file: self.items[indexPath.item])
+            cell.setFile(file: self.items[indexPath.item], isInSelectionMode: self.isSelectionModeActive, isFileSelected: self.selectedFiles.contains(self.items[indexPath.item]))
             return cell
         case .List:
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifierDetailCell, for: indexPath as IndexPath) as! NoteCollectionViewDetailCell
-            cell.setFile(file: self.items[indexPath.item])
+            cell.setFile(file: self.items[indexPath.item], isInSelectionMode: self.isSelectionModeActive, isFileSelected: self.selectedFiles.contains(self.items[indexPath.item]))
             return cell
         }
     }
@@ -709,15 +713,28 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let file = self.items[indexPath.item]
-        if let note = file as? NoteX {
-            self.open(note: note)
+        if self.isSelectionModeActive {
+            if self.selectedFiles.contains(file) {
+                self.selectedFiles.remove(object: file)
+            }
+            else {
+                self.selectedFiles.append(file)
+            }
+            collectionView.performBatchUpdates({
+                collectionView.reloadItems(at: [indexPath])
+            })
         }
-        else if let folder = file as? Folder {
-            self.open(folder: folder)
+        else {
+            if let note = file as? Note {
+                self.open(note: note)
+            }
+            else if let folder = file as? Folder {
+                self.open(folder: folder)
+            }
         }
     }
     
-    public func open(note: NoteX) {
+    public func open(note: Note) {
         DataManager.activeNote = note
         self.performSegue(withIdentifier: "EditSketchnote", sender: self)
         log.info("Opening note.")
@@ -754,31 +771,32 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         self.present(alertController, animated: true, completion: nil)
     }
     
-    var noteForRelatedNotes: NoteX?
-    private func showRelatedNotesFor(_ note: NoteX) {
+    var noteForRelatedNotes: Note?
+    private func showRelatedNotesFor(_ note: Note) {
         self.noteForRelatedNotes = note
         self.performSegue(withIdentifier: "showRelatedHomePage", sender: self)
     }
     
-    var fileToMove: File?
+    var filesToMove = [File]()
     private func moveFile(file: File) {
-        self.fileToMove = file
+        self.filesToMove = [File]()
+        self.filesToMove.append(file)
         self.performSegue(withIdentifier: "MoveFileHome", sender: self)
         
     }
     // MoveFileViewControllerDelegate
-    func movedFile(file: File) {
+    func movedFiles(files: [File]) {
         self.updateDisplayedNotes(true)
     }
     // Related Notes VC delegate
-    func openRelatedNote(note: NoteX) {
+    func openRelatedNote(note: Note) {
         self.open(note: note)
     }
-    func mergedNotes(note1: NoteX, note2: NoteX) {
+    func mergedNotes(note1: Note, note2: Note) {
     }
     
     var selectedCellForTagEditing: UICollectionViewCell?
-    private func editNoteTags(note: NoteX, cell: UICollectionViewCell?) {
+    private func editNoteTags(note: Note, cell: UICollectionViewCell?) {
         var looseTagsToRemove = [Tag]()
         for tag in note.tags {
             if !TagsManager.tags.contains(tag) {
@@ -796,7 +814,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         self.performSegue(withIdentifier: "EditNoteTags", sender: self)
        }
 
-    private func shareNote(note: NoteX, sender: UIView) {
+    private func shareNote(note: Note, sender: UIView) {
         self.performSegue(withIdentifier: "ShareNote", sender: sender)
     }
     
@@ -821,7 +839,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         }
     }
     
-    private func sendNote(note: NoteX) {
+    private func sendNote(note: Note) {
         self.sketchnoteToShare = note
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             self.joinSession()
@@ -877,4 +895,50 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     func collectionView(_ collectionView: UICollectionView, dropSessionDidUpdate session: UIDropSession, withDestinationIndexPath destinationIndexPath: IndexPath?) -> UICollectionViewDropProposal {
         return UICollectionViewDropProposal(operation: .move, intent: .insertIntoDestinationIndexPath)
     }
+    
+    // Selection
+    private var isSelectionModeActive = false
+    private var selectedFiles = [File]()
+    @IBAction func selectionModeButtonTapped(_ sender: UIButton) {
+        if self.isSelectionModeActive {
+            selectionModeButton.setImage(UIImage(systemName: "checkmark.square"), for: .normal)
+        }
+        else {
+            selectionModeButton.setImage(UIImage(systemName: "checkmark.square.fill"), for: .normal)
+        }
+        self.isSelectionModeActive = !self.isSelectionModeActive
+        selectionControlsView.isHidden = !self.isSelectionModeActive
+        self.updateDisplayedNotes(false)
+    }
+    @IBAction func selectAllButtonTapped(_ sender: UIButton) {
+        self.selectedFiles = self.items
+        self.updateDisplayedNotes(false)
+    }
+    @IBAction func deselectAllButtonTapped(_ sender: UIButton) {
+        self.selectedFiles = [File]()
+        self.updateDisplayedNotes(false)
+    }
+    @IBAction func moveSelectedButtonTapped(_ sender: UIButton) {
+        if !self.selectedFiles.isEmpty {
+            self.filesToMove = selectedFiles
+            self.performSegue(withIdentifier: "MoveFileHome", sender: self)
+        }
+    }
+    @IBAction func deleteSelectedButtonTapped(_ sender: UIButton) {
+        if !self.selectedFiles.isEmpty {
+            let alert = UIAlertController(title: "Delete \(self.selectedFiles.count) File(s)", message: "Are you sure you want to delete the selected files?", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "Delete", style: .destructive, handler: { action in
+                for selectedFile in self.selectedFiles {
+                    self.items.remove(object: selectedFile)
+                    DataManager.delete(file: selectedFile)
+                    self.noteCollectionView.reloadData()
+                }
+            }))
+            alert.addAction(UIAlertAction(title: "Cancel", style: .default, handler: { action in
+                  log.info("Not deleting selected files.")
+            }))
+            self.present(alert, animated: true, completion: nil)
+        }
+    }
+    
 }

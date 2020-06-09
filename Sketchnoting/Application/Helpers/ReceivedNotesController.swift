@@ -37,14 +37,14 @@ class ReceivedNotesController: NSObject, MCSessionDelegate {
     func session(_ session: MCSession, didFinishReceivingResourceWithName resourceName: String, fromPeer peerID: MCPeerID, at localURL: URL?, withError error: Error?) {
     }
     
-    var receivedNotes: [NoteX]!
+    var receivedNotes: [Note]!
     var peerID: MCPeerID!
     var mcSession: MCSession!
     var mcAdvertiserAssistant: MCAdvertiserAssistant?
     
     override init() {
         super.init()
-        receivedNotes = [NoteX]()
+        receivedNotes = [Note]()
         peerID = MCPeerID(displayName: UIDevice.current.name)
         mcSession = MCSession(peer: peerID, securityIdentity: nil, encryptionPreference: .required)
         mcSession.delegate = self
