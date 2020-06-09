@@ -663,15 +663,15 @@
                                         </connections>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="QAN-3k-yxQ">
-                                        <rect key="frame" x="75" y="1" width="81" height="32"/>
+                                        <rect key="frame" x="75" y="1" width="125" height="32"/>
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <constraints>
-                                            <constraint firstAttribute="width" constant="81" id="Hjv-VQ-LUf"/>
+                                            <constraint firstAttribute="width" constant="125" id="Hjv-VQ-LUf"/>
                                             <constraint firstAttribute="height" constant="32" id="yUy-iT-37y"/>
                                         </constraints>
                                         <fontDescription key="fontDescription" type="system" pointSize="15"/>
                                         <color key="tintColor" systemColor="systemBlueColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                        <state key="normal" title=" Filter" image="tag.circle" catalog="system">
+                                        <state key="normal" title=" Filter by Tags" image="tag.circle" catalog="system">
                                             <color key="titleColor" systemColor="systemBlueColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                             <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="large"/>
                                         </state>
@@ -750,7 +750,7 @@
                                                 </connections>
                                             </button>
                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="leading" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Ysg-uh-uEX">
-                                                <rect key="frame" x="111" y="9" width="110" height="25"/>
+                                                <rect key="frame" x="111" y="8.5" width="110" height="25"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="25" id="Ud5-by-dq9"/>
                                                     <constraint firstAttribute="width" constant="110" id="uas-Xt-Ajy"/>
@@ -1223,6 +1223,14 @@
                                             <constraint firstAttribute="height" constant="25" id="gaW-G5-taM"/>
                                         </constraints>
                                     </view>
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="JAh-B4-S7i">
+                                        <rect key="frame" x="585" y="7.5" width="2" height="25"/>
+                                        <color key="backgroundColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="25" id="3jd-Qc-JmP"/>
+                                            <constraint firstAttribute="width" constant="2" id="5Wz-5F-ixY"/>
+                                        </constraints>
+                                    </view>
                                     <button opaque="NO" contentMode="scaleToFill" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="WzL-oA-wuL">
                                         <rect key="frame" x="661" y="8" width="25" height="24"/>
                                         <state key="normal" image="arrow.right.circle" catalog="system">
@@ -1288,7 +1296,7 @@
                                         </connections>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="oVE-nf-Caz">
-                                        <rect key="frame" x="401" y="5" width="151" height="30"/>
+                                        <rect key="frame" x="384" y="5" width="151" height="30"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="30" id="Wpf-CU-Ijb"/>
                                             <constraint firstAttribute="width" constant="151" id="igf-cu-ULf"/>
@@ -1298,17 +1306,34 @@
                                             <action selector="testEditorButtonTapped:" destination="lDo-DG-9fX" eventType="touchUpInside" id="KhY-uG-iSn"/>
                                         </connections>
                                     </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="yGF-Hj-T4k">
+                                        <rect key="frame" x="552" y="7.5" width="25" height="25"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="25" id="4D6-2x-Yma"/>
+                                            <constraint firstAttribute="width" constant="25" id="Diw-qc-s0H"/>
+                                        </constraints>
+                                        <state key="normal" image="tag.circle" catalog="system">
+                                            <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="large"/>
+                                        </state>
+                                        <connections>
+                                            <segue destination="rTB-ZY-UKo" kind="popoverPresentation" identifier="EditCurrentNoteTags" popoverAnchorView="yGF-Hj-T4k" id="odf-CP-ags">
+                                                <popoverArrowDirection key="popoverArrowDirection" up="YES" down="YES" left="YES" right="YES"/>
+                                            </segue>
+                                        </connections>
+                                    </button>
                                 </subviews>
                                 <color key="backgroundColor" cocoaTouchSystemColor="viewFlipsideBackgroundColor"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="40" id="20h-xc-IL8"/>
                                     <constraint firstItem="jEA-WA-cjb" firstAttribute="centerY" secondItem="gne-qG-Zx4" secondAttribute="centerY" id="24q-s3-XNb"/>
                                     <constraint firstItem="Xyr-WH-2aV" firstAttribute="leading" secondItem="RnC-a4-JG6" secondAttribute="trailing" constant="8" id="2q6-hM-OwD"/>
-                                    <constraint firstItem="jEA-WA-cjb" firstAttribute="leading" secondItem="oVE-nf-Caz" secondAttribute="trailing" constant="43" id="550-Ik-758"/>
+                                    <constraint firstItem="jEA-WA-cjb" firstAttribute="leading" secondItem="oVE-nf-Caz" secondAttribute="trailing" constant="60" id="550-Ik-758"/>
                                     <constraint firstAttribute="trailing" secondItem="KuJ-PR-Rao" secondAttribute="trailing" id="7P1-fl-qgB"/>
                                     <constraint firstItem="oVE-nf-Caz" firstAttribute="centerY" secondItem="gne-qG-Zx4" secondAttribute="centerY" id="7vK-2D-2Mu"/>
+                                    <constraint firstItem="jEA-WA-cjb" firstAttribute="leading" secondItem="JAh-B4-S7i" secondAttribute="trailing" constant="8" id="85c-R0-gHx"/>
                                     <constraint firstItem="SiY-ox-qPY" firstAttribute="centerY" secondItem="gne-qG-Zx4" secondAttribute="centerY" id="9Ku-Hq-PeH"/>
                                     <constraint firstItem="hgu-d3-kvK" firstAttribute="centerY" secondItem="gne-qG-Zx4" secondAttribute="centerY" id="B0N-nk-nMt"/>
+                                    <constraint firstItem="JAh-B4-S7i" firstAttribute="centerY" secondItem="gne-qG-Zx4" secondAttribute="centerY" id="BMC-NF-kTk"/>
                                     <constraint firstItem="KuJ-PR-Rao" firstAttribute="width" secondItem="gne-qG-Zx4" secondAttribute="width" id="Cs4-KW-0SG"/>
                                     <constraint firstItem="Xyr-WH-2aV" firstAttribute="centerY" secondItem="gne-qG-Zx4" secondAttribute="centerY" id="Fao-7i-2ez"/>
                                     <constraint firstItem="g83-cE-vKX" firstAttribute="leading" secondItem="7xW-9Y-mzw" secondAttribute="trailing" constant="8" id="Ifj-8v-YtT"/>
@@ -1317,11 +1342,13 @@
                                     <constraint firstItem="hgu-d3-kvK" firstAttribute="leading" secondItem="qiG-6C-Pe4" secondAttribute="trailing" constant="8" id="Oq3-U4-CIt"/>
                                     <constraint firstItem="Q9N-HC-Ppd" firstAttribute="leading" secondItem="WzL-oA-wuL" secondAttribute="trailing" constant="8" id="Pg0-M1-64h"/>
                                     <constraint firstItem="SiY-ox-qPY" firstAttribute="leading" secondItem="YQI-WO-Gvp" secondAttribute="trailing" constant="8" id="QRi-KA-kF6"/>
+                                    <constraint firstItem="JAh-B4-S7i" firstAttribute="leading" secondItem="yGF-Hj-T4k" secondAttribute="trailing" constant="8" id="T40-7z-M8d"/>
                                     <constraint firstItem="g83-cE-vKX" firstAttribute="centerY" secondItem="gne-qG-Zx4" secondAttribute="centerY" id="T5T-zx-FOX"/>
                                     <constraint firstItem="X7t-cI-jkp" firstAttribute="leading" secondItem="g83-cE-vKX" secondAttribute="trailing" constant="8" id="TRb-ZL-MXh"/>
                                     <constraint firstItem="WzL-oA-wuL" firstAttribute="leading" secondItem="qbj-Vt-kvI" secondAttribute="trailing" constant="8" id="UhK-EE-Qx9"/>
                                     <constraint firstItem="qiG-6C-Pe4" firstAttribute="centerY" secondItem="gne-qG-Zx4" secondAttribute="centerY" id="VTk-94-VDr"/>
                                     <constraint firstAttribute="trailing" secondItem="hgu-d3-kvK" secondAttribute="trailing" constant="8" id="Wsp-J5-3YY"/>
+                                    <constraint firstItem="yGF-Hj-T4k" firstAttribute="centerY" secondItem="gne-qG-Zx4" secondAttribute="centerY" id="XST-eY-MeK"/>
                                     <constraint firstItem="KuJ-PR-Rao" firstAttribute="leading" secondItem="gne-qG-Zx4" secondAttribute="leading" id="Y8X-z3-Cdv"/>
                                     <constraint firstAttribute="bottom" secondItem="KuJ-PR-Rao" secondAttribute="bottom" id="Z1W-7h-bvP"/>
                                     <constraint firstItem="Q9N-HC-Ppd" firstAttribute="centerY" secondItem="gne-qG-Zx4" secondAttribute="centerY" id="ZDI-wJ-aa1"/>
@@ -1487,6 +1514,7 @@
                         <outlet property="pdfView" destination="tA3-q0-ddV" id="ULi-ad-rst"/>
                         <outlet property="previousPageButton" destination="jEA-WA-cjb" id="1TU-s6-01d"/>
                         <outlet property="rightScreenSidePanGesture" destination="HlQ-MV-mPk" id="cIj-Nz-M2F"/>
+                        <outlet property="tagsButton" destination="yGF-Hj-T4k" id="fRv-DA-0HD"/>
                         <outlet property="topicsButton" destination="RnC-a4-JG6" id="Mbd-F4-fiv"/>
                         <segue destination="phx-Z7-ZDE" kind="presentation" identifier="ViewNoteText" id="M8J-A4-lvC"/>
                         <segue destination="riE-Ei-xpK" kind="presentation" identifier="ShareNote" id="OAt-q3-0jJ"/>
@@ -3486,7 +3514,7 @@
     <inferredMetricsTieBreakers>
         <segue reference="fmI-KU-Ur1"/>
         <segue reference="ig0-q1-Lq9"/>
-        <segue reference="yvs-ei-HRy"/>
+        <segue reference="ghm-KV-m2E"/>
         <segue reference="58e-4d-iJp"/>
         <segue reference="ct4-u7-KZY"/>
     </inferredMetricsTieBreakers>

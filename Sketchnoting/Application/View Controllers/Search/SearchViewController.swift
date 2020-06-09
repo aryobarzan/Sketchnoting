@@ -21,6 +21,8 @@ class SearchViewController: UIViewController, UICollectionViewDelegate, UICollec
     var searchFilters = [SearchFilter]()
     var notes = [Note]()
     var currentSearchType = SearchType.All
+    
+    private var appSearch = AppSearch()
     override func viewDidLoad() {
         super.viewDidLoad()
         self.tabBarController?.tabBar.isHidden = false
@@ -139,19 +141,7 @@ class SearchViewController: UIViewController, UICollectionViewDelegate, UICollec
     }
     
     private func updateResults() {
-        if searchFilters.count > 0 {
-            self.notes = DataManager.notes
-            var searchedNotesToRemove = [Note]()
-            for note in notes {
-                if !note.applySearchFilters(filters: searchFilters) {
-                        searchedNotesToRemove.append(note)
-                }
-            }
-            self.notes = self.notes.filter { !searchedNotesToRemove.contains($0) }
-        }
-        else {
-            self.notes = [Note]()
-        }
+        self.notes = appSearch.search(filters: self.searchFilters)
         notesCollectionView.reloadData()
         resultsLabel.text = "Notes: \(self.notes.count) results"
     }

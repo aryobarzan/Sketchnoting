@@ -108,6 +108,7 @@
 		9FB9984724868561003773F2 /* MoveFileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB9984624868561003773F2 /* MoveFileViewController.swift */; };
 		9FB9984924868700003773F2 /* MoveFileViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB9984824868700003773F2 /* MoveFileViewCell.swift */; };
 		9FB9E501237F500B00279F3E /* ShareNoteViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB9E500237F500B00279F3E /* ShareNoteViewController.swift */; };
+		9FBC2E0924904DAD002AC8A3 /* AppSearch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FBC2E0824904DAD002AC8A3 /* AppSearch.swift */; };
 		9FBF6AB422E9F391001FD730 /* VisionTextWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FBF6AB322E9F391001FD730 /* VisionTextWrapper.swift */; };
 		9FBF6AB622E9F3FE001FD730 /* VisionTextBlockWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FBF6AB522E9F3FE001FD730 /* VisionTextBlockWrapper.swift */; };
 		9FBF6AB822E9F428001FD730 /* VisionTextLineWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FBF6AB722E9F428001FD730 /* VisionTextLineWrapper.swift */; };
@@ -252,6 +253,7 @@
 		9FB9984624868561003773F2 /* MoveFileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoveFileViewController.swift; sourceTree = "<group>"; };
 		9FB9984824868700003773F2 /* MoveFileViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoveFileViewCell.swift; sourceTree = "<group>"; };
 		9FB9E500237F500B00279F3E /* ShareNoteViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareNoteViewController.swift; sourceTree = "<group>"; };
+		9FBC2E0824904DAD002AC8A3 /* AppSearch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSearch.swift; sourceTree = "<group>"; };
 		9FBF6AB322E9F391001FD730 /* VisionTextWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisionTextWrapper.swift; sourceTree = "<group>"; };
 		9FBF6AB522E9F3FE001FD730 /* VisionTextBlockWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisionTextBlockWrapper.swift; sourceTree = "<group>"; };
 		9FBF6AB722E9F428001FD730 /* VisionTextLineWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisionTextLineWrapper.swift; sourceTree = "<group>"; };
@@ -748,6 +750,7 @@
 				9F9DAFDF242CB7C100713E75 /* DrawingRecognition.swift */,
 				9FC114D8243919BD004F576A /* ImagePickerHelper.swift */,
 				9FD8BB96243D5BE500542BFA /* ImportHelper.swift */,
+				9FBC2E0824904DAD002AC8A3 /* AppSearch.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -951,6 +954,7 @@
 				9FAB4B7E244BEF2F00DEA46F /* UILabelExtension.swift in Sources */,
 				9FF0AC962441308B00A82BE8 /* CodableExtensions.swift in Sources */,
 				9FA6239522DE3741007ED794 /* BioPortalDocument.swift in Sources */,
+				9FBC2E0924904DAD002AC8A3 /* AppSearch.swift in Sources */,
 				9FFE07E6232A5FE500DBD0AC /* TagTableViewCell.swift in Sources */,
 				9FAE72E424887158002D800B /* LineView.swift in Sources */,
 				9F5D8A30246113DC00934C0E /* WATHelper.swift in Sources */,

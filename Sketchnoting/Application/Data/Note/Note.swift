@@ -17,7 +17,7 @@ protocol NoteDelegate {
     func noteHasChanged(note: Note)
 }
 
-class Note: File, DocumentVisitor, DocumentDelegate {
+class Note: File, DocumentDelegate {
     var pages: [NotePage]
     private var documents: [Document]
     var hiddenDocuments: [Document]
@@ -263,137 +263,6 @@ class Note: File, DocumentVisitor, DocumentDelegate {
         return text
     }
     
-    // MARK: Search
-    var matchesSearch = false
-    var currentSearchFilter : SearchFilter?
-    public func applySearchFilters(filters: [SearchFilter]) -> Bool {
-        matchesSearch = false
-        var matches = 0
-        for filter in filters {
-            switch filter.type {
-            case .All:
-                var isInText = false
-                if (self.getName().lowercased().contains(filter.term) || self.getText().lowercased().contains(filter.term)) {
-                    matches += 1
-                    isInText = true
-                }
-                var isInDrawings = false
-                for page in pages {
-                    if page.drawingLabels.contains(filter.term) {
-                        matches += 1
-                        isInDrawings = true
-                        break
-                    }
-                }
-                if !isInText && !isInDrawings {
-                    currentSearchFilter = filter
-                    for doc in documents {
-                        doc.accept(visitor: self)
-                        if matchesSearch {
-                            matches += 1
-                            break
-                        }
-                    }
-                }
-                break
-            case .Text:
-                if (self.getName().lowercased().contains(filter.term) || self.getText().lowercased().contains(filter.term)) {
-                    matches += 1
-                }
-                break
-            case .Drawing:
-                for page in pages {
-                    if page.drawingLabels.contains(filter.term) {
-                        matches += 1
-                        break
-                    }
-                }
-                break
-            case .Document:
-                currentSearchFilter = filter
-                for doc in documents {
-                    doc.accept(visitor: self)
-                    if matchesSearch {
-                        matches += 1
-                        break
-                    }
-                }
-                break
-            }
-        }
-        return matches == filters.count
-    }
-    func process(document: Document) {
-        let _ = self.processBaseDocumentSearch(document: document)
-    }
-    
-    func process(document: SpotlightDocument) {
-        if !processBaseDocumentSearch(document: document) {
-            if let label = document.label {
-                if label.lowercased().contains(currentSearchFilter!.term) {
-                    matchesSearch = true
-                }
-            }
-            if let types = document.types {
-                for type in types {
-                    if type.lowercased().contains(currentSearchFilter!.term) {
-                        matchesSearch = true
-                        break
-                    }
-                }
-            }
-        }
-    }
-    func process(document: TAGMEDocument) {
-        if !processBaseDocumentSearch(document: document) {
-            if let spot = document.spot {
-                if spot.lowercased().contains(currentSearchFilter!.term) {
-                    matchesSearch = true
-                }
-            }
-            if let categories = document.categories {
-                for category in categories {
-                    if category.lowercased().contains(currentSearchFilter!.term) {
-                        matchesSearch = true
-                        break
-                    }
-                }
-            }
-        }
-    }
-    
-    func process(document: WATDocument) {
-        if !processBaseDocumentSearch(document: document) {
-            if let spot = document.spot {
-                if spot.lowercased().contains(currentSearchFilter!.term) {
-                    matchesSearch = true
-                }
-            }
-        }
-    }
-    
-    func process(document: BioPortalDocument) {
-        let _ = processBaseDocumentSearch(document: document)
-    }
-    
-    func process(document: CHEBIDocument) {
-        let _ = processBaseDocumentSearch(document: document)
-    }
-    
-    private func processBaseDocumentSearch(document: Document) -> Bool {
-        if document.title.lowercased().contains(currentSearchFilter!.term) {
-            matchesSearch = true
-            return true
-        }
-        else if let description = document.description {
-            if description.lowercased().contains(currentSearchFilter!.term) {
-                matchesSearch = true
-                return true
-            }
-        }
-        return false
-    }
-    
     // MARK: PDF Generation
     
     func createPDF() -> Data? {
@@ -532,5 +401,26 @@ class Note: File, DocumentVisitor, DocumentDelegate {
             return docs
         }
         return self.documents
+    }
+    
+    public func getDocuments(forPage: NotePage) -> [Document] {
+        var docs = [Document]()
+        for doc in documents {
+            var documentTitle = doc.title.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+            if let TAGMEDocument = doc as? TAGMEDocument {
+                if let spot = TAGMEDocument.spot {
+                    documentTitle = spot.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+                }
+            }
+            else if let watDocument = doc as? WATDocument {
+                if let spot = watDocument.spot {
+                    documentTitle = spot.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+                }
+            }
+            if forPage.getText().lowercased().contains(documentTitle) && !docs.contains(doc) {
+                docs.append(doc)
+            }
+        }
+        return docs
     }
 }

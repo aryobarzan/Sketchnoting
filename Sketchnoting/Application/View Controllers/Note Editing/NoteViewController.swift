@@ -23,7 +23,7 @@ import GPUImage
 import Highlightr
 import Toast
 
-class NoteViewController: UIViewController, UIPencilInteractionDelegate, UICollectionViewDelegate, NoteDelegate, PKCanvasViewDelegate, PKToolPickerObserver, UIScreenshotServiceDelegate, NoteOptionsDelegate, DocumentsViewControllerDelegate, NotePagesDelegate, VNDocumentCameraViewControllerDelegate, UIDocumentPickerDelegate, DraggableImageViewDelegate, DraggableTextViewDelegate, RelatedNotesVCDelegate, TextBoxViewControllerDelegate, MoveFileViewControllerDelegate {
+class NoteViewController: UIViewController, UIPencilInteractionDelegate, UICollectionViewDelegate, NoteDelegate, PKCanvasViewDelegate, PKToolPickerObserver, UIScreenshotServiceDelegate, NoteOptionsDelegate, DocumentsViewControllerDelegate, NotePagesDelegate, VNDocumentCameraViewControllerDelegate, UIDocumentPickerDelegate, DraggableImageViewDelegate, DraggableTextViewDelegate, RelatedNotesVCDelegate, TextBoxViewControllerDelegate, MoveFileViewControllerDelegate, UIPopoverPresentationControllerDelegate {
     
     
     private var documentsVC: DocumentsViewController!
@@ -67,6 +67,8 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     var noteTextViews = [DraggableTextView : NoteTypedText]()
     
     var noteForRelatedNotes: Note?
+    
+    @IBOutlet weak var tagsButton: UIButton!
     
     private lazy var topicsOverlayView: UIView = {
       precondition(isViewLoaded)
@@ -243,6 +245,13 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                     temp.append(DataManager.activeNote!)
                     destinationViewController.filesToMove = temp
                 }
+            }
+            break
+        case "EditCurrentNoteTags":
+            let destinationNC = segue.destination as! UINavigationController
+            destinationNC.popoverPresentationController?.delegate = self
+            if let destination = destinationNC.topViewController as? TagsViewController {
+                destination.note = DataManager.activeNote!
             }
             break
         default:
@@ -1591,4 +1600,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     }
     var highlightedImage: DraggableImageView?
     var highlightedTextView: DraggableTextView?
+    
+    // MARK: Tags
 }

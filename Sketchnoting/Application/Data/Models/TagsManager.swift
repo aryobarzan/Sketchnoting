@@ -21,6 +21,7 @@ class TagsManager {
                 tags.append(loadedTag)
             }
         }
+        tags = tags.sorted(by: { $0.title < $1.title })
         return tags
     }
     public static func reload() {
