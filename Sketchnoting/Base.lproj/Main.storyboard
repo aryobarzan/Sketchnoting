@@ -704,15 +704,15 @@
                                         <rect key="frame" x="8" y="42" width="752" height="42"/>
                                         <subviews>
                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="leading" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Hdy-fw-B6W">
-                                                <rect key="frame" x="8" y="8.5" width="70" height="25"/>
+                                                <rect key="frame" x="8" y="8.5" width="95" height="25"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="25" id="N8p-c3-SiW"/>
-                                                    <constraint firstAttribute="width" constant="70" id="Ur3-8y-q0I"/>
+                                                    <constraint firstAttribute="width" constant="95" id="Ur3-8y-q0I"/>
                                                 </constraints>
                                                 <fontDescription key="fontDescription" type="system" pointSize="15"/>
-                                                <state key="normal" title="Select All">
+                                                <state key="normal" title=" Select All" image="checkmark.circle.fill" catalog="system">
                                                     <color key="titleColor" red="0.26875244110000002" green="0.49985405119999998" blue="0.82210710099999995" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                                    <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="large"/>
+                                                    <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="medium"/>
                                                 </state>
                                                 <connections>
                                                     <action selector="selectAllButtonTapped:" destination="BYZ-38-t0r" eventType="touchUpInside" id="dHq-lJ-Aha"/>
@@ -734,21 +734,6 @@
                                                     <action selector="deleteSelectedButtonTapped:" destination="BYZ-38-t0r" eventType="touchUpInside" id="QDQ-Ww-plb"/>
                                                 </connections>
                                             </button>
-                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="leading" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Ysg-uh-uEX">
-                                                <rect key="frame" x="86" y="8.5" width="90" height="25"/>
-                                                <constraints>
-                                                    <constraint firstAttribute="height" constant="25" id="Ud5-by-dq9"/>
-                                                    <constraint firstAttribute="width" constant="90" id="uas-Xt-Ajy"/>
-                                                </constraints>
-                                                <fontDescription key="fontDescription" type="system" pointSize="15"/>
-                                                <state key="normal" title="Deselect All">
-                                                    <color key="titleColor" red="0.26875244110000002" green="0.49985405119999998" blue="0.82210710099999995" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                                    <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="large"/>
-                                                </state>
-                                                <connections>
-                                                    <action selector="deselectAllButtonTapped:" destination="BYZ-38-t0r" eventType="touchUpInside" id="pun-18-cfA"/>
-                                                </connections>
-                                            </button>
                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="leading" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="wHb-fC-SNw">
                                                 <rect key="frame" x="584" y="12" width="74" height="18"/>
                                                 <constraints>
@@ -762,6 +747,21 @@
                                                 </state>
                                                 <connections>
                                                     <action selector="moveSelectedButtonTapped:" destination="BYZ-38-t0r" eventType="touchUpInside" id="Z39-BT-QEP"/>
+                                                </connections>
+                                            </button>
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="leading" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Ysg-uh-uEX">
+                                                <rect key="frame" x="111" y="9" width="110" height="25"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="height" constant="25" id="Ud5-by-dq9"/>
+                                                    <constraint firstAttribute="width" constant="110" id="uas-Xt-Ajy"/>
+                                                </constraints>
+                                                <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                                <state key="normal" title=" Deselect All" image="checkmark.circle" catalog="system">
+                                                    <color key="titleColor" red="0.26875244110000002" green="0.49985405119999998" blue="0.82210710099999995" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="medium"/>
+                                                </state>
+                                                <connections>
+                                                    <action selector="deselectAllButtonTapped:" destination="BYZ-38-t0r" eventType="touchUpInside" id="pun-18-cfA"/>
                                                 </connections>
                                             </button>
                                         </subviews>
@@ -3503,6 +3503,8 @@
         <image name="book.circle" catalog="system" width="128" height="121"/>
         <image name="book.circle.fill" catalog="system" width="128" height="121"/>
         <image name="calendar" catalog="system" width="128" height="106"/>
+        <image name="checkmark.circle" catalog="system" width="128" height="121"/>
+        <image name="checkmark.circle.fill" catalog="system" width="128" height="121"/>
         <image name="checkmark.square" catalog="system" width="128" height="114"/>
         <image name="clear.fill" catalog="system" width="128" height="114"/>
         <image name="doc.plaintext" catalog="system" width="115" height="128"/>

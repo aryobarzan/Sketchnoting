@@ -565,7 +565,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     private func makeNoteContextMenu(file: File, point: CGPoint, cellIndexPath: IndexPath) -> UIMenu {
         var menuElements = [UIMenuElement]()
         let renameAction = UIAction(title: "Rename...", image: UIImage(systemName: "text.cursor")) { action in
-            self.renameFile(file: file)
+            self.renameFile(file: file, indexPath: cellIndexPath)
         }
         menuElements.append(renameAction)
         let moveAction = UIAction(title: "Move...", image: UIImage(systemName: "folder")) { action in
@@ -747,15 +747,17 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         log.info("Opening folder.")
     }
     
-    private func renameFile(file: File) {
+    private func renameFile(file: File, indexPath: IndexPath) {
         let alertController = UIAlertController(title: "Rename file", message: nil, preferredStyle: .alert)
         
         let confirmAction = UIAlertAction(title: "Set", style: .default) { (_) in
             
             let name = alertController.textFields?[0].text
-            
             file.setName(name: name ?? "Untitled")
             DataManager.save(file: file)
+            self.noteCollectionView.performBatchUpdates({
+                self.noteCollectionView.reloadItems(at: [indexPath])
+            })
             self.updateDisplayedNotes(false)
         }
         let cancelAction = UIAlertAction(title: "Cancel", style: .cancel) { (_) in }
