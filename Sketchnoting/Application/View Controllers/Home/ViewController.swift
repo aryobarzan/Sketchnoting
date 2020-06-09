@@ -902,6 +902,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     @IBAction func selectionModeButtonTapped(_ sender: UIButton) {
         if self.isSelectionModeActive {
             selectionModeButton.setImage(UIImage(systemName: "checkmark.square"), for: .normal)
+            self.selectedFiles = [File]()
         }
         else {
             selectionModeButton.setImage(UIImage(systemName: "checkmark.square.fill"), for: .normal)
