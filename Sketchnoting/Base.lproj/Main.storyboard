@@ -857,7 +857,7 @@
                             <popoverArrowDirection key="popoverArrowDirection" up="YES" down="YES" left="YES" right="YES"/>
                         </segue>
                         <segue destination="Od9-Xc-VPJ" kind="presentation" identifier="showRelatedHomePage" id="ig0-q1-Lq9"/>
-                        <segue destination="h1g-fm-D3K" kind="presentation" identifier="MoveFileHome" id="fmI-KU-Ur1"/>
+                        <segue destination="h1g-fm-D3K" kind="presentation" identifier="MoveFileHome" modalPresentationStyle="formSheet" id="fmI-KU-Ur1"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
@@ -3345,22 +3345,22 @@
             <objects>
                 <viewController id="sXp-QF-riX" customClass="MoveFileViewController" customModule="Sketchnoting" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="Ycp-CE-a9h">
-                        <rect key="frame" x="0.0" y="0.0" width="712" height="984"/>
+                        <rect key="frame" x="0.0" y="0.0" width="540" height="620"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="yDK-QC-nUn">
-                                <rect key="frame" x="20" y="86" width="672" height="898"/>
+                                <rect key="frame" x="20" y="86" width="500" height="534"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="MoveFileViewCell" id="pt3-2c-MI7" customClass="MoveFileViewCell" customModule="Sketchnoting" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="28" width="672" height="43.5"/>
+                                        <rect key="frame" x="0.0" y="28" width="500" height="43.5"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="pt3-2c-MI7" id="0Yg-eP-3n7">
-                                            <rect key="frame" x="0.0" y="0.0" width="672" height="43.5"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="500" height="43.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Folder" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="UFi-4a-BgY">
-                                                    <rect key="frame" x="15" y="11" width="642" height="21"/>
+                                                    <rect key="frame" x="15" y="11" width="470" height="21"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <color key="textColor" systemColor="linkColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <nil key="highlightedColor"/>
@@ -3393,7 +3393,7 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Sbp-cJ-SKj">
-                                <rect key="frame" x="665" y="60" width="27" height="22"/>
+                                <rect key="frame" x="493" y="60" width="27" height="22"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="27" id="0Z1-jB-NVN"/>
                                     <constraint firstAttribute="height" constant="22" id="vHZ-vf-ui1"/>
@@ -3480,7 +3480,7 @@
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="h1g-fm-D3K" sceneMemberID="viewController">
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="cld-9x-Law">
-                        <rect key="frame" x="0.0" y="0.0" width="712" height="56"/>
+                        <rect key="frame" x="0.0" y="0.0" width="540" height="56"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <nil name="viewControllers"/>

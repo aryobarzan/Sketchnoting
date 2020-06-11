@@ -308,25 +308,69 @@ class DataManager {
     }
     
     public static func move(file: File, toFolder folder: Folder?) {
+        // If the file is already in target folder, do nothing
         if file.parent == folder?.id {
+            log.info("File is already in target folder.")
             return
         }
+        if file is Folder {
+            if let source = file as? Folder {
+                if let destination = folder {
+                    if source == destination {
+                        log.error("Cannot move a folder inside itself.")
+                        // Prevent moving a folder to itself
+                        return
+                    }
+                    else {
+                        var parentFolder = destination.parent
+                        repeat {
+                            if let parentFolder = parentFolder {
+                                if parentFolder == source.id {
+                                    log.error("Destination folder is child of source folder being moved.")
+                                    return
+                                }
+                            }
+                            parentFolder = getFolder(id: parentFolder)?.parent
+                        } while (parentFolder != nil)
+//                        if fileIsContained(inFolder: destination, file: source) {
+//                            log.error("Destination folder")
+//                        }
+                    }
+                }
+            }
+        }
+        
         if let previousParentFolderID = file.parent {
             if let previousParentFolder = getFolder(id: previousParentFolderID) {
                 previousParentFolder.removeChild(file: file)
                 self.save(file: previousParentFolder)
             }
         }
-        
+
         if let folder = folder {
             folder.addChild(file: file)
             self.save(file: folder)
+            log.info("File moved to \(folder.getName())")
         }
         else { // Move to Home
             file.parent = nil
+            log.info("File moved to Home.")
         }
+        
         self.save(file: file)
         
+    }
+    
+    private static func fileIsContained(inFolder folder: Folder, file: File) -> Bool {
+        for c in folder.getChildren() {
+            if c == file.id {
+                return true
+            }
+            if let cFolder = self.getFolder(id: c) {
+                return fileIsContained(inFolder: cFolder, file: file)
+            }
+        }
+        return false
     }
 }
 

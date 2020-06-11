@@ -97,10 +97,7 @@ class MoveFileViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     @IBAction func moveTapped(_ sender: UIBarButtonItem) {
         for file in filesToMove {
-            if file != currentFolder {
-                DataManager.move(file: file, toFolder: currentFolder)
-                
-            }
+            DataManager.move(file: file, toFolder: currentFolder)
         }
         self.delegate?.movedFiles(files: filesToMove)
         self.dismiss(animated: true, completion: nil)
