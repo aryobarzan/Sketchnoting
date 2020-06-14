@@ -246,6 +246,9 @@ class DataManager {
             if decodedDataArray.count >= 1 {
                 let jsonDecoder = JSONDecoder()
                 if let note = try? jsonDecoder.decode(Note.self, from: decodedDataArray[0]) {
+                    if note.parent == nil {
+                        note.parent = self.homeFolder.id
+                    }
                     return note
                 }
             }
@@ -257,6 +260,9 @@ class DataManager {
             if decodedDataArray.count >= 1 {
                 let jsonDecoder = JSONDecoder()
                 if let folder = try? jsonDecoder.decode(Folder.self, from: decodedDataArray[0]) {
+                    if folder.parent == nil && folder != homeFolder {
+                        folder.parent = self.homeFolder.id
+                    }
                     return folder
                 }
             }
