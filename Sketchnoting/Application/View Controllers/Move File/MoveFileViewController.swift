@@ -16,7 +16,7 @@ class MoveFileViewController: UIViewController, UITableViewDataSource, UITableVi
     var delegate: MoveFileViewControllerDelegate?
     
     var filesToMove = [File]()
-    var currentFolder: Folder?
+    var currentFolder: Folder = DataManager.homeFolder
     var items = [Folder]()
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -24,12 +24,11 @@ class MoveFileViewController: UIViewController, UITableViewDataSource, UITableVi
         tableView.delegate = self
         tableView.dataSource = self
         
-        currentFolder = nil//SKFileManager.getFolder(id: file.parent)
         self.updateItems()
     }
     
     func updateItems() {
-        self.title = currentFolder != nil ? currentFolder!.getName() : "Home"
+        self.title = currentFolder.getName()
         items = [Folder]()
         for item in DataManager.getFolderFiles(folder: currentFolder, foldersOnly: true) {
             if let f = item as? Folder {
@@ -65,7 +64,7 @@ class MoveFileViewController: UIViewController, UITableViewDataSource, UITableVi
     }
 
     private func updateBackButton() {
-        if self.currentFolder == nil {
+        if self.currentFolder == DataManager.homeFolder {
             backButton.isHidden = true
         }
         else {
@@ -82,13 +81,13 @@ class MoveFileViewController: UIViewController, UITableViewDataSource, UITableVi
                     name = input
                 }
             }
-            let newFolder = Folder(name: name, parent: self.currentFolder?.id)
+            let newFolder = Folder(name: name, parent: self.currentFolder.id)
             _ = DataManager.add(folder: newFolder)
             self.updateItems()
         }
     }
     @IBAction func backButtonTapped(_ sender: UIButton) {
-        self.currentFolder = DataManager.getFolder(id: currentFolder?.parent)
+        self.currentFolder = DataManager.getFolder(id: currentFolder.parent) ?? DataManager.homeFolder
         self.updateItems()
         
     }
