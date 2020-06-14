@@ -852,7 +852,7 @@
                         <outlet property="selectionModeButton" destination="lgv-jf-NTo" id="iA0-hj-klJ"/>
                         <segue destination="lDo-DG-9fX" kind="show" identifier="NewSketchnote" id="ct4-u7-KZY"/>
                         <segue destination="lDo-DG-9fX" kind="show" identifier="EditSketchnote" id="lta-QB-BHq"/>
-                        <segue destination="riE-Ei-xpK" kind="presentation" identifier="ShareNote" id="58e-4d-iJp"/>
+                        <segue destination="riE-Ei-xpK" kind="presentation" identifier="ShareNote" modalPresentationStyle="formSheet" id="58e-4d-iJp"/>
                         <segue destination="rTB-ZY-UKo" kind="popoverPresentation" identifier="EditNoteTags" popoverAnchorView="QAN-3k-yxQ" id="yvs-ei-HRy">
                             <popoverArrowDirection key="popoverArrowDirection" up="YES" down="YES" left="YES" right="YES"/>
                         </segue>
@@ -1517,7 +1517,7 @@
                         <outlet property="tagsButton" destination="yGF-Hj-T4k" id="fRv-DA-0HD"/>
                         <outlet property="topicsButton" destination="RnC-a4-JG6" id="Mbd-F4-fiv"/>
                         <segue destination="phx-Z7-ZDE" kind="presentation" identifier="ViewNoteText" id="M8J-A4-lvC"/>
-                        <segue destination="riE-Ei-xpK" kind="presentation" identifier="ShareNote" id="OAt-q3-0jJ"/>
+                        <segue destination="riE-Ei-xpK" kind="presentation" identifier="ShareNote" modalPresentationStyle="formSheet" id="OAt-q3-0jJ"/>
                         <segue destination="Od9-Xc-VPJ" kind="presentation" identifier="showRelatedNoteEditing" id="b6T-Lb-KBp"/>
                         <segue destination="aTo-Yd-YX3" kind="presentation" identifier="ShowTextBoxVC" id="S3h-ZS-57D"/>
                         <segue destination="h1g-fm-D3K" kind="presentation" identifier="MoveFileNoteEditing" id="RAn-aJ-7TA"/>
@@ -2169,16 +2169,16 @@
             <objects>
                 <viewController modalPresentationStyle="formSheet" id="SQo-js-3ck" customClass="ShareNoteViewController" customModule="Sketchnoting" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="RPx-jo-deN">
-                        <rect key="frame" x="0.0" y="0.0" width="300" height="400"/>
+                        <rect key="frame" x="0.0" y="0.0" width="540" height="620"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <textField opaque="NO" contentMode="scaleToFill" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Page number" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="oOI-3r-bBK">
-                                <rect key="frame" x="93" y="104" width="114" height="34"/>
+                                <rect key="frame" x="213" y="104" width="114" height="34"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits" autocorrectionType="no" spellCheckingType="no" keyboardType="numberPad" textContentType="one-time-code"/>
                             </textField>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ic7-vI-E0c">
-                                <rect key="frame" x="30" y="146" width="240" height="70"/>
+                                <rect key="frame" x="150" y="146" width="240" height="70"/>
                                 <color key="backgroundColor" systemColor="systemBlueColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="70" id="2eR-oX-qzf"/>
@@ -2194,7 +2194,7 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="5N1-uy-U7o">
-                                <rect key="frame" x="30" y="302" width="240" height="70"/>
+                                <rect key="frame" x="150" y="302" width="240" height="70"/>
                                 <color key="backgroundColor" systemColor="systemBlueColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="70" id="Sor-DA-95G"/>
@@ -2210,7 +2210,7 @@
                                 </connections>
                             </button>
                             <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="WFJ-14-jWK">
-                                <rect key="frame" x="61.5" y="65" width="177" height="32"/>
+                                <rect key="frame" x="181.5" y="65" width="177" height="32"/>
                                 <segments>
                                     <segment title="Entire Note"/>
                                     <segment title="Page..."/>
@@ -2220,7 +2220,7 @@
                                 </connections>
                             </segmentedControl>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Px9-VS-PQm">
-                                <rect key="frame" x="30" y="224" width="240" height="70"/>
+                                <rect key="frame" x="150" y="224" width="240" height="70"/>
                                 <color key="backgroundColor" systemColor="systemBlueColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="240" id="l7i-Xo-0ng"/>
@@ -2258,9 +2258,7 @@
                             </connections>
                         </barButtonItem>
                     </navigationItem>
-                    <value key="contentSizeForViewInPopover" type="size" width="250" height="450"/>
-                    <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
-                    <size key="freeformSize" width="300" height="420"/>
+                    <modalFormSheetSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
                     <connections>
                         <outlet property="fileButton" destination="ic7-vI-E0c" id="JYb-FP-qzc"/>
                         <outlet property="imageButton" destination="5N1-uy-U7o" id="cfF-A1-3A6"/>
@@ -3255,7 +3253,7 @@
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="riE-Ei-xpK" sceneMemberID="viewController">
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="WS2-tY-kyH">
-                        <rect key="frame" x="0.0" y="0.0" width="712" height="56"/>
+                        <rect key="frame" x="0.0" y="0.0" width="540" height="56"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <nil name="viewControllers"/>
@@ -3515,7 +3513,7 @@
         <segue reference="fmI-KU-Ur1"/>
         <segue reference="ig0-q1-Lq9"/>
         <segue reference="ghm-KV-m2E"/>
-        <segue reference="58e-4d-iJp"/>
+        <segue reference="OAt-q3-0jJ"/>
         <segue reference="ct4-u7-KZY"/>
     </inferredMetricsTieBreakers>
     <resources>

@@ -10,19 +10,19 @@ import UIKit
 
 class FolderButton: UIButton {
     var delegate: FolderButtonDelegate?
-    var folder: Folder?
+    var folder: Folder!
     
-    func setFolder(folder: Folder?) {
+    func setFolder(folder: Folder) {
         self.folder = folder
         self.addTarget(self, action: #selector(onTap), for: .touchUpInside)
         self.setTitleColor(.link, for: .normal)
-        if let folder = folder {
-            self.setTitle(" " + folder.getName(), for: .normal)
-            self.setImage(UIImage(systemName: "arrow.turn.down.right"), for: .normal)
-        }
-        else {
+        if folder == DataManager.homeFolder {
             self.setTitle(" Home", for: .normal)
             self.setImage(UIImage(systemName: "house"), for: .normal)
+        }
+        else {
+            self.setTitle(" " + folder.getName(), for: .normal)
+            self.setImage(UIImage(systemName: "arrow.turn.down.right"), for: .normal)
         }
     }
 
@@ -32,5 +32,5 @@ class FolderButton: UIButton {
 }
 
 protocol FolderButtonDelegate {
-    func onTap(folder: Folder?)
+    func onTap(folder: Folder)
 }

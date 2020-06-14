@@ -143,7 +143,7 @@ class SearchViewController: UIViewController, UICollectionViewDelegate, UICollec
     private func updateResults() {
         self.notes = appSearch.search(filters: self.searchFilters)
         notesCollectionView.reloadData()
-        resultsLabel.text = "Notes: \(self.notes.count) results"
+        resultsLabel.text = "Notes: \(self.notes.count) result(s)"
     }
     
     var noteToOpen: Note?

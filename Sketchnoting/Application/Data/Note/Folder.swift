@@ -12,9 +12,9 @@ class Folder: File {
 
     private var children: [String] // Their IDs
     
-    override init(name: String, parent: String?) {
+    override init(name: String, parent: String?, customID: String? = nil) {
         self.children = [String]()
-        super.init(name: name, parent: parent)
+        super.init(name: name, parent: parent, customID: customID)
     }
     
     // Codable

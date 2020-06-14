@@ -274,7 +274,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
                             }
                         }
                     }
-                    let newNote = Note(name: pdfTitle, parent: DataManager.currentFolder?.id, documents: nil)
+                    let newNote = Note(name: pdfTitle, parent: DataManager.currentFolder.id, documents: nil)
                     var setPDFForCurrentPage = false
                     for i in 0..<pdf.pageCount {
                         if let pdfPage = pdf.page(at: i) {
@@ -323,7 +323,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     }
     
     private func createNoteFromImages(images: [UIImage]) -> Note {
-        let newNote = Note(name: "Imported Images", parent: DataManager.currentFolder?.id, documents: nil)
+        let newNote = Note(name: "Imported Images", parent: DataManager.currentFolder.id, documents: nil)
         for image in images {
             let noteImage = NoteImage(image: image)
             newNote.getCurrentPage().images.append(noteImage)
@@ -332,7 +332,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     }
     
     private func createNoteFromTypedTexts(texts: [NoteTypedText]) -> Note {
-        let newNote = Note(name: "Imported Text Files", parent: DataManager.currentFolder?.id, documents: nil)
+        let newNote = Note(name: "Imported Text Files", parent: DataManager.currentFolder.id, documents: nil)
         newNote.getCurrentPage().typedTexts = texts
         return newNote
     }
@@ -440,12 +440,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             button.removeFromSuperview()
         }
         folderButtons = [FolderButton]()
-        let homeButton = FolderButton()
-        homeButton.frame = CGRect(x: 0, y: 0, width: 100, height: 35)
-        homeButton.setFolder(folder: nil)
-        homeButton.delegate = self
-        navigationHierarchyStackView.addArrangedSubview(homeButton)
-        folderButtons.append(homeButton)
         for f in DataManager.currentFoldersHierarchy {
             let folderButton = FolderButton()
             folderButton.frame = CGRect(x: 0, y: 0, width: 100, height: 35)
@@ -459,7 +453,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         navigationHierarchyStackView.addArrangedSubview(spacerView)
     }
     
-    func onTap(folder: Folder?) {
+    func onTap(folder: Folder) {
         if DataManager.currentFolder != folder {
             DataManager.setCurrentFolder(folder: folder)
             self.updateDisplayedNotes(false)
@@ -491,7 +485,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     }
 
     @IBAction func newNoteButtonTapped(_ sender: UIButton) {
-        let newNote = Note(name: "Untitled", parent: DataManager.currentFolder?.id, documents: nil)
+        let newNote = Note(name: "Untitled", parent: DataManager.currentFolder.id, documents: nil)
         _ = DataManager.add(note: newNote)
         DataManager.activeNote = newNote
         performSegue(withIdentifier: "NewSketchnote", sender: self)
@@ -505,7 +499,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
                     name = input
                 }
             }
-            let newFolder = Folder(name: name, parent: DataManager.currentFolder?.id)
+            let newFolder = Folder(name: name, parent: DataManager.currentFolder.id)
             _ = DataManager.add(folder: newFolder)
             self.updateDisplayedNotes(false)
         }

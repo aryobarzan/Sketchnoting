@@ -11,11 +11,13 @@ import UIKit
 import Kingfisher
 
 class DataManager {
-    static var currentFolder: Folder?
-    static var currentFoldersHierarchy = [Folder]()
+    static var currentFolder: Folder = DataManager.homeFolder
+    static var currentFoldersHierarchy: [Folder] = [DataManager.homeFolder]
     static var folders = loadFolders()
     static var notes = loadNotes()
     static var activeNote: Note?
+    
+    static let homeFolder = Folder(name: "Home", parent: nil, customID: "HomeFolder")
     
     static var receivedNotesController = ReceivedNotesController()
     
@@ -32,7 +34,7 @@ class DataManager {
         }
         catch let error as NSError
         {
-            NSLog("Unable to create directory \(error.debugDescription)")
+            log.error("Unable to create directory \(error.debugDescription)")
         }
         return logsPath!
     }
@@ -48,7 +50,7 @@ class DataManager {
         }
         catch let error as NSError
         {
-            NSLog("Unable to create directory \(error.debugDescription)")
+            log.error("Unable to create directory \(error.debugDescription)")
         }
         return logsPath!
     }
@@ -98,7 +100,7 @@ class DataManager {
         return notes
     }
     private static func loadFolders() -> [Folder] {
-        var folders = [Folder]()
+        var folders: [Folder] = [homeFolder]
         do {
             let fileURLs = try FileManager.default.contentsOfDirectory(at: getFoldersDirectory(), includingPropertiesForKeys: nil)
             for url in fileURLs {
@@ -120,13 +122,13 @@ class DataManager {
     public static func getCurrentFiles() -> [File] {
         var files = [File]()
         for n in notes {
-            if n.parent == self.currentFolder?.id {
+            if n.parent == self.currentFolder.id {
                 files.append(n)
                 log.info("Retrieved note: \(n.id)")
             }
         }
         for f in folders {
-            if f.parent == self.currentFolder?.id {
+            if f.parent == self.currentFolder.id {
                 files.append(f)
                 log.info("Retrieved folder: \(f.id)")
             }
@@ -135,6 +137,9 @@ class DataManager {
     }
     
     public static func delete(file: File) {
+        if file == homeFolder {
+            return
+        }
         var path = self.getNotesDirectory()
         if file is Note {
             path = self.getNotesDirectory().appendingPathComponent(file.id + ".sketchnote")
@@ -279,28 +284,26 @@ class DataManager {
         log.info("All notes cleared.")
 
         
-        self.currentFolder = nil
+        self.currentFolder = self.homeFolder
         log.info("All files have been wiped.")
         
         SKCacheManager.cache.clearDiskCache{ log.info("KingFisher image cache cleared.") }
     }
     
     // MARK: Folder traversal
-    public static func setCurrentFolder(folder: Folder?) {
+    public static func setCurrentFolder(folder: Folder) {
         currentFolder = folder
         currentFoldersHierarchy = [Folder]()
-        if let folder = folder {
-            currentFoldersHierarchy.append(folder)
-            if folder.parent != nil {
-                var parent = getFolder(id: folder.parent!)
-                while parent != nil {
-                    currentFoldersHierarchy.append(parent!)
-                    if parent!.parent != nil {
-                        parent = getFolder(id: parent!.parent!)
-                    }
-                    else {
-                        parent = nil
-                    }
+        currentFoldersHierarchy.append(folder)
+        if folder.parent != nil {
+            var parent = getFolder(id: folder.parent!)
+            while parent != nil {
+                currentFoldersHierarchy.append(parent!)
+                if parent!.parent != nil {
+                    parent = getFolder(id: parent!.parent!)
+                }
+                else {
+                    parent = nil
                 }
             }
         }

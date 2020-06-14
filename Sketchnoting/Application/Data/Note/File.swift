@@ -15,8 +15,13 @@ class File: Codable, Comparable, Equatable, Hashable {
     var updateDate: Date
     var parent: String? // ID
     
-    init(name: String, parent: String?) {
-        self.id = UUID().uuidString
+    init(name: String, parent: String?, customID: String? = nil) {
+        if let customID = customID {
+            self.id = customID
+        }
+        else {
+            self.id = UUID().uuidString
+        }
         self.name = name
         self.creationDate = Date.init(timeIntervalSinceNow: 0)
         self.updateDate = Date.init(timeIntervalSinceNow: 0)
