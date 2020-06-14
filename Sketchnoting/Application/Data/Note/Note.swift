@@ -160,8 +160,9 @@ class Note: File, DocumentDelegate {
     public func duplicate() -> Note {
         let documents = self.documents
         let duplicate = Note(name: self.getName(), parent: self.parent, documents: documents)
-        duplicate.setName(name: self.getName() + " #2")
+        duplicate.setName(name: self.getName() + " (Copy)")
         duplicate.tags = self.tags
+        duplicate.pages = self.pages
         return duplicate
     }
     
