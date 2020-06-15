@@ -27,7 +27,7 @@ class DrawingRecognition {
     
     private var bestPrediction = ""
     private var bestPredictionScore = 0.0
-    func recognize(image: UIImage) -> String? {
+    func recognize(image: UIImage) -> (String, Double)? {
         self.bestPrediction = ""
         self.bestPredictionScore = 0.0
             self.predict(image: image)
@@ -42,7 +42,7 @@ class DrawingRecognition {
 
             if self.bestPredictionScore >= 0.3 && !self.bestPrediction.isEmpty {
                 log.info("Best prediction: \(self.bestPrediction) with a score of \(self.bestPredictionScore)")
-                return self.bestPrediction
+                return (self.bestPrediction, self.bestPredictionScore)
             }
             else {
                 log.error("Drawing not recognized.")

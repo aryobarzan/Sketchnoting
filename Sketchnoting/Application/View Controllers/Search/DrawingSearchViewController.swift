@@ -44,9 +44,9 @@ class DrawingSearchViewController: UIViewController, PKCanvasViewDelegate {
             let image = canvasView.asImage()
             
             if let recognition = self.drawingRecognition.recognize(image: image) {
-                self.searchButton.setTitle(" " + recognition, for: .normal)
+                self.searchButton.setTitle(" " + recognition.0, for: .normal)
                 self.searchButton.isEnabled = true
-                self.searchLabel = recognition
+                self.searchLabel = recognition.0
                 log.info("Best prediction: \(recognition)")
             }
             else {

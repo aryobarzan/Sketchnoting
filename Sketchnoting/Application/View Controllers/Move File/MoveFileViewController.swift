@@ -73,7 +73,7 @@ class MoveFileViewController: UIViewController, UITableViewDataSource, UITableVi
     }
 
     @IBAction func newFolderTapped(_ sender: UIButton) {
-        self.showInputDialog(title: "New Folder:", subtitle: nil, actionTitle: "Create", cancelTitle: "Cancel", inputPlaceholder: "Folder Name...", inputKeyboardType: .default, cancelHandler: nil)
+        self.showInputDialog(title: "New Folder", subtitle: nil, actionTitle: "Create", cancelTitle: "Cancel", inputPlaceholder: "Folder Name...", inputKeyboardType: .default, cancelHandler: nil)
         { (input: String?) in
             var name = "Untitled"
             if let input = input {

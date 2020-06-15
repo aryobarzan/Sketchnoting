@@ -147,7 +147,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         
         self.load(page: DataManager.activeNote!.getCurrentPage())
     }
-    
+        
     override func viewWillAppear(_ animated: Bool) {
         DataManager.activeNote!.delegate = self
     }
@@ -490,7 +490,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                     let image = UIImage(cgImage: merged.cgImage!.cropping(to: region.frame)!)
                     if let recognition = self.drawingRecognition.recognize(image: image) {
                         log.info("Recognized drawing: \(recognition)")
-                        DataManager.activeNote!.getCurrentPage().addDrawing(drawing: recognition)
+                        DataManager.activeNote!.getCurrentPage().addDrawing(drawing: recognition.0)
                         DataManager.saveCurrentNote()
                     }
                 }
@@ -617,8 +617,10 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     
     @IBAction func canvasViewLongPressed(_ sender: UILongPressGestureRecognizer) {
         if sender.state == .began {
+            var isRecognizingDrawing = true
             for (view, doc) in conceptHighlights {
                 if view.frame.contains(sender.location(in: canvasView)) {
+                    isRecognizingDrawing = false
                     log.info("Highlighting concept")
                     let documentPreviewVC = UIStoryboard(name: "Main", bundle: Bundle.main).instantiateViewController(withIdentifier: "DocumentPreviewViewController") as? DocumentPreviewViewController
                     if let documentPreviewVC = documentPreviewVC {
@@ -640,6 +642,59 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                         documentPreviewVC.titleLabel.text = doc[0].title
                         documentPreviewVC.bodyTextView.text = doc[0].description
                     }
+                }
+            }
+            if isRecognizingDrawing {
+                self.processDrawingRecognition(atTouch: sender.location(in: canvasView))
+            }
+        }
+    }
+    
+    private func processDrawingRecognition(atTouch loc: CGPoint) {
+        UITraitCollection(userInterfaceStyle: .light).performAsCurrent {
+            let whiteBackground = UIColor.white.image(CGSize(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height))
+            var canvasImage = self.canvasView.drawing.image(from: UIScreen.main.bounds, scale: 1.0)
+            canvasImage = canvasImage.blackAndWhite() ?? canvasImage.toGrayscale
+             
+            var merged = whiteBackground.mergeWith(withImage: canvasImage)
+            merged = merged.invertedImage() ?? merged
+            DispatchQueue.main.async {
+                
+                let regionSizes = [100, 150, 200]
+                var bestPredictionLabel: String?
+                var bestScore: Double?
+                var bestRegion: UIView?
+                for regionSize in regionSizes {
+                    let region = UIView(frame: CGRect(x: Int(loc.x)-regionSize/2, y: Int(loc.y)-regionSize/2, width: regionSize, height: regionSize))
+                    let image = UIImage(cgImage: merged.cgImage!.cropping(to: region.frame)!)
+                    if let recognition = self.drawingRecognition.recognize(image: image) {
+                        if bestPredictionLabel == nil || bestScore! < recognition.1 {
+                            bestPredictionLabel = recognition.0
+                            bestScore = recognition.1
+                            bestRegion = region
+                        }
+                    }
+                }
+                if bestPredictionLabel != nil {
+                    log.info("Recognized drawing at touched point: \(bestPredictionLabel!)")
+                    if !DataManager.activeNote!.getCurrentPage().drawingViewRects.contains(bestRegion!.frame) {
+                        bestRegion!.layer.borderColor = UIColor.label.cgColor
+                        bestRegion!.layer.borderWidth = 1
+                        self.drawingInsertionCanvas.addSubview(bestRegion!)
+                        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(self.handleDrawingRegionTap(_:)))
+                        bestRegion!.addGestureRecognizer(tapGesture)
+                        bestRegion!.isUserInteractionEnabled = true
+                        self.drawingViews.append(bestRegion!)
+                        DataManager.activeNote!.getCurrentPage().addDrawing(drawing: bestPredictionLabel!)
+                        DataManager.saveCurrentNote()
+                        self.view.makeToast("Recognized drawing: \(bestPredictionLabel!)", duration: 1.0, position: .center)
+                    }
+                    else {
+                        self.view.makeToast("Drawing is already recognized: \(bestPredictionLabel!)", duration: 1.0, position: .center)
+                    }
+                }
+                else {
+                    self.view.makeToast("No drawing recognized. Try long-pressing in the center of your drawing!", duration: 1.0, position: .center)
                 }
             }
         }

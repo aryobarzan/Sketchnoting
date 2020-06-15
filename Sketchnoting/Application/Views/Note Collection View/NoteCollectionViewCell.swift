@@ -26,6 +26,7 @@ class NoteCollectionViewCell: UICollectionViewCell {
     
     func setFile(file: File, isInSelectionMode: Bool = false, isFileSelected: Bool = false) {
         self.imageView.layer.cornerRadius = 6
+        self.imageView.image = nil
         
         self.file = file
         file.getPreviewImage() { image in
