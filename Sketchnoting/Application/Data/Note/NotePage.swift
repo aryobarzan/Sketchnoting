@@ -12,8 +12,7 @@ import PDFKit
 
 class NotePage: Codable {
     var canvasDrawing: PKDrawing
-    var drawingLabels: [String]
-    var drawingViewRects: [CGRect]
+    private var drawings: [NoteDrawing]
     private var noteText: NoteText?
     var backdropPDFData: Data?
     var pdfScale: Float? = 1.0
@@ -22,8 +21,7 @@ class NotePage: Codable {
     
     init() {
         self.canvasDrawing = PKDrawing()
-        self.drawingLabels = [String]()
-        self.drawingViewRects = [CGRect]()
+        self.drawings = [NoteDrawing]()
         self.images = [NoteImage]()
         self.typedTexts = [NoteTypedText]()
     }
@@ -31,8 +29,7 @@ class NotePage: Codable {
     //MARK: Decode / Encode
     enum CodingKeys: String, CodingKey {
         case canvasDrawing = "canvasDrawing"
-        case drawingLabels = "drawingLabels"
-        case drawingViewRects = "drawingViewRects"
+        case drawings = "noteDrawings"
         case noteText = "noteText"
         case backdropPDFData = "backdropPDFData"
         case pdfScale = "pdfScale"
@@ -42,8 +39,7 @@ class NotePage: Codable {
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(canvasDrawing, forKey: .canvasDrawing)
-        try container.encode(drawingLabels, forKey: .drawingLabels)
-        try container.encode(drawingViewRects, forKey: .drawingViewRects)
+        try container.encode(drawings, forKey: .drawings)
         try container.encode(noteText, forKey: .noteText)
         try container.encode(backdropPDFData, forKey: .backdropPDFData)
         try container.encode(pdfScale, forKey: .pdfScale)
@@ -54,8 +50,7 @@ class NotePage: Codable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         canvasDrawing = try container.decode(PKDrawing.self, forKey: .canvasDrawing)
-        drawingLabels = try container.decode([String].self, forKey: .drawingLabels)
-        drawingViewRects = try container.decode([CGRect].self, forKey: .drawingViewRects)
+        drawings = (try? container.decode([NoteDrawing].self, forKey: .drawings)) ?? [NoteDrawing]()
         noteText = try? container.decode(NoteText.self, forKey: .noteText)
         backdropPDFData = try? container.decode(Data.self, forKey: .backdropPDFData)
         pdfScale = try? container.decode(Float.self, forKey: .pdfScale)
@@ -66,22 +61,52 @@ class NotePage: Codable {
     // MARK: drawing recognition
     // This function only stores a recognized drawing's label for a note. The drawing itself (i.e. an image) is not stored.
     // Only the label is necessary, as it is used for search results.
-    func addDrawing(drawing: String) {
-        if !drawingLabels.contains(drawing.lowercased()) {
-            drawingLabels.append(drawing.lowercased())
+    
+    func addDrawing(label: String, region: CGRect) {
+        let drawing = NoteDrawing(label: label, region: region)
+        self.addDrawing(drawing: drawing)
+    }
+    func addDrawing(drawing: NoteDrawing) {
+        if !self.hasDrawing(drawing: drawing) {
+            self.drawings.append(drawing)
         }
     }
     
-    func addDrawingViewRect(rect: CGRect) {
-        if !drawingViewRects.contains(rect) {
-            drawingViewRects.append(rect)
+    func removeDrawing(drawing: NoteDrawing) {
+        if self.hasDrawing(drawing: drawing) {
+            drawings.removeAll{$0 == drawing}
+        }
+    }
+    func removeDrawing(region: CGRect) {
+        for d in self.drawings {
+            if d.getRegion() == region {
+                drawings.removeAll{$0 == d}
+                break
+            }
         }
     }
     
-    func removeDrawingViewRect(rect: CGRect) {
-        if drawingViewRects.contains(rect) {
-            drawingViewRects.removeAll{$0 == rect}
+    func hasDrawing(drawing: NoteDrawing) -> Bool {
+        for d in self.drawings {
+            if d == drawing {
+                return true
+            }
         }
+        return false
+    }
+    
+    func getDrawingLabels() -> [String] {
+        var labels = [String]()
+        for d in self.drawings {
+            if !labels.contains(d.getLabel()) {
+                labels.append(d.getLabel())
+            }
+        }
+        return labels
+    }
+    
+    func getDrawings() -> [NoteDrawing] {
+        return self.drawings
     }
     
     func updateNoteImage(noteImage: NoteImage) {
@@ -148,8 +173,7 @@ class NotePage: Codable {
     }
     
     public func clear() {
-        self.drawingLabels = [String]()
-        self.drawingViewRects = [CGRect]()
+        self.drawings = [NoteDrawing]()
         self.canvasDrawing = PKDrawing()
         self.noteText = nil
     }

@@ -23,6 +23,7 @@
 		9F2C00062351123700D53EE9 /* SwiftyJSON in Frameworks */ = {isa = PBXBuildFile; productRef = 9F2C00052351123700D53EE9 /* SwiftyJSON */; };
 		9F2C00092351126800D53EE9 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 9F2C00082351126800D53EE9 /* Alamofire */; };
 		9F2C0D75248F0E2600F58F5E /* ArrayExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F2C0D74248F0E2600F58F5E /* ArrayExtensions.swift */; };
+		9F2FF43A249B083D00597AD6 /* NoteDrawing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F2FF439249B083D00597AD6 /* NoteDrawing.swift */; };
 		9F318D39244A207300A1B4B5 /* UIFontExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F318D38244A207300A1B4B5 /* UIFontExtensions.swift */; };
 		9F318D3B244A20A000A1B4B5 /* UITextViewExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F318D3A244A20A000A1B4B5 /* UITextViewExtensions.swift */; };
 		9F318D40244A3EAD00A1B4B5 /* Toast in Frameworks */ = {isa = PBXBuildFile; productRef = 9F318D3F244A3EAD00A1B4B5 /* Toast */; };
@@ -172,6 +173,7 @@
 		9F0FC54823760E7600070FA0 /* NoteOptionsTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteOptionsTableViewController.swift; sourceTree = "<group>"; };
 		9F18E7A723FB4F1600543D78 /* FolderButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderButton.swift; sourceTree = "<group>"; };
 		9F2C0D74248F0E2600F58F5E /* ArrayExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArrayExtensions.swift; sourceTree = "<group>"; };
+		9F2FF439249B083D00597AD6 /* NoteDrawing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteDrawing.swift; sourceTree = "<group>"; };
 		9F318D38244A207300A1B4B5 /* UIFontExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIFontExtensions.swift; sourceTree = "<group>"; };
 		9F318D3A244A20A000A1B4B5 /* UITextViewExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UITextViewExtensions.swift; sourceTree = "<group>"; };
 		9F3424012407197000A92B98 /* HiddenDocumentsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HiddenDocumentsViewController.swift; sourceTree = "<group>"; };
@@ -575,6 +577,7 @@
 				9F87A47C2445441500F83B12 /* NoteTypedText.swift */,
 				9FFE07E7232A622A00DBD0AC /* Tag.swift */,
 				9F65983E23EDD80B00CDBE0C /* HelpLinesType.swift */,
+				9F2FF439249B083D00597AD6 /* NoteDrawing.swift */,
 			);
 			path = Note;
 			sourceTree = "<group>";
@@ -1024,6 +1027,7 @@
 				9FAE72E624887158002D800B /* DirectionalLineView.swift in Sources */,
 				9F65983323EDCEA300CDBE0C /* NotePage.swift in Sources */,
 				9FA6239E22E66D73007ED794 /* HandwritingRecognizer.swift in Sources */,
+				9F2FF43A249B083D00597AD6 /* NoteDrawing.swift in Sources */,
 				9FF0AC9424412F4C00A82BE8 /* NoteImage.swift in Sources */,
 				9F65983523EDD09F00CDBE0C /* NoteText.swift in Sources */,
 				9FAE72EC24887158002D800B /* Heisenberg.swift in Sources */,

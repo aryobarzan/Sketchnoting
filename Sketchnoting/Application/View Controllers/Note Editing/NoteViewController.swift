@@ -177,7 +177,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                 if topicsShown {
                     toggleConceptHighlight()
                 }
-                self.processDrawingRecognition()
+                //self.processDrawingRecognition()
                 DataManager.activeNote!.setUpdateDate()
                 DataManager.activeNote!.getCurrentPage().canvasDrawing = self.canvasView.drawing
                 DataManager.saveCurrentNote()
@@ -490,7 +490,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                     let image = UIImage(cgImage: merged.cgImage!.cropping(to: region.frame)!)
                     if let recognition = self.drawingRecognition.recognize(image: image) {
                         log.info("Recognized drawing: \(recognition)")
-                        DataManager.activeNote!.getCurrentPage().addDrawing(drawing: recognition.0)
+                        DataManager.activeNote!.getCurrentPage().addDrawing(label: recognition.0, region: region.frame)
                         DataManager.saveCurrentNote()
                     }
                 }
@@ -660,24 +660,37 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             merged = merged.invertedImage() ?? merged
             DispatchQueue.main.async {
                 
-                let regionSizes = [100, 150, 200]
+                let regionSizes = [75, 100, 125]
+                let offsets = [0, 10, 20, -10, -20]
                 var bestPredictionLabel: String?
                 var bestScore: Double?
                 var bestRegion: UIView?
                 for regionSize in regionSizes {
-                    let region = UIView(frame: CGRect(x: Int(loc.x)-regionSize/2, y: Int(loc.y)-regionSize/2, width: regionSize, height: regionSize))
-                    let image = UIImage(cgImage: merged.cgImage!.cropping(to: region.frame)!)
-                    if let recognition = self.drawingRecognition.recognize(image: image) {
-                        if bestPredictionLabel == nil || bestScore! < recognition.1 {
-                            bestPredictionLabel = recognition.0
-                            bestScore = recognition.1
-                            bestRegion = region
+                    for offset in offsets {
+                        let region = UIView(frame: CGRect(x: Int(loc.x)-regionSize/2+offset, y: Int(loc.y)-regionSize/2+offset, width: regionSize, height: regionSize))
+                        let image = UIImage(cgImage: merged.cgImage!.cropping(to: region.frame)!)
+                        if let recognition = self.drawingRecognition.recognize(image: image) {
+                            if bestPredictionLabel == nil || bestScore! < recognition.1 {
+                                bestPredictionLabel = recognition.0
+                                bestScore = recognition.1
+                                bestRegion = region
+                            }
                         }
                     }
+//                    let region = UIView(frame: CGRect(x: Int(loc.x)-regionSize/2, y: Int(loc.y)-regionSize/2, width: regionSize, height: regionSize))
+//                    let image = UIImage(cgImage: merged.cgImage!.cropping(to: region.frame)!)
+//                    if let recognition = self.drawingRecognition.recognize(image: image) {
+//                        if bestPredictionLabel == nil || bestScore! < recognition.1 {
+//                            bestPredictionLabel = recognition.0
+//                            bestScore = recognition.1
+//                            bestRegion = region
+//                        }
+//                    }
                 }
                 if bestPredictionLabel != nil {
-                    log.info("Recognized drawing at touched point: \(bestPredictionLabel!)")
-                    if !DataManager.activeNote!.getCurrentPage().drawingViewRects.contains(bestRegion!.frame) {
+                    log.info("Recognized drawing at touched point: \(bestPredictionLabel!) (\(Double(round(1000*bestScore!*100)/1000))% confidence)")
+                    let drawing = NoteDrawing(label: bestPredictionLabel!, region: bestRegion!.frame)
+                    if !DataManager.activeNote!.getCurrentPage().hasDrawing(drawing: drawing) {
                         bestRegion!.layer.borderColor = UIColor.label.cgColor
                         bestRegion!.layer.borderWidth = 1
                         self.drawingInsertionCanvas.addSubview(bestRegion!)
@@ -685,7 +698,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                         bestRegion!.addGestureRecognizer(tapGesture)
                         bestRegion!.isUserInteractionEnabled = true
                         self.drawingViews.append(bestRegion!)
-                        DataManager.activeNote!.getCurrentPage().addDrawing(drawing: bestPredictionLabel!)
+                        DataManager.activeNote!.getCurrentPage().addDrawing(drawing: drawing)
                         DataManager.saveCurrentNote()
                         self.view.makeToast("Recognized drawing: \(bestPredictionLabel!)", duration: 1.0, position: .center)
                     }
@@ -1100,9 +1113,8 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     
     //MARK: Drawing insertion mode
     private func setupDrawingRegions() {
-        let drawingRegionRects = DataManager.activeNote!.getCurrentPage().drawingViewRects
-        for rect in drawingRegionRects {
-            let region = UIView(frame: rect)
+        for drawing in DataManager.activeNote!.getCurrentPage().getDrawings() {
+            let region = UIView(frame: drawing.getRegion())
             region.layer.borderColor = UIColor.label.cgColor
             region.layer.borderWidth = 1
             drawingInsertionCanvas.addSubview(region)
@@ -1178,12 +1190,27 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             endPoint = tapPoint
             if let currentDrawingRegion = currentDrawingRegion {
                 if currentDrawingRegion.frame.width >= 150 {
-                    DataManager.activeNote!.getCurrentPage().addDrawingViewRect(rect: currentDrawingRegion.frame)
-                    self.drawingViews.append(currentDrawingRegion)
-                    
-                    let tapGesture = UITapGestureRecognizer(target: self, action: #selector(self.handleDrawingRegionTap(_:)))
-                    currentDrawingRegion.addGestureRecognizer(tapGesture)
-                    currentDrawingRegion.isUserInteractionEnabled = true
+                    UITraitCollection(userInterfaceStyle: .light).performAsCurrent {
+                        let whiteBackground = UIColor.white.image(CGSize(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height))
+                        var canvasImage = canvasView.drawing.image(from: UIScreen.main.bounds, scale: 1.0)
+                        canvasImage = canvasImage.blackAndWhite() ?? canvasImage.toGrayscale
+                        DispatchQueue.main.async {
+                            var merged = whiteBackground.mergeWith(withImage: canvasImage)
+                            merged = merged.invertedImage() ?? merged
+                            let image = UIImage(cgImage: merged.cgImage!.cropping(to: currentDrawingRegion.frame)!)
+                            if let recognition = self.drawingRecognition.recognize(image: image) {
+                                log.info("Recognized drawing: \(recognition)")
+                                self.view.makeToast("Recognized drawing: \(recognition.0)")
+                                DataManager.activeNote!.getCurrentPage().addDrawing(label: recognition.0, region: currentDrawingRegion.frame)
+                                self.drawingViews.append(currentDrawingRegion)
+                                
+                                let tapGesture = UITapGestureRecognizer(target: self, action: #selector(self.handleDrawingRegionTap(_:)))
+                                currentDrawingRegion.addGestureRecognizer(tapGesture)
+                                currentDrawingRegion.isUserInteractionEnabled = true
+                                DataManager.saveCurrentNote()
+                            }
+                        }
+                    }
                 }
                 else {
                     currentDrawingRegion.removeFromSuperview()
@@ -1204,7 +1231,8 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             let action = PopMenuDefaultAction(title: "Delete Drawing Region", didSelect: { action in
                 if let drawingRegion = sender.view {
                     drawingRegion.removeFromSuperview()
-                    DataManager.activeNote!.getCurrentPage().removeDrawingViewRect(rect: drawingRegion.frame)
+                    DataManager.activeNote!.getCurrentPage().removeDrawing(region: drawingRegion.frame)
+                    DataManager.saveCurrentNote()
                 }
             })
             popMenu.addAction(action)

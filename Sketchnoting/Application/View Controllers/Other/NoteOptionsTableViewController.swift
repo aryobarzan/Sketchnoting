@@ -32,7 +32,7 @@ class NoteOptionsTableViewController: UITableViewController {
         nameField.text = DataManager.activeNote!.getName()
         dateLabel.text = "\(DataManager.activeNote!.creationDate.getFormattedDate())"
         pageLabel.text = "Page: \(DataManager.activeNote!.activePageIndex+1)/\(DataManager.activeNote!.pages.count)"
-        drawingsTextView.text = "Drawings: \(DataManager.activeNote!.getCurrentPage().drawingLabels.joined(separator:" - "))"
+        drawingsTextView.text = "Drawings: \(DataManager.activeNote!.getCurrentPage().getDrawingLabels().joined(separator:" - "))"
         
         pdfScaleStepper.minimumValue = 0.1
         pdfScaleStepper.maximumValue = 2.0

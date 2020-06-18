@@ -66,7 +66,7 @@ class AppSearch: DocumentVisitor {
     }
     private func applyDrawingFilter(note: Note, term: String) -> Bool {
         for page in note.pages {
-            for drawing in page.drawingLabels {
+            for drawing in page.getDrawingLabels() {
                 if drawing.lowercased() == term.lowercased() {
                     return true
                 }
@@ -216,7 +216,7 @@ class AppSearch: DocumentVisitor {
         return false
     }
     private func applyDrawingFilter(page: NotePage, term: String) -> Bool {
-        for drawing in page.drawingLabels {
+        for drawing in page.getDrawingLabels() {
             if drawing.lowercased() == term.lowercased() {
                 return true
             }
