@@ -1189,7 +1189,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         case .ended:
             endPoint = tapPoint
             if let currentDrawingRegion = currentDrawingRegion {
-                if currentDrawingRegion.frame.width >= 150 {
+                if currentDrawingRegion.frame.width >= 50 {
                     UITraitCollection(userInterfaceStyle: .light).performAsCurrent {
                         let whiteBackground = UIColor.white.image(CGSize(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height))
                         var canvasImage = canvasView.drawing.image(from: UIScreen.main.bounds, scale: 1.0)
