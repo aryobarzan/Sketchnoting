@@ -13,4 +13,5 @@ target 'Sketchnoting' do
   pod 'Repeat'
   pod 'Highlightr'
   pod 'DropDown'
+  pod 'Hover'
 end

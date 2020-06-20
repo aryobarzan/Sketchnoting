@@ -22,7 +22,7 @@ import MobileCoreServices
 import VisionKit
 import Photos
 
-class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextFieldDelegate, MCSessionDelegate, MCBrowserViewControllerDelegate, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UIApplicationDelegate, UIPopoverPresentationControllerDelegate, UIDocumentPickerDelegate, VNDocumentCameraViewControllerDelegate, UICollectionViewDragDelegate, UICollectionViewDropDelegate, FolderButtonDelegate, RelatedNotesVCDelegate, MoveFileViewControllerDelegate {
+class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextFieldDelegate, MCSessionDelegate, MCBrowserViewControllerDelegate, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UIApplicationDelegate, UIPopoverPresentationControllerDelegate, UIDocumentPickerDelegate, VNDocumentCameraViewControllerDelegate, UICollectionViewDragDelegate, UICollectionViewDropDelegate, FolderButtonDelegate, RelatedNotesVCDelegate, MoveFileViewControllerDelegate, SKClipboardDelegate {
     
     @IBOutlet weak var navigationHierarchyScrollView: UIScrollView!
     @IBOutlet weak var navigationHierarchyStackView: UIStackView!
@@ -112,6 +112,9 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             noteListViewButton.backgroundColor = self.view.tintColor
             noteListViewButton.tintColor = .black
         }
+        
+        SKClipboard.delegate = self
+        SKClipboard.addClipboardButton(view: self.view)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -581,6 +584,12 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
                 self.updateDisplayedNotes(false)
             }
             menuElements.append(duplicateAction)
+            let copyNoteAction = UIAction(title: "Copy Note", image: UIImage(systemName: "doc.on.clipboard")) { action in
+                SKClipboard.copy(note: note)
+                SKClipboard.addClipboardButton(view: self.view)
+                self.view.makeToast("Copied note to SKClipboard.")
+            }
+            menuElements.append(copyNoteAction)
             let copyTextAction = UIAction(title: "Copy Text", image: UIImage(systemName: "text.quote")) { action in
                 UIPasteboard.general.string = note.getText()
                 self.view.makeToast("Copied text to Clipboard.")
@@ -666,8 +675,8 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     func joinSession() {
         let mcBrowser = MCBrowserViewController(serviceType: "hws-kb", session: mcSession)
         mcBrowser.delegate = self
-        present(mcBrowser, animated: true)
-        print("Joining sessions...")
+        self.present(mcBrowser, animated: true)
+        log.info("Joining sessions...")
     }
     
     private var noteCollectionViewState = SettingsManager.getFileDisplayLayout()
@@ -936,6 +945,27 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             }))
             self.present(alert, animated: true, completion: nil)
         }
+    }
+    
+    // MARK: SKClipboardDelegate
+    func pasteNoteTapped() {
+        log.info("Pasting note: \(SKClipboard.getNote()?.getName() ?? "Note name could not be retrieved.")")
+    }
+    // Implementation missing
+    func pastePageTapped() {
+        
+    }
+    // Implementation missing
+    func pasteImageTapped() {
+        
+    }
+    // Implementation missing
+    func pasteTypedTextTapped() {
+        
+    }
+    // Implementation missing
+    func clearClipboardTapped() {
+        
     }
     
 }

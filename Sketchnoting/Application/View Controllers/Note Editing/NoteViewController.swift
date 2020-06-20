@@ -23,8 +23,7 @@ import GPUImage
 import Highlightr
 import Toast
 
-class NoteViewController: UIViewController, UIPencilInteractionDelegate, UICollectionViewDelegate, NoteDelegate, PKCanvasViewDelegate, PKToolPickerObserver, UIScreenshotServiceDelegate, NoteOptionsDelegate, DocumentsViewControllerDelegate, NotePagesDelegate, VNDocumentCameraViewControllerDelegate, UIDocumentPickerDelegate, DraggableImageViewDelegate, DraggableTextViewDelegate, RelatedNotesVCDelegate, TextBoxViewControllerDelegate, MoveFileViewControllerDelegate, UIPopoverPresentationControllerDelegate {
-    
+class NoteViewController: UIViewController, UIPencilInteractionDelegate, UICollectionViewDelegate, NoteDelegate, PKCanvasViewDelegate, PKToolPickerObserver, UIScreenshotServiceDelegate, NoteOptionsDelegate, DocumentsViewControllerDelegate, NotePagesDelegate, VNDocumentCameraViewControllerDelegate, UIDocumentPickerDelegate, DraggableImageViewDelegate, DraggableTextViewDelegate, RelatedNotesVCDelegate, TextBoxViewControllerDelegate, MoveFileViewControllerDelegate, UIPopoverPresentationControllerDelegate, SKClipboardDelegate {
     
     private var documentsVC: DocumentsViewController!
     
@@ -146,6 +145,9 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
              ])
         
         self.load(page: DataManager.activeNote!.getCurrentPage())
+        
+        SKClipboard.delegate = self
+        SKClipboard.addClipboardButton(view: self.view)
     }
         
     override func viewWillAppear(_ animated: Bool) {
@@ -677,15 +679,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                             }
                         }
                     }
-//                    let region = UIView(frame: CGRect(x: Int(loc.x)-regionSize/2, y: Int(loc.y)-regionSize/2, width: regionSize, height: regionSize))
-//                    let image = UIImage(cgImage: merged.cgImage!.cropping(to: region.frame)!)
-//                    if let recognition = self.drawingRecognition.recognize(image: image) {
-//                        if bestPredictionLabel == nil || bestScore! < recognition.1 {
-//                            bestPredictionLabel = recognition.0
-//                            bestScore = recognition.1
-//                            bestRegion = region
-//                        }
-//                    }
                 }
                 if bestPredictionLabel != nil {
                     log.info("Recognized drawing at touched point: \(bestPredictionLabel!) (\(Double(round(1000*bestScore!*100)/1000))% confidence)")
@@ -701,13 +694,16 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                         DataManager.activeNote!.getCurrentPage().addDrawing(drawing: drawing)
                         DataManager.saveCurrentNote()
                         self.view.makeToast("Recognized drawing: \(bestPredictionLabel!)", duration: 1.0, position: .center)
+                        self.canvasView.rippleFill(location: loc, color: .systemGreen)
                     }
                     else {
                         self.view.makeToast("Drawing is already recognized: \(bestPredictionLabel!)", duration: 1.0, position: .center)
+                        self.canvasView.rippleFill(location: loc, color: .systemOrange)
                     }
                 }
                 else {
                     self.view.makeToast("No drawing recognized. Try long-pressing in the center of your drawing!", duration: 1.0, position: .center)
+                    self.canvasView.rippleFill(location: loc, color: .systemRed)
                 }
             }
         }
@@ -929,6 +925,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             }
         }
     }
+    
     
     var pageChanged = false
     func canvasViewDrawingDidChange(_ canvasView: PKCanvasView) {
@@ -1685,4 +1682,25 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     var highlightedTextView: DraggableTextView?
     
     // MARK: Tags
+    
+    // MARK: SKClipboardDelegate
+    func pasteNoteTapped() {
+           log.info("Pasting note: \(SKClipboard.getNote()?.getName() ?? "Note name could not be retrieved.")")
+       }
+       // Implementation missing
+       func pastePageTapped() {
+           
+       }
+       // Implementation missing
+       func pasteImageTapped() {
+           
+       }
+       // Implementation missing
+       func pasteTypedTextTapped() {
+           
+       }
+       // Implementation missing
+       func clearClipboardTapped() {
+           
+       }
 }
