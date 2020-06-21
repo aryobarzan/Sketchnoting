@@ -146,8 +146,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         
         self.load(page: DataManager.activeNote!.getCurrentPage())
         
-        SKClipboard.delegate = self
-        SKClipboard.addClipboardButton(view: self.view)
+        self.updateSKClipboardButton()
     }
         
     override func viewWillAppear(_ animated: Bool) {
@@ -163,6 +162,11 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                 drawingRegionView.layer.borderColor = UIColor.white.cgColor
             }
         }
+    }
+    
+    private func updateSKClipboardButton() {
+        SKClipboard.delegate = self
+        SKClipboard.addClipboardButton(view: self.view)
     }
     
     // This function is called when the user closes the page, i.e. stops editing the note, and the app returns to the home page.
@@ -1436,6 +1440,12 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                 self.showTypedTextLanguageOptions(source: source, typedText: typedText)
             })
             popMenu.addAction(languageOption)
+            let copyAction = PopMenuDefaultAction(title: "Copy", didSelect: { action in
+                SKClipboard.copy(typedText: typedText)
+                self.view.makeToast("Copied note typed text to SKClipboard.")
+                self.updateSKClipboardButton()
+            })
+            popMenu.addAction(copyAction)
             let copyTextAction = PopMenuDefaultAction(title: "Copy Text", didSelect: { action in
                 UIPasteboard.general.string = typedText.text
             })
@@ -1531,6 +1541,13 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     func draggableImageViewDelete(source: DraggableImageView) {
         let popMenu = PopMenuViewController(sourceView: source, actions: [PopMenuAction](), appearance: nil)
         let closeAction = PopMenuDefaultAction(title: "Close")
+        let copyAction = PopMenuDefaultAction(title: "Copy", didSelect: { action in
+            if let noteImage =  self.noteImageViews[source] {
+                SKClipboard.copy(image: noteImage)
+                self.view.makeToast("Copied note image to SKClipboard.")
+                self.updateSKClipboardButton()
+            }
+        })
         let action = PopMenuDefaultAction(title: "Delete Image", didSelect: { action in
             if let noteImage =  self.noteImageViews[source] {
                 DataManager.activeNote!.getCurrentPage().deleteImage(noteImage: noteImage)
@@ -1540,6 +1557,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             }
             
         })
+        popMenu.addAction(copyAction)
         popMenu.addAction(action)
         popMenu.addAction(closeAction)
         self.present(popMenu, animated: true, completion: nil)

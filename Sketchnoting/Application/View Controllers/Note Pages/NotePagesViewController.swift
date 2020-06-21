@@ -136,6 +136,10 @@ class NotePagesViewController: UIViewController, UICollectionViewDelegate, UICol
         })
     }
     private func makeDocumentContextMenu(pageIndex: Int) -> UIMenu {
+        let copyAction = UIAction(title: "Copy", image: UIImage(systemName: "doc.text")) { action in
+            SKClipboard.copy(page: DataManager.activeNote!.pages[pageIndex])
+            self.view.makeToast("Copied page to SKClipboard.")
+        }
         let deleteAction = UIAction(title: "Delete", image: UIImage(systemName: "trash")) { action in
             let isDeleted = DataManager.activeNote!.deletePage(index: pageIndex)
             if isDeleted {
@@ -143,7 +147,7 @@ class NotePagesViewController: UIViewController, UICollectionViewDelegate, UICol
             }
             self.collectionView.reloadData()
         }
-        return UIMenu(title: "Note Page", children: [deleteAction])
+        return UIMenu(title: "Note Page", children: [copyAction, deleteAction])
     }
 }
 

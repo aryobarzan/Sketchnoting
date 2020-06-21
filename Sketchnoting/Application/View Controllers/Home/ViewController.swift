@@ -240,6 +240,8 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
                 }
             }
             self.updateDisplayedNotes(false)
+            SKClipboard.delegate = self
+            SKClipboard.addClipboardButton(view: self.view)
         }
         self.tabBarController?.tabBar.isHidden = false
     }
@@ -950,22 +952,49 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     // MARK: SKClipboardDelegate
     func pasteNoteTapped() {
         log.info("Pasting note: \(SKClipboard.getNote()?.getName() ?? "Note name could not be retrieved.")")
+        if let n = SKClipboard.getNote() {
+            DataManager.currentFolder.addChild(file: n)
+            _ = DataManager.add(note: n)
+            self.updateDisplayedNotes(true)
+            self.view.makeToast("Pasted note: \(n.getName())")
+        }
     }
-    // Implementation missing
     func pastePageTapped() {
+        log.info("Pasting note page.")
+        if let p = SKClipboard.getPage() {
+            let newNote = Note(name: "Note Page Copy", parent: DataManager.currentFolder.id, documents: nil)
+            newNote.pages = [p]
+            DataManager.currentFolder.addChild(file: newNote)
+            _ = DataManager.add(note: newNote)
+            self.updateDisplayedNotes(true)
+            self.view.makeToast("Created new note \"Note Page Copy\" from pasted page.")
+        }
         
     }
-    // Implementation missing
     func pasteImageTapped() {
-        
+        log.info("Pasting note image.")
+        if let i = SKClipboard.getImage() {
+            let newNote = Note(name: "Note Image Copy", parent: DataManager.currentFolder.id, documents: nil)
+            newNote.getCurrentPage().images = [i]
+            DataManager.currentFolder.addChild(file: newNote)
+            _ = DataManager.add(note: newNote)
+            self.updateDisplayedNotes(true)
+            self.view.makeToast("Created new note \"Note Image Copy\" from pasted note image.")
+        }
     }
-    // Implementation missing
     func pasteTypedTextTapped() {
-        
+        log.info("Pasting note typed text.")
+        if let t = SKClipboard.getTypedText() {
+            let newNote = Note(name: "Note Typed Text Copy", parent: DataManager.currentFolder.id, documents: nil)
+            newNote.getCurrentPage().typedTexts = [t]
+            DataManager.currentFolder.addChild(file: newNote)
+            _ = DataManager.add(note: newNote)
+            self.updateDisplayedNotes(true)
+            self.view.makeToast("Created new note \"Note Typed Text Copy\" from pasted note typed text.")
+        }
     }
-    // Implementation missing
     func clearClipboardTapped() {
-        
+        self.view.makeToast("Cleared SKClipboard.")
     }
     
 }
