@@ -65,6 +65,28 @@ class SettingsManager {
             }
         }
     }
+    
+    public static func setNoteOptionsOrdering(orderingList: [NoteOption : Int]) {
+        let p = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("NoteOptionsOrdering.json")
+        do {
+            try JSONEncoder().encode(orderingList).write(to: p)
+            log.info("Saved Note Options ordering.")
+        } catch {
+            log.error("Failed to save Note Options ordering.")
+        }
+    }
+    public static func getNoteOptionsOrdering() -> [NoteOption : Int]? {
+        do {
+            let p = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("NoteOptionsOrdering.json")
+            let data = try Data(contentsOf: p)
+            let ordering = try JSONDecoder().decode([NoteOption : Int].self, from: data)
+            return ordering
+        } catch {
+            print(error)
+            log.info("Failed to fetch Note Options ordering.")
+            return nil
+        }
+    }
 }
 
 
@@ -75,6 +97,7 @@ public enum SettingsKeys : String, Any {
     case TextRecognitionCloudOption
     case FileSorting
     case FileDisplayLayout
+    case NoteOptionsOrdering
 }
 public enum FileSorting: String {
     case ByNewest = "ByNewest"

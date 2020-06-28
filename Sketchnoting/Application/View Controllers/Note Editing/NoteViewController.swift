@@ -43,9 +43,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     
     @IBOutlet var bookshelf: UIView!
     @IBOutlet var documentsUnderlyingView: UIView!
-        
-    @IBOutlet weak var helpLinesButton: UIButton!
-    
+            
     @IBOutlet var canvasViewLongPressGesture: UILongPressGestureRecognizer!
     var drawingViews = [UIView]()
     var drawingViewsShown = false
@@ -78,10 +76,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
       return topicsOverlayView
     }()
     
-    
-    @IBAction func testEditorButtonTapped(_ sender: UIButton) {
-        self.performSegue(withIdentifier: "ShowMoleculeEditor", sender: self)
-    }
     // This function sets up the page and every element contained within it.
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -155,7 +149,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     
     override func viewDidAppear(_ animated: Bool) {
         self.refreshHelpLines()
-        self.refreshHelpLinesButton()
         
         if traitCollection.userInterfaceStyle == .dark {
             for drawingRegionView in drawingViews {
@@ -200,10 +193,9 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                 }
             }
             break
-        case "NoteOptions":
-            if let destination = segue.destination as? NoteOptionsTableViewController {
+        case "ShowNoteOptions":
+            if let destination = segue.destination as? NoteOptionsViewController {
                 destination.delegate = self
-                destination.canDeletePage = (DataManager.activeNote!.pages.count > 1)
             }
             break
         case "ViewNoteText":
@@ -516,11 +508,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         self.backdropView.addSubview(gridView!)
         self.gridView!.type = DataManager.activeNote!.helpLinesType
         gridView!.draw(self.backdropView.frame)
-        refreshHelpLinesButton()
-    }
-    
-    @IBAction func helpLinesButtonTapped(_ sender: UIButton) {
-        self.toggleHelpLinesType()
     }
     
     private func toggleHelpLinesType() {
@@ -536,25 +523,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             break
         }
         refreshHelpLines()
-        refreshHelpLinesButton()
         DataManager.saveCurrentNote()
-    }
-    
-    private func refreshHelpLinesButton() {
-        switch DataManager.activeNote!.helpLinesType {
-        case .None:
-            helpLinesButton.setImage(UIImage(systemName: "line.horizontal.3"), for: .normal)
-            helpLinesButton.tintColor = .white
-            break
-        case .Horizontal:
-            helpLinesButton.setImage(UIImage(systemName: "line.horizontal.3"), for: .normal)
-            helpLinesButton.tintColor = self.view.tintColor
-            break
-        case .Grid:
-            helpLinesButton.tintColor = self.view.tintColor
-            helpLinesButton.setImage(UIImage(systemName: "grid"), for: .normal)
-            break
-        }
     }
 
     private func hideAllHelpLines() {
@@ -722,23 +691,12 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             self.noteForRelatedNotes = DataManager.activeNote!
             self.performSegue(withIdentifier: "showRelatedNoteEditing", sender: self)
             break
-        case .SetTitle:
-            let alertController = UIAlertController(title: "Rename Note", message: nil, preferredStyle: .alert)
-            let confirmAction = UIAlertAction(title: "Set", style: .default) { (_) in
-                let name = alertController.textFields?[0].text
-                DataManager.activeNote!.setName(name: name ?? "Untitled")
-                DataManager.save(file: DataManager.activeNote!)
-            }
-            let cancelAction = UIAlertAction(title: "Cancel", style: .cancel) { (_) in }
-            alertController.addTextField { (textField) in
-                textField.placeholder = "Enter Note Name"
-            }
-            alertController.addAction(confirmAction)
-            alertController.addAction(cancelAction)
-            self.present(alertController, animated: true, completion: nil)
-            break
         case .ViewText:
             self.performSegue(withIdentifier: "ViewNoteText", sender: self)
+            break
+        case .CopyNote:
+            SKClipboard.copy(note: DataManager.activeNote!)
+            self.view.makeToast("Copied note to SKClipboard.", title: DataManager.activeNote!.getName())
             break
         case .CopyText:
             UIPasteboard.general.string = DataManager.activeNote!.getText()
@@ -764,9 +722,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             DataManager.activeNote!.getCurrentPage().backdropPDFData = nil
             self.pdfView.document = nil
             DataManager.save(file: DataManager.activeNote!)
-        case .ResetDocuments:
-            self.resetDocuments()
-            break
         case .ResetTextRecognition:
             DataManager.activeNote!.clearDocuments()
             documentsVC.items = [Document]()
@@ -779,6 +734,13 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             self.isDeletingNote = true
             DataManager.delete(file: DataManager.activeNote!)
             self.performSegue(withIdentifier: "CloseNote", sender: self)
+            break
+        case .MoleculeEditor:
+            self.performSegue(withIdentifier: "ShowMoleculeEditor", sender: self)
+            break
+        case .HelpLines:
+            self.toggleHelpLinesType()
+            break
         }
     }
     

@@ -16,7 +16,6 @@
 		9F0EC7DD2446A8AE000A28CB /* GestureExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0EC7DC2446A8AE000A28CB /* GestureExtensions.swift */; };
 		9F0F0566244FF0D700318604 /* DraggableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0F0565244FF0D700318604 /* DraggableView.swift */; };
 		9F0F4E0A2451260700B1F2EA /* UIUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0F4E092451260700B1F2EA /* UIUtilities.swift */; };
-		9F0FC54923760E7600070FA0 /* NoteOptionsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0FC54823760E7600070FA0 /* NoteOptionsTableViewController.swift */; };
 		9F10EC162347D64C005340AA /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 9F10EC152347D64C005340AA /* Kingfisher */; };
 		9F10EC192347E4B4005340AA /* SwiftyBeaver in Frameworks */ = {isa = PBXBuildFile; productRef = 9F10EC182347E4B4005340AA /* SwiftyBeaver */; };
 		9F18E7A823FB4F1600543D78 /* FolderButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F18E7A723FB4F1600543D78 /* FolderButton.swift */; };
@@ -120,6 +119,8 @@
 		9FC02C1E23EDB6400051C576 /* Note.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FC02C1D23EDB6400051C576 /* Note.swift */; };
 		9FC02C2023EDB6520051C576 /* Folder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FC02C1F23EDB6520051C576 /* Folder.swift */; };
 		9FC114D9243919BD004F576A /* ImagePickerHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FC114D8243919BD004F576A /* ImagePickerHelper.swift */; };
+		9FC5F90824A8DFEA00CDF2DF /* NoteOptionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FC5F90724A8DFEA00CDF2DF /* NoteOptionsViewController.swift */; };
+		9FC5F90A24A8E20000CDF2DF /* NoteOptionsCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FC5F90924A8E20000CDF2DF /* NoteOptionsCollectionViewCell.swift */; };
 		9FD1ADF123A52C090013C68E /* NoteViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29C182236DCFC00CC969A /* NoteViewController.swift */; };
 		9FD1ADF323A52F7C0013C68E /* NotePagesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD1ADF223A52F7C0013C68E /* NotePagesViewController.swift */; };
 		9FD29BA72220524D00CC969A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29BA62220524D00CC969A /* AppDelegate.swift */; };
@@ -172,7 +173,6 @@
 		9F0EC7DC2446A8AE000A28CB /* GestureExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GestureExtensions.swift; sourceTree = "<group>"; };
 		9F0F0565244FF0D700318604 /* DraggableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DraggableView.swift; sourceTree = "<group>"; };
 		9F0F4E092451260700B1F2EA /* UIUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIUtilities.swift; sourceTree = "<group>"; };
-		9F0FC54823760E7600070FA0 /* NoteOptionsTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteOptionsTableViewController.swift; sourceTree = "<group>"; };
 		9F18E7A723FB4F1600543D78 /* FolderButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderButton.swift; sourceTree = "<group>"; };
 		9F1A0C52249DA1C600E507BC /* YRipple.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YRipple.swift; sourceTree = "<group>"; };
 		9F1A0C54249DA60B00E507BC /* SKClipboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SKClipboard.swift; sourceTree = "<group>"; };
@@ -268,6 +268,8 @@
 		9FC02C1D23EDB6400051C576 /* Note.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Note.swift; sourceTree = "<group>"; };
 		9FC02C1F23EDB6520051C576 /* Folder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Folder.swift; sourceTree = "<group>"; };
 		9FC114D8243919BD004F576A /* ImagePickerHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePickerHelper.swift; sourceTree = "<group>"; };
+		9FC5F90724A8DFEA00CDF2DF /* NoteOptionsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteOptionsViewController.swift; sourceTree = "<group>"; };
+		9FC5F90924A8E20000CDF2DF /* NoteOptionsCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteOptionsCollectionViewCell.swift; sourceTree = "<group>"; };
 		9FCD3D5C23EA0A59005CB98D /* CocoaLumberjack.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = CocoaLumberjack.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		9FD1ADF223A52F7C0013C68E /* NotePagesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotePagesViewController.swift; sourceTree = "<group>"; };
 		9FD29BA32220524D00CC969A /* Sketchnoting.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Sketchnoting.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -463,10 +465,11 @@
 			children = (
 				9F75E44E230D848200488BBD /* SettingsViewController.swift */,
 				9F05BC7E23761C4A00D49A88 /* NoteTextViewController.swift */,
-				9F0FC54823760E7600070FA0 /* NoteOptionsTableViewController.swift */,
 				9FB9E500237F500B00279F3E /* ShareNoteViewController.swift */,
 				9F3424012407197000A92B98 /* HiddenDocumentsViewController.swift */,
 				9F9898302470DC2700E62CD1 /* TextBoxViewController.swift */,
+				9FC5F90724A8DFEA00CDF2DF /* NoteOptionsViewController.swift */,
+				9FC5F90924A8E20000CDF2DF /* NoteOptionsCollectionViewCell.swift */,
 			);
 			path = Other;
 			sourceTree = "<group>";
@@ -993,12 +996,12 @@
 				9F96895724679D4000D02F81 /* NoteDoc.swift in Sources */,
 				9F65983D23EDD2FA00CDBE0C /* NoteTextComplete.swift in Sources */,
 				9F92D11C23217D0500BC0E57 /* SearchFilterView.swift in Sources */,
-				9F0FC54923760E7600070FA0 /* NoteOptionsTableViewController.swift in Sources */,
 				9F1A0C53249DA1C600E507BC /* YRipple.swift in Sources */,
 				9F06977024427823002DCE47 /* URLExtensions.swift in Sources */,
 				9FFE07EA232A63BA00DBD0AC /* TagsManager.swift in Sources */,
 				9F4B38BF23EA3EE200F87B61 /* ReceivedNotesViewController.swift in Sources */,
 				9F65984D23F3227300CDBE0C /* DrawingSearchViewController.swift in Sources */,
+				9FC5F90824A8DFEA00CDF2DF /* NoteOptionsViewController.swift in Sources */,
 				9FD29C4E223998BC00CC969A /* UIViewControllerExtensions.swift in Sources */,
 				9FD29C472239588E00CC969A /* UIViewExtensions.swift in Sources */,
 				9FB9984924868700003773F2 /* MoveFileViewCell.swift in Sources */,
@@ -1038,6 +1041,7 @@
 				9F2FF43A249B083D00597AD6 /* NoteDrawing.swift in Sources */,
 				9FF0AC9424412F4C00A82BE8 /* NoteImage.swift in Sources */,
 				9F65983523EDD09F00CDBE0C /* NoteText.swift in Sources */,
+				9FC5F90A24A8E20000CDF2DF /* NoteOptionsCollectionViewCell.swift in Sources */,
 				9FAE72EC24887158002D800B /* Heisenberg.swift in Sources */,
 				9F65984123EE1EE900CDBE0C /* DataManager.swift in Sources */,
 				9FD5516E246A4364005D14D2 /* RelatedNotesViewController.swift in Sources */,
