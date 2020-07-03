@@ -23,7 +23,7 @@ import GPUImage
 import Highlightr
 import Toast
 
-class NoteViewController: UIViewController, UIPencilInteractionDelegate, UICollectionViewDelegate, NoteDelegate, PKCanvasViewDelegate, PKToolPickerObserver, UIScreenshotServiceDelegate, NoteOptionsDelegate, DocumentsViewControllerDelegate, NotePagesDelegate, VNDocumentCameraViewControllerDelegate, UIDocumentPickerDelegate, DraggableImageViewDelegate, DraggableTextViewDelegate, RelatedNotesVCDelegate, TextBoxViewControllerDelegate, MoveFileViewControllerDelegate, UIPopoverPresentationControllerDelegate, SKClipboardDelegate {
+class NoteViewController: UIViewController, UIPencilInteractionDelegate, UICollectionViewDelegate, NoteDelegate, PKCanvasViewDelegate, PKToolPickerObserver, UIScreenshotServiceDelegate, NoteOptionsDelegate, DocumentsViewControllerDelegate, NotePagesDelegate, VNDocumentCameraViewControllerDelegate, UIDocumentPickerDelegate, DraggableImageViewDelegate, DraggableTextViewDelegate, RelatedNotesVCDelegate, TextBoxViewControllerDelegate, MoveFileViewControllerDelegate, UIPopoverPresentationControllerDelegate, SKClipboardDelegate, NoteInfoDelegate {
     
     private var documentsVC: DocumentsViewController!
     
@@ -37,6 +37,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     @IBOutlet weak var previousPageButton: UIButton!
     @IBOutlet weak var nextPageButton: UIButton!
     @IBOutlet weak var newPageButton: UIButton!
+    @IBOutlet weak var noteTitleButton: UIButton!
     
     @IBOutlet weak var closeButton: UIButton!
     var topicsBadgeHub: BadgeHub!
@@ -138,6 +139,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
              topicsOverlayView.bottomAnchor.constraint(equalTo: canvasView.bottomAnchor),
              ])
         
+        self.noteTitleButton.setTitle(" \(DataManager.activeNote!.getName())", for: .normal)
         self.load(page: DataManager.activeNote!.getCurrentPage())
         
         self.updateSKClipboardButton()
@@ -243,6 +245,11 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                     temp.append(DataManager.activeNote!)
                     destinationViewController.filesToMove = temp
                 }
+            }
+            break
+        case "ShowNoteInfo":
+            if let destination = segue.destination as? NoteInfoViewController {
+                destination.delegate = self
             }
             break
         case "EditCurrentNoteTags":
@@ -1683,4 +1690,10 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
        func clearClipboardTapped() {
            
        }
+    
+    
+    // MARK: NoteInfoDelegate
+    func noteTitleUpdated(title: String) {
+        self.noteTitleButton.setTitle(" \(title)", for: .normal)
+    }
 }

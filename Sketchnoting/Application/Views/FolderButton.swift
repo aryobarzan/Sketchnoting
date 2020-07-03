@@ -22,7 +22,7 @@ class FolderButton: UIButton {
         }
         else {
             self.setTitle(" " + folder.getName(), for: .normal)
-            self.setImage(UIImage(systemName: "arrow.turn.down.right"), for: .normal)
+            self.setImage(UIImage(systemName: "arrow.right"), for: .normal)
         }
     }
 

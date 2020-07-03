@@ -121,6 +121,7 @@
 		9FC114D9243919BD004F576A /* ImagePickerHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FC114D8243919BD004F576A /* ImagePickerHelper.swift */; };
 		9FC5F90824A8DFEA00CDF2DF /* NoteOptionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FC5F90724A8DFEA00CDF2DF /* NoteOptionsViewController.swift */; };
 		9FC5F90A24A8E20000CDF2DF /* NoteOptionsCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FC5F90924A8E20000CDF2DF /* NoteOptionsCollectionViewCell.swift */; };
+		9FC5F90D24AFB07D00CDF2DF /* NVActivityIndicatorView in Frameworks */ = {isa = PBXBuildFile; productRef = 9FC5F90C24AFB07D00CDF2DF /* NVActivityIndicatorView */; };
 		9FD1ADF123A52C090013C68E /* NoteViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29C182236DCFC00CC969A /* NoteViewController.swift */; };
 		9FD1ADF323A52F7C0013C68E /* NotePagesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD1ADF223A52F7C0013C68E /* NotePagesViewController.swift */; };
 		9FD29BA72220524D00CC969A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29BA62220524D00CC969A /* AppDelegate.swift */; };
@@ -138,6 +139,7 @@
 		9FD29C6622431C0000CC969A /* labels.txt in Resources */ = {isa = PBXBuildFile; fileRef = 9FD29C6522431C0000CC969A /* labels.txt */; };
 		9FD5516E246A4364005D14D2 /* RelatedNotesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD5516D246A4364005D14D2 /* RelatedNotesViewController.swift */; };
 		9FD8BB97243D5BE500542BFA /* ImportHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD8BB96243D5BE500542BFA /* ImportHelper.swift */; };
+		9FDD6CA524AFB7C10093EDF4 /* NoteInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FDD6CA424AFB7C10093EDF4 /* NoteInfoViewController.swift */; };
 		9FF0AC9224412C5200A82BE8 /* DraggableImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FF0AC9124412C5200A82BE8 /* DraggableImageView.swift */; };
 		9FF0AC9424412F4C00A82BE8 /* NoteImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FF0AC9324412F4C00A82BE8 /* NoteImage.swift */; };
 		9FF0AC962441308B00A82BE8 /* CodableExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FF0AC952441308B00A82BE8 /* CodableExtensions.swift */; };
@@ -290,6 +292,7 @@
 		9FD29C6522431C0000CC969A /* labels.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = labels.txt; sourceTree = "<group>"; };
 		9FD5516D246A4364005D14D2 /* RelatedNotesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RelatedNotesViewController.swift; sourceTree = "<group>"; };
 		9FD8BB96243D5BE500542BFA /* ImportHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportHelper.swift; sourceTree = "<group>"; };
+		9FDD6CA424AFB7C10093EDF4 /* NoteInfoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteInfoViewController.swift; sourceTree = "<group>"; };
 		9FF0AC9124412C5200A82BE8 /* DraggableImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DraggableImageView.swift; sourceTree = "<group>"; };
 		9FF0AC9324412F4C00A82BE8 /* NoteImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteImage.swift; sourceTree = "<group>"; };
 		9FF0AC952441308B00A82BE8 /* CodableExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodableExtensions.swift; sourceTree = "<group>"; };
@@ -312,6 +315,7 @@
 				9F10EC162347D64C005340AA /* Kingfisher in Frameworks */,
 				9FAA827E236DD45200B2004F /* ViewAnimator in Frameworks */,
 				9F2C00062351123700D53EE9 /* SwiftyJSON in Frameworks */,
+				9FC5F90D24AFB07D00CDF2DF /* NVActivityIndicatorView in Frameworks */,
 				9F9460E223F5BAA10073D709 /* Connectivity in Frameworks */,
 				9F10EC192347E4B4005340AA /* SwiftyBeaver in Frameworks */,
 				D2A21B26513E1A7C02F6BD40 /* libPods-Sketchnoting.a in Frameworks */,
@@ -456,6 +460,7 @@
 			isa = PBXGroup;
 			children = (
 				9FD29C182236DCFC00CC969A /* NoteViewController.swift */,
+				9FDD6CA424AFB7C10093EDF4 /* NoteInfoViewController.swift */,
 			);
 			path = "Note Editing";
 			sourceTree = "<group>";
@@ -730,6 +735,7 @@
 				9F5E89EA2391AF1B002FA8B2 /* View Controllers */,
 				9F5010CA22491F8900425424 /* Views */,
 				9FD29C69224589FE00CC969A /* Helpers */,
+				9F5D0FC6229CBC2A00BCA451 /* Models */,
 				9FD29C68224589DA00CC969A /* Data */,
 			);
 			path = Application;
@@ -743,7 +749,6 @@
 				9FBF6ABB22EA1D0D001FD730 /* Handwriting Recognition */,
 				9FD29C6222431BDD00CC969A /* DrawingRecognition */,
 				9FA6239A22DE3ADB007ED794 /* Documents */,
-				9F5D0FC6229CBC2A00BCA451 /* Models */,
 			);
 			path = Data;
 			sourceTree = "<group>";
@@ -813,6 +818,7 @@
 				9F560FA9240855F700932A55 /* GPUImage */,
 				9F0D8564242052E600B8BE2F /* BSImagePicker */,
 				9F318D3F244A3EAD00A1B4B5 /* Toast */,
+				9FC5F90C24AFB07D00CDF2DF /* NVActivityIndicatorView */,
 			);
 			productName = Sketchnoting;
 			productReference = 9FD29BA32220524D00CC969A /* Sketchnoting.app */;
@@ -855,6 +861,7 @@
 				9F560FA8240855F700932A55 /* XCRemoteSwiftPackageReference "GPUImage2" */,
 				9F0D8563242052E600B8BE2F /* XCRemoteSwiftPackageReference "BSImagePicker" */,
 				9F318D3E244A3EAD00A1B4B5 /* XCRemoteSwiftPackageReference "Toast-Swift" */,
+				9FC5F90B24AFB07D00CDF2DF /* XCRemoteSwiftPackageReference "NVActivityIndicatorView" */,
 			);
 			productRefGroup = 9FD29BA42220524D00CC969A /* Products */;
 			projectDirPath = "";
@@ -996,6 +1003,7 @@
 				9F96895724679D4000D02F81 /* NoteDoc.swift in Sources */,
 				9F65983D23EDD2FA00CDBE0C /* NoteTextComplete.swift in Sources */,
 				9F92D11C23217D0500BC0E57 /* SearchFilterView.swift in Sources */,
+				9FDD6CA524AFB7C10093EDF4 /* NoteInfoViewController.swift in Sources */,
 				9F1A0C53249DA1C600E507BC /* YRipple.swift in Sources */,
 				9F06977024427823002DCE47 /* URLExtensions.swift in Sources */,
 				9FFE07EA232A63BA00DBD0AC /* TagsManager.swift in Sources */,
@@ -1350,6 +1358,14 @@
 				minimumVersion = 2.7.0;
 			};
 		};
+		9FC5F90B24AFB07D00CDF2DF /* XCRemoteSwiftPackageReference "NVActivityIndicatorView" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ninjaprox/NVActivityIndicatorView.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.0.0;
+			};
+		};
 		9FCD3D5723EA08A1005CB98D /* XCRemoteSwiftPackageReference "CocoaLumberjack" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/CocoaLumberjack/CocoaLumberjack";
@@ -1410,6 +1426,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 9FAA827C236DD45200B2004F /* XCRemoteSwiftPackageReference "ViewAnimator" */;
 			productName = ViewAnimator;
+		};
+		9FC5F90C24AFB07D00CDF2DF /* NVActivityIndicatorView */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9FC5F90B24AFB07D00CDF2DF /* XCRemoteSwiftPackageReference "NVActivityIndicatorView" */;
+			productName = NVActivityIndicatorView;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

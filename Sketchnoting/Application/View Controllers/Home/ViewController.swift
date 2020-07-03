@@ -711,9 +711,8 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         case .Grid:
             return CGSize(width: CGFloat(175), height: CGFloat(275))
         case .List:
-            return CGSize(width: collectionView.bounds.size.width - CGFloat(10), height: CGFloat(60))
+            return CGSize(width: collectionView.bounds.size.width - CGFloat(10), height: CGFloat(100))
         }
-        
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {

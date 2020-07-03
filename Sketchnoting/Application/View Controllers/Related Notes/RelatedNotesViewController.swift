@@ -20,17 +20,24 @@ protocol RelatedNotesVCDelegate {
 
 class RelatedNotesViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate {
     
+    private enum SimilarityLevel: Float {
+        case Low = 0.1
+        case Medium = 0.5
+        case High = 0.9
+    }
+    
     var note: Note!
     var context: RelatedNotesContext! = .HomePage
     
     var relatedNotes = [Note]()
-     var similarityThreshold: Float = 0.5
+    var similarityThreshold: Float = 0.5
+    private var similarityLevel: SimilarityLevel = .Low
     
     var openNote: Note?
     var delegate: RelatedNotesVCDelegate?
 
     @IBOutlet weak var countLabel: UILabel!
-    @IBOutlet weak var similaritySlider: UISlider!
+    @IBOutlet weak var similaritySegmentedControl: UISegmentedControl!
     @IBOutlet weak var collectionView: UICollectionView!
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -48,13 +55,26 @@ class RelatedNotesViewController: UIViewController, UICollectionViewDataSource, 
         self.dismiss(animated: true, completion: nil)
     }
     
-    @IBAction func similaritySliderTouchUpInside(_ sender: UISlider) {
-        refreshRelatedNotes()
+    @IBAction func similaritySegmentedControlChanged(_ sender: UISegmentedControl) {
+        var newLevel = self.similarityLevel
+        switch sender.titleForSegment(at: sender.selectedSegmentIndex) {
+        case "Low":
+            newLevel = .Low
+            break
+        case "Medium":
+            newLevel = .Medium
+            break
+        case "High":
+            newLevel = .High
+            break
+        default:
+            break
+        }
+        if newLevel != self.similarityLevel {
+            self.refreshRelatedNotes()
+        }
     }
     
-    @IBAction func similaritySliderTouchUpOutside(_ sender: UISlider) {
-        refreshRelatedNotes()
-    }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return relatedNotes.count
@@ -116,7 +136,7 @@ class RelatedNotesViewController: UIViewController, UICollectionViewDataSource, 
         let foundNotes = Knowledge.similarNotesFor(note: note)
         self.relatedNotes = [Note]()
         for (note, score) in foundNotes {
-            if score > similaritySlider.value {
+            if score > self.similarityLevel.rawValue {
                 self.relatedNotes.append(note)
             }
         }

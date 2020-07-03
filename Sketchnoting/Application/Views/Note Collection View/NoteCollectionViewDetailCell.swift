@@ -30,30 +30,41 @@ class NoteCollectionViewDetailCell: UICollectionViewCell {
     func setFile(file: File, isInSelectionMode: Bool = false, isFileSelected: Bool = false) {
         self.file = file
         
+        self.imageView.layer.cornerRadius = 3
+        self.imageView.image = nil
+        file.getPreviewImage() { image in
+            self.imageView.image = image
+        }
+        if file is Folder {
+            self.imageView.backgroundColor = .clear
+            self.imageView.layer.borderColor = nil
+        }
+        else {
+            self.imageView.backgroundColor = .white
+            self.imageView.layer.borderWidth = 1
+            self.imageView.layer.borderColor = UIColor.black.cgColor
+            if self.traitCollection.userInterfaceStyle == .dark {
+                self.imageView.layer.borderColor = UIColor.gray.cgColor
+            }
+        }
+        
         titleLabel.text = file.getName()
         
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+        self.creationLabel.text = file.creationDate.getFormattedDate()
         
-        let dateAsString = formatter.string(from: file.creationDate)
-        let date = formatter.date(from: dateAsString)
-        formatter.dateFormat = "dd MMM yyyy (HH:mm)"
-        let formattedDateAsString = formatter.string(from: date!)
-        self.creationLabel.text = formattedDateAsString
-        
-        if file is Note {
-            imageView.image = UIImage(systemName: "doc")
-        }
-        else if file is Folder {
-            imageView.image = UIImage(systemName: "folder.fill")
-        }
+//        if file is Note {
+//            imageView.image = UIImage(systemName: "doc")
+//        }
+//        else if file is Folder {
+//            imageView.image = UIImage(systemName: "folder.fill")
+//        }
         if isInSelectionMode {
             self.selectedImage.isHidden = false
-            self.imageView.isHidden = true
+            //self.imageView.isHidden = true
         }
         else {
             self.selectedImage.isHidden = true
-            self.imageView.isHidden = false
+            //self.imageView.isHidden = false
         }
         self.toggleSelected(isFileSelected: isFileSelected)
     }
