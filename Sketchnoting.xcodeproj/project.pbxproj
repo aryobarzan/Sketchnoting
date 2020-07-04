@@ -107,6 +107,8 @@
 		9FAE72EC24887158002D800B /* Heisenberg.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FAE72E124887157002D800B /* Heisenberg.swift */; };
 		9FAE72ED24887158002D800B /* Atom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FAE72E224887158002D800B /* Atom.swift */; };
 		9FAE72F024887628002D800B /* MoleculeEditorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FAE72EF24887628002D800B /* MoleculeEditorViewController.swift */; };
+		9FB87CF624B0061200A262D8 /* ARDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB87CF524B0061200A262D8 /* ARDocument.swift */; };
+		9FB87CF924B006B900A262D8 /* ALMAARHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB87CF824B006B900A262D8 /* ALMAARHelper.swift */; };
 		9FB9984724868561003773F2 /* MoveFileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB9984624868561003773F2 /* MoveFileViewController.swift */; };
 		9FB9984924868700003773F2 /* MoveFileViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB9984824868700003773F2 /* MoveFileViewCell.swift */; };
 		9FB9E501237F500B00279F3E /* ShareNoteViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB9E500237F500B00279F3E /* ShareNoteViewController.swift */; };
@@ -258,6 +260,8 @@
 		9FAE72E124887157002D800B /* Heisenberg.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Heisenberg.swift; sourceTree = "<group>"; };
 		9FAE72E224887158002D800B /* Atom.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Atom.swift; sourceTree = "<group>"; };
 		9FAE72EF24887628002D800B /* MoleculeEditorViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoleculeEditorViewController.swift; sourceTree = "<group>"; };
+		9FB87CF524B0061200A262D8 /* ARDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARDocument.swift; sourceTree = "<group>"; };
+		9FB87CF824B006B900A262D8 /* ALMAARHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ALMAARHelper.swift; sourceTree = "<group>"; };
 		9FB9984624868561003773F2 /* MoveFileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoveFileViewController.swift; sourceTree = "<group>"; };
 		9FB9984824868700003773F2 /* MoveFileViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoveFileViewCell.swift; sourceTree = "<group>"; };
 		9FB9E500237F500B00279F3E /* ShareNoteViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareNoteViewController.swift; sourceTree = "<group>"; };
@@ -517,6 +521,7 @@
 		9FA6238922D371F1007ED794 /* Semantic Annotation */ = {
 			isa = PBXGroup;
 			children = (
+				9FB87CF724B006A200A262D8 /* ALMA_AR */,
 				9F5D8A2E246113C900934C0E /* WAT */,
 				9F92D11323202B8600BC0E57 /* Knowledge Graph */,
 				9F75E4802314108500488BBD /* TAGME */,
@@ -553,6 +558,7 @@
 				9F75E483231419FA00488BBD /* TAGMEDocument.swift */,
 				9F5D8A312461157200934C0E /* WATDocument.swift */,
 				9F96895624679D4000D02F81 /* NoteDoc.swift */,
+				9FB87CF524B0061200A262D8 /* ARDocument.swift */,
 			);
 			path = Documents;
 			sourceTree = "<group>";
@@ -619,6 +625,14 @@
 				9FAE72EF24887628002D800B /* MoleculeEditorViewController.swift */,
 			);
 			path = MoleculeEditor;
+			sourceTree = "<group>";
+		};
+		9FB87CF724B006A200A262D8 /* ALMA_AR */ = {
+			isa = PBXGroup;
+			children = (
+				9FB87CF824B006B900A262D8 /* ALMAARHelper.swift */,
+			);
+			path = ALMA_AR;
 			sourceTree = "<group>";
 		};
 		9FB9984524868545003773F2 /* Move File */ = {
@@ -956,9 +970,11 @@
 				9FA6239322DE30AC007ED794 /* SpotlightDocument.swift in Sources */,
 				9F77DBCA23FFD619007C8B7D /* AnnotationUtilities.swift in Sources */,
 				9F0ABB282412E5D400CA5A4E /* SKCacheManager.swift in Sources */,
+				9FB87CF924B006B900A262D8 /* ALMAARHelper.swift in Sources */,
 				9FD29C58223C3CF700CC969A /* UIImageExtensions.swift in Sources */,
 				9F00428923E9FB2600961636 /* BadgeHub.swift in Sources */,
 				9F65983B23EDD29300CDBE0C /* NoteTextBlock.swift in Sources */,
+				9FB87CF624B0061200A262D8 /* ARDocument.swift in Sources */,
 				9F4B38C523EC76F400F87B61 /* DocumentPreviewViewController.swift in Sources */,
 				9F65984B23F3175E00CDBE0C /* SearchViewController.swift in Sources */,
 				9F65983723EDD15C00CDBE0C /* NoteTextElement.swift in Sources */,

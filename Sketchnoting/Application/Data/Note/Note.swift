@@ -102,6 +102,10 @@ class Note: File, DocumentDelegate {
                     break
                 case .WAT:
                     docs.append(try docsArray.decode(WATDocument.self))
+                    break
+                case .ALMAAR:
+                    docs.append(try docsArray.decode(ARDocument.self))
+                    break
                 case .Other:
                     docs.append(try docsArray.decode(Document.self))
                     break
@@ -135,6 +139,9 @@ class Note: File, DocumentDelegate {
                 case .WAT:
                         hiddenDocuments.append(try docsArray.decode(WATDocument.self))
                         break
+                case .ALMAAR:
+                    hiddenDocuments.append(try docsArray.decode(ARDocument.self))
+                    break
                 case .Other:
                         hiddenDocuments.append(try docsArray.decode(Document.self))
                         break

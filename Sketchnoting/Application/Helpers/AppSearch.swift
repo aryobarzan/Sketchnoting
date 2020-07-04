@@ -147,6 +147,16 @@ class AppSearch: DocumentVisitor {
         let _ = processBaseDocumentSearch(document: document)
     }
     
+    func process(document: ARDocument) {
+        if !processBaseDocumentSearch(document: document) {
+            if let spot = document.spot {
+                if spot.lowercased().contains(documentFilterTerm) {
+                    documentFilterMatches = true
+                }
+            }
+        }
+    }
+    
     private func processBaseDocumentSearch(document: Document) -> Bool {
         if document.title.lowercased().contains(documentFilterTerm) {
             documentFilterMatches = true

@@ -20,6 +20,7 @@ protocol DocumentVisitor {
     func process(document: CHEBIDocument)
     func process(document: TAGMEDocument)
     func process(document: WATDocument)
+    func process(document: ARDocument)
 }
 
 protocol DocumentDelegate {
@@ -32,6 +33,7 @@ enum DocumentType: String, Codable {
     case WAT
     case BioPortal
     case Chemistry
+    case ALMAAR
     case Other
 }
 

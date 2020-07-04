@@ -134,6 +134,9 @@ class DocumentsViewController: UICollectionViewController{
         case .Chemistry:
             cell.typeImage.tintColor = #colorLiteral(red: 0.9529411793, green: 0.6862745285, blue: 0.1333333403, alpha: 1)
             break
+        case .ALMAAR:
+            cell.typeImage.tintColor = #colorLiteral(red: 0.9254902005, green: 0.2352941185, blue: 0.1019607857, alpha: 1)
+            break
         case .Other:
             cell.typeImage.tintColor = #colorLiteral(red: 0.6000000238, green: 0.6000000238, blue: 0.6000000238, alpha: 1)
             break
@@ -213,6 +216,8 @@ class DocumentsViewController: UICollectionViewController{
             return documents.filter{ $0.documentType == .BioPortal }
         case .CHEBI:
             return documents.filter{ $0.documentType == .Chemistry }
+        case .ALMAAR:
+            return documents.filter{ $0.documentType == .ALMAAR }
         }
     }
     
@@ -317,6 +322,10 @@ class DocumentsViewController: UICollectionViewController{
         case .Chemistry:
             if self.bookshelfFilter == .CHEBI {
                 return true
+            }
+        case .ALMAAR:
+            if self.bookshelfFilter == .ALMAAR {
+            return true
             }
         case .Other:
             return true
@@ -429,6 +438,7 @@ class DocumentsViewController: UICollectionViewController{
         var watImage: UIImage? = nil
         var bioportalImage: UIImage? = nil
         var chebiImage: UIImage? = nil
+        var almaarImage: UIImage? = nil
         switch self.bookshelfFilter {
         case .All:
             allImage = UIImage(systemName: "checkmark.circle.fill")
@@ -448,6 +458,9 @@ class DocumentsViewController: UICollectionViewController{
         case .CHEBI:
             chebiImage = UIImage(systemName: "checkmark.circle.fill")
             break
+        case .ALMAAR:
+            almaarImage = UIImage(systemName: "checkmark.circle.fill")
+        break
         }
         let allAction = PopMenuDefaultAction(title: "All", image: allImage,  didSelect: { action in
             self.bookshelfFilter = .All
@@ -481,6 +494,11 @@ class DocumentsViewController: UICollectionViewController{
             self.updateBookshelf()
         })
         popMenu.addAction(chebiAction)
+        let almaarAction = PopMenuDefaultAction(title: "AR", image: almaarImage, didSelect: { action in
+            self.bookshelfFilter = .ALMAAR
+            self.updateBookshelf()
+        })
+        popMenu.addAction(almaarAction)
         
         self.present(popMenu, animated: true, completion: nil)
     }
@@ -493,6 +511,7 @@ public enum BookshelfFilter {
     case WAT
     case Spotlight
     case BioPortal
+    case ALMAAR
     case CHEBI
 }
 public enum BookshelfState {

@@ -119,6 +119,12 @@ class DocumentDetailViewController: UIViewController, DocumentVisitor {
             bottomImageView.image = moleculeImage
         }
     }
+    func process(document: ARDocument) {
+        typeBackView.backgroundColor = #colorLiteral(red: 0.9254902005, green: 0.2352941185, blue: 0.1019607857, alpha: 1)
+        typeLabel.text = "AR"
+        contentTextView.dataDetectorTypes = UIDataDetectorTypes.link
+        self.setDetailDescription(text: document.URL)
+    }
     
     private func setDetailDescription(text: String) {
         contentTextView.text = text
