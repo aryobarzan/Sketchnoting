@@ -148,6 +148,7 @@
 		9FFE07E6232A5FE500DBD0AC /* TagTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FFE07E5232A5FE500DBD0AC /* TagTableViewCell.swift */; };
 		9FFE07E8232A622A00DBD0AC /* Tag.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FFE07E7232A622A00DBD0AC /* Tag.swift */; };
 		9FFE07EA232A63BA00DBD0AC /* TagsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FFE07E9232A63BA00DBD0AC /* TagsManager.swift */; };
+		9FFE9B3424B3C77200D92FBA /* NeoLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FFE9B3324B3C77200D92FBA /* NeoLibrary.swift */; };
 		D2A21B26513E1A7C02F6BD40 /* libPods-Sketchnoting.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2DBAD86A2FDA51F4DEA66F8A /* libPods-Sketchnoting.a */; };
 /* End PBXBuildFile section */
 
@@ -303,6 +304,7 @@
 		9FFE07E5232A5FE500DBD0AC /* TagTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagTableViewCell.swift; sourceTree = "<group>"; };
 		9FFE07E7232A622A00DBD0AC /* Tag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tag.swift; sourceTree = "<group>"; };
 		9FFE07E9232A63BA00DBD0AC /* TagsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagsManager.swift; sourceTree = "<group>"; };
+		9FFE9B3324B3C77200D92FBA /* NeoLibrary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NeoLibrary.swift; sourceTree = "<group>"; };
 		E0C0F2F2CA423E7E8B0DC8D5 /* Pods-Sketchnoting.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Sketchnoting.debug.xcconfig"; path = "Target Support Files/Pods-Sketchnoting/Pods-Sketchnoting.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -374,6 +376,7 @@
 				9FFE07E9232A63BA00DBD0AC /* TagsManager.swift */,
 				9F5F340523AC64E400EB2804 /* Knowledge.swift */,
 				9F1A0C54249DA60B00E507BC /* SKClipboard.swift */,
+				9FFE9B3324B3C77200D92FBA /* NeoLibrary.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -966,6 +969,7 @@
 				9F75E482231410A100488BBD /* TAGMEHelper.swift in Sources */,
 				9F65984823F315FE00CDBE0C /* SearchFilterCollectionViewCell.swift in Sources */,
 				9FAE72E324887158002D800B /* DirectionalAtom.swift in Sources */,
+				9FFE9B3424B3C77200D92FBA /* NeoLibrary.swift in Sources */,
 				9FA6238B22D37213007ED794 /* BioPortalHelper.swift in Sources */,
 				9FA6239322DE30AC007ED794 /* SpotlightDocument.swift in Sources */,
 				9F77DBCA23FFD619007C8B7D /* AnnotationUtilities.swift in Sources */,

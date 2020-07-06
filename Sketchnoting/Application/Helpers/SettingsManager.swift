@@ -87,6 +87,22 @@ class SettingsManager {
             return nil
         }
     }
+    
+    public static func isAnnotationServiceAvailable() -> Bool {
+        if let lastDate = UserDefaults.standard.object(forKey: "LastAnnotationDate") as? Date {
+            let delta = Date().timeIntervalSince(lastDate)
+            log.info(delta)
+            if delta >= 10 {
+                return true
+            }
+            return false
+        }
+        return true
+    }
+    
+    public static func updateAnnotationServiceAvailability() {
+        UserDefaults.standard.set(Date(), forKey: "LastAnnotationDate")
+    }
 }
 
 

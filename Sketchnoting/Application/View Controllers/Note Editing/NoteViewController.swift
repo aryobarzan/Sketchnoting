@@ -830,27 +830,33 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         connectivity = Connectivity()
         connectivity!.framework = .network
         connectivity!.checkConnectivity { connectivity in
-            log.info("Checking Internet connection.")
+            log.info("Checking Internet connection for annotation services.")
             switch connectivity.status {
                 case .connected, .connectedViaWiFi, .connectedViaCellular:
                     log.info("Internet Connection detected.")
-                    DispatchQueue.global(qos: .background).async {
-                        if SettingsManager.getAnnotatorStatus(annotator: .TAGME) {
-                            TAGMEHelper.shared.fetch(text: text, note: DataManager.activeNote!)
+                    if SettingsManager.isAnnotationServiceAvailable() {
+                        SettingsManager.updateAnnotationServiceAvailability()
+                        DispatchQueue.global(qos: .background).async {
+                            if SettingsManager.getAnnotatorStatus(annotator: .TAGME) {
+                                TAGMEHelper.shared.fetch(text: text, note: DataManager.activeNote!)
+                            }
+                            if SettingsManager.getAnnotatorStatus(annotator: .WAT) {
+                                WATHelper.shared.fetch(text: text, note: DataManager.activeNote!)
+                            }
+                            if SettingsManager.getAnnotatorStatus(annotator: .BioPortal) {
+                                self.bioportalHelper.fetch(text: text, note: DataManager.activeNote!)
+                            }
+                            if SettingsManager.getAnnotatorStatus(annotator: .CHEBI) {
+                                self.bioportalHelper.fetchCHEBI(text: text, note: DataManager.activeNote!)
+                            }
                         }
-                        if SettingsManager.getAnnotatorStatus(annotator: .WAT) {
-                            WATHelper.shared.fetch(text: text, note: DataManager.activeNote!)
-                        }
-                        if SettingsManager.getAnnotatorStatus(annotator: .BioPortal) {
-                            self.bioportalHelper.fetch(text: text, note: DataManager.activeNote!)
-                        }
-                        if SettingsManager.getAnnotatorStatus(annotator: .CHEBI) {
-                            self.bioportalHelper.fetchCHEBI(text: text, note: DataManager.activeNote!)
-                        }
+                    }
+                    else {
+                        self.view.makeToast("You cannot annotate your note right now, please wait 10 seconds.", duration: 4.0, position: .center)
                     }
                     break
                 default:
-                    log.info("Internet Connection not detected.")
+                    log.error("Internet Connection not detected: Annotation not possible.")
                     break
             }
         }
