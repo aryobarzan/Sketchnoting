@@ -72,9 +72,9 @@ class TAGMEHelper {
             if !note.getDocuments().contains(document) {
                 log.info("TAGME: new document added - \(document.title)")
                 note.addDocument(document: document)
-                if let categories = document.categories, let spot = document.spot {
+                if let spot = document.spot {
                     log.info("TAGME has triggered ALMA AR api calls.")
-                    ALMAARHelper.shared.fetch(db_categories: categories, spot: spot, note: note)
+                    ALMAARHelper.shared.fetch(concept: document.title, spot: spot, note: note)
                 }
                 self.tagmeQueue.async {
                     self.fetchWikipediaIntroText(document: document)

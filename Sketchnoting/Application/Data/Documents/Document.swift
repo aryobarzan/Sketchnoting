@@ -104,7 +104,7 @@ class Document: Codable, Visitable, Equatable {
     
     public func downloadImage(url: URL, type: DocumentImageType) {
         let cache = SKCacheManager.cache
-        let key = type.rawValue + "-" + self.title
+        let key = type.rawValue + "-" + self.documentType.rawValue + "-" + self.title
         let downloader = ImageDownloader.default
         if !url.absoluteString.lowercased().contains(".svg") {
             downloader.downloadImage(with: url) { result in
@@ -148,7 +148,7 @@ class Document: Codable, Visitable, Equatable {
     }
     
     internal func retrieveImage(type: DocumentImageType, completion:@escaping (Result<KFCrossPlatformImage?, KingfisherError>) -> ()) {
-        let key = type.rawValue + "-" + self.title
+        let key = type.rawValue + "-" + self.documentType.rawValue + "-" + self.title
         let cache = SKCacheManager.cache
         cache.retrieveImageInDiskCache(forKey: key, completionHandler: { result in
             completion(result)

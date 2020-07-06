@@ -7,8 +7,9 @@
 //
 
 import UIKit
+import WebKit
 
-class DocumentDetailViewController: UIViewController, DocumentVisitor {
+class DocumentDetailViewController: UIViewController, DocumentVisitor, WKUIDelegate {
 
     @IBOutlet weak var previewImage: UIImageView!
     @IBOutlet weak var titleLabel: UILabel!
@@ -18,6 +19,8 @@ class DocumentDetailViewController: UIViewController, DocumentVisitor {
     @IBOutlet weak var bottomImageView: UIImageView!
     @IBOutlet weak var backButton: UIButton!
     @IBOutlet weak var backgroundBlurEffect: UIVisualEffectView!
+    
+    //var webView: WKWebView?
     
     var document: Document!
     override func viewDidLoad() {
@@ -124,6 +127,21 @@ class DocumentDetailViewController: UIViewController, DocumentVisitor {
         typeLabel.text = "AR"
         contentTextView.dataDetectorTypes = UIDataDetectorTypes.link
         self.setDetailDescription(text: document.URL)
+//        if let webView = webView {
+//            webView.removeFromSuperview()
+//        }
+//        let config = WKWebViewConfiguration()
+//        webView = WKWebView(frame: CGRect(x: 0, y: 0, width: 200, height: 200), configuration: config)
+//        DispatchQueue.main.async {
+//            self.webView!.load(URLRequest(url: URL(string: document.URL)!))
+//        }
+//        webView!.uiDelegate = self
+//        view.addSubview(webView!)
+//        webView!.translatesAutoresizingMaskIntoConstraints = false
+//        webView!.topAnchor.constraint(equalTo: contentTextView.topAnchor).isActive = true
+//        webView!.bottomAnchor.constraint(equalTo: contentTextView.bottomAnchor).isActive = true
+//        webView!.leadingAnchor.constraint(equalTo: contentTextView.leadingAnchor, constant: 10).isActive = true
+//        webView!.trailingAnchor.constraint(equalTo: contentTextView.trailingAnchor, constant: 10).isActive = true
     }
     
     private func setDetailDescription(text: String) {
