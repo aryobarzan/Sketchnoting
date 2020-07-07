@@ -14,6 +14,7 @@ class File: Codable, Comparable, Equatable, Hashable {
     var creationDate: Date
     var updateDate: Date
     var parent: String? // ID
+    //var url: URL
     
     init(name: String, parent: String?, customID: String? = nil) {
         if let customID = customID {
@@ -26,6 +27,7 @@ class File: Codable, Comparable, Equatable, Hashable {
         self.creationDate = Date.init(timeIntervalSinceNow: 0)
         self.updateDate = Date.init(timeIntervalSinceNow: 0)
         self.parent = parent
+        //self.url = url
     }
     
     // Codable
@@ -35,6 +37,7 @@ class File: Codable, Comparable, Equatable, Hashable {
         case creationDate
         case updateDate
         case parent
+        //case url
     }
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
@@ -42,6 +45,7 @@ class File: Codable, Comparable, Equatable, Hashable {
         try container.encode(name, forKey: .name)
         try container.encode(creationDate.timeIntervalSince1970, forKey: .creationDate)
         try container.encode(updateDate.timeIntervalSince1970, forKey: .updateDate)
+        //try container.encode(url, forKey: .url)
         if parent != nil {
             try container.encode(parent, forKey: .parent)
         }
@@ -57,6 +61,7 @@ class File: Codable, Comparable, Equatable, Hashable {
         }
         creationDate = Date(timeIntervalSince1970: try container.decode(TimeInterval.self, forKey: .creationDate))
         updateDate = Date(timeIntervalSince1970: try container.decode(TimeInterval.self, forKey: .updateDate))
+        //url = try container.decode(URL.self, forKey: .url)
         parent = try? container.decode(String.self, forKey: .parent)
         log.info("File " + self.id + " decoded.")
     }
