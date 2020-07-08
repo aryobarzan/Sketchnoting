@@ -14,10 +14,10 @@ class TAGMEHelper {
     static var shared = TAGMEHelper()
     //var requestDelay: Double = 0
     private let tagmeQueue = DispatchQueue(label: "TAGMEQueue", qos: .background)
-    func fetch(text: String, note: Note, parentConcept: TAGMEDocument? = nil) {
+    func fetch(text: String, note: (URL, Note), parentConcept: TAGMEDocument? = nil) {
         let chunks = text.split(by: 6000)
         for chunk in chunks {
-            let parameters: Parameters = ["text": chunk, "lang": "en", "include_abstract": "true", "include_categories": "true", "gcube-token": "5f57008b-3114-47e9-9ee2-742c877d37b2-843339462", "epsilon": note.tagmeEpsilon]
+            let parameters: Parameters = ["text": chunk, "lang": "en", "include_abstract": "true", "include_categories": "true", "gcube-token": "5f57008b-3114-47e9-9ee2-742c877d37b2-843339462", "epsilon": note.1.tagmeEpsilon]
             let headers: HTTPHeaders = [
                 "Accept": "application/json"
             ]
@@ -67,11 +67,11 @@ class TAGMEHelper {
         }
     }
     
-    private func performAdditionalSteps(document: TAGMEDocument, note: Note) {
+    private func performAdditionalSteps(document: TAGMEDocument, note: (URL, Note)) {
         DispatchQueue.main.async {
-            if !note.getDocuments().contains(document) {
+            if !note.1.getDocuments().contains(document) {
                 log.info("TAGME: new document added - \(document.title)")
-                note.addDocument(document: document)
+                note.1.addDocument(document: document)
                 if let spot = document.spot {
                     log.info("TAGME has triggered ALMA AR api calls.")
                     ALMAARHelper.shared.fetch(concept: document.title, spot: spot, note: note)
@@ -80,18 +80,19 @@ class TAGMEHelper {
                     self.fetchWikipediaIntroText(document: document)
                     self.fetchWikipediaImage(document: document, completion: {foundImage in
                         if !foundImage {
-                            KnowledgeGraphHelper.fetchWikipediaImage(note: note, document: document)
+                            KnowledgeGraphHelper.fetchWikipediaImage(
+                                document: document)
                         }
                     })
                     KnowledgeGraphHelper.isPlace(name: document.title, completionHandler: { isPlace in
                         if isPlace {
-                            MapHelper.fetchMap(location: document.title, document: document, note: note)
+                            MapHelper.fetchMap(location: document.title, document: document)
                         }
                         else {
                             let placeTerms = ["place", "city", "populated", "country", "capital", "location", "state", "village"]
                             for term in placeTerms {
                                 if document.description?.lowercased().contains(term) ?? false {
-                                    MapHelper.fetchMap(location: document.title, document: document, note: note)
+                                    MapHelper.fetchMap(location: document.title, document: document)
                                     break
                                 }
                             }
@@ -191,7 +192,7 @@ class TAGMEHelper {
         }
     }
     
-    func checkForSubconcepts(document: TAGMEDocument, note: Note) {
+    func checkForSubconcepts(document: TAGMEDocument, note: (URL, Note)) {
         self.tagmeQueue.async {
             let text = document.title.lowercased().replacingOccurrences(of: "\n", with: " ")
             var words = text.components(separatedBy: " ")
@@ -211,7 +212,7 @@ class TAGMEHelper {
         }
     }
     
-    func checkRelatedness(doc_one: TAGMEDocument, doc_two: TAGMEDocument, note: Note) {
+    func checkRelatedness(doc_one: TAGMEDocument, doc_two: TAGMEDocument, note: (URL, Note)) {
         self.tagmeQueue.async {
             if doc_one != doc_two {
                 if let id_one = doc_one.wikiPageID, let id_two = doc_two.wikiPageID {

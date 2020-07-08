@@ -12,21 +12,16 @@ class NoteTextViewController: UIViewController {
 
     
     @IBOutlet var textView: UITextView!
-    var note: Note?
+    var note: (URL, Note)!
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        if let note = note {
-            self.title = note.getName()
-            textView.text = note.getText()
-        }
+        self.title = note.1.getName()
+        textView.text = note.1.getText()
     }
    
     @IBAction func copyTapped(_ sender: UIBarButtonItem) {
-        if let note = note {
-            UIPasteboard.general.string = note.getText()
-            self.view.makeToast("Copied text to clipboard.")
-        }
+        UIPasteboard.general.string = note.1.getText()
+        self.view.makeToast("Copied text to clipboard.")
     }
     
     @IBAction func closeTapped(_ sender: UIBarButtonItem) {

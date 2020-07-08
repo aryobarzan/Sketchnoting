@@ -34,7 +34,7 @@ class SKClipboard {
     }
     
     public static func copy(note: Note) {
-        self.note = note.duplicate()
+        self.note = note
     }
     
     public static func copy(page: NotePage) {
@@ -49,6 +49,7 @@ class SKClipboard {
         self.typedText = typedText
     }
     
+    // Missing: rework
     public static func getNote() -> Note? {
         return note
     }

@@ -15,9 +15,9 @@ class MoveFileViewController: UIViewController, UITableViewDataSource, UITableVi
     
     var delegate: MoveFileViewControllerDelegate?
     
-    var filesToMove = [File]()
-    var currentFolder: Folder = DataManager.homeFolder
-    var items = [Folder]()
+    var filesToMove = [(URL, File)]()
+    var currentFolder: URL = NeoLibrary.currentLocation
+    var items = [URL]()
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -28,12 +28,10 @@ class MoveFileViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     func updateItems() {
-        self.title = currentFolder.getName()
-        items = [Folder]()
-        for item in DataManager.getFolderFiles(folder: currentFolder, foldersOnly: true) {
-            if let f = item as? Folder {
-                items.append(f)
-            }
+        self.title = currentFolder.deletingPathExtension().lastPathComponent
+        items = [URL]()
+        for item in NeoLibrary.getFiles(atURL: currentFolder, foldersOnly: true) {
+            items.append(item.0)
         }
         tableView.reloadData()
         if items.count == 0 {
@@ -51,9 +49,8 @@ class MoveFileViewController: UIViewController, UITableViewDataSource, UITableVi
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "MoveFileViewCell", for: indexPath) as! MoveFileViewCell
-        
         let folder = items[indexPath.row]
-        cell.setFolder(folder: folder)
+        cell.set(folderURL: folder)
         return cell
     }
     
@@ -64,7 +61,7 @@ class MoveFileViewController: UIViewController, UITableViewDataSource, UITableVi
     }
 
     private func updateBackButton() {
-        if self.currentFolder == DataManager.homeFolder {
+        if NeoLibrary.isHomeDirectory(url: self.currentFolder) {
             backButton.isHidden = true
         }
         else {
@@ -81,13 +78,14 @@ class MoveFileViewController: UIViewController, UITableViewDataSource, UITableVi
                     name = input
                 }
             }
-            let newFolder = Folder(name: name, parent: self.currentFolder.id)
-            _ = DataManager.add(folder: newFolder)
+            _ = NeoLibrary.createFolder(name: name, root: self.currentFolder)
             self.updateItems()
         }
     }
     @IBAction func backButtonTapped(_ sender: UIButton) {
-        self.currentFolder = DataManager.getFolder(id: currentFolder.parent) ?? DataManager.homeFolder
+        if !NeoLibrary.isHomeDirectory(url: currentFolder) {
+            currentFolder = currentFolder.deletingLastPathComponent()
+        }
         self.updateItems()
         
     }
@@ -95,15 +93,18 @@ class MoveFileViewController: UIViewController, UITableViewDataSource, UITableVi
         self.dismiss(animated: true, completion: nil)
     }
     @IBAction func moveTapped(_ sender: UIBarButtonItem) {
+        var newFiles = [(URL, File)]()
         for file in filesToMove {
-            DataManager.move(file: file, toFolder: currentFolder)
+            if let url = NeoLibrary.move(file: file.1, from: file.0, to: currentFolder) {
+                newFiles.append((url, file.1))
+            }
         }
-        self.delegate?.movedFiles(files: filesToMove)
+        self.delegate?.movedFiles(items: newFiles)
         self.dismiss(animated: true, completion: nil)
     }
 }
 
 
 protocol MoveFileViewControllerDelegate {
-    func movedFiles(files: [File])
+    func movedFiles(items: [(URL, File)])
 }

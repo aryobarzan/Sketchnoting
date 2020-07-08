@@ -15,7 +15,7 @@ class TagsViewController: UIViewController, UITableViewDataSource, UITableViewDe
     var isEditingTags: Bool = false
     var isFiltering: Bool = false
     
-    var note: Note?
+    var note: (URL, Note)?
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -75,7 +75,7 @@ class TagsViewController: UIViewController, UITableViewDataSource, UITableViewDe
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         if let cell = cell as? TagTableViewCell {
             if note != nil {
-                for t in note!.tags {
+                for t in note!.1.tags {
                     if cell.noteTag == t {
                         tableView.selectRow(at: indexPath, animated: false, scrollPosition: .none)
                         break
@@ -111,8 +111,8 @@ class TagsViewController: UIViewController, UITableViewDataSource, UITableViewDe
             }
         }
         if note != nil {
-            note!.tags = selectedTags
-            DataManager.save(file: note!)
+            note!.1.tags = selectedTags
+            NeoLibrary.save(note: note!.1, url: note!.0)
         }
         else if isFiltering {
             TagsManager.filterTags = selectedTags

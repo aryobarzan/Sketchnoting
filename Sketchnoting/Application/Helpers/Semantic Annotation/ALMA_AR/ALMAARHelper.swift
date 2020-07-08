@@ -13,7 +13,7 @@ import SwiftyJSON
 class ALMAARHelper {
     static var shared = ALMAARHelper()
     private let almaarQueue = DispatchQueue(label: "ALMAARQueue", qos: .background)
-    func fetch(concept: String, spot: String, note: Note) {
+    func fetch(concept: String, spot: String, note: (URL, Note)) {
         let concept_sanitized = concept.replacingOccurrences(of: " ", with: "_")
         let parameters: Parameters = [:]
         let headers: HTTPHeaders = [
@@ -42,7 +42,7 @@ class ALMAARHelper {
         }
     }
     
-    private func fetchResource(id: Int, concept: String, spot: String, note: Note) {
+    private func fetchResource(id: Int, concept: String, spot: String, note: (URL, Note)) {
         let parameters: Parameters = [:]
         let headers: HTTPHeaders = [
             "Accept": "application/json"
@@ -62,7 +62,7 @@ class ALMAARHelper {
                 if let id = json["id"].int, let title = json["title"].string, let previewURL = json["previewURL"].string, let url = json["url"].string {
                     if let document = ARDocument(title: title, description: nil, URL: url, type: .ALMAAR, spot: spot, categories: [String](), wikiPageID: nil)  { // Wiki page ID same as id?
                         DispatchQueue.main.async {
-                            note.addDocument(document: document)
+                            note.1.addDocument(document: document)
                             DispatchQueue.global(qos: .utility).async {
                                 if let url = URL(string: previewURL) {
                                     log.info("Found ALMA AR document preview image for: \(document.title)")

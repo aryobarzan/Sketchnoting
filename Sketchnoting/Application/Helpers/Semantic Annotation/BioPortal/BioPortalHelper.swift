@@ -13,7 +13,7 @@ import SwiftyJSON
 class BioPortalHelper {
     let apiKey = "79790f4e-3333-477a-b9c2-7c0a815a62e0"
     
-    func fetch(text: String, note: Note) {
+    func fetch(text: String, note: (URL, Note)) {
         let parameters: Parameters = ["apikey": apiKey, "input": text]
         let headers: HTTPHeaders = [
             "Accept": "application/json"
@@ -38,11 +38,11 @@ class BioPortalHelper {
         }
     }
     
-    func fetchCHEBI(text: String, note: Note) {
+    func fetchCHEBI(text: String, note: (URL, Note)) {
         self.annotate(text: text, ontology: "CHEBI", note: note)
     }
     
-    private func annotate(text: String, ontology: String, note: Note) {
+    private func annotate(text: String, ontology: String, note: (URL, Note)) {
         let parameters: Parameters = ["apikey": apiKey, "text": text, "ontologies": ontology, "include": "prefLabel,definition"]
         let headers: HTTPHeaders = [
             "Accept": "application/json"
@@ -82,19 +82,19 @@ class BioPortalHelper {
                     }
                     DispatchQueue.main.async {
                         for doc in documents {
-                            print("BioPortal/CHEBI: new document added - \(doc.title)")
-                            note.addDocument(document: doc)
+                            log.info("BioPortal/CHEBI: new document added - \(doc.title)")
+                            note.1.addDocument(document: doc)
                         }
                     }
                 }
             case .failure(let error):
-                print(error.localizedDescription)
+                log.error(error.localizedDescription)
                 return
             }
         }
     }
     
-    private func fetchMoleculeImageForCHEBI(document: CHEBIDocument!, id: String, note: Note) {
+    private func fetchMoleculeImageForCHEBI(document: CHEBIDocument!, id: String, note: (URL, Note)) {
         let regex = try? NSRegularExpression(pattern: "http://purl.obolibrary.org/obo/CHEBI_([0-9]*)", options: .caseInsensitive)
         if let match = regex?.firstMatch(in: id, options: [], range: NSRange(location: 0, length: id.utf16.count)) {
             if let valueRange = Range(match.range(at: 1), in: id) {

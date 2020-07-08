@@ -15,7 +15,8 @@ class NoteCollectionViewDetailCell: UICollectionViewCell {
     @IBOutlet weak var creationLabel: UILabel!
     @IBOutlet weak var selectedImage: UIImageView!
     
-    var file: File?
+    var file: File!
+    var url: URL!
     
     var longPressGesture: UILongPressGestureRecognizer?
     
@@ -27,19 +28,16 @@ class NoteCollectionViewDetailCell: UICollectionViewCell {
         super.init(coder: aDecoder)
     }
     
-    func setFile(file: File, isInSelectionMode: Bool = false, isFileSelected: Bool = false) {
+    func setFile(url: URL, file: File, isInSelectionMode: Bool = false, isFileSelected: Bool = false) {
         self.file = file
+        self.url = url
         
         self.imageView.layer.cornerRadius = 3
         self.imageView.image = nil
         file.getPreviewImage() { image in
             self.imageView.image = image
         }
-        if file is Folder {
-            self.imageView.backgroundColor = .clear
-            self.imageView.layer.borderColor = nil
-        }
-        else {
+        if file is Note {
             self.imageView.backgroundColor = .white
             self.imageView.layer.borderWidth = 1
             self.imageView.layer.borderColor = UIColor.black.cgColor
@@ -47,24 +45,20 @@ class NoteCollectionViewDetailCell: UICollectionViewCell {
                 self.imageView.layer.borderColor = UIColor.gray.cgColor
             }
         }
+        else {
+            self.imageView.backgroundColor = .clear
+            self.imageView.layer.borderColor = nil
+        }
         
         titleLabel.text = file.getName()
         
-        self.creationLabel.text = file.creationDate.getFormattedDate()
+        self.creationLabel.text = NeoLibrary.getCreationDate(url: url).getFormattedDate()
         
-//        if file is Note {
-//            imageView.image = UIImage(systemName: "doc")
-//        }
-//        else if file is Folder {
-//            imageView.image = UIImage(systemName: "folder.fill")
-//        }
         if isInSelectionMode {
             self.selectedImage.isHidden = false
-            //self.imageView.isHidden = true
         }
         else {
             self.selectedImage.isHidden = true
-            //self.imageView.isHidden = false
         }
         self.toggleSelected(isFileSelected: isFileSelected)
     }

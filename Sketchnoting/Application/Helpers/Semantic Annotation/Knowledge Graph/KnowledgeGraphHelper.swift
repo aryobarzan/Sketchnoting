@@ -47,7 +47,7 @@ class KnowledgeGraphHelper {
         }
     }
     
-    public static func fetchWikipediaImage(note: Note, document: Document) {
+    public static func fetchWikipediaImage(document: Document) {
         let parameters: Parameters = ["query": document.title, "key": apiKey, "limit": 1]
         let headers: HTTPHeaders = [
             "Accept": "application/json"

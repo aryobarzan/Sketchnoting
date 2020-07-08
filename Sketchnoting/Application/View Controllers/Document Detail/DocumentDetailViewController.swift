@@ -21,7 +21,7 @@ class DocumentDetailViewController: UIViewController, DocumentVisitor {
     @IBOutlet weak var backButton: UIButton!
     @IBOutlet weak var backgroundBlurEffect: UIVisualEffectView!
     
-    var safariVC: SFSafariViewController?
+    //var safariVC: SFSafariViewController?
     
     var document: Document!
     override func viewDidLoad() {
@@ -128,21 +128,25 @@ class DocumentDetailViewController: UIViewController, DocumentVisitor {
         typeLabel.text = "AR"
         contentTextView.dataDetectorTypes = UIDataDetectorTypes.link
         self.setDetailDescription(text: document.URL)
-        if let safariVC = safariVC {
-            safariVC.willMove(toParent: nil)
-            safariVC.view.removeFromSuperview()
-            safariVC.removeFromParent()
-        }
+//        if let safariVC = safariVC {
+//            safariVC.willMove(toParent: nil)
+//            safariVC.view.removeFromSuperview()
+//            safariVC.removeFromParent()
+//        }
         if document.URL.contains(".reality") {
-            safariVC = SFSafariViewController(url: URL(string: document.URL)!)
-            addChild(safariVC!)
-            self.view.addSubview(safariVC!.view)
-            safariVC!.view.translatesAutoresizingMaskIntoConstraints = false
-            safariVC!.view.topAnchor.constraint(equalTo: contentTextView.topAnchor).isActive = true
-            safariVC!.view.bottomAnchor.constraint(equalTo: contentTextView.bottomAnchor).isActive = true
-            safariVC!.view.leadingAnchor.constraint(equalTo: contentTextView.leadingAnchor).isActive = true
-            safariVC!.view.trailingAnchor.constraint(equalTo: contentTextView.trailingAnchor).isActive = true
-            safariVC!.didMove(toParent: self)
+            let safariVC = SFSafariViewController(url: URL(string: document.URL)!)
+            safariVC.modalPresentationStyle = .pageSheet
+            present(safariVC, animated: true)
+//            addChild(safariVC!)
+//            self.view.addSubview(safariVC!.view)
+//            safariVC!.view.translatesAutoresizingMaskIntoConstraints = false
+//            safariVC!.view.topAnchor.constraint(equalTo: contentTextView.topAnchor, constant: 10).isActive = true
+//            safariVC!.view.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+//            safariVC!.view.leadingAnchor.constraint(equalTo: contentTextView.leadingAnchor).isActive = true
+//            safariVC!.view.trailingAnchor.constraint(equalTo: contentTextView.trailingAnchor).isActive = true
+//            safariVC!.didMove(toParent: self)
+            //safariVC!.modalPresentationStyle = .pageSheet
+            
         }
     }
     

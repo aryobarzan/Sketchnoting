@@ -19,7 +19,7 @@ class SearchViewController: UIViewController, UICollectionViewDelegate, UICollec
     @IBOutlet weak var notesCollectionView: UICollectionView!
     
     var searchFilters = [SearchFilter]()
-    var notes = [Note]()
+    var notes = [(URL, Note)]()
     var currentSearchType = SearchType.All
     
     private var appSearch = AppSearch()
@@ -93,7 +93,7 @@ class SearchViewController: UIViewController, UICollectionViewDelegate, UICollec
         }
         else {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "NoteCollectionViewCell", for: indexPath as IndexPath) as! NoteCollectionViewCell
-            cell.setFile(file: notes[indexPath.item])
+            cell.setFile(url: notes[indexPath.item].0 ,file: notes[indexPath.item].1)
             return cell
         }
     }
@@ -106,7 +106,7 @@ class SearchViewController: UIViewController, UICollectionViewDelegate, UICollec
             self.updateResults()
         }
         else {
-            self.openNote(note: self.notes[indexPath.item])
+            self.openNote(url: self.notes[indexPath.item].0, note: self.notes[indexPath.item].1)
             log.info("Note tapped.")
         }
     }
@@ -146,16 +146,16 @@ class SearchViewController: UIViewController, UICollectionViewDelegate, UICollec
         resultsLabel.text = "Notes: \(self.notes.count) result(s)"
     }
     
-    var noteToOpen: Note?
-    func openNote(note: Note) {
-        noteToOpen = note
+    var noteToOpen: (URL, Note)?
+    func openNote(url: URL, note: Note) {
+        noteToOpen = (url, note)
         Timer.scheduledTimer(timeInterval: 0.2, target: self, selector: #selector(switchToHomeTab), userInfo: nil, repeats: false)
     }
     @objc func switchToHomeTab() {
         tabBarController!.selectedIndex = 0
         if let nc = tabBarController!.viewControllers![0] as? UINavigationController {
             if let vc = nc.topViewController as? ViewController {
-                vc.open(note: noteToOpen!)
+                vc.open(url: noteToOpen!.0, note: noteToOpen!.1)
             }
         }
     }

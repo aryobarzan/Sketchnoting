@@ -14,7 +14,8 @@ class NoteCollectionViewCell: UICollectionViewCell {
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var selectedImage: UIImageView!
     
-    var file: File?
+    var file: File!
+    var url: URL!
         
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -24,26 +25,29 @@ class NoteCollectionViewCell: UICollectionViewCell {
         super.init(coder: aDecoder)
     }
     
-    func setFile(file: File, isInSelectionMode: Bool = false, isFileSelected: Bool = false) {
+    func setFile(url: URL, file: File, isInSelectionMode: Bool = false, isFileSelected: Bool = false) {
+        self.file = file
+        self.url = url
+        
         self.imageView.layer.cornerRadius = 6
         self.imageView.image = nil
         
-        self.file = file
         file.getPreviewImage() { image in
             self.imageView.image = image
         }
         titleLabel.text = file.getName()
-        if file is Folder {
-            self.imageView.backgroundColor = .clear
-            self.imageView.layer.borderColor = nil
-        }
-        else {
+        if file is Note {
             self.imageView.backgroundColor = .white
             self.imageView.layer.borderWidth = 1
             self.imageView.layer.borderColor = UIColor.black.cgColor
             if self.traitCollection.userInterfaceStyle == .dark {
                 self.imageView.layer.borderColor = UIColor.gray.cgColor
             }
+            
+        }
+        else { // Folder
+            self.imageView.backgroundColor = .clear
+            self.imageView.layer.borderColor = nil
         }
         if isInSelectionMode {
             self.selectedImage.isHidden = false

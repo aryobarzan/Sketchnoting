@@ -13,6 +13,8 @@ class NotePagesViewController: UIViewController, UICollectionViewDelegate, UICol
     @IBOutlet weak var collectionView: UICollectionView!
     var delegate: NotePagesDelegate?
     
+    var note: (URL, Note)!
+    
     @IBOutlet weak var pageButton: UIBarButtonItem!
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -23,7 +25,7 @@ class NotePagesViewController: UIViewController, UICollectionViewDelegate, UICol
         collectionView.dropDelegate = self
         collectionView.dragInteractionEnabled = true
         
-        pageButton.title = "Page \(DataManager.activeNote!.activePageIndex+1)"
+        pageButton.title = "Page \(note.1.activePageIndex+1)"
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -32,19 +34,19 @@ class NotePagesViewController: UIViewController, UICollectionViewDelegate, UICol
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return DataManager.activeNote!.pages.count
+        return note.1.pages.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "NotePageCell", for: indexPath as IndexPath) as! NotePageCollectionViewCell
-        let page = DataManager.activeNote!.pages[indexPath.item]
+        let page = note.1.pages[indexPath.item]
         page.getAsImage() { image in
             cell.imageView.image = image
         }
         cell.pageIndexLabel.text = "\(indexPath.item + 1)"
         cell.imageView.layer.cornerRadius = 4
         cell.imageView.layer.borderWidth = 2
-        if indexPath.item == DataManager.activeNote!.activePageIndex {
+        if indexPath.item == note.1.activePageIndex {
             cell.imageView.layer.borderColor = UIColor.systemBlue.cgColor
         }
         else {
@@ -67,7 +69,7 @@ class NotePagesViewController: UIViewController, UICollectionViewDelegate, UICol
     
     // Drag and drop delegates for re-ordering
     func collectionView(_ collectionView: UICollectionView, itemsForBeginning session: UIDragSession, at indexPath: IndexPath) -> [UIDragItem] {
-        let item = DataManager.activeNote!.pages[indexPath.row]
+        let item = note.1.pages[indexPath.row]
         let itemProvider = NSItemProvider(object: item.getText() as NSString)
         let dragItem = UIDragItem(itemProvider: itemProvider)
         return [dragItem]
@@ -89,21 +91,21 @@ class NotePagesViewController: UIViewController, UICollectionViewDelegate, UICol
           }
 
           collectionView.performBatchUpdates({
-            let page = DataManager.activeNote!.pages[sourceIndexPath.item]
-            if DataManager.activeNote!.activePageIndex == sourceIndexPath.item {
-                DataManager.activeNote!.activePageIndex = destinationIndexPath.item
+            let page = note.1.pages[sourceIndexPath.item]
+            if note.1.activePageIndex == sourceIndexPath.item {
+                note.1.activePageIndex = destinationIndexPath.item
             }
-            DataManager.activeNote!.removePage(at: sourceIndexPath)
-            DataManager.activeNote!.insertPage(page, at: destinationIndexPath)
+            note.1.removePage(at: sourceIndexPath)
+            note.1.insertPage(page, at: destinationIndexPath)
             collectionView.deleteItems(at: [sourceIndexPath])
             collectionView.insertItems(at: [destinationIndexPath])
-            DataManager.save(file: DataManager.activeNote!)
+            NeoLibrary.save(note: note.1, url: note.0)
           }, completion: { _ in
             coordinator.drop(dropItem.dragItem,
                               toItemAt: destinationIndexPath)
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 collectionView.reloadData()
-                self.delegate?.notePagesReordered()
+                self.delegate?.notePagesReordered(note: self.note.1)
             }
           })
         }
@@ -117,7 +119,7 @@ class NotePagesViewController: UIViewController, UICollectionViewDelegate, UICol
         { (input:String?) in
             if input != nil && Int(input!) != nil {
                 if let pageNumber = Int(input!) {
-                    if (pageNumber - 1) >= 0 && (pageNumber - 1) < DataManager.activeNote!.pages.count && (pageNumber - 1) != DataManager.activeNote!.activePageIndex {
+                    if (pageNumber - 1) >= 0 && (pageNumber - 1) < self.note.1.pages.count && (pageNumber - 1) != self.note.1.activePageIndex {
                         self.delegate?.notePageSelected(index: pageNumber - 1)
                         self.dismiss(animated: true, completion: nil)
                     }
@@ -137,13 +139,13 @@ class NotePagesViewController: UIViewController, UICollectionViewDelegate, UICol
     }
     private func makeDocumentContextMenu(pageIndex: Int) -> UIMenu {
         let copyAction = UIAction(title: "Copy", image: UIImage(systemName: "doc.text")) { action in
-            SKClipboard.copy(page: DataManager.activeNote!.pages[pageIndex])
+            SKClipboard.copy(page: self.note.1.pages[pageIndex])
             self.view.makeToast("Copied page to SKClipboard.")
         }
         let deleteAction = UIAction(title: "Delete", image: UIImage(systemName: "trash")) { action in
-            let isDeleted = DataManager.activeNote!.deletePage(index: pageIndex)
+            let isDeleted = self.note.1.deletePage(index: pageIndex)
             if isDeleted {
-                self.delegate?.notePageDeleted()
+                self.delegate?.notePageDeleted(note: self.note.1)
             }
             self.collectionView.reloadData()
         }
@@ -153,6 +155,6 @@ class NotePagesViewController: UIViewController, UICollectionViewDelegate, UICol
 
 protocol NotePagesDelegate {
     func notePageSelected(index: Int)
-    func notePagesReordered()
-    func notePageDeleted()
+    func notePagesReordered(note: Note)
+    func notePageDeleted(note: Note)
 }

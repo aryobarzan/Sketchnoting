@@ -11,7 +11,7 @@ import Alamofire
 
 class MapHelper {
     private static let mapQuestAPIKey = "bAELaFV3A8vNwICyhbziI7tNeSfYdUvr"
-    static func fetchMap(location: String, document: Document, note: Note) {
+    static func fetchMap(location: String, document: Document) {
         let parameters: Parameters = ["q": location, "maxRows": 1, "username": "aryo"]
         let headers: HTTPHeaders = [
                 "Accept": "application/json"
@@ -33,7 +33,7 @@ class MapHelper {
                 for res in resources! {
                     let latitude = res["lat"] as! String
                     let longitude = res["lng"] as! String
-                    self.fetchMapImage(latitude: latitude, longitude: longitude, document: document, note: note)
+                    self.fetchMapImage(latitude: latitude, longitude: longitude, document: document)
                 }
             }
             else {
@@ -41,7 +41,7 @@ class MapHelper {
             }
         }
     }
-    static func fetchMapImage(latitude: String, longitude: String, document: Document, note: Note) {
+    static func fetchMapImage(latitude: String, longitude: String, document: Document) {
         DispatchQueue.global(qos: .utility).async {
             if let url = URL(string: "https://www.mapquestapi.com/staticmap/v5/map?key=" + mapQuestAPIKey + "&center=" + latitude + "," + longitude + "&size=800,600") {
                 document.downloadImage(url: url, type: .Map)

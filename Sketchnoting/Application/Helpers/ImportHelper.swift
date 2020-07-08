@@ -14,8 +14,8 @@ import Highlightr
 
 class ImportHelper {
     static var importUTTypes = ["public.image", "public.jpeg", "public.jpg", "public.png", "com.sketchnote", "com.adobe.pdf", String(kUTTypeText), String(kUTTypeJavaClass), String(kUTTypeCSource), String(kUTTypePlainText), String(kUTTypeSourceCode), "com.sun.java-source"]
-    static func importItems(urls: [URL], n: Note?) -> ([Note], [UIImage], [PDFDocument], [NoteTypedText]) {
-        var notes = [Note]()
+    static func importItems(urls: [URL]) -> ([(URL, Note)], [UIImage], [PDFDocument], [NoteTypedText]) {
+        var notes = [(URL, Note)]()
         var images = [UIImage]()
         var pdfs = [PDFDocument]()
         var texts = [NoteTypedText]()
@@ -29,8 +29,8 @@ class ImportHelper {
                     }
                     break
                 case "com.sketchnote":
-                    if let decodedNote = DataManager.decodeNoteFromData(data: data) {
-                        notes.append(decodedNote)
+                    if let decodedNote = NeoLibrary.decodeNoteFromData(data: data) {
+                        notes.append((url, decodedNote))
                     }
                     break
                 case "com.adobe.pdf":
@@ -52,23 +52,6 @@ class ImportHelper {
             } catch {
                 log.error("Imported URL could not be decoded.")
             }
-        }
-        for note in notes {
-            if let n = n {
-                log.info("Added pages of imported note to currently open note.")
-                n.pages += note.pages
-            }
-            else {
-                if DataManager.notes.contains(note) {
-                    log.info("Note is already in your library, updating its data.")
-                    DataManager.save(file: note)
-                }
-                else {
-                    log.info("Importing new note.")
-                    _ = DataManager.add(note: note)
-                }
-            }
-            
         }
         return (notes, images, pdfs, texts)
     }

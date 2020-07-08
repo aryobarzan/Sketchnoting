@@ -10,17 +10,14 @@ import UIKit
 
 class AppSearch: DocumentVisitor {
     
-    public func search(filters: [SearchFilter]) -> [Note] {
-        var results = [Note]()
+    public func search(filters: [SearchFilter]) -> [(URL, Note)] {
+        var results = [(URL, Note)]()
         if filters.count > 0 {
-            results = DataManager.notes
-            var searchedNotesToRemove = [Note]()
-            for note in results {
-                if !applySearchFilters(note: note, filters: filters) {
-                        searchedNotesToRemove.append(note)
+            for note in NeoLibrary.getNotes() {
+                if applySearchFilters(note: note.1, filters: filters) {
+                    results.append((note.0, note.1))
                 }
             }
-            results = results.filter { !searchedNotesToRemove.contains($0) }
         }
         return results
     }

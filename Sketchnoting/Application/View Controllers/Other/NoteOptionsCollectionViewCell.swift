@@ -13,20 +13,10 @@ class NoteOptionsCollectionViewCell: UICollectionViewCell {
     @IBOutlet weak var label: UILabel!
     @IBOutlet weak var image: UIImageView!
     @IBOutlet weak var notInstantActionImage: UIImageView!
-    
+        
     func set(option: NoteOptionWrapper) {
         if option.option == .HelpLines {
-            switch DataManager.activeNote!.helpLinesType {
-            case .None:
-                image.image = UIImage(systemName: "perspective")
-                break
-            case .Horizontal:
-                image.image = UIImage(systemName: "line.horizontal.3")
-                break
-            case .Grid:
-                image.image = UIImage(systemName: "grid")
-                break
-            }
+            image.image = UIImage(systemName: "grid")
         }
         else {
             image.image = UIImage(systemName: option.image)

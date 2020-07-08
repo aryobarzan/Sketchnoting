@@ -38,6 +38,7 @@ class NoteOptionsViewController: UIViewController, UICollectionViewDelegate, UIC
     
     @IBOutlet weak var collectionView: UICollectionView!
     var delegate: NoteOptionsDelegate?
+    var note: (URL, Note)!
     
     private var options: [NoteOptionWrapper] = [
                                               NoteOptionWrapper(option: .Annotate, image: "wand.and.rays", isDestructive: false, isInstantAction: true, isToggle: false),

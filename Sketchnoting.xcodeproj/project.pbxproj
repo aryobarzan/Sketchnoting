@@ -54,7 +54,6 @@
 		9F65983B23EDD29300CDBE0C /* NoteTextBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F65983A23EDD29300CDBE0C /* NoteTextBlock.swift */; };
 		9F65983D23EDD2FA00CDBE0C /* NoteTextComplete.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F65983C23EDD2FA00CDBE0C /* NoteTextComplete.swift */; };
 		9F65983F23EDD80B00CDBE0C /* HelpLinesType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F65983E23EDD80B00CDBE0C /* HelpLinesType.swift */; };
-		9F65984123EE1EE900CDBE0C /* DataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F65984023EE1EE900CDBE0C /* DataManager.swift */; };
 		9F65984823F315FE00CDBE0C /* SearchFilterCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F65984723F315FE00CDBE0C /* SearchFilterCollectionViewCell.swift */; };
 		9F65984B23F3175E00CDBE0C /* SearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F65984A23F3175E00CDBE0C /* SearchViewController.swift */; };
 		9F65984D23F3227300CDBE0C /* DrawingSearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F65984C23F3227300CDBE0C /* DrawingSearchViewController.swift */; };
@@ -119,7 +118,6 @@
 		9FBF6ABA22E9F439001FD730 /* VisionTextElementWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FBF6AB922E9F439001FD730 /* VisionTextElementWrapper.swift */; };
 		9FC02C1C23EDB6290051C576 /* File.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FC02C1B23EDB6290051C576 /* File.swift */; };
 		9FC02C1E23EDB6400051C576 /* Note.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FC02C1D23EDB6400051C576 /* Note.swift */; };
-		9FC02C2023EDB6520051C576 /* Folder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FC02C1F23EDB6520051C576 /* Folder.swift */; };
 		9FC114D9243919BD004F576A /* ImagePickerHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FC114D8243919BD004F576A /* ImagePickerHelper.swift */; };
 		9FC5F90824A8DFEA00CDF2DF /* NoteOptionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FC5F90724A8DFEA00CDF2DF /* NoteOptionsViewController.swift */; };
 		9FC5F90A24A8E20000CDF2DF /* NoteOptionsCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FC5F90924A8E20000CDF2DF /* NoteOptionsCollectionViewCell.swift */; };
@@ -211,7 +209,6 @@
 		9F65983A23EDD29300CDBE0C /* NoteTextBlock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteTextBlock.swift; sourceTree = "<group>"; };
 		9F65983C23EDD2FA00CDBE0C /* NoteTextComplete.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteTextComplete.swift; sourceTree = "<group>"; };
 		9F65983E23EDD80B00CDBE0C /* HelpLinesType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpLinesType.swift; sourceTree = "<group>"; };
-		9F65984023EE1EE900CDBE0C /* DataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataManager.swift; sourceTree = "<group>"; };
 		9F65984723F315FE00CDBE0C /* SearchFilterCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchFilterCollectionViewCell.swift; sourceTree = "<group>"; };
 		9F65984A23F3175E00CDBE0C /* SearchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchViewController.swift; sourceTree = "<group>"; };
 		9F65984C23F3227300CDBE0C /* DrawingSearchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrawingSearchViewController.swift; sourceTree = "<group>"; };
@@ -273,7 +270,6 @@
 		9FBF6AB922E9F439001FD730 /* VisionTextElementWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisionTextElementWrapper.swift; sourceTree = "<group>"; };
 		9FC02C1B23EDB6290051C576 /* File.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = File.swift; sourceTree = "<group>"; };
 		9FC02C1D23EDB6400051C576 /* Note.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Note.swift; sourceTree = "<group>"; };
-		9FC02C1F23EDB6520051C576 /* Folder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Folder.swift; sourceTree = "<group>"; };
 		9FC114D8243919BD004F576A /* ImagePickerHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePickerHelper.swift; sourceTree = "<group>"; };
 		9FC5F90724A8DFEA00CDF2DF /* NoteOptionsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteOptionsViewController.swift; sourceTree = "<group>"; };
 		9FC5F90924A8E20000CDF2DF /* NoteOptionsCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteOptionsCollectionViewCell.swift; sourceTree = "<group>"; };
@@ -372,7 +368,6 @@
 		9F5D0FC6229CBC2A00BCA451 /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				9F65984023EE1EE900CDBE0C /* DataManager.swift */,
 				9FFE07E9232A63BA00DBD0AC /* TagsManager.swift */,
 				9F5F340523AC64E400EB2804 /* Knowledge.swift */,
 				9F1A0C54249DA60B00E507BC /* SKClipboard.swift */,
@@ -588,7 +583,6 @@
 			children = (
 				9FC02C1B23EDB6290051C576 /* File.swift */,
 				9FC02C1D23EDB6400051C576 /* Note.swift */,
-				9FC02C1F23EDB6520051C576 /* Folder.swift */,
 				9F65983223EDCEA300CDBE0C /* NotePage.swift */,
 				9F65983423EDD09F00CDBE0C /* NoteText.swift */,
 				9F65983C23EDD2FA00CDBE0C /* NoteTextComplete.swift */,
@@ -997,7 +991,6 @@
 				9FFE07E6232A5FE500DBD0AC /* TagTableViewCell.swift in Sources */,
 				9FAE72E424887158002D800B /* LineView.swift in Sources */,
 				9F5D8A30246113DC00934C0E /* WATHelper.swift in Sources */,
-				9FC02C2023EDB6520051C576 /* Folder.swift in Sources */,
 				9F5D80F02332D32600552D58 /* SVGImageProcessorExtension.swift in Sources */,
 				9F4D2336239C1FDB0078B364 /* UIColorExtensions.swift in Sources */,
 				9F65983923EDD23500CDBE0C /* NoteTextLine.swift in Sources */,
@@ -1071,7 +1064,6 @@
 				9F65983523EDD09F00CDBE0C /* NoteText.swift in Sources */,
 				9FC5F90A24A8E20000CDF2DF /* NoteOptionsCollectionViewCell.swift in Sources */,
 				9FAE72EC24887158002D800B /* Heisenberg.swift in Sources */,
-				9F65984123EE1EE900CDBE0C /* DataManager.swift in Sources */,
 				9FD5516E246A4364005D14D2 /* RelatedNotesViewController.swift in Sources */,
 				9FA6238D22D38AEE007ED794 /* SpotlightHelper.swift in Sources */,
 				9F18E7A823FB4F1600543D78 /* FolderButton.swift in Sources */,

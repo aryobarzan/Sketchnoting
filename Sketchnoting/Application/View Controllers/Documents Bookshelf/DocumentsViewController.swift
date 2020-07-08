@@ -16,7 +16,7 @@ private let reuseIdentifier = "cell"
 class DocumentsViewController: UICollectionViewController{
     
     var items : [Document]!
-    var note: Note!
+    var note: (URL, Note)!
     
     private var header: DocumentsCollectionReusableView?
         
@@ -61,15 +61,15 @@ class DocumentsViewController: UICollectionViewController{
         }
     }
     
-    public func setNote(note: Note) {
-        self.note = note
+    public func setNote(url: URL, note: Note) {
+        self.note = (url, note)
         self.items = note.getDocuments()
         self.updateBookshelf()
     }
     
     public func clear() {
-        self.note.clearDocuments()
-        self.items = self.note.getDocuments()
+        self.note.1.clearDocuments()
+        self.items = self.note.1.getDocuments()
         self.updateBookshelf()
     }
     
@@ -173,7 +173,7 @@ class DocumentsViewController: UICollectionViewController{
             if self.bookshelfState == .All {
                 log.info("Updating Bookshelf.")
                 self.header?.clearFilterButton.isHidden = true
-                self.items = self.getFilteredDocuments(documents: self.note.getDocuments())
+                self.items = self.getFilteredDocuments(documents: self.note.1.getDocuments())
                 self.collectionView.reloadData()
             }
             else if self.bookshelfState == .Topic {
@@ -258,7 +258,7 @@ class DocumentsViewController: UICollectionViewController{
             }
         }
         let hideAction = UIAction(title: "Hide", image: UIImage(systemName: "eye.slash")) { action in
-            self.note.hide(document: document)
+            self.note.1.hide(document: document)
             if self.bookshelfState == .Topic {
                 if self.selectedTopicDocuments != nil && self.selectedTopicDocuments!.contains(document) {
                     self.selectedTopicDocuments!.removeAll{$0 == document}
@@ -373,7 +373,7 @@ class DocumentsViewController: UICollectionViewController{
     }
     
     private func resetDocuments() {
-        self.note.clearDocuments()
+        self.note.1.clearDocuments()
         self.updateBookshelfState(state: .All)
         self.bookshelfFilter = .All
         self.updateBookshelf()
@@ -390,28 +390,28 @@ class DocumentsViewController: UICollectionViewController{
         let tagmeEpsilonAction = PopMenuDefaultAction(title: "Change TAGME Accuracy", image: UIImage(systemName: "dial"),  didSelect: { action in
             popMenu.dismiss(animated: true, completion: nil)
             var title = "Favor Common Topics (More)"
-            if self.note.tagmeEpsilon == Float(0.0) {
+            if self.note.1.tagmeEpsilon == Float(0.0) {
                 title = "✔︎ Favor Common Topics (More)"
             }
             let alert = UIAlertController(title: "TAGME Accuracy", message: "Choose how documents are fetched.", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: NSLocalizedString(title, comment: ""), style: .default, handler: { _ in
-                self.note.tagmeEpsilon = 0.0
+                self.note.1.tagmeEpsilon = 0.0
             }))
             
             title = "Balanced"
-            if self.note.tagmeEpsilon == Float(0.3) {
+            if self.note.1.tagmeEpsilon == Float(0.3) {
                 title = "✔︎ Balanced"
             }
             alert.addAction(UIAlertAction(title: NSLocalizedString(title, comment: ""), style: .default, handler: { _ in
-                self.note.tagmeEpsilon = 0.3
+                self.note.1.tagmeEpsilon = 0.3
             }))
             
             title = "Favor Contextual Topics (Less)"
-            if self.note.tagmeEpsilon == Float(0.5) {
+            if self.note.1.tagmeEpsilon == Float(0.5) {
                 title = "✔︎ Favor Contextual Topics (Less)"
             }
             alert.addAction(UIAlertAction(title: NSLocalizedString(title, comment: ""), style: .default, handler: { _ in
-                self.note.tagmeEpsilon = 0.5
+                self.note.1.tagmeEpsilon = 0.5
             }))
             self.present(alert, animated: true, completion: nil)
         })

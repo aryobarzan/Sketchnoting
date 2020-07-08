@@ -17,7 +17,7 @@ class ReceivedNotesViewController: UIViewController, UICollectionViewDelegate, U
 
         collectionView.delegate = self
         collectionView.dataSource = self
-        if DataManager.receivedNotesController.mcAdvertiserAssistant != nil {
+        if NeoLibrary.receivedNotesController.mcAdvertiserAssistant != nil {
             visibilitySwitch.setOn(true, animated: true)
         }
         
@@ -45,43 +45,37 @@ class ReceivedNotesViewController: UIViewController, UICollectionViewDelegate, U
     */
     @IBAction func visibilitySwitchChanged(_ sender: UISwitch) {
         if sender.isOn {
-            DataManager.receivedNotesController.startHosting()
+            NeoLibrary.receivedNotesController.startHosting()
         }
         else {
-            DataManager.receivedNotesController.stopHosting()
+            NeoLibrary.receivedNotesController.stopHosting()
         }
         Notifications.announceDeviceVisibility()
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return DataManager.receivedNotesController.receivedNotes.count
+        return NeoLibrary.receivedNotesController.receivedNotes.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "ReceivedNoteCell", for: indexPath as IndexPath) as! ReceivedNoteCollectionViewCell
-        let note = DataManager.receivedNotesController.receivedNotes[indexPath.item]
+        let note = NeoLibrary.receivedNotesController.receivedNotes[indexPath.item]
         cell.setNote(note: note)
         cell.delegate = self
         return cell
     }
     
-    /*func collectionView(_ collectionView: UICollectionView,
-                        layout collectionViewLayout: UICollectionViewLayout,
-                        sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: CGFloat(150), height: CGFloat(200))
-    }*/
-    
     func acceptReceivedNote(note: Note) {
         log.info("Accepted shared note")
-        DataManager.receivedNotesController.receivedNotes.removeAll(where: { $0 == note } )
-        _ = DataManager.add(note: note)
+        NeoLibrary.receivedNotesController.receivedNotes.removeAll(where: { $0 == note } )
+        NeoLibrary.add(note: note)
         self.collectionView.reloadData()
         Notifications.announceDeviceVisibility()
     }
        
     func rejectReceivedNote(note: Note) {
         log.info("Rejected shared note")
-        DataManager.receivedNotesController.receivedNotes.removeAll(where: { $0 == note } )
+        NeoLibrary.receivedNotesController.receivedNotes.removeAll(where: { $0 == note } )
         self.collectionView.reloadData()
         Notifications.announceDeviceVisibility()
     }

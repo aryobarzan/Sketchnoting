@@ -10,7 +10,7 @@ import UIKit
 
 class MoveFileViewCell: UITableViewCell {
     
-    var folder: Folder!
+    var folderURL: URL!
     @IBOutlet weak var nameLabel: UILabel!
     
     override func awakeFromNib() {
@@ -18,10 +18,10 @@ class MoveFileViewCell: UITableViewCell {
         // Initialization code
     }
     
-    public func setFolder(folder: Folder) {
-        self.folder = folder
+    public func set(folderURL: URL) {
+        self.folderURL = folderURL
         
-        nameLabel.text = folder.getName()
+        nameLabel.text = folderURL.deletingPathExtension().lastPathComponent
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {

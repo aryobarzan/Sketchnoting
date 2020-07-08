@@ -29,7 +29,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     private var folderButtons = [FolderButton]()
     private var spacerView = UIView()
     
-    private var selectedNoteForTagEditing: Note?
+    private var selectedNoteForTagEditing: (URL, Note)?
     
     @IBOutlet var newNoteButton: UIButton!
     @IBOutlet var noteLoadingIndicator: NVActivityIndicatorView!
@@ -53,9 +53,12 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     var mcAdvertiserAssistant: MCAdvertiserAssistant!
     
     // The note the user has selected to send to other devices is stored here.
-    var sketchnoteToShare: Note?
+    var sketchnoteToShare: (URL, Note)?
     // The two above variables are added to this following array and this array is sent to the receiving device(s)
     var dataToShare = [Data]()
+    
+    //
+    var noteToEdit: (URL, Note)?
     
     @IBOutlet weak var selectionModeButton: UIButton!
     @IBOutlet weak var selectAllButton: UIButton!
@@ -152,13 +155,13 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     }
     
     private func updateReceivedNotesButton() {
-        if DataManager.receivedNotesController.mcAdvertiserAssistant != nil {
+        if NeoLibrary.receivedNotesController.mcAdvertiserAssistant != nil {
             receivedNotesButton.tintColor = UIColor.systemBlue
         }
         else {
             receivedNotesButton.tintColor = UIColor.systemGray
         }
-        receivedNotesBadge.setCount(DataManager.receivedNotesController.receivedNotes.count)
+        receivedNotesBadge.setCount(NeoLibrary.receivedNotesController.receivedNotes.count)
     }
     
     private func loadData() {
@@ -173,6 +176,9 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             break
         case "EditSketchnote":
             log.info("Editing note.")
+            if let destination = segue.destination as? NoteViewController {
+                destination.note = noteToEdit
+            }
             break
         case "NoteSharing":
             self.navigationController?.setNavigationBarHidden(false, animated: false)
@@ -231,11 +237,10 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     @IBAction func unwindToHome(sender: UIStoryboardSegue) {
         if sender.source is NoteViewController {
             let vc = sender.source as! NoteViewController
-            if vc.openNote != nil {
-                let note = vc.openNote!
+            if let noteToOpen = vc.openNote {
                 if let segue = sender as? UIStoryboardSegueWithCompletion {
                     segue.completion = {
-                        self.open(note: note)
+                        self.open(url: noteToOpen.0, note: noteToOpen.1)
                     }
                 }
             }
@@ -248,54 +253,23 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     
     private func manageFileImport(urls: [URL]) {
         if urls.count > 0 {
-            let (importedNotes, importedImages, importedPDFs, importedTexts) = ImportHelper.importItems(urls: urls, n: nil)
+            let (importedNotes, importedImages, importedPDFs, importedTexts) = ImportHelper.importItems(urls: urls)
             for note in importedNotes {
-                if DataManager.notes.contains(note) {
-                    log.info("Note is already in your library, updating its data.")
-                    DataManager.save(file: note)
-                }
-                else {
-                    log.info("Importing new note.")
-                    _ = DataManager.add(note: note)
-                }
+                NeoLibrary.add(note: note.1)
+                log.info("Imported note \(note.1.getName()).")
             }
             if importedImages.count > 0 {
-                let newNote = createNoteFromImages(images: importedImages)
+                _ = NeoLibrary.createNoteFromImages(images: importedImages)
                 log.info("New note from imported images.")
-                _ = DataManager.add(note: newNote)
             }
             if importedTexts.count > 0 {
-                let newNote = createNoteFromTypedTexts(texts: importedTexts)
+                _ = NeoLibrary.createNoteFromTypedTexts(texts: importedTexts)
                 log.info("New note from imported text files.")
-                _ = DataManager.add(note: newNote)
             }
             for pdf in importedPDFs {
                 if pdf.pageCount > 0 {
-                    var pdfTitle = "Imported PDF"
-                    if let attributes = pdf.documentAttributes {
-                        if let title = attributes["Title"] as? String {
-                            if !title.isEmpty {
-                                pdfTitle = title
-                            }
-                        }
-                    }
-                    let newNote = Note(name: pdfTitle, parent: DataManager.currentFolder.id, documents: nil)
-                    var setPDFForCurrentPage = false
-                    for i in 0..<pdf.pageCount {
-                        if let pdfPage = pdf.page(at: i) {
-                            if !setPDFForCurrentPage {
-                                setPDFForCurrentPage = true
-                                newNote.getCurrentPage().backdropPDFData = pdfPage.dataRepresentation
-                            }
-                            else {
-                                let newPage = NotePage()
-                                newPage.backdropPDFData = pdfPage.dataRepresentation
-                                newNote.pages.append(newPage)
-                            }
-                        }
-                    }
+                    _ = NeoLibrary.createNoteFromPDF(pdf: pdf)
                     log.info("New note from imported pdf.")
-                    _ = DataManager.add(note: newNote)
                 }
             }
             self.view.makeToast("Imported your selected documents.")
@@ -319,27 +293,11 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     private func displayImagePicker() {
         ImagePickerHelper.displayImagePickerWithImageOutput(vc: self, completion: { images in
             if images.count > 0 {
-                let newNote = self.createNoteFromImages(images: images)
+                _ = NeoLibrary.createNoteFromImages(images: images)
                 log.info("New note from imported images (camera roll).")
-                _ = DataManager.add(note: newNote)
                 self.updateDisplayedNotes(true)
             }
         })
-    }
-    
-    private func createNoteFromImages(images: [UIImage]) -> Note {
-        let newNote = Note(name: "Imported Images", parent: DataManager.currentFolder.id, documents: nil)
-        for image in images {
-            let noteImage = NoteImage(image: image)
-            newNote.getCurrentPage().images.append(noteImage)
-        }
-        return newNote
-    }
-    
-    private func createNoteFromTypedTexts(texts: [NoteTypedText]) -> Note {
-        let newNote = Note(name: "Imported Text Files", parent: DataManager.currentFolder.id, documents: nil)
-        newNote.getCurrentPage().typedTexts = texts
-        return newNote
     }
     
     @IBAction func importDocumentTapped(_ sender: UIButton) {
@@ -377,8 +335,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             let image = scan.imageOfPage(at: i)
             images.append(image)
         }
-        let newNote = self.createNoteFromImages(images: images)
-        _ = DataManager.add(note: newNote)
+        _ = NeoLibrary.createNoteFromImages(images: images)
         log.info("New note from scanned images.")
         self.updateDisplayedNotes(true)
     }
@@ -392,41 +349,48 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     
     // MARK: Note display management
     private func updateDisplayedNotes(_ animated: Bool) {
-        self.items = DataManager.getCurrentFiles()
+        self.items = NeoLibrary.getFiles()
         
-        var filteredNotesToRemove = [File]()
         if TagsManager.filterTags.count > 0 {
-            for file in self.items {
-                if file is Folder {
-                    filteredNotesToRemove.append(file)
-                }
-                else if let note = file as? Note {
+            var filteredItems = [(URL, File)]()
+            for item in self.items {
+                if let note = item.1 as? Note {
                     for tag in TagsManager.filterTags {
-                        if !note.tags.contains(tag) {
-                            filteredNotesToRemove.append(note)
+                        if note.tags.contains(tag) {
+                            filteredItems.append(item)
                             break
                         }
                     }
                 }
+                else { // Folder
+                }
             }
-            self.items = self.items.filter { !filteredNotesToRemove.contains($0) }
+            self.items = filteredItems
         }
         
         switch SettingsManager.getFileSorting() {
             
         case .ByNewest:
-            self.items = self.items.sorted(by: { (file0: File, file1: File) -> Bool in
-                return file0 > file1
+            self.items = self.items.sorted(by: { (item0: (URL, File), item1: (URL, File)) -> Bool in
+                if NeoLibrary.getCreationDate(url: item0.0) > NeoLibrary.getCreationDate(url: item1.0) {
+                    return true
+                }
+                return false
             })
         case .ByOldest:
-            self.items = self.items.sorted()
+            self.items = self.items.sorted(by: { (item0: (URL, File), item1: (URL, File)) -> Bool in
+                if NeoLibrary.getCreationDate(url: item0.0) < NeoLibrary.getCreationDate(url: item1.0) {
+                    return true
+                }
+                return false
+            })
         case .ByNameAZ:
-            self.items = self.items.sorted(by: { (file0: File, file1: File) -> Bool in
-                return file0.getName() < file1.getName()
+            self.items = self.items.sorted(by: { (item0: (URL, File), item1: (URL, File)) -> Bool in
+                return item0.1.getName() < item1.1.getName()
             })
         case .ByNameZA:
-            self.items = self.items.sorted(by: { (file0: File, file1: File) -> Bool in
-                return file0.getName() > file1.getName()
+            self.items = self.items.sorted(by: { (item0: (URL, File), item1: (URL, File)) -> Bool in
+                return item0.1.getName() > item1.1.getName()
             })
         }
         noteCollectionView.reloadData()
@@ -445,22 +409,32 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             button.removeFromSuperview()
         }
         folderButtons = [FolderButton]()
-        for f in DataManager.currentFoldersHierarchy {
+        var component = NeoLibrary.currentLocation
+        while !NeoLibrary.isHomeDirectory(url: component) {
+            log.info(component)
             let folderButton = FolderButton()
             folderButton.frame = CGRect(x: 0, y: 0, width: 100, height: 35)
-            folderButton.setFolder(folder: f)
+            folderButton.set(directoryURL: component)
             folderButton.delegate = self
-            navigationHierarchyStackView.addArrangedSubview(folderButton)
             folderButtons.append(folderButton)
+            component = component.deletingLastPathComponent()
+        }
+        let folderButton = FolderButton()
+        folderButton.frame = CGRect(x: 0, y: 0, width: 100, height: 35)
+        folderButton.set(directoryURL: component)
+        folderButton.delegate = self
+        folderButtons.append(folderButton)
+        for button in folderButtons.reversed() {
+            navigationHierarchyStackView.addArrangedSubview(button)
         }
         spacerView.removeFromSuperview()
         spacerView.setContentHuggingPriority(.defaultLow, for: .horizontal)
         navigationHierarchyStackView.addArrangedSubview(spacerView)
     }
     
-    func onTap(folder: Folder) {
-        if DataManager.currentFolder != folder {
-            DataManager.setCurrentFolder(folder: folder)
+    func onTap(directoryURL: URL) {
+        if NeoLibrary.currentLocation != directoryURL {
+            NeoLibrary.currentLocation = directoryURL
             self.updateDisplayedNotes(false)
             self.updateFoldersHierarchy()
         }
@@ -490,10 +464,8 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     }
 
     @IBAction func newNoteButtonTapped(_ sender: UIButton) {
-        let newNote = Note(name: "Untitled", parent: DataManager.currentFolder.id, documents: nil)
-        _ = DataManager.add(note: newNote)
-        DataManager.activeNote = newNote
-        performSegue(withIdentifier: "NewSketchnote", sender: self)
+        self.noteToEdit = NeoLibrary.createNote(name: "Untitled")
+        performSegue(withIdentifier: "EditSketchnote", sender: self)
     }
     @IBAction func newFolderButtonTapped(_ sender: UIButton) {
         self.showInputDialog(title: "New Folder", subtitle: nil, actionTitle: "Create", cancelTitle: "Cancel", inputPlaceholder: "Folder Name...", inputKeyboardType: .default, cancelHandler: nil)
@@ -504,8 +476,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
                     name = input
                 }
             }
-            let newFolder = Folder(name: name, parent: DataManager.currentFolder.id)
-            _ = DataManager.add(folder: newFolder)
+            _ = NeoLibrary.createFolder(name: name)
             self.updateDisplayedNotes(false)
         }
     }
@@ -556,33 +527,34 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
 
         return UIContextMenuConfiguration(identifier: nil, previewProvider: nil, actionProvider: { suggestedActions in
 
-            return self.makeNoteContextMenu(file: self.items[indexPath.row], point: point, cellIndexPath: indexPath)
+            return self.makeFileContextMenu(url: self.items[indexPath.row].0, file: self.items[indexPath.row].1, point: point, cellIndexPath: indexPath)
         })
     }
     
-    var shareNoteObject: Note?
-    private func makeNoteContextMenu(file: File, point: CGPoint, cellIndexPath: IndexPath) -> UIMenu {
+    var shareNoteObject: (URL, Note)?
+    private func makeFileContextMenu(url: URL, file: File, point: CGPoint, cellIndexPath: IndexPath) -> UIMenu {
+        // To rework
         var menuElements = [UIMenuElement]()
         let renameAction = UIAction(title: "Rename...", image: UIImage(systemName: "text.cursor")) { action in
-            self.renameFile(file: file, indexPath: cellIndexPath)
+            self.renameFile(url: url, file: file, indexPath: cellIndexPath)
         }
         menuElements.append(renameAction)
         let moveAction = UIAction(title: "Move...", image: UIImage(systemName: "folder")) { action in
-            self.moveFile(file: file)
+            self.moveFile(url: url, file: file)
         }
         menuElements.append(moveAction)
         if let note = file as? Note {
             let tagsAction = UIAction(title: "Manage Tags...", image: UIImage(systemName: "tag.fill")) { action in
-                self.editNoteTags(note: note, cell: self.noteCollectionView.cellForItem(at: cellIndexPath))
+                self.editNoteTags(url: url, note: note, cell: self.noteCollectionView.cellForItem(at: cellIndexPath))
             }
             menuElements.append(tagsAction)
             let similarNotesAction = UIAction(title: "Related Notes...", image: UIImage(systemName: "link")) { action in
-                self.showRelatedNotesFor(note)
+                self.showRelatedNotesFor(url: url, note: note)
                 self.view.makeToast("Showing related notes.", title: note.getName())
             }
             menuElements.append(similarNotesAction)
             let duplicateAction = UIAction(title: "Duplicate", image: UIImage(systemName: "doc.on.doc")) { action in
-                _ = DataManager.add(note: note.duplicate())
+                _ = NeoLibrary.createDuplicate(note: note, url: url)
                 self.updateDisplayedNotes(false)
             }
             menuElements.append(duplicateAction)
@@ -598,17 +570,17 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             }
             menuElements.append(copyTextAction)
             let shareAction = UIAction(title: "Share...", image: UIImage(systemName: "square.and.arrow.up")) { action in
-                self.shareNoteObject = note
-                self.shareNote(note: note, sender: UIView(frame: CGRect(x: point.x, y: point.y, width: point.x, height: point.y)))
+                self.shareNoteObject = (url, note)
+                self.shareNote(url: url, note: note, sender: UIView(frame: CGRect(x: point.x, y: point.y, width: point.x, height: point.y)))
             }
             menuElements.append(shareAction)
             let sendAction = UIAction(title: "Send...", image: UIImage(systemName: "paperplane")) { action in
-                self.sendNote(note: note)
+                self.sendNote(url: url, note: note)
             }
             menuElements.append(sendAction)
         }
         let deleteAction = UIAction(title: "Delete", image: UIImage(systemName: "xmark.circle.fill"), attributes: .destructive) { action in
-            self.deleteFile(file: file)
+            self.deleteFile(url: url, file: file)
         }
         menuElements.append(deleteAction)
         return UIMenu(title: file.getName(), children: menuElements)
@@ -629,7 +601,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         dismiss(animated: true)
         // After the user has selected the nearby devices to send a note to, the main sharing function shareNote is called
         if sketchnoteToShare != nil {
-            self.sendNoteInternal(note: sketchnoteToShare!)
+            self.sendNoteInternal(url: sketchnoteToShare!.0, note: sketchnoteToShare!.1)
         }
     }
     
@@ -653,7 +625,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         }
     }
     
-    private func sendNoteInternal(note: Note) {
+    private func sendNoteInternal(url: URL, note: Note) {
         if mcSession.connectedPeers.count > 0 {
             if let noteData = note.encodeFileAsData() {
                 do {
@@ -686,7 +658,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     @IBOutlet weak var noteCollectionView: UICollectionView!
     let reuseIdentifier = "NoteCollectionViewCell" // also enter this string as the cell identifier in the storyboard
     let reuseIdentifierDetailCell = "NoteCollectionViewDetailCell"
-    var items = [File]()
+    var items = [(URL, File)]()
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return items.count
     }
@@ -695,11 +667,11 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         switch self.noteCollectionViewState {
         case .Grid:
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath as IndexPath) as! NoteCollectionViewCell
-            cell.setFile(file: self.items[indexPath.item], isInSelectionMode: self.isSelectionModeActive, isFileSelected: self.selectedFiles.contains(self.items[indexPath.item]))
+            cell.setFile(url: self.items[indexPath.item].0, file: self.items[indexPath.item].1, isInSelectionMode: self.isSelectionModeActive, isFileSelected: self.selectedFiles[self.items[indexPath.item].0] != nil)
             return cell
         case .List:
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifierDetailCell, for: indexPath as IndexPath) as! NoteCollectionViewDetailCell
-            cell.setFile(file: self.items[indexPath.item], isInSelectionMode: self.isSelectionModeActive, isFileSelected: self.selectedFiles.contains(self.items[indexPath.item]))
+            cell.setFile(url: self.items[indexPath.item].0, file: self.items[indexPath.item].1, isInSelectionMode: self.isSelectionModeActive, isFileSelected: self.selectedFiles[self.items[indexPath.item].0] != nil)
             return cell
         }
     }
@@ -716,49 +688,52 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let file = self.items[indexPath.item]
+        let item = self.items[indexPath.item]
         if self.isSelectionModeActive {
-            if self.selectedFiles.contains(file) {
-                self.selectedFiles.remove(object: file)
+            if self.selectedFiles[item.0] != nil {
+                self.selectedFiles[item.0] = nil
             }
             else {
-                self.selectedFiles.append(file)
+                self.selectedFiles[item.0] = item.1
             }
             collectionView.performBatchUpdates({
                 collectionView.reloadItems(at: [indexPath])
             })
         }
         else {
-            if let note = file as? Note {
-                self.open(note: note)
+            if let note = item.1 as? Note {
+                self.open(url: item.0, note: note)
             }
-            else if let folder = file as? Folder {
-                self.open(folder: folder)
+            else {
+                self.open(url: item.0, folder: item.1)
             }
         }
     }
     
-    public func open(note: Note) {
-        DataManager.activeNote = note
+    public func open(url: URL, note: Note) {
+        self.noteToEdit = (url, note)
         self.performSegue(withIdentifier: "EditSketchnote", sender: self)
         log.info("Opening note.")
     }
     
-    private func open(folder: Folder) {
-        DataManager.setCurrentFolder(folder: folder)
+    private func open(url: URL, folder: File) {
+        NeoLibrary.currentLocation = url
         self.updateDisplayedNotes(false)
         self.updateFoldersHierarchy()
         log.info("Opening folder.")
     }
     
-    private func renameFile(file: File, indexPath: IndexPath) {
+    private func renameFile(url: URL, file: File, indexPath: IndexPath) {
         let alertController = UIAlertController(title: "Rename file", message: nil, preferredStyle: .alert)
         
         let confirmAction = UIAlertAction(title: "Set", style: .default) { (_) in
             
             let name = alertController.textFields?[0].text
             file.setName(name: name ?? "Untitled")
-            DataManager.save(file: file)
+            let newURL = NeoLibrary.rename(url: url, file: file, name: name ?? "Untitled")
+            if newURL == nil {
+                self.view.makeToast("File could not be renamed.")
+            }
             self.noteCollectionView.performBatchUpdates({
                 self.noteCollectionView.reloadItems(at: [indexPath])
             })
@@ -777,32 +752,32 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         self.present(alertController, animated: true, completion: nil)
     }
     
-    var noteForRelatedNotes: Note?
-    private func showRelatedNotesFor(_ note: Note) {
-        self.noteForRelatedNotes = note
+    var noteForRelatedNotes: (URL, Note)?
+    private func showRelatedNotesFor(url: URL, note: Note) {
+        self.noteForRelatedNotes = (url, note)
         self.performSegue(withIdentifier: "showRelatedHomePage", sender: self)
     }
     
-    var filesToMove = [File]()
-    private func moveFile(file: File) {
-        self.filesToMove = [File]()
-        self.filesToMove.append(file)
+    var filesToMove = [(URL, File)]()
+    private func moveFile(url: URL, file: File) {
+        self.filesToMove = [(URL, File)]()
+        self.filesToMove.append((url, file))
         self.performSegue(withIdentifier: "MoveFileHome", sender: self)
         
     }
     // MoveFileViewControllerDelegate
-    func movedFiles(files: [File]) {
+    func movedFiles(items: [(URL, File)]) {
         self.updateDisplayedNotes(true)
     }
     // Related Notes VC delegate
-    func openRelatedNote(note: Note) {
-        self.open(note: note)
+    func openRelatedNote(url: URL, note: Note) {
+        self.open(url: url, note: note)
     }
     func mergedNotes(note1: Note, note2: Note) {
     }
     
     var selectedCellForTagEditing: UICollectionViewCell?
-    private func editNoteTags(note: Note, cell: UICollectionViewCell?) {
+    private func editNoteTags(url: URL, note: Note, cell: UICollectionViewCell?) {
         var looseTagsToRemove = [Tag]()
         for tag in note.tags {
             if !TagsManager.tags.contains(tag) {
@@ -813,61 +788,45 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             for t in looseTagsToRemove {
                 note.tags.removeAll{$0 == t}
             }
-            DataManager.save(file: note)
+            NeoLibrary.save(note: note, url: url)
         }
-        self.selectedNoteForTagEditing = note
+        self.selectedNoteForTagEditing = (url, note)
         self.selectedCellForTagEditing = cell
         self.performSegue(withIdentifier: "EditNoteTags", sender: self)
        }
 
-    private func shareNote(note: Note, sender: UIView) {
+    private func shareNote(url: URL, note: Note, sender: UIView) {
         self.performSegue(withIdentifier: "ShareNote", sender: sender)
     }
     
-    // TO UPDATE
     func importNote(url: URL) {
-        if let imported = DataManager.importNoteFile(url: url) {
-            if DataManager.notes.contains(imported) {
-                log.info("Sketchnote already in your library, updating its data.")
-                self.view.makeToast("The imported note is already in library: It has been updated.", title: imported.getName())
-                DataManager.save(file: imported)
-            }
-            else {
-                log.info("Importing new sketchnote.")
-                _ = DataManager.add(note: imported)
-                self.view.makeToast("The imported note has been added to your library.", title: imported.getName())
-            }
-            self.updateDisplayedNotes(false)
-        }
-        else {
-            log.error("Note could not be imported.")
-            self.view.makeToast("Sorry, the selected document could not be imported.", title: "Error")
-        }
+        NeoLibrary.importNote(url: url)
+        self.view.makeToast("Note imported.")
     }
     
-    private func sendNote(note: Note) {
-        self.sketchnoteToShare = note
+    private func sendNote(url: URL, note: Note) {
+        self.sketchnoteToShare = (url, note)
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             self.joinSession()
         }
     }
     
-    private func deleteFile(file: File) {
+    private func deleteFile(url: URL, file: File) {
         let alert = UIAlertController(title: "Delete File", message: "Are you sure you want to delete this file?", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Delete", style: .destructive, handler: { action in
-              self.items.removeAll{$0 == file}
-              DataManager.delete(file: file)
-              self.noteCollectionView.reloadData()
+            self.items.removeAll{$0.0 == url}
+            NeoLibrary.delete(file: file, url: url)
+            self.noteCollectionView.reloadData()
         }))
         alert.addAction(UIAlertAction(title: "Cancel", style: .default, handler: { action in
-              log.info("Not deleting note.")
+              log.info("Not deleting file.")
         }))
         self.present(alert, animated: true, completion: nil)
     }
     
     func collectionView(_ collectionView: UICollectionView, itemsForBeginning session: UIDragSession, at indexPath: IndexPath) -> [UIDragItem] {
         let item = self.items[indexPath.row]
-        let itemProvider = NSItemProvider(object: item.getName() as NSString)
+        let itemProvider = NSItemProvider(object: item.1.getName() as NSString)
         let dragItem = UIDragItem(itemProvider: itemProvider)
         return [dragItem]
     }
@@ -887,10 +846,10 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
           }
           collectionView.performBatchUpdates({
             let sourceFile = self.items[sourceIndexPath.item]
-            
-            if let folderDestination = self.items[destinationIndexPath.item] as? Folder {
+            let destinationItem = self.items[destinationIndexPath.item]
+            if !(destinationItem.1 is Note) { // Folder
                 log.info("Moving file to folder.")
-                DataManager.move(file: sourceFile, toFolder: folderDestination)
+                _ = NeoLibrary.move(file: sourceFile.1, from: sourceFile.0, to: destinationItem.0)
                 self.updateDisplayedNotes(false)
             }
           }, completion: nil)
@@ -904,11 +863,11 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     
     // Selection
     private var isSelectionModeActive = false
-    private var selectedFiles = [File]()
+    private var selectedFiles = [URL : File]()
     @IBAction func selectionModeButtonTapped(_ sender: UIButton) {
         if self.isSelectionModeActive {
             selectionModeButton.setImage(UIImage(systemName: "checkmark.square"), for: .normal)
-            self.selectedFiles = [File]()
+            self.selectedFiles = [URL : File]()
         }
         else {
             selectionModeButton.setImage(UIImage(systemName: "checkmark.square.fill"), for: .normal)
@@ -918,16 +877,18 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         self.updateDisplayedNotes(false)
     }
     @IBAction func selectAllButtonTapped(_ sender: UIButton) {
-        self.selectedFiles = self.items
+        for item in self.items {
+            self.selectedFiles[item.0] = item.1
+        }
         self.updateDisplayedNotes(false)
     }
     @IBAction func deselectAllButtonTapped(_ sender: UIButton) {
-        self.selectedFiles = [File]()
+        self.selectedFiles = [URL : File]()
         self.updateDisplayedNotes(false)
     }
     @IBAction func moveSelectedButtonTapped(_ sender: UIButton) {
         if !self.selectedFiles.isEmpty {
-            self.filesToMove = selectedFiles
+            self.filesToMove = selectedFiles.map {($0, $1)} // Convert dictionary to array of tuples
             self.performSegue(withIdentifier: "MoveFileHome", sender: self)
         }
     }
@@ -935,10 +896,9 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         if !self.selectedFiles.isEmpty {
             let alert = UIAlertController(title: "Delete \(self.selectedFiles.count) File(s)", message: "Are you sure you want to delete the selected files?", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "Delete", style: .destructive, handler: { action in
-                for selectedFile in self.selectedFiles {
-                    self.items.remove(object: selectedFile)
-                    DataManager.delete(file: selectedFile)
-                    self.noteCollectionView.reloadData()
+                for (url, file) in self.selectedFiles {
+                    NeoLibrary.delete(file: file, url: url)
+                    self.updateDisplayedNotes(false)
                 }
             }))
             alert.addAction(UIAlertAction(title: "Cancel", style: .default, handler: { action in
@@ -948,12 +908,11 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         }
     }
     
-    // MARK: SKClipboardDelegate
+    // MARK: SKClipboardDelegate (to update)
     func pasteNoteTapped() {
         log.info("Pasting note: \(SKClipboard.getNote()?.getName() ?? "Note name could not be retrieved.")")
         if let n = SKClipboard.getNote() {
-            DataManager.currentFolder.addChild(file: n)
-            _ = DataManager.add(note: n)
+            NeoLibrary.add(note: n)
             self.updateDisplayedNotes(true)
             self.view.makeToast("Pasted note: \(n.getName())")
         }
@@ -961,10 +920,9 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     func pastePageTapped() {
         log.info("Pasting note page.")
         if let p = SKClipboard.getPage() {
-            let newNote = Note(name: "Note Page Copy", parent: DataManager.currentFolder.id, documents: nil)
+            let newNote = Note(name: "Note Page Copy", documents: nil)
             newNote.pages = [p]
-            DataManager.currentFolder.addChild(file: newNote)
-            _ = DataManager.add(note: newNote)
+            NeoLibrary.add(note: newNote)
             self.updateDisplayedNotes(true)
             self.view.makeToast("Created new note \"Note Page Copy\" from pasted page.")
         }
@@ -973,10 +931,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     func pasteImageTapped() {
         log.info("Pasting note image.")
         if let i = SKClipboard.getImage() {
-            let newNote = Note(name: "Note Image Copy", parent: DataManager.currentFolder.id, documents: nil)
-            newNote.getCurrentPage().images = [i]
-            DataManager.currentFolder.addChild(file: newNote)
-            _ = DataManager.add(note: newNote)
+            _ = NeoLibrary.createNoteFromImages(images: [i.image])
             self.updateDisplayedNotes(true)
             self.view.makeToast("Created new note \"Note Image Copy\" from pasted note image.")
         }
@@ -984,10 +939,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     func pasteTypedTextTapped() {
         log.info("Pasting note typed text.")
         if let t = SKClipboard.getTypedText() {
-            let newNote = Note(name: "Note Typed Text Copy", parent: DataManager.currentFolder.id, documents: nil)
-            newNote.getCurrentPage().typedTexts = [t]
-            DataManager.currentFolder.addChild(file: newNote)
-            _ = DataManager.add(note: newNote)
+            _ = NeoLibrary.createNoteFromTypedTexts(texts: [t])
             self.updateDisplayedNotes(true)
             self.view.makeToast("Created new note \"Note Typed Text Copy\" from pasted note typed text.")
         }

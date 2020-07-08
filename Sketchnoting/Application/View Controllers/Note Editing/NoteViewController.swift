@@ -11,6 +11,7 @@ import PencilKit
 import VisionKit
 import MobileCoreServices
 import PDFKit
+import SafariServices
 
 import Firebase
 import NVActivityIndicatorView
@@ -64,7 +65,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     
     var noteTextViews = [DraggableTextView : NoteTypedText]()
     
-    var noteForRelatedNotes: Note?
+    var noteForRelatedNotes: (URL, Note)?
     
     @IBOutlet weak var tagsButton: UIButton!
     
@@ -76,6 +77,9 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         topicsOverlayView.isOpaque = false
       return topicsOverlayView
     }()
+    
+    // Main properties
+    var note: (URL, Note)!
     
     // This function sets up the page and every element contained within it.
     override func viewDidLoad() {
@@ -113,7 +117,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             self.documentsVC.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
             self.documentsVC.didMove(toParent: self)
             self.documentsVC.collectionView.refreshLayout()
-            self.documentsVC.setNote(note: DataManager.activeNote!)
+            self.documentsVC.setNote(url: self.note.0, note: self.note.1)
             self.bookshelfLeftDragView.curveTopCorners(size: 5)
             self.bookshelfButton.isEnabled = true
         }
@@ -127,7 +131,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         
         canvasView.bringSubviewToFront(drawingInsertionCanvas)
         
-        self.oldDocuments = DataManager.activeNote!.getDocuments()
+        self.oldDocuments = self.note.1.getDocuments()
         
         NotificationCenter.default.addObserver(self, selector: #selector(self.notifiedReceiveSketchnote(_:)), name: NSNotification.Name(rawValue: Notifications.NOTIFICATION_RECEIVE_NOTE), object: nil)
         
@@ -139,14 +143,14 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
              topicsOverlayView.bottomAnchor.constraint(equalTo: canvasView.bottomAnchor),
              ])
         
-        self.noteTitleButton.setTitle(" \(DataManager.activeNote!.getName())", for: .normal)
-        self.load(page: DataManager.activeNote!.getCurrentPage())
+        self.noteTitleButton.setTitle(" \(note.1.getName())", for: .normal)
+        self.load(page: note.1.getCurrentPage())
         
         self.updateSKClipboardButton()
     }
         
     override func viewWillAppear(_ animated: Bool) {
-        DataManager.activeNote!.delegate = self
+        note.1.delegate = self
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -179,9 +183,8 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                     toggleConceptHighlight()
                 }
                 //self.processDrawingRecognition()
-                DataManager.activeNote!.setUpdateDate()
-                DataManager.activeNote!.getCurrentPage().canvasDrawing = self.canvasView.drawing
-                DataManager.saveCurrentNote()
+                note.1.getCurrentPage().canvasDrawing = self.canvasView.drawing
+                NeoLibrary.save(note: note.1, url: note.0)
                 log.info("Closing & saving note.")
             }
             else {
@@ -192,25 +195,27 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             if let destination = segue.destination as? UINavigationController {
                 if let destinationViewController = destination.topViewController as? NotePagesViewController {
                     destinationViewController.delegate = self
+                    destinationViewController.note = self.note
                 }
             }
             break
         case "ShowNoteOptions":
             if let destination = segue.destination as? NoteOptionsViewController {
                 destination.delegate = self
+                destination.note = note
             }
             break
         case "ViewNoteText":
             if let destination = segue.destination as? UINavigationController {
                 if let destinationViewController = destination.topViewController as? NoteTextViewController {
-                    destinationViewController.note = DataManager.activeNote!
+                    destinationViewController.note = note
                 }
             }
             break
         case "ShareNote":
             if let destination = segue.destination as? UINavigationController {
                 if let destinationViewController = destination.topViewController as? ShareNoteViewController {
-                    destinationViewController.note = DataManager.activeNote!
+                    destinationViewController.note = note
                 }
             }
             break
@@ -241,22 +246,21 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             if let destination = segue.destination as? UINavigationController {
                 if let destinationViewController = destination.topViewController as? MoveFileViewController {
                     destinationViewController.delegate = self
-                    var temp = [File]()
-                    temp.append(DataManager.activeNote!)
-                    destinationViewController.filesToMove = temp
+                    destinationViewController.filesToMove = [note]
                 }
             }
             break
         case "ShowNoteInfo":
             if let destination = segue.destination as? NoteInfoViewController {
                 destination.delegate = self
+                destination.note = self.note
             }
             break
         case "EditCurrentNoteTags":
             let destinationNC = segue.destination as! UINavigationController
             destinationNC.popoverPresentationController?.delegate = self
             if let destination = destinationNC.topViewController as? TagsViewController {
-                destination.note = DataManager.activeNote!
+                destination.note = note
             }
             break
         default:
@@ -292,7 +296,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     }
     
     // ----------------
-    func load(page: NotePage = DataManager.activeNote!.getCurrentPage()) {
+    func load(page: NotePage) {
         // Load canvas
         self.canvasView.drawing = page.canvasDrawing
         
@@ -353,8 +357,8 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         self.removeDetectionAnnotations()
         let transform = self.transformMatrix(recognitionImageSize)
 
-        let documents = DataManager.activeNote!.getDocuments()
-        if let textData = DataManager.activeNote!.getCurrentPage().getNoteText() {
+        let documents = note.1.getDocuments()
+        if let textData = note.1.getCurrentPage().getNoteText() {
             for document in documents {
                 var documentTitle = document.title.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
                 if let tagmeDocument = document as? TAGMEDocument {
@@ -495,8 +499,8 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                     let image = UIImage(cgImage: merged.cgImage!.cropping(to: region.frame)!)
                     if let recognition = self.drawingRecognition.recognize(image: image) {
                         log.info("Recognized drawing: \(recognition)")
-                        DataManager.activeNote!.getCurrentPage().addDrawing(label: recognition.0, region: region.frame)
-                        DataManager.saveCurrentNote()
+                        self.note.1.getCurrentPage().addDrawing(label: recognition.0, region: region.frame)
+                        NeoLibrary.save(note: self.note.1, url: self.note.0)
                     }
                 }
             }
@@ -513,24 +517,24 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             gridView!.lineColor = .black
         }
         self.backdropView.addSubview(gridView!)
-        self.gridView!.type = DataManager.activeNote!.helpLinesType
+        self.gridView!.type = note.1.helpLinesType
         gridView!.draw(self.backdropView.frame)
     }
     
     private func toggleHelpLinesType() {
-        switch DataManager.activeNote!.helpLinesType {
+        switch note.1.helpLinesType {
         case .None:
-            DataManager.activeNote!.helpLinesType = .Horizontal
+            note.1.helpLinesType = .Horizontal
             break
         case .Horizontal:
-            DataManager.activeNote!.helpLinesType = .Grid
+            note.1.helpLinesType = .Grid
             break
         case .Grid:
-            DataManager.activeNote!.helpLinesType = .None
+            note.1.helpLinesType = .None
             break
         }
         refreshHelpLines()
-        DataManager.saveCurrentNote()
+        NeoLibrary.save(note: note.1, url: note.0)
     }
 
     private func hideAllHelpLines() {
@@ -541,7 +545,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     
     private func setupNoteImages() {
         noteImageViews = [DraggableImageView : NoteImage]()
-        for image in DataManager.activeNote!.getCurrentPage().images {
+        for image in note.1.getCurrentPage().images {
             let frame = CGRect(x: image.location.x, y: image.location.y, width: image.size.width, height: image.size.height)
             let draggableView = DraggableImageView(frame: frame)
             draggableView.image = image.image
@@ -555,7 +559,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     
     private func setupNoteTypedTexts() {
         noteTextViews = [DraggableTextView : NoteTypedText]()
-        for typedText in DataManager.activeNote!.getCurrentPage().typedTexts {
+        for typedText in note.1.getCurrentPage().typedTexts {
             let textView = self.createNoteTypedTextView(typedText: typedText)
             self.addTypedTextViewToCanvas(textView: textView, typedText: typedText)
         }
@@ -663,7 +667,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                 if bestPredictionLabel != nil {
                     log.info("Recognized drawing at touched point: \(bestPredictionLabel!) (\(Double(round(1000*bestScore!*100)/1000))% confidence)")
                     let drawing = NoteDrawing(label: bestPredictionLabel!, region: bestRegion!.frame)
-                    if !DataManager.activeNote!.getCurrentPage().hasDrawing(drawing: drawing) {
+                    if !self.note.1.getCurrentPage().hasDrawing(drawing: drawing) {
                         bestRegion!.layer.borderColor = UIColor.label.cgColor
                         bestRegion!.layer.borderWidth = 1
                         self.drawingInsertionCanvas.addSubview(bestRegion!)
@@ -671,8 +675,8 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                         bestRegion!.addGestureRecognizer(tapGesture)
                         bestRegion!.isUserInteractionEnabled = true
                         self.drawingViews.append(bestRegion!)
-                        DataManager.activeNote!.getCurrentPage().addDrawing(drawing: drawing)
-                        DataManager.saveCurrentNote()
+                        self.note.1.getCurrentPage().addDrawing(drawing: drawing)
+                        NeoLibrary.save(note: self.note.1, url: self.note.0)
                         self.view.makeToast("Recognized drawing: \(bestPredictionLabel!)", duration: 1.0, position: .center)
                         self.canvasView.rippleFill(location: loc, color: .systemGreen)
                     }
@@ -695,42 +699,42 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             self.processHandwritingRecognition()
             break
         case .RelatedNotes:
-            self.noteForRelatedNotes = DataManager.activeNote!
+            self.noteForRelatedNotes = self.note
             self.performSegue(withIdentifier: "showRelatedNoteEditing", sender: self)
             break
         case .ViewText:
             self.performSegue(withIdentifier: "ViewNoteText", sender: self)
             break
         case .CopyNote:
-            SKClipboard.copy(note: DataManager.activeNote!)
-            self.view.makeToast("Copied note to SKClipboard.", title: DataManager.activeNote!.getName())
+            SKClipboard.copy(note: note.1)
+            self.view.makeToast("Copied note to SKClipboard.", title: note.1.getName())
             break
         case .CopyText:
-            UIPasteboard.general.string = DataManager.activeNote!.getText()
-            self.view.makeToast("Copied text to Clipboard.", title: DataManager.activeNote!.getName())
+            UIPasteboard.general.string = note.1.getText()
+            self.view.makeToast("Copied text to Clipboard.", title: note.1.getName())
             break
         case .MoveFile:
             self.performSegue(withIdentifier: "MoveFileNoteEditing", sender: self)
             break
         case .ClearPage:
-            DataManager.activeNote!.getCurrentPage().clear()
-            self.load()
+            note.1.getCurrentPage().clear()
+            self.load(page: note.1.getCurrentPage())
             self.saveCurrentPage()
             break
         case .DeletePage:
-            _ = DataManager.activeNote!.deletePage(index: DataManager.activeNote!.activePageIndex)
-            self.load()
-            DataManager.saveCurrentNote()
+            _ = note.1.deletePage(index: note.1.activePageIndex)
+            self.load(page: note.1.getCurrentPage())
+            NeoLibrary.save(note: note.1, url: note.0)
             break
         case .Share:
             self.performSegue(withIdentifier: "ShareNote", sender: self)
             break
         case .ClearPDFPage:
-            DataManager.activeNote!.getCurrentPage().backdropPDFData = nil
+            note.1.getCurrentPage().backdropPDFData = nil
             self.pdfView.document = nil
-            DataManager.save(file: DataManager.activeNote!)
+            NeoLibrary.save(note: note.1, url: note.0)
         case .ResetTextRecognition:
-            DataManager.activeNote!.clearDocuments()
+            note.1.clearDocuments()
             documentsVC.items = [Document]()
             self.clearConceptHighlights()
             documentsVC.updateBookshelfState(state: .All)
@@ -739,7 +743,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             break
         case .DeleteNote:
             self.isDeletingNote = true
-            DataManager.delete(file: DataManager.activeNote!)
+            NeoLibrary.delete(file: note.1, url: note.0)
             self.performSegue(withIdentifier: "CloseNote", sender: self)
             break
         case .MoleculeEditor:
@@ -752,13 +756,13 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     }
     
     // MoveFileViewControllerDelegate
-    func movedFiles(files: [File]) {
+    func movedFiles(items: [(URL, File)]) {
         self.view.makeToast("Note moved.", duration: 1.0, position: .center)
     }
     
     func pdfScaleChanged(scale: Float) {
         pdfView.scaleFactor = CGFloat(scale)
-        DataManager.activeNote!.getCurrentPage().pdfScale = scale
+        note.1.getCurrentPage().pdfScale = scale
         self.startSaveTimer()
     }
     
@@ -786,14 +790,14 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         self.generateHandwritingRecognitionImage(completion: { image in
             self.handwritingRecognizer.recognize(spellcheck: false, image: image) { (success, noteText) in
                 if success {
-                    DataManager.activeNote!.getCurrentPage().clearNoteText()
+                    self.note.1.getCurrentPage().clearNoteText()
                     if let noteText = noteText {
-                        DataManager.activeNote!.getCurrentPage().setNoteText(noteText: noteText)
+                        self.note.1.getCurrentPage().setNoteText(noteText: noteText)
                         self.startSaveTimer()
                         if self.topicsShown {
                             self.setupTopicAnnotations(recognitionImageSize: image.size)
                         }
-                        self.annotateText(text: DataManager.activeNote!.getText())
+                        self.annotateText(text: self.note.1.getText())
                         log.info(noteText.spellchecked)
                     }
                 }
@@ -804,7 +808,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         })
     }
     private func generateHandwritingRecognitionImage(completion: @escaping (UIImage) -> Void){
-        let page = DataManager.activeNote!.getCurrentPage()
+        let page = note.1.getCurrentPage()
         UITraitCollection(userInterfaceStyle: .light).performAsCurrent {
             var image = canvasView.drawing.image(from: canvasView.bounds, scale: 1.0)
             let canvasImage = image
@@ -838,16 +842,16 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                         SettingsManager.updateAnnotationServiceAvailability()
                         DispatchQueue.global(qos: .background).async {
                             if SettingsManager.getAnnotatorStatus(annotator: .TAGME) {
-                                TAGMEHelper.shared.fetch(text: text, note: DataManager.activeNote!)
+                                TAGMEHelper.shared.fetch(text: text, note: self.note)
                             }
                             if SettingsManager.getAnnotatorStatus(annotator: .WAT) {
-                                WATHelper.shared.fetch(text: text, note: DataManager.activeNote!)
+                                WATHelper.shared.fetch(text: text, note: self.note)
                             }
                             if SettingsManager.getAnnotatorStatus(annotator: .BioPortal) {
-                                self.bioportalHelper.fetch(text: text, note: DataManager.activeNote!)
+                                self.bioportalHelper.fetch(text: text, note: self.note)
                             }
                             if SettingsManager.getAnnotatorStatus(annotator: .CHEBI) {
-                                self.bioportalHelper.fetchCHEBI(text: text, note: DataManager.activeNote!)
+                                self.bioportalHelper.fetchCHEBI(text: text, note: self.note)
                             }
                         }
                     }
@@ -913,7 +917,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             pageChanged = false
         }
         else {
-            DataManager.activeNote!.getCurrentPage().canvasDrawing = self.canvasView.drawing
+            note.1.getCurrentPage().canvasDrawing = self.canvasView.drawing
             self.startSaveTimer()
         }
     }
@@ -946,14 +950,13 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         saveTimer?.invalidate()
         saveTimer = nil
         log.info("Auto-saving note.")
-        DataManager.saveCurrentNote()
+        NeoLibrary.save(note: note.1, url: note.0)
     }
     
     //MARK: Bookshelf resize
     @IBOutlet weak var bookshelfLeftConstraint: NSLayoutConstraint!
     @IBOutlet weak var bookshelfRightConstraint: NSLayoutConstraint!
     @IBOutlet weak var bookshelfBottomConstraint: NSLayoutConstraint!
-    
     
     struct ResizeRect{
         var topTouch = false
@@ -1030,7 +1033,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     
     // MARK: - UICollectionViewDelegate protocol
     
-    var openNote : Note?
+    var openNote : (URL, Note)?
     
     func collectionView(_ collectionView: UICollectionView,
                         layout collectionViewLayout: UICollectionViewLayout,
@@ -1050,25 +1053,25 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         documentsVC.startBookshelfUpdateTimer()
     }
     
-    // MARK: NoteXDelegate
+    // MARK: NoteDelegate
     func noteHasNewDocument(note: Note, document: Document) {
         documentsVC.noteHasNewDocument(note: note, document: document)
-        DataManager.saveCurrentNote()
+        NeoLibrary.save(note: self.note.1, url: self.note.0)
     }
     func noteHasRemovedDocument(note: Note, document: Document) {
         documentsVC.noteDocumentHasChanged(note: note, document: document)
-        DataManager.saveCurrentNote()
+        NeoLibrary.save(note: self.note.1, url: self.note.0)
     }
     func noteDocumentHasChanged(note: Note, document: Document) {
         documentsVC.noteDocumentHasChanged(note: note, document: document)
-        DataManager.saveCurrentNote()
+        NeoLibrary.save(note: self.note.1, url: self.note.0)
     }
     func noteHasChanged(note: Note) {
     }
     
     // Related Notes VC delegate
-    func openRelatedNote(note: Note) {
-        self.openNote = note
+    func openRelatedNote(url: URL, note: Note) {
+        self.openNote = (url, note)
         self.saveCurrentPage()
         if self.textRecognitionTimer != nil {
             self.textRecognitionTimer!.invalidate()
@@ -1089,7 +1092,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     
     //MARK: Drawing insertion mode
     private func setupDrawingRegions() {
-        for drawing in DataManager.activeNote!.getCurrentPage().getDrawings() {
+        for drawing in note.1.getCurrentPage().getDrawings() {
             let region = UIView(frame: drawing.getRegion())
             region.layer.borderColor = UIColor.label.cgColor
             region.layer.borderWidth = 1
@@ -1177,13 +1180,13 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                             if let recognition = self.drawingRecognition.recognize(image: image) {
                                 log.info("Recognized drawing: \(recognition)")
                                 self.view.makeToast("Recognized drawing: \(recognition.0)")
-                                DataManager.activeNote!.getCurrentPage().addDrawing(label: recognition.0, region: currentDrawingRegion.frame)
+                                self.note.1.getCurrentPage().addDrawing(label: recognition.0, region: currentDrawingRegion.frame)
                                 self.drawingViews.append(currentDrawingRegion)
                                 
                                 let tapGesture = UITapGestureRecognizer(target: self, action: #selector(self.handleDrawingRegionTap(_:)))
                                 currentDrawingRegion.addGestureRecognizer(tapGesture)
                                 currentDrawingRegion.isUserInteractionEnabled = true
-                                DataManager.saveCurrentNote()
+                                NeoLibrary.save(note: self.note.1, url: self.note.0)
                             }
                         }
                     }
@@ -1207,8 +1210,8 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             let action = PopMenuDefaultAction(title: "Delete Drawing Region", didSelect: { action in
                 if let drawingRegion = sender.view {
                     drawingRegion.removeFromSuperview()
-                    DataManager.activeNote!.getCurrentPage().removeDrawing(region: drawingRegion.frame)
-                    DataManager.saveCurrentNote()
+                    self.note.1.getCurrentPage().removeDrawing(region: drawingRegion.frame)
+                    NeoLibrary.save(note: self.note.1, url: self.note.0)
                 }
             })
             popMenu.addAction(action)
@@ -1234,32 +1237,31 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             self.toggleConceptHighlight()
         }
         self.processDrawingRecognition()
-        DataManager.activeNote!.setUpdateDate()
-        DataManager.activeNote!.getCurrentPage().canvasDrawing = self.canvasView.drawing
-        DataManager.save(file: DataManager.activeNote!)
+        note.1.getCurrentPage().canvasDrawing = self.canvasView.drawing
+        NeoLibrary.save(note: note.1, url: note.0)
         log.info("Saved note for current page.")
     }
     
     func previousPage() {
-        if DataManager.activeNote!.hasPreviousPage() {
-            self.view.makeToast("Page \(DataManager.activeNote!.activePageIndex)/\(DataManager.activeNote!.pages.count)", duration: 1.0, position: .center)
+        if note.1.hasPreviousPage() {
+            self.view.makeToast("Page \(note.1.activePageIndex)/\(note.1.pages.count)", duration: 1.0, position: .center)
             self.pageChanged = true
             if self.saveTimer != nil {
                 self.saveCurrentPage()
             }
-            DataManager.activeNote!.previousPage()
-            self.load()
+            note.1.previousPage()
+            self.load(page: note.1.getCurrentPage())
         }
     }
     func nextPage() {
-        if DataManager.activeNote!.hasNextPage() {
-            self.view.makeToast("Page \(DataManager.activeNote!.activePageIndex+2)/\(DataManager.activeNote!.pages.count)", duration: 1.0, position: .center)
+        if note.1.hasNextPage() {
+            self.view.makeToast("Page \(note.1.activePageIndex+2)/\(note.1.pages.count)", duration: 1.0, position: .center)
             self.pageChanged = true
             if self.saveTimer != nil {
                 self.saveCurrentPage()
             }
-            DataManager.activeNote!.nextPage()
-            self.load()
+            note.1.nextPage()
+            self.load(page: note.1.getCurrentPage())
         }
     }
     
@@ -1268,10 +1270,10 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         popMenu.appearance.popMenuBackgroundStyle = .blurred(.dark)
         let newPageAction = PopMenuDefaultAction(title: "New Page", image: UIImage(systemName: "plus.circle"),  didSelect: { action in
             let newPage = NotePage()
-            DataManager.activeNote!.pages.insert(newPage, at: DataManager.activeNote!.activePageIndex + 1)
+            self.note.1.pages.insert(newPage, at: self.note.1.activePageIndex + 1)
             self.saveCurrentPage()
-            DataManager.activeNote!.nextPage()
-            self.load()
+            self.note.1.nextPage()
+            self.load(page: self.note.1.getCurrentPage())
             self.saveCurrentPage()
         })
         popMenu.addAction(newPageAction)
@@ -1332,7 +1334,11 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
         if urls.count > 0 {
             self.view.makeToast("Imported the selected documents.")
-            let (notes, images, pdfs, texts) = ImportHelper.importItems(urls: urls, n: DataManager.activeNote!)
+            let (notes, images, pdfs, texts) = ImportHelper.importItems(urls: urls)
+            for n in notes {
+                log.info("Added pages of imported note to currently open note.")
+                note.1.pages += n.1.pages
+            }
             for img in images {
                 self.addNoteImage(image: img)
             }
@@ -1342,23 +1348,23 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                     if let pdfPage = pdf.page(at: i) {
                         if !setPDFForCurrentPage {
                             setPDFForCurrentPage = true
-                            DataManager.activeNote!.getCurrentPage().backdropPDFData = pdfPage.dataRepresentation
+                            note.1.getCurrentPage().backdropPDFData = pdfPage.dataRepresentation
                             self.pdfView.document = PDFDocument(data: pdfPage.dataRepresentation!)
                         }
                         else {
                             let newPage = NotePage()
                             newPage.backdropPDFData = pdfPage.dataRepresentation
-                            DataManager.activeNote!.pages.insert(newPage, at: DataManager.activeNote!.activePageIndex + 1)
+                            note.1.pages.insert(newPage, at: note.1.activePageIndex + 1)
                         }
                     }
                 }
             }
             for text in texts {
-                DataManager.activeNote!.getCurrentPage().typedTexts.append(text)
+                note.1.getCurrentPage().typedTexts.append(text)
                 let textView = self.createNoteTypedTextView(typedText: text)
                 self.addTypedTextViewToCanvas(textView: textView, typedText: text)
             }
-            DataManager.save(file: DataManager.activeNote!)
+            NeoLibrary.save(note: note.1, url: note.0)
         }
     }
     
@@ -1387,7 +1393,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         if let typedText = self.noteTextViews[source] {
             typedText.size = scale
             log.info(scale)
-            DataManager.activeNote!.getCurrentPage().updateNoteTypedText(typedText: typedText)
+            note.1.getCurrentPage().updateNoteTypedText(typedText: typedText)
             self.startSaveTimer()
         }
     }
@@ -1395,7 +1401,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     func draggableTextViewLocationChanged(source: DraggableTextView, location: CGPoint) {
         if let typedText = self.noteTextViews[source] {
             typedText.location = location
-            DataManager.activeNote!.getCurrentPage().updateNoteTypedText(typedText: typedText)
+            note.1.getCurrentPage().updateNoteTypedText(typedText: typedText)
             self.startSaveTimer()
         }
     }
@@ -1426,7 +1432,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             })
             popMenu.addAction(copyTextAction)
             let action = PopMenuDefaultAction(title: "Delete", didSelect: { action in
-                DataManager.activeNote!.getCurrentPage().deleteTypedText(typedText: typedText)
+                self.note.1.getCurrentPage().deleteTypedText(typedText: typedText)
                 source.removeFromSuperview()
                 self.noteTextViews[source] = nil
                 self.startSaveTimer()
@@ -1448,7 +1454,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                 self.noteTextViews[source] = nil
                 self.addTypedTextViewToCanvas(textView: self.createNoteTypedTextView(typedText: typedText), typedText: typedText)
                 self.highlightedTextView = nil
-                DataManager.activeNote!.getCurrentPage().updateNoteTypedText(typedText: typedText)
+                self.note.1.getCurrentPage().updateNoteTypedText(typedText: typedText)
                 self.startSaveTimer()
                 self.view.makeToast("Changed code language to \(lang.lowercased().capitalizingFirstLetter()).", duration: 1, position: .center)
             }))
@@ -1462,7 +1468,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     func draggableTextViewTextChanged(source: DraggableTextView, text: String) {
         if let typedText = self.noteTextViews[source] {
             typedText.text = text
-            DataManager.activeNote!.getCurrentPage().updateNoteTypedText(typedText: typedText)
+            note.1.getCurrentPage().updateNoteTypedText(typedText: typedText)
             self.startSaveTimer()
         }
     }
@@ -1485,7 +1491,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     
     private func addNoteImage(image: UIImage) {
         let noteImage = NoteImage(image: image)
-        DataManager.activeNote!.getCurrentPage().images.append(noteImage)
+        note.1.getCurrentPage().images.append(noteImage)
         let frame = CGRect(x: 50, y: 50, width: 0.25 * image.size.width, height: 0.25 * image.size.height)
         let draggableView = DraggableImageView(frame: frame)
         draggableView.draggableView.lastScale = 1.0
@@ -1500,7 +1506,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         if let noteImage = self.noteImageViews[source] {
             noteImage.size = scale
             log.info(scale)
-            DataManager.activeNote!.getCurrentPage().updateNoteImage(noteImage: noteImage)
+            note.1.getCurrentPage().updateNoteImage(noteImage: noteImage)
             self.startSaveTimer()
         }
     }
@@ -1508,7 +1514,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     func draggableImageViewLocationChanged(source: DraggableImageView, location: CGPoint) {
         if let noteImage = self.noteImageViews[source] {
             noteImage.location = location
-            DataManager.activeNote!.getCurrentPage().updateNoteImage(noteImage: noteImage)
+            note.1.getCurrentPage().updateNoteImage(noteImage: noteImage)
             self.startSaveTimer()
         }
     }
@@ -1525,7 +1531,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         })
         let action = PopMenuDefaultAction(title: "Delete Image", didSelect: { action in
             if let noteImage =  self.noteImageViews[source] {
-                DataManager.activeNote!.getCurrentPage().deleteImage(noteImage: noteImage)
+                self.note.1.getCurrentPage().deleteImage(noteImage: noteImage)
                 source.removeFromSuperview()
                 self.noteImageViews[source] = nil
                 self.startSaveTimer()
@@ -1539,8 +1545,8 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     }
     
     private func updatePaginationButtons() {
-        previousPageButton.isEnabled = DataManager.activeNote!.hasPreviousPage()
-        nextPageButton.isEnabled = DataManager.activeNote!.hasNextPage()
+        previousPageButton.isEnabled = note.1.hasPreviousPage()
+        nextPageButton.isEnabled = note.1.hasNextPage()
     }
     
     private func clearFloatingViews() {
@@ -1569,15 +1575,15 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     // MARK: Documents View Controller delegate
     func resetDocuments() {
         self.clearConceptHighlights()
-        DataManager.activeNote!.clearDocuments()
+        note.1.clearDocuments()
         documentsVC.clear()
-        DataManager.saveCurrentNote()
-        self.annotateText(text: DataManager.activeNote!.getText())
+        NeoLibrary.save(note: note.1, url: note.0)
+        self.annotateText(text: note.1.getText())
     }
     var oldDocuments: [Document]!
     func updateTopicsCount() {
-        self.topicsBadgeHub.setCount(DataManager.activeNote!.getDocuments(forCurrentPage: true).count)
-        let differences = zip(oldDocuments, DataManager.activeNote!.getDocuments()).map {$0.0 == $0.1}
+        self.topicsBadgeHub.setCount(note.1.getDocuments(forCurrentPage: true).count)
+        let differences = zip(oldDocuments, note.1.getDocuments()).map {$0.0 == $0.1}
         if differences.count > 0 {
             if self.topicsShown {
                 self.setupTopicAnnotations(recognitionImageSize: canvasView.frame.size)
@@ -1590,19 +1596,22 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     }
 
     func notePageSelected(index: Int) {
-        if DataManager.activeNote!.activePageIndex != index {
+        if note.1.activePageIndex != index {
             if self.saveTimer != nil {
                 self.saveCurrentPage()
             }
-            DataManager.activeNote!.activePageIndex = index
-            self.load()
+            note.1.activePageIndex = index
+            self.load(page: note.1.getCurrentPage())
         }
     }
-    func notePagesReordered() {
+    func notePagesReordered(note: Note) {
+        self.note.1 = note
         self.updatePaginationButtons()
+        self.saveCurrentPage()
     }
-    func notePageDeleted() {
-        self.load()
+    func notePageDeleted(note: Note) {
+        self.note.1 = note
+        self.load(page: self.note.1.getCurrentPage())
         self.saveCurrentPage()
     }
     @IBAction func canvasRightSwiped(_ sender: UISwipeGestureRecognizer) {

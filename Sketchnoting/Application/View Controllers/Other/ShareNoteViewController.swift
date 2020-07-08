@@ -16,7 +16,7 @@ class ShareNoteViewController: UIViewController {
     @IBOutlet var pdfButton: UIButton!
     @IBOutlet var imageButton: UIButton!
     
-    var note: Note!
+    var note: (URL, Note)!
     override func viewDidLoad() {
         super.viewDidLoad()
         fileButton.layer.borderColor = UIColor.white.cgColor
@@ -55,7 +55,7 @@ class ShareNoteViewController: UIViewController {
     private func validatePageNumber() -> Bool {
         if pageNumberField.text != nil && Int(pageNumberField.text!) != nil {
             let number = Int(pageNumberField.text!)! - 1
-            if number >= 0 && number < note.pages.count {
+            if number >= 0 && number < note.1.pages.count {
                 return true
             }
             return false
@@ -68,9 +68,8 @@ class ShareNoteViewController: UIViewController {
             return
         }
         if asType == 0 {
-            let noteURL = DataManager.getNotesDirectory().appendingPathComponent(note.id + ".sketchnote")
-            if FileManager.default.fileExists(atPath: noteURL.path) {
-                let activityController = UIActivityViewController(activityItems: [noteURL], applicationActivities: nil)
+            if FileManager.default.fileExists(atPath: note.0.path) {
+                let activityController = UIActivityViewController(activityItems: [note.0], applicationActivities: nil)
                 self.present(activityController, animated: true, completion: nil)
                 if let popOver = activityController.popoverPresentationController {
                     popOver.sourceView = fileButton
@@ -78,20 +77,29 @@ class ShareNoteViewController: UIViewController {
             }
         }
         else if asType == 1 {
-            var pdf = note.createPDF()
-            if typeSegmentedControl.selectedSegmentIndex == 1 {
-                pdf = note.pages[Int(pageNumberField.text!)! - 1].createPDF()
-            }
-            if let pdf = pdf {
-                let activityController = UIActivityViewController(activityItems: [pdf], applicationActivities: nil)
-                self.present(activityController, animated: true, completion: nil)
-                if let popOver = activityController.popoverPresentationController {
-                    popOver.sourceView = pdfButton
+            note.1.createPDF2() { pdf in
+                if let pdf = pdf {
+                    let activityController = UIActivityViewController(activityItems: [pdf], applicationActivities: nil)
+                    self.present(activityController, animated: true, completion: nil)
+                    if let popOver = activityController.popoverPresentationController {
+                        popOver.sourceView = self.pdfButton
+                    }
                 }
             }
+//            var pdf = note.1.createPDF()
+//            if typeSegmentedControl.selectedSegmentIndex == 1 {
+//                pdf = note.1.pages[Int(pageNumberField.text!)! - 1].createPDF()
+//            }
+//            if let pdf = pdf {
+//                let activityController = UIActivityViewController(activityItems: [pdf], applicationActivities: nil)
+//                self.present(activityController, animated: true, completion: nil)
+//                if let popOver = activityController.popoverPresentationController {
+//                    popOver.sourceView = pdfButton
+//                }
+//            }
         }
         else {
-            let page = note.pages[Int(pageNumberField.text!)! - 1]
+            let page = note.1.pages[Int(pageNumberField.text!)! - 1]
             page.getAsImage() { image in
                 if let jpegData = image.jpegData(compressionQuality: 1) {
                     let activityController = UIActivityViewController(activityItems: [jpegData], applicationActivities: nil)

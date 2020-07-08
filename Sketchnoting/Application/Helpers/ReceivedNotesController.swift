@@ -15,7 +15,7 @@ class ReceivedNotesController: NSObject, MCSessionDelegate {
     }
     
     func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
-        if let decodedNote = DataManager.decodeNoteFromData(data: data) {
+        if let decodedNote = NeoLibrary.decodeNoteFromData(data: data) {
             decodedNote.sharedByDevice = peerID.displayName
             DispatchQueue.main.async {
                 self.receivedNotes.append(decodedNote)

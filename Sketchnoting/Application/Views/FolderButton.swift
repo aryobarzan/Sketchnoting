@@ -10,27 +10,24 @@ import UIKit
 
 class FolderButton: UIButton {
     var delegate: FolderButtonDelegate?
-    var folder: Folder!
+    var directoryURL: URL!
     
-    func setFolder(folder: Folder) {
-        self.folder = folder
+    func set(directoryURL: URL) {
+        self.directoryURL = directoryURL
         self.addTarget(self, action: #selector(onTap), for: .touchUpInside)
         self.setTitleColor(.link, for: .normal)
-        if folder == DataManager.homeFolder {
-            self.setTitle(" Home", for: .normal)
+        self.setTitle(" \(directoryURL.deletingPathExtension().lastPathComponent)", for: .normal)
+        self.setImage(UIImage(systemName: "arrow.right"), for: .normal)
+        if NeoLibrary.isHomeDirectory(url: directoryURL) {
             self.setImage(UIImage(systemName: "house"), for: .normal)
-        }
-        else {
-            self.setTitle(" " + folder.getName(), for: .normal)
-            self.setImage(UIImage(systemName: "arrow.right"), for: .normal)
         }
     }
 
     @objc func onTap(sender: UIButton!) {
-        self.delegate?.onTap(folder: folder)
+        self.delegate?.onTap(directoryURL: directoryURL)
     }
 }
 
 protocol FolderButtonDelegate {
-    func onTap(folder: Folder)
+    func onTap(directoryURL: URL)
 }

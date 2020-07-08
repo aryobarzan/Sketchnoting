@@ -30,7 +30,7 @@ class Note: File, DocumentDelegate {
     
     var delegate: NoteDelegate?
     
-    init(name: String, parent: String?, documents: [Document]?) {
+    init(name: String, documents: [Document]?) {
         self.documents = documents ?? [Document]()
         self.hiddenDocuments = [Document]()
         self.pages = [NotePage]()
@@ -38,7 +38,7 @@ class Note: File, DocumentDelegate {
         self.helpLinesType = .None
         let firstPage = NotePage()
         self.pages.append(firstPage)
-        super.init(name: name, parent: parent)
+        super.init(name: name)
     }
     
     //Codable
@@ -67,7 +67,6 @@ class Note: File, DocumentDelegate {
         do {
             try container.encode(documents, forKey: .documents)
             try container.encode(hiddenDocuments, forKey: .hiddenDocuments)
-            log.info("Encoded note documents.")
         } catch {
             log.error("Error while encoding documents of note.")
         }
@@ -161,16 +160,6 @@ class Note: File, DocumentDelegate {
         for doc in documents {
             doc.delegate = self
         }
-        log.info("Note " + self.getName() + " decoded.")
-    }
-    
-    public func duplicate() -> Note {
-        let documents = self.documents
-        let duplicate = Note(name: self.getName(), parent: self.parent, documents: documents)
-        duplicate.setName(name: self.getName() + " (Copy)")
-        duplicate.tags = self.tags
-        duplicate.pages = self.pages
-        return duplicate
     }
     
     //MARK: updating data
@@ -204,7 +193,6 @@ class Note: File, DocumentDelegate {
             documents.append(document)
             document.delegate = self
             self.delegate?.noteHasNewDocument(note: self, document: document)
-            DataManager.save(file: self)
         }
     }
     
@@ -306,6 +294,43 @@ class Note: File, DocumentDelegate {
         return nil
     }
     
+    func createPDF2(completion: @escaping (Data?) -> Void) {
+        UITraitCollection(userInterfaceStyle: .light).performAsCurrent {
+            if pages.count > 0 {
+                let pdfWidth = UIScreen.main.bounds.width
+                let pdfHeight = UIScreen.main.bounds.height
+                
+                let bounds = CGRect(x: 0, y: 0, width: pdfWidth, height: pdfHeight)
+                let mutableData = NSMutableData()
+                UIGraphicsBeginPDFContextToData(mutableData, bounds, nil)
+                for page in pages {
+                    UIGraphicsBeginPDFPage()
+                        
+                    var image = page.canvasDrawing.image(from: bounds, scale: 1.0)
+                    let canvasImage = image
+                    var pdfImage: UIImage?
+                    if let pdfDocument = page.getPDFDocument() {
+                        if let p = pdfDocument.page(at: 0) {
+                            pdfImage = p.thumbnail(of: p.bounds(for: .cropBox).size, for: .cropBox)
+                        }
+                    }
+                    if let pdfImage = pdfImage {
+                        image = pdfImage.mergeWith2(withImage: canvasImage)
+                    }
+                    for noteImage in page.images {
+                        image = image.mergeWith3(withImage: noteImage)
+                    }
+                    for noteTypedText in page.typedTexts {
+                        image = image.addText(drawText: noteTypedText)
+                    }
+                    image.draw(in: bounds)
+                }
+                UIGraphicsEndPDFContext()
+                completion(mutableData as Data)
+            }
+        }
+    }
+    
     // MARK: Page helper functions
     public func getCurrentPage() -> NotePage {
         if activePageIndex >= pages.count {
@@ -375,7 +400,6 @@ class Note: File, DocumentDelegate {
                 self.pages.append(page)
             }
             self.mergeTagsWith(note: note)
-            self.setUpdateDate()
         }
     }
     

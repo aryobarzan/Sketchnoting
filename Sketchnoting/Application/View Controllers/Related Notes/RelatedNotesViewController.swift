@@ -14,8 +14,7 @@ enum RelatedNotesContext {
 }
 
 protocol RelatedNotesVCDelegate {
-    func openRelatedNote(note: Note)
-    func mergedNotes(note1: Note, note2: Note)
+    func openRelatedNote(url: URL, note: Note)
 }
 
 class RelatedNotesViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate {
@@ -26,14 +25,14 @@ class RelatedNotesViewController: UIViewController, UICollectionViewDataSource, 
         case High = 0.9
     }
     
-    var note: Note!
+    var note: (URL, Note)!
     var context: RelatedNotesContext! = .HomePage
     
-    var relatedNotes = [Note]()
+    var relatedNotes = [(URL, Note)]()
     var similarityThreshold: Float = 0.5
     private var similarityLevel: SimilarityLevel = .Low
     
-    var openNote: Note?
+    var openNote: (URL, Note)?
     var delegate: RelatedNotesVCDelegate?
 
     @IBOutlet weak var countLabel: UILabel!
@@ -46,7 +45,7 @@ class RelatedNotesViewController: UIViewController, UICollectionViewDataSource, 
         collectionView.delegate = self
         collectionView.dataSource = self
         
-        self.title = note.getName()
+        self.title = note.1.getName()
         
         refreshRelatedNotes()
     }
@@ -82,16 +81,16 @@ class RelatedNotesViewController: UIViewController, UICollectionViewDataSource, 
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "NoteCollectionViewCell", for: indexPath as IndexPath) as! NoteCollectionViewCell
-        cell.setFile(file: self.relatedNotes[indexPath.item])
+        cell.setFile(url: self.relatedNotes[indexPath.item].0, file: self.relatedNotes[indexPath.item].1)
         return cell
     }
         
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let related = self.relatedNotes[indexPath.item]
-        let alert = UIAlertController(title: "Open Note", message: "Close this note and open the note " + related.getName() + "?", preferredStyle: .alert)
+        let alert = UIAlertController(title: "Open Note", message: "Close this note and open the note " + related.1.getName() + "?", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Open", style: .default, handler: { action in
             self.dismiss(animated: true, completion: nil)
-            self.delegate?.openRelatedNote(note: related)
+            self.delegate?.openRelatedNote(url: related.0, note: related.1)
         }))
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in
                 log.info("Not opening note.")
@@ -99,45 +98,13 @@ class RelatedNotesViewController: UIViewController, UICollectionViewDataSource, 
         self.present(alert, animated: true, completion: nil)
     }
     
-    func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
-        return UIContextMenuConfiguration(identifier: nil, previewProvider: nil, actionProvider: { suggestedActions in
-
-            return self.makeNoteContextMenu(n: self.relatedNotes[indexPath.row], point: point, cellIndexPath: indexPath)
-        })
-    }
-    
-    private func makeNoteContextMenu(n: Note, point: CGPoint, cellIndexPath: IndexPath) -> UIMenu {
-        let mergeAction = UIAction(title: "Merge", image: UIImage(systemName: "arrow.merge")) { action in
-            let alert = UIAlertController(title: "Merge Note", message: "Are you sure you want to merge this note with the related note? This will delete the related note.", preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: "Merge", style: .destructive, handler: { action in
-                self.note.mergeWith(note: n)
-                DataManager.save(file: self.note)
-                if self.note != n {
-                    DataManager.delete(file: n)
-                }
-                log.info("Merged notes.")
-                self.refreshRelatedNotes()
-                self.delegate?.mergedNotes(note1: self.note, note2: n)
-            }))
-            alert.addAction(UIAlertAction(title: "Cancel", style: .default, handler: { action in
-                  log.info("Not merging note.")
-            }))
-            self.present(alert, animated: true, completion: nil)
-        }
-        let mergeTagsAction = UIAction(title: "Merge Tags", image: UIImage(systemName: "tag.fill")) { action in
-            self.note.mergeTagsWith(note: n)
-            DataManager.save(file: self.note)
-        }
-        return UIMenu(title: note.getName(), children: [mergeAction, mergeTagsAction])
-    }
-    
     private func refreshRelatedNotes() {
         Knowledge.setupSimilarityMatrix()
-        let foundNotes = Knowledge.similarNotesFor(note: note)
-        self.relatedNotes = [Note]()
-        for (note, score) in foundNotes {
+        let foundNotes = Knowledge.similarNotesFor(url: note.0, note: note.1)
+        self.relatedNotes = [(URL, Note)]()
+        for (url, note, score) in foundNotes {
             if score > self.similarityLevel.rawValue {
-                self.relatedNotes.append(note)
+                self.relatedNotes.append((url, note))
             }
         }
         collectionView.reloadData()

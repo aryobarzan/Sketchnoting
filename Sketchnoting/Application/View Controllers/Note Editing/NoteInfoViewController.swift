@@ -15,23 +15,22 @@ class NoteInfoViewController: UIViewController {
     @IBOutlet weak var updateDateLabel: UILabel!
     
     var delegate: NoteInfoDelegate?
+    var note: (URL, Note)!
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        titleTextField.text = DataManager.activeNote!.getName()
-        creationDateLabel.text = "\(DataManager.activeNote!.creationDate.getFormattedDate())"
-        updateDateLabel.text = "\(DataManager.activeNote!.updateDate.getFormattedDate())"
+        titleTextField.text = note.1.getName()
+        creationDateLabel.text = "\(NeoLibrary.getCreationDate(url: note.0).getFormattedDate())"
+        updateDateLabel.text = "\(NeoLibrary.getModificationDate(url: note.0).getFormattedDate())"
     }
     
     @IBAction func titleTextViewDone(_ sender: UITextField) {
         if let text = sender.text {
-            DataManager.activeNote!.setName(name: text)
             log.info("Note title updated.")
-            DataManager.saveCurrentNote()
-            delegate?.noteTitleUpdated(title: DataManager.activeNote!.getName())
+            _ = NeoLibrary.rename(url: note.0, file: note.1, name: text)
+            delegate?.noteTitleUpdated(title: text)
         }
-        sender.text = DataManager.activeNote!.getName()
-        
+        sender.text = note.1.getName()
     }
     
 }

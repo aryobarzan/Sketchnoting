@@ -15,7 +15,7 @@ class WATHelper {
     private let gcube_token = "5f57008b-3114-47e9-9ee2-742c877d37b2-843339462"
     private let watQueue = DispatchQueue(label: "WATQueue", qos: .background)
     
-    func fetch(text: String, note: Note, parentConcept: WATDocument? = nil) {
+    func fetch(text: String, note: (URL, Note), parentConcept: WATDocument? = nil) {
         let parameters: Parameters = ["text": text, "lang": "en", "tokenizer": "opennlp", "gcube-token": gcube_token]
         let headers: HTTPHeaders = [
             "Accept": "application/json"
@@ -57,21 +57,21 @@ class WATHelper {
         }
     }
     // to update
-    private func performAdditionalSteps(document: WATDocument, note: Note) {
+    private func performAdditionalSteps(document: WATDocument, note: (URL, Note)) {
         DispatchQueue.main.async {
-            if !note.getDocuments().contains(document) {
+            if !note.1.getDocuments().contains(document) {
                 log.info("WAT: new document added - \(document.title)")
-                note.addDocument(document: document)
+                note.1.addDocument(document: document)
                 self.watQueue.async {
                     self.fetchWikipediaIntroText(document: document)
                     self.fetchWikipediaImage(document: document, completion: {foundImage in
                         if !foundImage {
-                            KnowledgeGraphHelper.fetchWikipediaImage(note: note, document: document)
+                            KnowledgeGraphHelper.fetchWikipediaImage(document: document)
                         }
                     })
                     KnowledgeGraphHelper.isPlace(name: document.title, completionHandler: { isPlace in
                         if isPlace {
-                            MapHelper.fetchMap(location: document.title, document: document, note: note)
+                            MapHelper.fetchMap(location: document.title, document: document)
                         }
                     })
                 }
@@ -167,7 +167,7 @@ class WATHelper {
         }
     }
     // To update
-    func checkForSubconcepts(document: WATDocument, note: Note) {
+    func checkForSubconcepts(document: WATDocument, note: (URL, Note)) {
         self.watQueue.async {
             let text = document.title.lowercased().replacingOccurrences(of: "\n", with: " ")
             var words = text.components(separatedBy: " ")
@@ -187,7 +187,7 @@ class WATHelper {
         }
     }
     // To update
-    func checkRelatedness(doc_one: WATDocument, doc_two: WATDocument, note: Note) {
+    func checkRelatedness(doc_one: WATDocument, doc_two: WATDocument, note: (URL, Note)) {
         self.watQueue.async {
             if doc_one != doc_two {
                 if let id_one = doc_one.wikiPageID, let id_two = doc_two.wikiPageID {

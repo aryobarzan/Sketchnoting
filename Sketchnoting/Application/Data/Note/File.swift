@@ -8,62 +8,29 @@
 
 import UIKit
 
-class File: Codable, Comparable, Equatable, Hashable {
-    var id: String
+class File: Codable, Equatable, Hashable {
     private var name: String
-    var creationDate: Date
-    var updateDate: Date
-    var parent: String? // ID
-    //var url: URL
     
-    init(name: String, parent: String?, customID: String? = nil) {
-        if let customID = customID {
-            self.id = customID
-        }
-        else {
-            self.id = UUID().uuidString
-        }
+    init(name: String) {
         self.name = name
-        self.creationDate = Date.init(timeIntervalSinceNow: 0)
-        self.updateDate = Date.init(timeIntervalSinceNow: 0)
-        self.parent = parent
-        //self.url = url
     }
     
     // Codable
     enum CodingKeys: String, CodingKey {
-        case id
         case name
-        case creationDate
-        case updateDate
-        case parent
-        //case url
     }
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(id, forKey: .id)
         try container.encode(name, forKey: .name)
-        try container.encode(creationDate.timeIntervalSince1970, forKey: .creationDate)
-        try container.encode(updateDate.timeIntervalSince1970, forKey: .updateDate)
-        //try container.encode(url, forKey: .url)
-        if parent != nil {
-            try container.encode(parent, forKey: .parent)
-        }
-        log.info("File " + self.id + " encoded.")
-
+        log.info("File " + self.name + " encoded.")
     }
     required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        id = try container.decode(String.self, forKey: .id)
         name = try container.decode(String.self, forKey: .name)
         if name.isEmpty {
             name = "Untitled"
         }
-        creationDate = Date(timeIntervalSince1970: try container.decode(TimeInterval.self, forKey: .creationDate))
-        updateDate = Date(timeIntervalSince1970: try container.decode(TimeInterval.self, forKey: .updateDate))
-        //url = try container.decode(URL.self, forKey: .url)
-        parent = try? container.decode(String.self, forKey: .parent)
-        log.info("File " + self.id + " decoded.")
+        log.info("File " + self.name + " decoded.")
     }
     
     //
@@ -78,10 +45,6 @@ class File: Codable, Comparable, Equatable, Hashable {
         else {
             self.name = name
         }
-    }
-    
-    func setUpdateDate() {
-        self.updateDate = Date.init(timeIntervalSinceNow: 0)
     }
     
     public func getPreviewImage(completion: @escaping (UIImage) -> Void) {
@@ -106,17 +69,13 @@ class File: Codable, Comparable, Equatable, Hashable {
     }
     
     static func == (lhs: File, rhs: File) -> Bool {
-        if lhs.id == rhs.id {
+        if lhs.name == rhs.name {
             return true
         }
         return false
     }
     
-    static func < (lhs: File, rhs: File) -> Bool {
-        return lhs.creationDate < rhs.creationDate
-    }
-    
     func hash(into hasher: inout Hasher) {
-        hasher.combine(id)
+        hasher.combine(name)
     }
 }

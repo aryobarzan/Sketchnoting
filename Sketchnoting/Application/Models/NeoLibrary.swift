@@ -6,67 +6,335 @@
 //  Copyright © 2020 Aryobarzan. All rights reserved.
 //
 
-//import UIKit
-//
-//class NeoLibrary {
-//    private static var navigationPath = [Folder]()
-//    public static func getHomeDirectoryURL() -> URL {
-//        let documentsPath = NSURL(fileURLWithPath: NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0])
-//        let homeURL = documentsPath.appendingPathComponent("Home")
-//        do
-//        {
-//            if !FileManager.default.fileExists(atPath: homeURL!.path) {
-//                try FileManager.default.createDirectory(atPath: homeURL!.path, withIntermediateDirectories: true, attributes: nil)
-//            }
-//            return homeURL!
-//        }
-//        catch let error as NSError
-//        {
-//            log.error("Unable to create directory \(error.debugDescription)")
-//        }
-//        return homeURL!
-//    }
-//
-//    public static func createFolder(name: String, root: URL = getHomeDirectoryURL()) -> Folder? {
-//        let location = root.appendingPathComponent(name)
-//        do
-//        {
-//            if !FileManager.default.fileExists(atPath: location.path) {
-//                try FileManager.default.createDirectory(atPath: location.path, withIntermediateDirectories: true, attributes: nil)
-//                return Folder(name: name, parent: nil, customID: nil, url: location)
-//            }
-//            log.error("Folder could not be created: A folder with the name \(name) already exists.")
-//            return nil
-//        }
-//        catch _ as NSError
-//        {
-//            log.error("Unable to create folder.")
-//        }
-//        return nil
-//    }
-//
-//    public static func move(file: File, toFolder folder: Folder) -> Bool {
-//        if file.url != folder.url {
-//            do
-//            {
-//                var name = file.getName()
-//                while FileManager.default.fileExists(atPath: folder.url.appendingPathComponent(name).path) {
-//                    name = name + " 2"
-//                }
-//                file.setName(name: name)
-//                if file is Note {
-//                    name = name + ".sketchnote"
-//                }
-//                try FileManager.default.moveItem(at: file.url, to: folder.url.appendingPathComponent(name))
-//                file.url = folder.url.appendingPathComponent(name)
-//                log.info("Moved file \(file.getName()) to \(folder.url.appendingPathComponent(name).path).")
-//                return true
-//            }
-//            catch _ as NSError
-//            {
-//                log.error("Unable to move file \(file.getName()) to folder \(folder.getName()).")
-//            }
-//        }
-//        return false
-//    }
-//}
+import UIKit
+import PDFKit
+
+class NeoLibrary {
+    public static var currentLocation: URL = getHomeDirectoryURL()
+    private static let neoLibraryQueue = DispatchQueue(label: "NeoLibraryQueue", qos: .background)
+    
+    static var receivedNotesController = ReceivedNotesController()
+    
+    public static func getDocumentsURL() -> URL {
+        let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
+        let documentsDirectory = paths[0]
+        return documentsDirectory
+    }
+    
+    public static func getHomeDirectoryURL() -> URL {
+        let documentsPath = self.getDocumentsURL()
+        let homeURL = documentsPath.appendingPathComponent("Home")
+        do
+        {
+            if !FileManager.default.fileExists(atPath: homeURL.path) {
+                try FileManager.default.createDirectory(atPath: homeURL.path, withIntermediateDirectories: true, attributes: nil)
+            }
+            return homeURL
+        }
+        catch let error as NSError
+        {
+            log.error("Unable to create directory \(error.debugDescription)")
+        }
+        return homeURL
+    }
+    
+    public static func isHomeDirectory(url: URL) -> Bool {
+        var temp0 = url.absoluteString
+        if temp0.starts(with: "file:///private") {
+            temp0 = "file:///" + String(temp0[16..<temp0.count])
+        }
+        var temp1 = self.getHomeDirectoryURL().absoluteString
+        if temp1.starts(with: "file:///private") {
+            temp1 = "file:///" + String(temp1[16..<temp1.count])
+        }
+        return temp0 == temp1
+    }
+    
+    public static func getFiles(atURL url: URL = NeoLibrary.currentLocation, foldersOnly: Bool = false) -> [(URL, File)] {
+        var files = [(URL, File)]()
+        do {
+            let fileURLs = try FileManager.default.contentsOfDirectory(at: url, includingPropertiesForKeys: nil)
+            for url in fileURLs {
+                do {
+                    if url.hasDirectoryPath {
+                        let file = File(name: url.deletingPathExtension().lastPathComponent)
+                        files.append((url, file))
+                    }
+                    else {
+                        if !foldersOnly {
+                            let data = try Data(contentsOf: url)
+                            if let decoded = self.decodeNoteFromData(data: data) {
+                                files.append((url, decoded))
+                            }
+                        }
+                    }
+                } catch {
+                    log.error(error)
+                }
+            }
+        } catch {
+            log.error("Failed to load current files: \(error.localizedDescription)")
+        }
+        return files
+    }
+    
+    public static func getNotes() -> [(URL, Note)] {
+        var notes = [(URL, Note)]()
+        if let enumerator = FileManager.default.enumerator(at: self.getHomeDirectoryURL(), includingPropertiesForKeys: [.isRegularFileKey], options: [.skipsHiddenFiles, .skipsPackageDescendants]) {
+            for case let fileURL as URL in enumerator {
+                do {
+                    let fileAttributes = try fileURL.resourceValues(forKeys:[.isRegularFileKey])
+                    if fileAttributes.isRegularFile! {
+                        do {
+                            let data = try Data(contentsOf: fileURL)
+                            if let note = self.decodeNoteFromData(data: data) {
+                                notes.append((fileURL, note))
+                            }
+                        } catch {}
+                        
+                    }
+                } catch { log.error(error) }
+            }
+        }
+        return notes
+    }
+    
+    public static func save(note: Note, url: URL) {
+        neoLibraryQueue.async {
+            if let encoded = note.encodeFileAsData() {
+                try? encoded.write(to: url)
+                log.info("Note \(note.getName()) saved.")
+            }
+        }
+    }
+    
+    private static func saveSynchronously(note: Note, url: URL) {
+        if let encoded = note.encodeFileAsData() {
+            try? encoded.write(to: url)
+            log.info("Note \(note.getName()) saved synchronously.")
+        }
+    }
+    
+    public static func delete(file: File, url: URL) {
+        do {
+            if FileManager.default.fileExists(atPath: url.path) {
+                try FileManager.default.removeItem(atPath: url.path)
+                log.info("Deleted file \(file.getName()).")
+            }
+            else {
+                log.error("File to delete \(file.getName()) could not be found on disk.")
+            }
+        } catch {
+            log.error("Failed to delete file \(file.getName()).")
+        }
+    }
+
+    public static func move(file: File, from source: URL, to destination: URL) -> URL? {
+        // Missing: recursive destination handling necessary?
+        if source != destination {
+            do
+            {
+                var name = file.getName()
+                var tmp = name
+                if file is Note {
+                    tmp = name + ".sketchnote"
+                }
+                while FileManager.default.fileExists(atPath: destination.appendingPathComponent(tmp).path) {
+                    name = name + " 2"
+                    if file is Note {
+                        tmp = name + ".sketchnote"
+                    }
+                }
+                file.setName(name: name)
+                if file is Note {
+                    name = name + ".sketchnote"
+                }
+                try FileManager.default.moveItem(at: source, to: destination.appendingPathComponent(name))
+                log.info("Moved file \(file.getName()).")
+                return destination.appendingPathComponent(name)
+            }
+            catch _ as NSError
+            {
+                log.error("Unable to move file \(file.getName()) to \(destination.path).")
+            }
+        }
+        return nil
+    }
+    
+    public static func rename(url: URL, file: File, name: String) -> URL? {
+        if FileManager.default.fileExists(atPath: url.path) {
+            var newName = name
+            if newName.isEmpty {
+                newName = "Untitled"
+            }
+            var temp = newName
+            if file is Note {
+                temp = temp + ".sketchnote"
+            }
+            let newURL = url.deletingLastPathComponent().appendingPathComponent(temp)
+            if FileManager.default.fileExists(atPath: newURL.path) {
+                return nil
+            }
+            do {
+                try FileManager.default.moveItem(at: url, to: newURL)
+                if let note = file as? Note {
+                    note.setName(name: newName)
+                    self.save(note: note, url: newURL)
+                }
+                return newURL
+            } catch {
+                log.error("Error while trying to rename file.")
+            }
+        }
+        return nil
+    }
+    
+    public static func importNote(url: URL) {
+        do {
+            let data = try Data(contentsOf: url)
+            if let note = self.decodeNoteFromData(data: data) {
+                var n = note.getName()
+                while FileManager.default.fileExists(atPath: self.currentLocation.appendingPathComponent(n + ".sketchnote").path) {
+                    n = n + " 2"
+                }
+                let url = self.currentLocation.appendingPathComponent(n + ".sketchnote")
+                let note = Note(name: n, documents: nil)
+                self.saveSynchronously(note: note, url: url)
+                log.info("Note imported.")
+            }
+        } catch {
+            log.error("Failed to import note.")
+        }
+    }
+    
+    public static func add(note: Note) {
+        var n = note.getName()
+        while FileManager.default.fileExists(atPath: self.currentLocation.appendingPathComponent(n + ".sketchnote").path) {
+            n = n + " 2"
+        }
+        let url = self.currentLocation.appendingPathComponent(n + ".sketchnote")
+        note.setName(name: n)
+        self.saveSynchronously(note: note, url: url)
+        log.info("Note added.")
+    }
+    
+    
+    // Decoding
+    public static func decodeNoteFromData(data: Data) -> Note? {
+        if let decodedDataArray = try? NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(data) as? [Data] {
+            if decodedDataArray.count >= 1 {
+                let jsonDecoder = JSONDecoder()
+                if let note = try? jsonDecoder.decode(Note.self, from: decodedDataArray[0]) {
+                    return note
+                }
+            }
+        }
+        return nil
+    }
+    // File Creation
+    
+    public static func createFolder(name: String, root: URL = getHomeDirectoryURL()) -> (URL, File)? {
+        do
+        {
+            var n = name
+            while FileManager.default.fileExists(atPath: root.appendingPathComponent(n).path) {
+                n = n + " 2"
+            }
+            let url = root.appendingPathComponent(n)
+            try FileManager.default.createDirectory(atPath: url.path, withIntermediateDirectories: true, attributes: nil)
+            return (url, File(name: name))
+        }
+        catch _ as NSError
+        {
+            log.error("Unable to create folder.")
+        }
+        return nil
+    }
+    
+    public static func createNote(name: String, at location: URL = currentLocation) -> (URL, Note) {
+        var n = name
+        while FileManager.default.fileExists(atPath: location.appendingPathComponent(n + ".sketchnote").path) {
+            n = n + " 2"
+        }
+        let url = location.appendingPathComponent(n + ".sketchnote")
+        let note = Note(name: n, documents: nil)
+        self.saveSynchronously(note: note, url: url)
+        return (url, note)
+    }
+    public static func createNoteFromImages(images: [UIImage], at location: URL = currentLocation) -> (URL, Note) {
+        let (url, note) = NeoLibrary.createNote(name: "Imported Images")
+        for image in images {
+            let noteImage = NoteImage(image: image)
+            note.getCurrentPage().images.append(noteImage)
+        }
+        self.saveSynchronously(note: note, url: url)
+        return (url, note)
+    }
+    
+    public static func createNoteFromTypedTexts(texts: [NoteTypedText], at location: URL = currentLocation) -> (URL, Note) {
+        let (url, note) = NeoLibrary.createNote(name: "Imported Text Files")
+        note.getCurrentPage().typedTexts = texts
+        self.saveSynchronously(note: note, url: url)
+        return (url, note)
+    }
+    
+    public static func createNoteFromPDF(pdf: PDFDocument, at location: URL = currentLocation) -> (URL, Note) {
+        var pdfTitle = "Imported PDF"
+        if let attributes = pdf.documentAttributes {
+            if let title = attributes["Title"] as? String {
+                if !title.isEmpty {
+                    pdfTitle = title
+                }
+            }
+        }
+        let (url, note) = NeoLibrary.createNote(name: pdfTitle)
+        var setPDFForCurrentPage = false
+        for i in 0..<pdf.pageCount {
+            if let pdfPage = pdf.page(at: i) {
+                if !setPDFForCurrentPage {
+                    setPDFForCurrentPage = true
+                    note.getCurrentPage().backdropPDFData = pdfPage.dataRepresentation
+                }
+                else {
+                    let newPage = NotePage()
+                    newPage.backdropPDFData = pdfPage.dataRepresentation
+                    note.pages.append(newPage)
+                }
+            }
+        }
+        self.saveSynchronously(note: note, url: url)
+        return (url, note)
+    }
+    
+    public static func createDuplicate(note: Note, url: URL) -> (URL, Note) {
+        var n = note.getName() + " (Copy)"
+        while FileManager.default.fileExists(atPath: url.deletingLastPathComponent().appendingPathComponent(n + ".sketchnote").path) {
+            n = n + " 2"
+        }
+        let duplicateURL =  url.deletingLastPathComponent().appendingPathComponent(n + ".sketchnote")
+        let documents = note.getDocuments()
+        let duplicate = Note(name: n, documents: documents)
+        duplicate.tags = note.tags
+        duplicate.pages = note.pages
+        self.saveSynchronously(note: duplicate, url: duplicateURL)
+        return (duplicateURL, duplicate)
+    }
+    
+    // Helper
+    public static func getCreationDate(url: URL) -> Date {
+        if let attributes = try? FileManager.default.attributesOfItem(atPath: url.path) as [FileAttributeKey: Any] {
+            if let date = attributes[FileAttributeKey.creationDate] as? Date {
+                return date
+            }
+        }
+        return Date()
+    }
+    public static func getModificationDate(url: URL) -> Date {
+        if let attributes = try? FileManager.default.attributesOfItem(atPath: url.path) as [FileAttributeKey: Any] {
+            if let date = attributes[FileAttributeKey.modificationDate] as? Date {
+                return date
+            }
+        }
+        return Date()
+    }
+}

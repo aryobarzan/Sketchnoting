@@ -11,7 +11,7 @@ import Alamofire
 import SwiftyJSON
 
 class SpotlightHelper {
-    func fetch(text: String, note: Note) {
+    func fetch(text: String, note: (URL, Note)) {
         let chunks = text.split(by: 6000)
         
         for chunk in chunks {
@@ -49,7 +49,7 @@ class SpotlightHelper {
         }
     }
     
-    private func fetchJSONOfResource(concept: String, conceptURI: String, secondRankPercentage: Double, resourceJSONURL: String, note: Note) {
+    private func fetchJSONOfResource(concept: String, conceptURI: String, secondRankPercentage: Double, resourceJSONURL: String, note: (URL, Note)) {
         let headers: HTTPHeaders = [
             "Accept": "application/json"
         ]
@@ -133,17 +133,17 @@ class SpotlightHelper {
                 
                 if let document = SpotlightDocument(title: concept, description: abstract, URL: conceptURI, type: .Spotlight, rank: secondRankPercentage, label: label, types: types, wikiPageID: wikiPageID, latitude: latitude, longitude: longitude, mapImage: nil) {
                     if let latitude = latitude, let longitude = longitude {
-                        MapHelper.fetchMapImage(latitude: String(latitude), longitude: String(longitude), document: document, note: note)
+                        MapHelper.fetchMapImage(latitude: String(latitude), longitude: String(longitude), document: document)
                     }
                     else {
                         for type in types {
                             if type.lowercased().contains("place") || type.lowercased().contains("location") || type.lowercased().contains("event") {
-                                MapHelper.fetchMap(location: concept, document: document, note: note)
+                                MapHelper.fetchMap(location: concept, document: document)
                                 break
                             }
                         }
                     }                        
-                    note.addDocument(document: document)
+                    note.1.addDocument(document: document)
                 }
             }
         }
