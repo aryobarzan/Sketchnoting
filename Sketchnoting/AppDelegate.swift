@@ -36,6 +36,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         FirebaseApp.configure()
         
         if SettingsManager.firstAppStartup() {
+            _ = NeoLibrary.getHomeDirectoryURL()
             UserDefaults.settings.set(false, forKey: SettingsKeys.AutomaticAnnotation.rawValue)
             UserDefaults.settings.set(true, forKey: SettingsKeys.TextRecognitionCloud.rawValue)
             UserDefaults.settings.set(true, forKey: SettingsKeys.TextRecognitionCloudOption.rawValue)

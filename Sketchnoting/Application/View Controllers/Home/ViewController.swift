@@ -405,17 +405,23 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     }
     
     private func updateFoldersHierarchy() {
+        log.info("Updating folder navigation hierarchy.")
         for button in folderButtons {
             button.removeFromSuperview()
         }
         folderButtons = [FolderButton]()
         var component = NeoLibrary.currentLocation
-        while !NeoLibrary.isHomeDirectory(url: component) {
+        var limit = 0
+        while !NeoLibrary.isHomeDirectory(url: component) && component != NeoLibrary.getHomeDirectoryURL() {
             log.info(component)
             let folderButton = FolderButton()
             folderButton.frame = CGRect(x: 0, y: 0, width: 100, height: 35)
             folderButton.set(directoryURL: component)
             folderButton.delegate = self
+            limit += 1
+            if limit >= 20 {
+                break
+            }
             folderButtons.append(folderButton)
             component = component.deletingLastPathComponent()
         }
