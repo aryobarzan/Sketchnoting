@@ -138,18 +138,34 @@ class NotePagesViewController: UIViewController, UICollectionViewDelegate, UICol
         })
     }
     private func makeDocumentContextMenu(pageIndex: Int) -> UIMenu {
-        let copyAction = UIAction(title: "Copy", image: UIImage(systemName: "doc.text")) { action in
+        var actions = [UIAction]()
+        actions.append(UIAction(title: "Copy", image: UIImage(systemName: "doc.text")) { action in
             SKClipboard.copy(page: self.note.1.pages[pageIndex])
             self.view.makeToast("Copied page to SKClipboard.")
+        })
+        if let copiedPage = SKClipboard.getPage() {
+            actions.append(UIAction(title: "Paste Page (after)", image: UIImage(systemName: "arrow.right")) { action in
+                self.note.1.insert(page: copiedPage, i: pageIndex + 1)
+                NeoLibrary.save(note: self.note.1, url: self.note.0)
+                self.view.makeToast("Pasted page.")
+                self.collectionView.reloadData()
+            })
+            actions.append(UIAction(title: "Paste Page (before)", image: UIImage(systemName: "arrow.left")) { action in
+                self.note.1.insert(page: copiedPage, i: pageIndex)
+                self.note.1.activePageIndex += 1
+                NeoLibrary.save(note: self.note.1, url: self.note.0)
+                self.view.makeToast("Pasted page.")
+                self.collectionView.reloadData()
+            })
         }
-        let deleteAction = UIAction(title: "Delete", image: UIImage(systemName: "trash")) { action in
+        actions.append(UIAction(title: "Delete", image: UIImage(systemName: "trash"), attributes: [.destructive]) { action in
             let isDeleted = self.note.1.deletePage(index: pageIndex)
             if isDeleted {
                 self.delegate?.notePageDeleted(note: self.note.1)
             }
             self.collectionView.reloadData()
-        }
-        return UIMenu(title: "Note Page", children: [copyAction, deleteAction])
+        })
+        return UIMenu(title: "Note Page", children: actions)
     }
 }
 

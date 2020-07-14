@@ -19,7 +19,7 @@ open class DirectionalLineView: UIView{
     var itemSize: Int
     
     override public func draw(_ rect: CGRect) {
-        guard let context = UIGraphicsGetCurrentContext() else {
+        guard let context = UIGraphicsGetCurrentContext() else {
             fatalError("Err: Expected context to be non-nil, but got nil, Cannot draw DirectionalLineView")
         }
         

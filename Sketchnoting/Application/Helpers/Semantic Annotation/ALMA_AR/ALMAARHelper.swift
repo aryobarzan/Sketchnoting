@@ -59,7 +59,7 @@ class ALMAARHelper {
                     return
                 }
                 log.info("ALMA AR (Resource): API call successful.")
-                if let id = json["id"].int, let title = json["title"].string, let previewURL = json["previewURL"].string, let url = json["url"].string {
+                if let _ = json["id"].int, let title = json["title"].string, let previewURL = json["previewURL"].string, let url = json["url"].string {
                     if let document = ARDocument(title: title, description: nil, URL: url, type: .ALMAAR, spot: spot, categories: [String](), wikiPageID: nil)  { // Wiki page ID same as id?
                         DispatchQueue.main.async {
                             note.1.addDocument(document: document)

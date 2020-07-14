@@ -302,18 +302,18 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     
     @IBAction func importDocumentTapped(_ sender: UIButton) {
         let popMenu = PopMenuViewController(sourceView: sender, actions: [PopMenuAction](), appearance: nil)
-        popMenu.appearance.popMenuBackgroundStyle = .blurred(.dark)
-        let noteImportAction = PopMenuDefaultAction(title: "Import Note(s)/Image(s)...", image: UIImage(systemName: "doc"),  didSelect: { action in
+        popMenu.appearance.popMenuBackgroundStyle = .none()
+        let noteImportAction = PopMenuDefaultAction(title: "Import Files", image: UIImage(systemName: "doc"),  didSelect: { action in
             popMenu.dismiss(animated: true, completion: nil)
             self.displayDocumentPicker()
         })
         popMenu.addAction(noteImportAction)
-        let scanAction = PopMenuDefaultAction(title: "Scan Document(s)...", image: UIImage(systemName: "camera.viewfinder"),  didSelect: { action in
+        let scanAction = PopMenuDefaultAction(title: "Scan Documents", image: UIImage(systemName: "camera.viewfinder"),  didSelect: { action in
             popMenu.dismiss(animated: true, completion: nil)
             self.showDocumentScanner()
         })
         popMenu.addAction(scanAction)
-        let imageImportAction = PopMenuDefaultAction(title: "Camera Roll...", image: UIImage(systemName: "photo"),  didSelect: { action in
+        let imageImportAction = PopMenuDefaultAction(title: "Camera Roll", image: UIImage(systemName: "photo"),  didSelect: { action in
             popMenu.dismiss(animated: true, completion: nil)
             self.displayImagePicker()
         })
@@ -821,7 +821,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         let alert = UIAlertController(title: "Delete File", message: "Are you sure you want to delete this file?", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Delete", style: .destructive, handler: { action in
             self.items.removeAll{$0.0 == url}
-            NeoLibrary.delete(file: file, url: url)
+            NeoLibrary.delete(url: url)
             self.noteCollectionView.reloadData()
         }))
         alert.addAction(UIAlertAction(title: "Cancel", style: .default, handler: { action in
@@ -902,8 +902,8 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         if !self.selectedFiles.isEmpty {
             let alert = UIAlertController(title: "Delete \(self.selectedFiles.count) File(s)", message: "Are you sure you want to delete the selected files?", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "Delete", style: .destructive, handler: { action in
-                for (url, file) in self.selectedFiles {
-                    NeoLibrary.delete(file: file, url: url)
+                for (url, _) in self.selectedFiles {
+                    NeoLibrary.delete(url: url)
                     self.updateDisplayedNotes(false)
                 }
             }))

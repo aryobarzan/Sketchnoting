@@ -23,10 +23,6 @@ class SettingsViewController: UITableViewController {
         super.viewDidLoad()
         self.navigationController?.setNavigationBarHidden(false, animated: false)
         
-        exportBackupButton.layer.borderColor = UIColor.systemGray.cgColor
-        exportBackupButton.layer.borderWidth = 1
-        exportBackupButton.layer.cornerRadius = 8
-        
         automaticAnnotationSwitch.setOn(SettingsManager.automaticAnnotation(), animated: false)
         tagmeSwitch.setOn(SettingsManager.getAnnotatorStatus(annotator: .TAGME), animated: false)
         watSwitch.setOn(SettingsManager.getAnnotatorStatus(annotator: .WAT), animated: false)
@@ -91,8 +87,11 @@ class SettingsViewController: UITableViewController {
     }
     @IBAction func backupNotesTapped(_ sender: UIButton) {
         let alertView = UIAlertController(title: "Please wait", message: "Creating backup...", preferredStyle: .alert)
-        // Missing: handle cancel
-        alertView.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        var isCancelled = false
+        alertView.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: {(alert: UIAlertAction!) in
+            isCancelled = true
+            
+        }))
         var progressView = UIProgressView()
         present(alertView, animated: true, completion: {
             let margin: CGFloat = 8.0
@@ -102,11 +101,25 @@ class SettingsViewController: UITableViewController {
             alertView.view.addSubview(progressView)
             if let backupFileURL = NeoLibrary.createBackup(progressView: progressView) {
                 if FileManager.default.fileExists(atPath: backupFileURL.path) {
-                    let activityController = UIActivityViewController(activityItems: [backupFileURL], applicationActivities: nil)
-                    alertView.dismiss(animated: true, completion: {self.present(activityController, animated: true, completion: nil)
-                    if let popOver = activityController.popoverPresentationController {
-                        popOver.sourceView = sender
-                    }})
+                    if (!isCancelled) {
+                        let activityController = UIActivityViewController(activityItems: [backupFileURL], applicationActivities: nil)
+                        alertView.dismiss(animated: true, completion: {
+                            self.present(activityController, animated: true)
+                            if let popOver = activityController.popoverPresentationController {
+                                popOver.sourceView = sender
+                            }
+                            activityController.completionWithItemsHandler = {(activityType, completed, returnedItems, error) in
+                                if (completed) {
+                                    NeoLibrary.delete(url: backupFileURL)
+                                    log.info("Deleted temporary backup zip file.")
+                                }
+                            }
+                        })
+                    }
+                    else {
+                        NeoLibrary.delete(url: backupFileURL)
+                        log.info("Deleted temporary backup zip file.")
+                    }
                 }
             }
         })

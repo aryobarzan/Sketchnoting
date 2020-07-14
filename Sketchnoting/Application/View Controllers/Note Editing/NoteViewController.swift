@@ -24,7 +24,7 @@ import GPUImage
 import Highlightr
 import Toast
 
-class NoteViewController: UIViewController, UIPencilInteractionDelegate, UICollectionViewDelegate, NoteDelegate, PKCanvasViewDelegate, PKToolPickerObserver, UIScreenshotServiceDelegate, NoteOptionsDelegate, DocumentsViewControllerDelegate, NotePagesDelegate, VNDocumentCameraViewControllerDelegate, UIDocumentPickerDelegate, DraggableImageViewDelegate, DraggableTextViewDelegate, RelatedNotesVCDelegate, TextBoxViewControllerDelegate, MoveFileViewControllerDelegate, UIPopoverPresentationControllerDelegate, SKClipboardDelegate, NoteInfoDelegate {
+class NoteViewController: UIViewController, UIPencilInteractionDelegate, UICollectionViewDelegate, NoteDelegate, PKCanvasViewDelegate, PKToolPickerObserver, UIScreenshotServiceDelegate, NoteOptionsDelegate, DocumentsViewControllerDelegate, NotePagesDelegate, VNDocumentCameraViewControllerDelegate, UIDocumentPickerDelegate, DraggableImageViewDelegate, DraggableTextViewDelegate, RelatedNotesVCDelegate, TextBoxViewControllerDelegate, MoveFileViewControllerDelegate, UIPopoverPresentationControllerDelegate, NoteInfoDelegate {
     
     private var documentsVC: DocumentsViewController!
     
@@ -145,8 +145,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         
         self.noteTitleButton.setTitle(" \(note.1.getName())", for: .normal)
         self.load(page: note.1.getCurrentPage())
-        
-        self.updateSKClipboardButton()
     }
         
     override func viewWillAppear(_ animated: Bool) {
@@ -161,11 +159,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                 drawingRegionView.layer.borderColor = UIColor.white.cgColor
             }
         }
-    }
-    
-    private func updateSKClipboardButton() {
-        SKClipboard.delegate = self
-        SKClipboard.addClipboardButton(view: self.view)
     }
     
     // This function is called when the user closes the page, i.e. stops editing the note, and the app returns to the home page.
@@ -546,23 +539,31 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     private func setupNoteImages() {
         noteImageViews = [DraggableImageView : NoteImage]()
         for image in note.1.getCurrentPage().images {
-            let frame = CGRect(x: image.location.x, y: image.location.y, width: image.size.width, height: image.size.height)
-            let draggableView = DraggableImageView(frame: frame)
-            draggableView.image = image.image
-            draggableView.delegate = self
-            self.canvasView.addSubview(draggableView)
-            self.canvasView.sendSubviewToBack(draggableView)
-            self.noteImageViews[draggableView] = image
-            draggableView.center = image.location
+            displayNoteImage(image: image)
         }
+    }
+    
+    private func displayNoteImage(image: NoteImage) {
+        let frame = CGRect(x: image.location.x, y: image.location.y, width: image.size.width, height: image.size.height)
+        let draggableView = DraggableImageView(frame: frame)
+        draggableView.image = image.image
+        draggableView.delegate = self
+        self.canvasView.addSubview(draggableView)
+        self.canvasView.sendSubviewToBack(draggableView)
+        self.noteImageViews[draggableView] = image
+        draggableView.center = image.location
     }
     
     private func setupNoteTypedTexts() {
         noteTextViews = [DraggableTextView : NoteTypedText]()
         for typedText in note.1.getCurrentPage().typedTexts {
-            let textView = self.createNoteTypedTextView(typedText: typedText)
-            self.addTypedTextViewToCanvas(textView: textView, typedText: typedText)
+            displayTypedText(typedText: typedText)
         }
+    }
+    
+    private func displayTypedText(typedText: NoteTypedText) {
+        let textView = self.createNoteTypedTextView(typedText: typedText)
+        self.addTypedTextViewToCanvas(textView: textView, typedText: typedText)
     }
     
     
@@ -743,7 +744,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             break
         case .DeleteNote:
             self.isDeletingNote = true
-            NeoLibrary.delete(file: note.1, url: note.0)
+            NeoLibrary.delete(url: note.0)
             self.performSegue(withIdentifier: "CloseNote", sender: self)
             break
         case .MoleculeEditor:
@@ -1265,35 +1266,71 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         }
     }
     
-    @IBAction func newPageTapped(_ sender: UIButton) {
+    @IBAction func newItemTapped(_ sender: UIButton) {
         let popMenu = PopMenuViewController(sourceView: sender, actions: [PopMenuAction](), appearance: nil)
-        popMenu.appearance.popMenuBackgroundStyle = .blurred(.dark)
-        let newPageAction = PopMenuDefaultAction(title: "New Page", image: UIImage(systemName: "plus.circle"),  didSelect: { action in
+        popMenu.appearance.popMenuBackgroundStyle = .none()
+        let newPageAction = PopMenuDefaultAction(title: "New Page", image: UIImage(systemName: "plus.circle"), color: .link, didSelect: { action in
             let newPage = NotePage()
-            self.note.1.pages.insert(newPage, at: self.note.1.activePageIndex + 1)
+            self.note.1.add(page: newPage)
             self.saveCurrentPage()
             self.note.1.nextPage()
             self.load(page: self.note.1.getCurrentPage())
             self.saveCurrentPage()
         })
         popMenu.addAction(newPageAction)
-        let importItemsAction = PopMenuDefaultAction(title: "Import Note(s)/Image(s)...", image: UIImage(systemName: "doc"),  didSelect: { action in
+        let importItemsAction = PopMenuDefaultAction(title: "Import Files", image: UIImage(systemName: "doc"), didSelect: { action in
             popMenu.dismiss(animated: true, completion: nil)
             self.displayDocumentPicker()
         })
         popMenu.addAction(importItemsAction)
-        let scanAction = PopMenuDefaultAction(title: "Scan Document(s)...", image: UIImage(systemName: "doc.text.viewfinder"),  didSelect: { action in
+        let scanAction = PopMenuDefaultAction(title: "Scan Documents", image: UIImage(systemName: "doc.text.viewfinder"), didSelect: { action in
             popMenu.dismiss(animated: true, completion: nil)
             let scannerVC = VNDocumentCameraViewController()
             scannerVC.delegate = self
             self.present(scannerVC, animated: true)
         })
         popMenu.addAction(scanAction)
-        let imageImportAction = PopMenuDefaultAction(title: "Camera Roll...", image: UIImage(systemName: "photo"),  didSelect: { action in
+        let imageImportAction = PopMenuDefaultAction(title: "Camera Roll", image: UIImage(systemName: "photo"), didSelect: { action in
             popMenu.dismiss(animated: true, completion: nil)
             self.displayImagePicker()
         })
         popMenu.addAction(imageImportAction)
+        if (SKClipboard.hasItems()) {
+            if let copiedNote = SKClipboard.getNote() {
+                let pasteNoteAction = PopMenuDefaultAction(title: "Paste Note", image: UIImage(systemName: "square.stack.3d.down.right.fill"), didSelect: { action in
+                    self.note.1.add(pages: copiedNote.pages)
+                    self.saveCurrentPage()
+                    self.view.makeToast("Pasted \(copiedNote.pages.count) page(s).", duration: 2, position: .center)
+                })
+                popMenu.addAction(pasteNoteAction)
+            }
+            if let copiedPage = SKClipboard.getPage() {
+                let pastePageAction = PopMenuDefaultAction(title: "Paste Page", image: UIImage(systemName: "doc"), didSelect: { action in
+                    self.note.1.add(page: copiedPage)
+                    self.saveCurrentPage()
+                    self.view.makeToast("Pasted page.", duration: 1, position: .center)
+                })
+                popMenu.addAction(pastePageAction)
+            }
+            if let copiedImage = SKClipboard.getImage() {
+                let pasteImageAction = PopMenuDefaultAction(title: "Paste Image", image: UIImage(systemName: "photo"), didSelect: { action in
+                    self.note.1.getCurrentPage().images.append(copiedImage)
+                    self.displayNoteImage(image: copiedImage)
+                    self.saveCurrentPage()
+                    self.view.makeToast("Pasted image.", duration: 1, position: .center)
+                })
+                popMenu.addAction(pasteImageAction)
+            }
+            if let copiedTypedText = SKClipboard.getTypedText() {
+                let pasteTypedTextAction = PopMenuDefaultAction(title: "Paste Typed Text", image: UIImage(systemName: "text.alignleft"), didSelect: { action in
+                    self.note.1.getCurrentPage().typedTexts.append(copiedTypedText)
+                    self.displayTypedText(typedText: copiedTypedText)
+                    self.saveCurrentPage()
+                    self.view.makeToast("Pasted typed text.", duration: 1, position: .center)
+                })
+                popMenu.addAction(pasteTypedTextAction)
+            }
+        }
         self.present(popMenu, animated: true, completion: nil)
     }
     
@@ -1424,7 +1461,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             let copyAction = PopMenuDefaultAction(title: "Copy", didSelect: { action in
                 SKClipboard.copy(typedText: typedText)
                 self.view.makeToast("Copied note typed text to SKClipboard.")
-                self.updateSKClipboardButton()
             })
             popMenu.addAction(copyAction)
             let copyTextAction = PopMenuDefaultAction(title: "Copy Text", didSelect: { action in
@@ -1526,7 +1562,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             if let noteImage =  self.noteImageViews[source] {
                 SKClipboard.copy(image: noteImage)
                 self.view.makeToast("Copied note image to SKClipboard.")
-                self.updateSKClipboardButton()
             }
         })
         let action = PopMenuDefaultAction(title: "Delete Image", didSelect: { action in
@@ -1682,29 +1717,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     }
     var highlightedImage: DraggableImageView?
     var highlightedTextView: DraggableTextView?
-    
-    // MARK: Tags
-    
-    // MARK: SKClipboardDelegate
-    func pasteNoteTapped() {
-           log.info("Pasting note: \(SKClipboard.getNote()?.getName() ?? "Note name could not be retrieved.")")
-       }
-       // Implementation missing
-       func pastePageTapped() {
-           
-       }
-       // Implementation missing
-       func pasteImageTapped() {
-           
-       }
-       // Implementation missing
-       func pasteTypedTextTapped() {
-           
-       }
-       // Implementation missing
-       func clearClipboardTapped() {
-           
-       }
     
     
     // MARK: NoteInfoDelegate

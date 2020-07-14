@@ -118,17 +118,17 @@ class NeoLibrary {
         }
     }
     
-    public static func delete(file: File, url: URL) {
+    public static func delete(url: URL) {
         do {
             if FileManager.default.fileExists(atPath: url.path) {
                 try FileManager.default.removeItem(atPath: url.path)
-                log.info("Deleted file \(file.getName()).")
+                log.info("Deleted file \(url.lastPathComponent).")
             }
             else {
-                log.error("File to delete \(file.getName()) could not be found on disk.")
+                log.error("File to delete \(url.lastPathComponent) could not be found on disk.")
             }
         } catch {
-            log.error("Failed to delete file \(file.getName()).")
+            log.error("Failed to delete file \(url.lastPathComponent).")
         }
     }
 
@@ -333,7 +333,7 @@ class NeoLibrary {
         do {
             let progress = Progress()
             var _: NSKeyValueObservation = progress.observe(\.fractionCompleted) { [] object, change in
-            print("Backup ZIP creation progress: \(object.fractionCompleted)")
+                log.info("Backup ZIP creation progress: \(object.fractionCompleted)")
                 if let progressView = progressView {
                     progressView.progress = Float(object.fractionCompleted)
                 }

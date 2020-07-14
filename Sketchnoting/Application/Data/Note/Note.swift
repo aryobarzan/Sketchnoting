@@ -163,6 +163,30 @@ class Note: File, DocumentDelegate {
     }
     
     //MARK: updating data
+    func add(pages: [NotePage]) {
+        var i = activePageIndex + 1
+        for p in pages {
+            self.pages.insert(p, at: i)
+            i += 1
+        }
+    }
+    
+    func add(page: NotePage) {
+        self.pages.insert(page, at: activePageIndex + 1)
+    }
+    
+    func insert(page: NotePage, i: Int) {
+        if self.pages.count == 0 {
+            self.pages.append(page)
+        }
+        else {
+            if i <= self.pages.count && i >= 0 {
+                self.pages.insert(page, at: i)
+            }
+        }
+    }
+    
+    
     func hide(document: Document) {
         if (!isHidden(document: document)) {
             hiddenDocuments.append(document)
