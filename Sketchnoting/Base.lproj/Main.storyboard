@@ -783,7 +783,7 @@
                                             <constraint firstAttribute="trailing" secondItem="Is9-l7-CB7" secondAttribute="trailing" constant="8" id="ftH-gX-MCS"/>
                                             <constraint firstAttribute="height" constant="42" id="gwS-zk-pyi"/>
                                             <constraint firstItem="Is9-l7-CB7" firstAttribute="leading" secondItem="wHb-fC-SNw" secondAttribute="trailing" constant="8" id="iAE-Ib-pKQ"/>
-                                            <constraint firstItem="wHb-fC-SNw" firstAttribute="leading" relation="lessThanOrEqual" secondItem="Ysg-uh-uEX" secondAttribute="trailing" constant="398" id="od1-kN-L8T"/>
+                                            <constraint firstItem="wHb-fC-SNw" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="Ysg-uh-uEX" secondAttribute="trailing" constant="398" id="od1-kN-L8T"/>
                                             <constraint firstItem="Ysg-uh-uEX" firstAttribute="leading" secondItem="Hdy-fw-B6W" secondAttribute="trailing" constant="8" id="qXT-GK-Q6N"/>
                                         </constraints>
                                     </view>
@@ -1201,6 +1201,7 @@
                                         <rect key="frame" x="56" y="9" width="73" height="22"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="22" id="QCf-lE-ukC"/>
+                                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="73" id="ftO-Hl-SFT"/>
                                         </constraints>
                                         <fontDescription key="fontDescription" type="system" pointSize="15"/>
                                         <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -3179,10 +3180,10 @@
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>
-        <segue reference="fmI-KU-Ur1"/>
-        <segue reference="ig0-q1-Lq9"/>
-        <segue reference="ghm-KV-m2E"/>
-        <segue reference="58e-4d-iJp"/>
+        <segue reference="RAn-aJ-7TA"/>
+        <segue reference="b6T-Lb-KBp"/>
+        <segue reference="odf-CP-ags"/>
+        <segue reference="OAt-q3-0jJ"/>
         <segue reference="ct4-u7-KZY"/>
     </inferredMetricsTieBreakers>
     <resources>

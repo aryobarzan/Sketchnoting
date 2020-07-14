@@ -386,7 +386,7 @@ class DocumentsViewController: UICollectionViewController{
     }
     @IBAction func settingsTapped(_ sender: UIButton) {
         let popMenu = PopMenuViewController(sourceView: sender, actions: [PopMenuAction](), appearance: nil)
-        popMenu.appearance.popMenuBackgroundStyle = .blurred(.dark)
+        popMenu.appearance.popMenuBackgroundStyle = .none()
         let tagmeEpsilonAction = PopMenuDefaultAction(title: "Change TAGME Accuracy", image: UIImage(systemName: "dial"),  didSelect: { action in
             popMenu.dismiss(animated: true, completion: nil)
             var title = "Favor Common Topics (More)"
@@ -430,7 +430,7 @@ class DocumentsViewController: UICollectionViewController{
     
     @IBAction func filterTapped(_ sender: UIButton) {
         let popMenu = PopMenuViewController(sourceView: sender, actions: [PopMenuAction](), appearance: nil)
-        popMenu.appearance.popMenuBackgroundStyle = .blurred(.dark)
+        popMenu.appearance.popMenuBackgroundStyle = .none()
         
         var allImage: UIImage? = nil
         var spotlightImage: UIImage? = nil

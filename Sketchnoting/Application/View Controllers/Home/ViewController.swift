@@ -489,7 +489,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     
     @IBAction func noteSortingTapped(_ sender: UIButton) {
         let popMenu = PopMenuViewController(sourceView: sender, actions: [PopMenuAction](), appearance: nil)
-        popMenu.appearance.popMenuBackgroundStyle = .blurred(.dark)
+        popMenu.appearance.popMenuBackgroundStyle = .none()
         
         var newestFirstImage: UIImage? = nil
         var oldestFirstImage: UIImage? = nil
