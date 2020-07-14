@@ -36,7 +36,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         FirebaseApp.configure()
         
         if SettingsManager.firstAppStartup() {
-            _ = NeoLibrary.getHomeDirectoryURL()
+            _ = NeoLibrary.getHomeDirectoryURL() // Critical (causes infinite loop otherwise on first time app run)
             UserDefaults.settings.set(false, forKey: SettingsKeys.AutomaticAnnotation.rawValue)
             UserDefaults.settings.set(true, forKey: SettingsKeys.TextRecognitionCloud.rawValue)
             UserDefaults.settings.set(true, forKey: SettingsKeys.TextRecognitionCloudOption.rawValue)

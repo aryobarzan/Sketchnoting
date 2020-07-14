@@ -13,7 +13,8 @@ import MobileCoreServices
 import Highlightr
 
 class ImportHelper {
-    static var importUTTypes = ["public.image", "public.jpeg", "public.jpg", "public.png", "com.sketchnote", "com.adobe.pdf", String(kUTTypeText), String(kUTTypeJavaClass), String(kUTTypeCSource), String(kUTTypePlainText), String(kUTTypeSourceCode), "com.sun.java-source"]
+    static var importUTTypes = ["public.image", "public.jpeg", "public.jpg", "public.png", "com.sketchnote", "com.adobe.pdf", String(kUTTypeText), String(kUTTypeJavaClass), String(kUTTypeCSource), String(kUTTypePlainText), String(kUTTypeSourceCode), "com.sun.java-source", "com.pkware.zip-archive", "public.zip-archive"]
+    static var noteEditingUTTypes = ["public.image", "public.jpeg", "public.jpg", "public.png", "com.sketchnote", "com.adobe.pdf", String(kUTTypeText), String(kUTTypeJavaClass), String(kUTTypeCSource), String(kUTTypePlainText), String(kUTTypeSourceCode), "com.sun.java-source"]
     static func importItems(urls: [URL]) -> ([(URL, Note)], [UIImage], [PDFDocument], [NoteTypedText]) {
         var notes = [(URL, Note)]()
         var images = [UIImage]()
@@ -46,6 +47,22 @@ class ImportHelper {
                         }
                     }
                     break
+                case "com.pkware.zip-archive", "public.zip-archive":
+                    let result = NeoLibrary.importZIP(url: url)
+                    switch result {
+                    case .Success:
+                        log.info("Success: ZIP file imported.")
+                        break
+                    case .InvalidFile:
+                        log.error("Failure: ZIP file contains invalid file.")
+                        break
+                    case .InvalidZIP:
+                        log.error("Failure: ZIP file is invalid.")
+                        break
+                    case .Failure:
+                        log.error("Failure: ZIP import failed for unknown reason.")
+                        break
+                    }
                 default:
                     log.error("Unrecognized type for URL: \(url.typeIdentifier ?? "No type identifier")")
                 }

@@ -1323,7 +1323,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     }
     
     private func displayDocumentPicker() {
-        let types: [String] = ImportHelper.importUTTypes
+        let types: [String] = ImportHelper.noteEditingUTTypes
         let documentPicker = UIDocumentPickerViewController(documentTypes: types, in: .import)
         documentPicker.delegate = self
         documentPicker.modalPresentationStyle = .pageSheet
@@ -1708,7 +1708,10 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     
     
     // MARK: NoteInfoDelegate
-    func noteTitleUpdated(title: String) {
+    func noteTitleUpdated(title: String, newURL: URL) {
         self.noteTitleButton.setTitle(" \(title)", for: .normal)
+        self.note.0 = newURL
+        self.note.1.setName(name: title)
+        self.saveCurrentPage()
     }
 }

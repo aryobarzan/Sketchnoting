@@ -18,9 +18,14 @@ class SettingsViewController: UITableViewController {
     @IBOutlet var bioportalSwitch: UISwitch!
     @IBOutlet weak var watSwitch: UISwitch!
     @IBOutlet var chebiSwitch: UISwitch!
+    @IBOutlet weak var exportBackupButton: UIButton!
     override func viewDidLoad() {
         super.viewDidLoad()
         self.navigationController?.setNavigationBarHidden(false, animated: false)
+        
+        exportBackupButton.layer.borderColor = UIColor.systemGray.cgColor
+        exportBackupButton.layer.borderWidth = 1
+        exportBackupButton.layer.cornerRadius = 8
         
         automaticAnnotationSwitch.setOn(SettingsManager.automaticAnnotation(), animated: false)
         tagmeSwitch.setOn(SettingsManager.getAnnotatorStatus(annotator: .TAGME), animated: false)
@@ -85,6 +90,26 @@ class SettingsViewController: UITableViewController {
         }
     }
     @IBAction func backupNotesTapped(_ sender: UIButton) {
+        let alertView = UIAlertController(title: "Please wait", message: "Creating backup...", preferredStyle: .alert)
+        // Missing: handle cancel
+        alertView.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        var progressView = UIProgressView()
+        present(alertView, animated: true, completion: {
+            let margin: CGFloat = 8.0
+            let rect = CGRect(x: margin, y: 72.0, width: alertView.view.frame.width - margin * 2.0 , height: 2.0)
+            progressView = UIProgressView(frame: rect)
+            progressView.tintColor = self.view.tintColor
+            alertView.view.addSubview(progressView)
+            if let backupFileURL = NeoLibrary.createBackup(progressView: progressView) {
+                if FileManager.default.fileExists(atPath: backupFileURL.path) {
+                    let activityController = UIActivityViewController(activityItems: [backupFileURL], applicationActivities: nil)
+                    alertView.dismiss(animated: true, completion: {self.present(activityController, animated: true, completion: nil)
+                    if let popOver = activityController.popoverPresentationController {
+                        popOver.sourceView = sender
+                    }})
+                }
+            }
+        })
     }
 }
 

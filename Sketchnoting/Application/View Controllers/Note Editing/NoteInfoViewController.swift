@@ -27,8 +27,10 @@ class NoteInfoViewController: UIViewController {
     @IBAction func titleTextViewDone(_ sender: UITextField) {
         if let text = sender.text {
             log.info("Note title updated.")
-            _ = NeoLibrary.rename(url: note.0, file: note.1, name: text)
-            delegate?.noteTitleUpdated(title: text)
+            let newURL = NeoLibrary.rename(url: note.0, file: note.1, name: text)
+            if let newURL = newURL {
+                delegate?.noteTitleUpdated(title: text, newURL: newURL)
+            }
         }
         sender.text = note.1.getName()
     }
@@ -36,5 +38,5 @@ class NoteInfoViewController: UIViewController {
 }
 
 protocol NoteInfoDelegate {
-    func noteTitleUpdated(title: String)
+    func noteTitleUpdated(title: String, newURL: URL)
 }

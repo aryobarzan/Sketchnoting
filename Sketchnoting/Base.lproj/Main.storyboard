@@ -283,13 +283,16 @@
                                             <rect key="frame" x="0.0" y="0.0" width="712" height="100"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <button opaque="NO" contentMode="scaleToFill" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="r6a-sw-SHt">
-                                                    <rect key="frame" x="20" y="11" width="672" height="30"/>
+                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="r6a-sw-SHt">
+                                                    <rect key="frame" x="276" y="33" width="160" height="34"/>
+                                                    <color key="backgroundColor" systemColor="linkColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <constraints>
-                                                        <constraint firstAttribute="height" constant="30" id="Hmz-U4-S27"/>
+                                                        <constraint firstAttribute="width" constant="160" id="EbT-Hi-KdX"/>
+                                                        <constraint firstAttribute="height" constant="34" id="Hmz-U4-S27"/>
                                                     </constraints>
+                                                    <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                     <state key="normal" title=" Export Backup" image="square.and.arrow.up.on.square.fill" catalog="system">
-                                                        <color key="titleColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                        <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                     </state>
                                                     <connections>
                                                         <action selector="backupNotesTapped:" destination="9zg-b6-ctU" eventType="touchUpInside" id="JtK-u1-Lmc"/>
@@ -297,9 +300,8 @@
                                                 </button>
                                             </subviews>
                                             <constraints>
-                                                <constraint firstItem="r6a-sw-SHt" firstAttribute="top" secondItem="x3Q-rp-Seq" secondAttribute="topMargin" id="FWH-zB-kHT"/>
-                                                <constraint firstItem="r6a-sw-SHt" firstAttribute="trailing" secondItem="x3Q-rp-Seq" secondAttribute="trailingMargin" id="fx7-IH-vYW"/>
-                                                <constraint firstItem="r6a-sw-SHt" firstAttribute="leading" secondItem="x3Q-rp-Seq" secondAttribute="leadingMargin" id="krL-tH-m9y"/>
+                                                <constraint firstItem="r6a-sw-SHt" firstAttribute="centerX" secondItem="x3Q-rp-Seq" secondAttribute="centerX" id="eV1-Rp-6l5"/>
+                                                <constraint firstItem="r6a-sw-SHt" firstAttribute="centerY" secondItem="x3Q-rp-Seq" secondAttribute="centerY" id="gc3-4D-gHI"/>
                                             </constraints>
                                         </tableViewCellContentView>
                                     </tableViewCell>
@@ -324,6 +326,7 @@
                         <outlet property="automaticAnnotationSwitch" destination="Csy-l9-mh1" id="G3N-cT-oxo"/>
                         <outlet property="bioportalSwitch" destination="LdY-yR-OsO" id="7yg-4G-xWK"/>
                         <outlet property="chebiSwitch" destination="Vlz-Q3-7hh" id="3eo-2f-k20"/>
+                        <outlet property="exportBackupButton" destination="r6a-sw-SHt" id="GAj-Hm-gjY"/>
                         <outlet property="pencilSideButtonSegmentedControl" destination="8Sn-sq-rPx" id="Dev-LW-PNh"/>
                         <outlet property="tagmeSwitch" destination="BgV-Kh-M93" id="rtm-1D-ksd"/>
                         <outlet property="textRecognitionSegmentedControl" destination="To0-14-nYX" id="3dV-Z0-IFv"/>
@@ -713,7 +716,7 @@
                                                 </constraints>
                                                 <fontDescription key="fontDescription" type="system" pointSize="15"/>
                                                 <color key="tintColor" systemColor="systemRedColor" red="1" green="0.23137254900000001" blue="0.18823529410000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                                <state key="normal" title=" Delete..." image="xmark.circle.fill" catalog="system">
+                                                <state key="normal" title=" Delete" image="xmark.circle.fill" catalog="system">
                                                     <color key="titleColor" systemColor="systemRedColor" red="1" green="0.23137254900000001" blue="0.18823529410000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="small"/>
                                                 </state>
@@ -728,7 +731,7 @@
                                                     <constraint firstAttribute="width" constant="74" id="cmi-xu-weR"/>
                                                 </constraints>
                                                 <fontDescription key="fontDescription" type="system" pointSize="15"/>
-                                                <state key="normal" title=" Move..." image="folder" catalog="system">
+                                                <state key="normal" title=" Move" image="folder" catalog="system">
                                                     <color key="titleColor" red="0.26875244110000002" green="0.49985405119999998" blue="0.82210710099999995" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="small"/>
                                                 </state>
@@ -3170,10 +3173,10 @@
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>
-        <segue reference="RAn-aJ-7TA"/>
-        <segue reference="b6T-Lb-KBp"/>
-        <segue reference="odf-CP-ags"/>
-        <segue reference="OAt-q3-0jJ"/>
+        <segue reference="fmI-KU-Ur1"/>
+        <segue reference="ig0-q1-Lq9"/>
+        <segue reference="yvs-ei-HRy"/>
+        <segue reference="58e-4d-iJp"/>
         <segue reference="ct4-u7-KZY"/>
     </inferredMetricsTieBreakers>
     <resources>

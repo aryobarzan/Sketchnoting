@@ -8,6 +8,9 @@
 
 import UIKit
 import PDFKit
+import Foundation
+
+import ZIPFoundation
 
 class NeoLibrary {
     public static var currentLocation: URL = getHomeDirectoryURL()
@@ -53,7 +56,7 @@ class NeoLibrary {
     public static func getFiles(atURL url: URL = NeoLibrary.currentLocation, foldersOnly: Bool = false) -> [(URL, File)] {
         var files = [(URL, File)]()
         do {
-            let fileURLs = try FileManager.default.contentsOfDirectory(at: url, includingPropertiesForKeys: nil)
+            let fileURLs = try FileManager.default.contentsOfDirectory(at: url, includingPropertiesForKeys: nil, options: .skipsHiddenFiles)
             for url in fileURLs {
                 do {
                     if url.hasDirectoryPath {
@@ -177,10 +180,6 @@ class NeoLibrary {
             }
             do {
                 try FileManager.default.moveItem(at: url, to: newURL)
-                if let note = file as? Note {
-                    note.setName(name: newName)
-                    self.save(note: note, url: newURL)
-                }
                 return newURL
             } catch {
                 log.error("Error while trying to rename file.")
@@ -318,6 +317,85 @@ class NeoLibrary {
         duplicate.pages = note.pages
         self.saveSynchronously(note: duplicate, url: duplicateURL)
         return (duplicateURL, duplicate)
+    }
+    
+    public static func createBackup(progressView: UIProgressView? = nil) -> URL? {
+        let fileManager = FileManager()
+        let sourceURL = URL(fileURLWithPath: getHomeDirectoryURL().path)
+        let date = Date()
+        let calendar = Calendar.current
+        let year = calendar.component(.year, from: date)
+        let month = calendar.component(.month, from: date)
+        let day = calendar.component(.day, from: date)
+        let hour = calendar.component(.hour, from: date)
+        let minutes = calendar.component(.minute, from: date)
+        let destinationURL = URL(fileURLWithPath: getDocumentsURL().path).appendingPathComponent("Backup-\(year)\(month)\(day)\(hour)\(minutes).zip")
+        do {
+            let progress = Progress()
+            var _: NSKeyValueObservation = progress.observe(\.fractionCompleted) { [] object, change in
+            print("Backup ZIP creation progress: \(object.fractionCompleted)")
+                if let progressView = progressView {
+                    progressView.progress = Float(object.fractionCompleted)
+                }
+            }
+            try fileManager.zipItem(at: sourceURL, to: destinationURL, shouldKeepParent: false, progress: progress)
+        } catch {
+            log.error("Failed to create backup of library: \(error)")
+            return nil
+        }
+        return destinationURL
+    }
+    
+    enum ImportZIPResult {
+        case Success
+        case InvalidFile
+        case InvalidZIP
+        case Failure
+    }
+    public static func importZIP(url: URL) -> ImportZIPResult {
+        let fileManager = FileManager()
+        let sourceURL = url
+        var destinationURL = currentLocation
+        destinationURL.appendPathComponent(url.deletingPathExtension().lastPathComponent)
+        
+        // First verify if the content of the zip consists solely of directories and .sketchnote files
+        guard let archive = Archive(url: sourceURL, accessMode: .read) else  {
+            return .InvalidZIP
+        }
+        var valid = true
+        archive.forEach { entry in
+            if (!entry.path.hasSuffix("/")) {
+                if (entry.path.lowercased().hasSuffix(".sketchnote")) {
+                    log.info("Inspecting file \(entry.path)")
+                    _ = try? archive.extract(entry) { data in
+                        if self.decodeNoteFromData(data: data) != nil {
+                            // Valid .sketchnote file
+                        }
+                        else {
+                            log.error("Invalid file being imported! ZIP file import cancelled.")
+                            valid = false
+                        }
+                    }
+                }
+                else {
+                    valid = false
+                }
+            }
+        }
+        if (!valid) {
+            return ImportZIPResult.InvalidFile
+        }
+        
+        // ZIP file being imported is valid, so it is now saved to the app's library:
+        do {
+            try fileManager.createDirectory(at: destinationURL, withIntermediateDirectories: true, attributes: nil)
+            try fileManager.unzipItem(at: sourceURL, to: destinationURL)
+        } catch {
+            log.error("Failed to extract ZIP file for import: \(error)")
+            return ImportZIPResult.Failure
+        }
+        
+        return ImportZIPResult.Success
     }
     
     // Helper

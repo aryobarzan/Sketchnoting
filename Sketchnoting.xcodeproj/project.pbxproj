@@ -140,6 +140,7 @@
 		9FD5516E246A4364005D14D2 /* RelatedNotesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD5516D246A4364005D14D2 /* RelatedNotesViewController.swift */; };
 		9FD8BB97243D5BE500542BFA /* ImportHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD8BB96243D5BE500542BFA /* ImportHelper.swift */; };
 		9FDD6CA524AFB7C10093EDF4 /* NoteInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FDD6CA424AFB7C10093EDF4 /* NoteInfoViewController.swift */; };
+		9FE5B7A024BDF3AF00D94255 /* ZIPFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = 9FE5B79F24BDF3AF00D94255 /* ZIPFoundation */; };
 		9FF0AC9224412C5200A82BE8 /* DraggableImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FF0AC9124412C5200A82BE8 /* DraggableImageView.swift */; };
 		9FF0AC9424412F4C00A82BE8 /* NoteImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FF0AC9324412F4C00A82BE8 /* NoteImage.swift */; };
 		9FF0AC962441308B00A82BE8 /* CodableExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FF0AC952441308B00A82BE8 /* CodableExtensions.swift */; };
@@ -320,6 +321,7 @@
 				9FC5F90D24AFB07D00CDF2DF /* NVActivityIndicatorView in Frameworks */,
 				9F9460E223F5BAA10073D709 /* Connectivity in Frameworks */,
 				9F10EC192347E4B4005340AA /* SwiftyBeaver in Frameworks */,
+				9FE5B7A024BDF3AF00D94255 /* ZIPFoundation in Frameworks */,
 				D2A21B26513E1A7C02F6BD40 /* libPods-Sketchnoting.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -830,6 +832,7 @@
 				9F0D8564242052E600B8BE2F /* BSImagePicker */,
 				9F318D3F244A3EAD00A1B4B5 /* Toast */,
 				9FC5F90C24AFB07D00CDF2DF /* NVActivityIndicatorView */,
+				9FE5B79F24BDF3AF00D94255 /* ZIPFoundation */,
 			);
 			productName = Sketchnoting;
 			productReference = 9FD29BA32220524D00CC969A /* Sketchnoting.app */;
@@ -873,6 +876,7 @@
 				9F0D8563242052E600B8BE2F /* XCRemoteSwiftPackageReference "BSImagePicker" */,
 				9F318D3E244A3EAD00A1B4B5 /* XCRemoteSwiftPackageReference "Toast-Swift" */,
 				9FC5F90B24AFB07D00CDF2DF /* XCRemoteSwiftPackageReference "NVActivityIndicatorView" */,
+				9FE5B79E24BDF3AF00D94255 /* XCRemoteSwiftPackageReference "ZIPFoundation" */,
 			);
 			productRefGroup = 9FD29BA42220524D00CC969A /* Products */;
 			projectDirPath = "";
@@ -1386,6 +1390,14 @@
 				minimumVersion = 3.6.1;
 			};
 		};
+		9FE5B79E24BDF3AF00D94255 /* XCRemoteSwiftPackageReference "ZIPFoundation" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/weichsel/ZIPFoundation";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.9.11;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -1443,6 +1455,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 9FC5F90B24AFB07D00CDF2DF /* XCRemoteSwiftPackageReference "NVActivityIndicatorView" */;
 			productName = NVActivityIndicatorView;
+		};
+		9FE5B79F24BDF3AF00D94255 /* ZIPFoundation */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9FE5B79E24BDF3AF00D94255 /* XCRemoteSwiftPackageReference "ZIPFoundation" */;
+			productName = ZIPFoundation;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
