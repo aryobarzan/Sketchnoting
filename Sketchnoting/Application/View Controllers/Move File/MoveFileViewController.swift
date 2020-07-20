@@ -20,7 +20,7 @@ class MoveFileViewController: UIViewController, UITableViewDataSource, UITableVi
     var items = [URL]()
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+                
         tableView.delegate = self
         tableView.dataSource = self
         
@@ -31,7 +31,16 @@ class MoveFileViewController: UIViewController, UITableViewDataSource, UITableVi
         self.title = currentFolder.deletingPathExtension().lastPathComponent
         items = [URL]()
         for item in NeoLibrary.getFiles(atURL: currentFolder, foldersOnly: true) {
-            items.append(item.0)
+            var exclude = false
+            for it in filesToMove {
+                if it.0 == item.0 {
+                    exclude = true
+                    break
+                }
+            }
+            if !exclude {
+                items.append(item.0)
+            }
         }
         tableView.reloadData()
         if items.count == 0 {
@@ -69,7 +78,7 @@ class MoveFileViewController: UIViewController, UITableViewDataSource, UITableVi
         }
     }
 
-    @IBAction func newFolderTapped(_ sender: UIButton) {
+    @IBAction func newFolderTapped(_ sender: UIBarButtonItem) {
         self.showInputDialog(title: "New Folder", subtitle: nil, actionTitle: "Create", cancelTitle: "Cancel", inputPlaceholder: "Folder Name...", inputKeyboardType: .default, cancelHandler: nil)
         { (input: String?) in
             var name = "Untitled"
@@ -82,6 +91,7 @@ class MoveFileViewController: UIViewController, UITableViewDataSource, UITableVi
             self.updateItems()
         }
     }
+    
     @IBAction func backButtonTapped(_ sender: UIButton) {
         if !NeoLibrary.isHomeDirectory(url: currentFolder) {
             currentFolder = currentFolder.deletingLastPathComponent()

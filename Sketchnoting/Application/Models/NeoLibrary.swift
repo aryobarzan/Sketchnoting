@@ -338,7 +338,7 @@ class NeoLibrary {
                     progressView.progress = Float(object.fractionCompleted)
                 }
             }
-            try fileManager.zipItem(at: sourceURL, to: destinationURL, shouldKeepParent: false, progress: progress)
+            try fileManager.zipItem(at: sourceURL, to: destinationURL, shouldKeepParent: false, compressionMethod: .deflate, progress: progress)
         } catch {
             log.error("Failed to create backup of library: \(error)")
             return nil

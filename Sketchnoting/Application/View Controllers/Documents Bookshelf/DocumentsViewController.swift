@@ -119,9 +119,6 @@ class DocumentsViewController: UICollectionViewController{
             }
         })
         switch document.documentType {
-        case .Spotlight:
-            cell.typeImage.tintColor = #colorLiteral(red: 0.1764705926, green: 0.01176470611, blue: 0.5607843399, alpha: 1)
-            break
         case .TAGME:
             cell.typeImage.tintColor = #colorLiteral(red: 0.1764705926, green: 0.4980392158, blue: 0.7568627596, alpha: 1)
             break
@@ -210,8 +207,6 @@ class DocumentsViewController: UICollectionViewController{
             return documents.filter{ $0.documentType == .TAGME }
         case .WAT:
             return documents.filter{ $0.documentType == .WAT }
-        case .Spotlight:
-            return documents.filter{ $0.documentType == .Spotlight }
         case .BioPortal:
             return documents.filter{ $0.documentType == .BioPortal }
         case .CHEBI:
@@ -303,10 +298,6 @@ class DocumentsViewController: UICollectionViewController{
             return true
         }
         switch type {
-        case .Spotlight:
-            if self.bookshelfFilter == .Spotlight {
-                return true
-            }
         case .TAGME:
             if self.bookshelfFilter == .TAGME {
                 return true
@@ -352,10 +343,6 @@ class DocumentsViewController: UICollectionViewController{
             break
         case .FilterTAGME:
             self.bookshelfFilter = .TAGME
-            self.updateBookshelf()
-            break
-        case .FilterSpotlight:
-            self.bookshelfFilter = .Spotlight
             self.updateBookshelf()
             break
         case .FilterBioPortal:
@@ -433,7 +420,6 @@ class DocumentsViewController: UICollectionViewController{
         popMenu.appearance.popMenuBackgroundStyle = .none()
         
         var allImage: UIImage? = nil
-        var spotlightImage: UIImage? = nil
         var tagmeImage: UIImage? = nil
         var watImage: UIImage? = nil
         var bioportalImage: UIImage? = nil
@@ -448,9 +434,6 @@ class DocumentsViewController: UICollectionViewController{
             break
         case .WAT:
             watImage = UIImage(systemName: "checkmark.circle.fill")
-            break
-        case .Spotlight:
-            spotlightImage = UIImage(systemName: "checkmark.circle.fill")
             break
         case .BioPortal:
             bioportalImage = UIImage(systemName: "checkmark.circle.fill")
@@ -468,12 +451,6 @@ class DocumentsViewController: UICollectionViewController{
             
         })
         popMenu.addAction(allAction)
-        let spotlightAction = PopMenuDefaultAction(title: "Spotlight", image: spotlightImage,  didSelect: { action in
-            self.bookshelfFilter = .Spotlight
-            self.updateBookshelf()
-            
-        })
-        popMenu.addAction(spotlightAction)
         let tagmeAction = PopMenuDefaultAction(title: "TAGME", image: tagmeImage, didSelect: { action in
             self.bookshelfFilter = .TAGME
             self.updateBookshelf()
@@ -509,7 +486,6 @@ public enum BookshelfFilter {
     case All
     case TAGME
     case WAT
-    case Spotlight
     case BioPortal
     case ALMAAR
     case CHEBI
@@ -522,7 +498,6 @@ public enum BookshelfState {
 enum BookshelfOption {
     case FilterAll
     case FilterTAGME
-    case FilterSpotlight
     case FilterBioPortal
     case FilterCHEBI
     case ResetDocuments

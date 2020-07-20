@@ -8,6 +8,10 @@
 
 /* Begin PBXBuildFile section */
 		9F00428923E9FB2600961636 /* BadgeHub.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F00428823E9FB2600961636 /* BadgeHub.swift */; };
+		9F00B9F824C5D56E000153A8 /* NeoDocumentsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F00B9F724C5D56E000153A8 /* NeoDocumentsVC.swift */; };
+		9F00B9FB24C5D5FF000153A8 /* NeoDocumentCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F00B9F924C5D5FF000153A8 /* NeoDocumentCell.swift */; };
+		9F00B9FE24C5DBA2000153A8 /* NeoDocumentsSectionHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F00B9FD24C5DBA2000153A8 /* NeoDocumentsSectionHeader.swift */; };
+		9F00BA0024C5DD2D000153A8 /* NeoDocumentsSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F00B9FF24C5DD2D000153A8 /* NeoDocumentsSection.swift */; };
 		9F05B5A1232BE4EC00983AF2 /* NoteCollectionViewDetailCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9F05B59F232BE4EC00983AF2 /* NoteCollectionViewDetailCell.xib */; };
 		9F05B5A3232BF0C800983AF2 /* NoteCollectionViewDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F05B5A2232BF0C800983AF2 /* NoteCollectionViewDetailCell.swift */; };
 		9F06977024427823002DCE47 /* URLExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F06976F24427823002DCE47 /* URLExtensions.swift */; };
@@ -83,8 +87,6 @@
 		9FA5A482244AB14E006D9FB2 /* UILabelExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA5A481244AB14E006D9FB2 /* UILabelExtensions.swift */; };
 		9FA6238822CEA7FE007ED794 /* MapHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA6238722CEA7FE007ED794 /* MapHelper.swift */; };
 		9FA6238B22D37213007ED794 /* BioPortalHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA6238A22D37213007ED794 /* BioPortalHelper.swift */; };
-		9FA6238D22D38AEE007ED794 /* SpotlightHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA6238C22D38AEE007ED794 /* SpotlightHelper.swift */; };
-		9FA6239322DE30AC007ED794 /* SpotlightDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA6239222DE30AC007ED794 /* SpotlightDocument.swift */; };
 		9FA6239522DE3741007ED794 /* BioPortalDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA6239422DE3741007ED794 /* BioPortalDocument.swift */; };
 		9FA6239722DE3806007ED794 /* CHEBIDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA6239622DE3806007ED794 /* CHEBIDocument.swift */; };
 		9FA6239E22E66D73007ED794 /* HandwritingRecognizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA6239D22E66D73007ED794 /* HandwritingRecognizer.swift */; };
@@ -169,6 +171,10 @@
 		6DBA3B8B1161909D0B9A8C86 /* Pods_Sketchnoting.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Sketchnoting.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		775C24EF4DB826D48E4192A6 /* Pods-Sketchnoting.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Sketchnoting.release.xcconfig"; path = "Target Support Files/Pods-Sketchnoting/Pods-Sketchnoting.release.xcconfig"; sourceTree = "<group>"; };
 		9F00428823E9FB2600961636 /* BadgeHub.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BadgeHub.swift; sourceTree = "<group>"; };
+		9F00B9F724C5D56E000153A8 /* NeoDocumentsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NeoDocumentsVC.swift; sourceTree = "<group>"; };
+		9F00B9F924C5D5FF000153A8 /* NeoDocumentCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NeoDocumentCell.swift; sourceTree = "<group>"; };
+		9F00B9FD24C5DBA2000153A8 /* NeoDocumentsSectionHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NeoDocumentsSectionHeader.swift; sourceTree = "<group>"; };
+		9F00B9FF24C5DD2D000153A8 /* NeoDocumentsSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NeoDocumentsSection.swift; sourceTree = "<group>"; };
 		9F05B59F232BE4EC00983AF2 /* NoteCollectionViewDetailCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NoteCollectionViewDetailCell.xib; sourceTree = "<group>"; };
 		9F05B5A2232BF0C800983AF2 /* NoteCollectionViewDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteCollectionViewDetailCell.swift; sourceTree = "<group>"; };
 		9F05BC7E23761C4A00D49A88 /* NoteTextViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteTextViewController.swift; sourceTree = "<group>"; };
@@ -238,8 +244,6 @@
 		9FA5A481244AB14E006D9FB2 /* UILabelExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UILabelExtensions.swift; sourceTree = "<group>"; };
 		9FA6238722CEA7FE007ED794 /* MapHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapHelper.swift; sourceTree = "<group>"; };
 		9FA6238A22D37213007ED794 /* BioPortalHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BioPortalHelper.swift; sourceTree = "<group>"; };
-		9FA6238C22D38AEE007ED794 /* SpotlightHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotlightHelper.swift; sourceTree = "<group>"; };
-		9FA6239222DE30AC007ED794 /* SpotlightDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotlightDocument.swift; sourceTree = "<group>"; };
 		9FA6239422DE3741007ED794 /* BioPortalDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BioPortalDocument.swift; sourceTree = "<group>"; };
 		9FA6239622DE3806007ED794 /* CHEBIDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CHEBIDocument.swift; sourceTree = "<group>"; };
 		9FA6239D22E66D73007ED794 /* HandwritingRecognizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandwritingRecognizer.swift; sourceTree = "<group>"; };
@@ -411,6 +415,10 @@
 				9F5E89EB2391AF49002FA8B2 /* DocumentsViewController.swift */,
 				9F5E89ED2391B474002FA8B2 /* DocumentsCollectionReusableView.swift */,
 				9F5E89EF2391CBA2002FA8B2 /* DocumentViewCell.swift */,
+				9F00B9F724C5D56E000153A8 /* NeoDocumentsVC.swift */,
+				9F00B9F924C5D5FF000153A8 /* NeoDocumentCell.swift */,
+				9F00B9FD24C5DBA2000153A8 /* NeoDocumentsSectionHeader.swift */,
+				9F00B9FF24C5DD2D000153A8 /* NeoDocumentsSection.swift */,
 			);
 			path = "Documents Bookshelf";
 			sourceTree = "<group>";
@@ -526,18 +534,9 @@
 				9F92D11323202B8600BC0E57 /* Knowledge Graph */,
 				9F75E4802314108500488BBD /* TAGME */,
 				9FA6239922DE3ACD007ED794 /* BioPortal */,
-				9FA6239822DE3AC0007ED794 /* Spotlight */,
 				9F77DBC923FFD619007C8B7D /* AnnotationUtilities.swift */,
 			);
 			path = "Semantic Annotation";
-			sourceTree = "<group>";
-		};
-		9FA6239822DE3AC0007ED794 /* Spotlight */ = {
-			isa = PBXGroup;
-			children = (
-				9FA6238C22D38AEE007ED794 /* SpotlightHelper.swift */,
-			);
-			path = Spotlight;
 			sourceTree = "<group>";
 		};
 		9FA6239922DE3ACD007ED794 /* BioPortal */ = {
@@ -552,7 +551,6 @@
 			isa = PBXGroup;
 			children = (
 				9FD29BC62224B58600CC969A /* Document.swift */,
-				9FA6239222DE30AC007ED794 /* SpotlightDocument.swift */,
 				9FA6239422DE3741007ED794 /* BioPortalDocument.swift */,
 				9FA6239622DE3806007ED794 /* CHEBIDocument.swift */,
 				9F75E483231419FA00488BBD /* TAGMEDocument.swift */,
@@ -962,6 +960,7 @@
 				9F0F4E0A2451260700B1F2EA /* UIUtilities.swift in Sources */,
 				9F942506238A341E006B0E81 /* UIStoryboardSegueWithCompletion.swift in Sources */,
 				9F87A47D2445441500F83B12 /* NoteTypedText.swift in Sources */,
+				9F00B9FB24C5D5FF000153A8 /* NeoDocumentCell.swift in Sources */,
 				9F4B38C323EB1E6D00F87B61 /* Notifications.swift in Sources */,
 				9F75E451230D8AE100488BBD /* SettingsManager.swift in Sources */,
 				9F75E482231410A100488BBD /* TAGMEHelper.swift in Sources */,
@@ -969,7 +968,6 @@
 				9FAE72E324887158002D800B /* DirectionalAtom.swift in Sources */,
 				9FFE9B3424B3C77200D92FBA /* NeoLibrary.swift in Sources */,
 				9FA6238B22D37213007ED794 /* BioPortalHelper.swift in Sources */,
-				9FA6239322DE30AC007ED794 /* SpotlightDocument.swift in Sources */,
 				9F77DBCA23FFD619007C8B7D /* AnnotationUtilities.swift in Sources */,
 				9F0ABB282412E5D400CA5A4E /* SKCacheManager.swift in Sources */,
 				9FB87CF924B006B900A262D8 /* ALMAARHelper.swift in Sources */,
@@ -1010,8 +1008,10 @@
 				9F9DAFE0242CB7C100713E75 /* DrawingRecognition.swift in Sources */,
 				9FAB4B7C244BEF2700DEA46F /* FittableFontLabel.swift in Sources */,
 				9FB9984724868561003773F2 /* MoveFileViewController.swift in Sources */,
+				9F00B9F824C5D56E000153A8 /* NeoDocumentsVC.swift in Sources */,
 				9F92D10E231E95B400BC0E57 /* UICollectionViewExtensions.swift in Sources */,
 				9F9460DF23F5B0460073D709 /* GridView.swift in Sources */,
+				9F00B9FE24C5DBA2000153A8 /* NeoDocumentsSectionHeader.swift in Sources */,
 				9F1A0C55249DA60B00E507BC /* SKClipboard.swift in Sources */,
 				9F5E89F42391CE84002FA8B2 /* DocumentDetailViewController.swift in Sources */,
 				9FD29C56223C3C3900CC969A /* StringExtensions.swift in Sources */,
@@ -1026,6 +1026,7 @@
 				9FFE07EA232A63BA00DBD0AC /* TagsManager.swift in Sources */,
 				9F4B38BF23EA3EE200F87B61 /* ReceivedNotesViewController.swift in Sources */,
 				9F65984D23F3227300CDBE0C /* DrawingSearchViewController.swift in Sources */,
+				9F00BA0024C5DD2D000153A8 /* NeoDocumentsSection.swift in Sources */,
 				9FC5F90824A8DFEA00CDF2DF /* NoteOptionsViewController.swift in Sources */,
 				9FD29C4E223998BC00CC969A /* UIViewControllerExtensions.swift in Sources */,
 				9FD29C472239588E00CC969A /* UIViewExtensions.swift in Sources */,
@@ -1069,7 +1070,6 @@
 				9FC5F90A24A8E20000CDF2DF /* NoteOptionsCollectionViewCell.swift in Sources */,
 				9FAE72EC24887158002D800B /* Heisenberg.swift in Sources */,
 				9FD5516E246A4364005D14D2 /* RelatedNotesViewController.swift in Sources */,
-				9FA6238D22D38AEE007ED794 /* SpotlightHelper.swift in Sources */,
 				9F18E7A823FB4F1600543D78 /* FolderButton.swift in Sources */,
 				9FFE07E8232A622A00DBD0AC /* Tag.swift in Sources */,
 				9F3424022407197000A92B98 /* HiddenDocumentsViewController.swift in Sources */,

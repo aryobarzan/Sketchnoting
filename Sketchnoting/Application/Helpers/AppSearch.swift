@@ -91,23 +91,6 @@ class AppSearch: DocumentVisitor {
         let _ = self.processBaseDocumentSearch(document: document)
     }
     
-    func process(document: SpotlightDocument) {
-        if !processBaseDocumentSearch(document: document) {
-            if let label = document.label {
-                if label.lowercased().contains(documentFilterTerm) {
-                    documentFilterMatches = true
-                }
-            }
-            if let types = document.types {
-                for type in types {
-                    if type.lowercased().contains(documentFilterTerm) {
-                        documentFilterMatches = true
-                        break
-                    }
-                }
-            }
-        }
-    }
     func process(document: TAGMEDocument) {
         if !processBaseDocumentSearch(document: document) {
             if let spot = document.spot {

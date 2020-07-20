@@ -55,7 +55,6 @@ class Note: File, DocumentDelegate {
         case type = "DocumentType"
     }
     private enum DocumentTypes : String, Decodable {
-        case spotlight = "Spotlight"
         case bioportal = "BioPortal"
         case chebi = "CHEBI"
         case tagme = "TAGME"
@@ -87,9 +86,6 @@ class Note: File, DocumentDelegate {
                 let doc = try docsArrayForType.nestedContainer(keyedBy: DocumentTypeKey.self)
                 let t = try doc.decode(DocumentType.self, forKey: DocumentTypeKey.type)
                 switch t {
-                case .Spotlight:
-                    docs.append(try docsArray.decode(SpotlightDocument.self))
-                    break
                 case .BioPortal:
                     docs.append(try docsArray.decode(BioPortalDocument.self))
                     break
@@ -123,9 +119,6 @@ class Note: File, DocumentDelegate {
                 let doc = try hiddenDocsArrayForType.nestedContainer(keyedBy: DocumentTypeKey.self)
                 let t = try doc.decode(DocumentType.self, forKey: DocumentTypeKey.type)
                 switch t {
-                case .Spotlight:
-                        hiddenDocuments.append(try docsArray.decode(SpotlightDocument.self))
-                        break
                 case .BioPortal:
                         hiddenDocuments.append(try docsArray.decode(BioPortalDocument.self))
                         break
@@ -255,10 +248,6 @@ class Note: File, DocumentDelegate {
         if self.documents.contains(document) {
             if document is TAGMEDocument {
                 (document as! TAGMEDocument).mapImage = image
-                self.delegate?.noteDocumentHasChanged(note: self, document: document)
-            }
-            else if document is SpotlightDocument {
-                (document as! SpotlightDocument).mapImage = image
                 self.delegate?.noteDocumentHasChanged(note: self, document: document)
             }
         }

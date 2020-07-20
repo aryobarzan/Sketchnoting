@@ -67,20 +67,6 @@ class DocumentDetailViewController: UIViewController, DocumentVisitor {
         }
     }
     
-    func process(document: SpotlightDocument) {
-        typeBackView.backgroundColor = #colorLiteral(red: 0.1764705926, green: 0.01176470611, blue: 0.5607843399, alpha: 1)
-        typeLabel.text = "Spotlight"
-        if let label = document.label {
-            titleLabel.text = label
-        }
-        if let description = document.description {
-            self.setDetailDescription(text: description)
-        }
-        if let mapImage = document.mapImage {
-            bottomImageView.image = mapImage
-        }
-    }
-    
     func process(document: TAGMEDocument) {
         typeBackView.backgroundColor = #colorLiteral(red: 0.1764705926, green: 0.4980392158, blue: 0.7568627596, alpha: 1)
         typeLabel.text = "TAGME"

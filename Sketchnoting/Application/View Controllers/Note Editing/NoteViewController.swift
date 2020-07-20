@@ -117,6 +117,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             self.documentsVC.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
             self.documentsVC.didMove(toParent: self)
             self.documentsVC.collectionView.refreshLayout()
+            self.documentsVC.note = self.note
             self.documentsVC.setNote(url: self.note.0, note: self.note.1)
             self.bookshelfLeftDragView.curveTopCorners(size: 5)
             self.bookshelfButton.isEnabled = true
@@ -877,6 +878,11 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         else {
             closeBookshelf()
         }
+//        let storyboard = UIStoryboard(name: "Main", bundle: Bundle.main)
+//        if let testVC = storyboard.instantiateViewController(withIdentifier: "NeoDocumentsVC") as? NeoDocumentsVC {
+//            testVC.setup(note: self.note)
+//            self.present(testVC, animated: true)
+//        }
     }
     
     

@@ -15,7 +15,6 @@ protocol Visitable {
 }
 protocol DocumentVisitor {
     func process(document: Document)
-    func process(document: SpotlightDocument)
     func process(document: BioPortalDocument)
     func process(document: CHEBIDocument)
     func process(document: TAGMEDocument)
@@ -27,8 +26,7 @@ protocol DocumentDelegate {
     func documentHasChanged(document: Document)
 }
 
-enum DocumentType: String, Codable {
-    case Spotlight
+enum DocumentType: String, Codable, CaseIterable {
     case TAGME
     case WAT
     case BioPortal
@@ -37,7 +35,7 @@ enum DocumentType: String, Codable {
     case Other
 }
 
-class Document: Codable, Visitable, Equatable {
+class Document: Codable, Visitable, Equatable, Hashable {
     
     var title: String
     var description: String?
@@ -165,4 +163,10 @@ class Document: Codable, Visitable, Equatable {
         }
         return false
     }
+    
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(title)
+        hasher.combine(documentType)
+    }
+    
 }
