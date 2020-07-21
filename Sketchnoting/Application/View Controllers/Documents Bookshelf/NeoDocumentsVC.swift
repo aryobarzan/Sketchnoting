@@ -11,6 +11,11 @@ import UIKit
 import ViewAnimator
 import PopMenu
 
+protocol DocumentsViewControllerDelegate  {
+    func resetDocuments()
+    func updateTopicsCount()
+}
+
 class NeoDocumentsVC: UIViewController, UICollectionViewDelegate, UISearchBarDelegate {
     
     @IBOutlet weak var searchBar: UISearchBar!
