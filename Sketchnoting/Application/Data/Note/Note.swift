@@ -20,7 +20,6 @@ protocol NoteDelegate {
 class Note: File, DocumentDelegate {
     var pages: [NotePage]
     private var documents: [Document]
-    var hiddenDocuments: [Document]
     var tags: [Tag]
     var activePageIndex = 0
     var helpLinesType: HelpLinesType
@@ -32,7 +31,6 @@ class Note: File, DocumentDelegate {
     
     init(name: String, documents: [Document]?) {
         self.documents = documents ?? [Document]()
-        self.hiddenDocuments = [Document]()
         self.pages = [NotePage]()
         self.tags = [Tag]()
         self.helpLinesType = .None
@@ -44,7 +42,6 @@ class Note: File, DocumentDelegate {
     //Codable
     enum NoteCodingKeys: String, CodingKey {
         case documents = "documents"
-        case hiddenDocuments = "hiddenDocuments"
         case tags = "tags"
         case activePageIndex
         case helpLinesType = "helpLinesType"
@@ -65,7 +62,6 @@ class Note: File, DocumentDelegate {
         var container = encoder.container(keyedBy: NoteCodingKeys.self)
         do {
             try container.encode(documents, forKey: .documents)
-            try container.encode(hiddenDocuments, forKey: .hiddenDocuments)
         } catch {
             log.error("Error while encoding documents of note.")
         }
@@ -111,38 +107,6 @@ class Note: File, DocumentDelegate {
             log.error(error)
         }
         documents = docs
-        hiddenDocuments = [Document]()
-        do {
-            var hiddenDocsArrayForType = try container.nestedUnkeyedContainer(forKey: .hiddenDocuments)
-            docsArray = hiddenDocsArrayForType
-            while(!hiddenDocsArrayForType.isAtEnd) {
-                let doc = try hiddenDocsArrayForType.nestedContainer(keyedBy: DocumentTypeKey.self)
-                let t = try doc.decode(DocumentType.self, forKey: DocumentTypeKey.type)
-                switch t {
-                case .BioPortal:
-                        hiddenDocuments.append(try docsArray.decode(BioPortalDocument.self))
-                        break
-                case .Chemistry:
-                        hiddenDocuments.append(try docsArray.decode(CHEBIDocument.self))
-                        break
-                case .TAGME:
-                        hiddenDocuments.append(try docsArray.decode(TAGMEDocument.self))
-                        break
-                case .WAT:
-                        hiddenDocuments.append(try docsArray.decode(WATDocument.self))
-                        break
-                case .ALMAAR:
-                    hiddenDocuments.append(try docsArray.decode(ARDocument.self))
-                    break
-                case .Other:
-                        hiddenDocuments.append(try docsArray.decode(Document.self))
-                        break
-                }
-            }
-        } catch {
-            log.error("Decoding a note's hidden documents failed.")
-            log.error(error)
-        }
         
         tags = (try? container.decode([Tag].self, forKey: .tags)) ?? [Tag]()
         activePageIndex = try container.decode(Int.self, forKey: .activePageIndex)
@@ -181,24 +145,15 @@ class Note: File, DocumentDelegate {
     
     
     func hide(document: Document) {
-        if (!isHidden(document: document)) {
-            hiddenDocuments.append(document)
-        }
-        removeDocument(document: document)
+        document.isHidden = true
     }
     
     func isHidden(document: Document) -> Bool {
-        if hiddenDocuments.contains(document) {
-            return true
-        }
-        return false
+        return document.isHidden
     }
     
     func unhide(document: Document) {
-        if isHidden(document: document) {
-            hiddenDocuments.removeAll{$0 == document}
-        }
-        self.addDocument(document: document)
+        document.isHidden = false
     }
     
     public func clear() {
@@ -424,7 +379,7 @@ class Note: File, DocumentDelegate {
         }
     }
     
-    public func getDocuments(forCurrentPage: Bool = false) -> [Document] {
+    public func getDocuments(forCurrentPage: Bool = false, includeHidden: Bool = false) -> [Document] {
         if forCurrentPage {
             var docs = [Document]()
             for doc in documents {
@@ -440,15 +395,32 @@ class Note: File, DocumentDelegate {
                     }
                 }
                 if self.getCurrentPage().getText().lowercased().contains(documentTitle) && !docs.contains(doc) {
-                    docs.append(doc)
+                    if doc.isHidden {
+                        if includeHidden {
+                            docs.append(doc)
+                        }
+                    }
+                    else {
+                        docs.append(doc)
+                    }
                 }
             }
             return docs
         }
-        return self.documents
+        if includeHidden {
+            return self.documents
+        }
+        else {
+            return self.documents.filter { doc in
+                if !doc.isHidden {
+                    return true
+                }
+                return false
+            }
+        }
     }
     
-    public func getDocuments(forPage: NotePage) -> [Document] {
+    public func getDocuments(forPage: NotePage, includeHidden: Bool = false) -> [Document] {
         var docs = [Document]()
         for doc in documents {
             var documentTitle = doc.title.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
@@ -466,6 +438,16 @@ class Note: File, DocumentDelegate {
                 docs.append(doc)
             }
         }
-        return docs
+        if includeHidden {
+            return documents
+        }
+        else {
+            return docs.filter { doc in
+                if !doc.isHidden {
+                    return true
+                }
+                return false
+            }
+        }
     }
 }

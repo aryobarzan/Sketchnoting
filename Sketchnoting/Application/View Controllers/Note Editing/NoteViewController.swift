@@ -26,7 +26,8 @@ import Toast
 
 class NoteViewController: UIViewController, UIPencilInteractionDelegate, UICollectionViewDelegate, NoteDelegate, PKCanvasViewDelegate, PKToolPickerObserver, UIScreenshotServiceDelegate, NoteOptionsDelegate, DocumentsViewControllerDelegate, NotePagesDelegate, VNDocumentCameraViewControllerDelegate, UIDocumentPickerDelegate, DraggableImageViewDelegate, DraggableTextViewDelegate, RelatedNotesVCDelegate, TextBoxViewControllerDelegate, MoveFileViewControllerDelegate, UIPopoverPresentationControllerDelegate, NoteInfoDelegate {
     
-    private var documentsVC: DocumentsViewController!
+    //private var documentsVC: DocumentsViewController!
+    private var documentsVC: NeoDocumentsVC!
     
     @IBOutlet var backdropView: UIView!
     @IBOutlet var canvasView: PKCanvasView!
@@ -109,16 +110,15 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             let storyboard = UIStoryboard(name: "Main", bundle: Bundle.main)
-            self.documentsVC = storyboard.instantiateViewController(withIdentifier: "DocumentsViewController") as? DocumentsViewController
-            self.documentsVC.delegate = self
+            self.documentsVC = storyboard.instantiateViewController(withIdentifier: "NeoDocumentsVC") as? NeoDocumentsVC
             self.addChild(self.documentsVC)
+            self.documentsVC.delegate = self
             self.documentsUnderlyingView.addSubview(self.documentsVC.view)
             self.documentsVC.view.frame = self.documentsUnderlyingView.bounds
             self.documentsVC.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
             self.documentsVC.didMove(toParent: self)
-            self.documentsVC.collectionView.refreshLayout()
-            self.documentsVC.note = self.note
-            self.documentsVC.setNote(url: self.note.0, note: self.note.1)
+            self.documentsVC.collectionView.collectionViewLayout.invalidateLayout()
+            self.documentsVC.setup(note: self.note)
             self.bookshelfLeftDragView.curveTopCorners(size: 5)
             self.bookshelfButton.isEnabled = true
         }
@@ -737,10 +737,9 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             NeoLibrary.save(note: note.1, url: note.0)
         case .ResetTextRecognition:
             note.1.clearDocuments()
-            documentsVC.items = [Document]()
             self.clearConceptHighlights()
-            documentsVC.updateBookshelfState(state: .All)
-            documentsVC.bookshelfFilter = .All
+            documentsVC.clear()
+            documentsVC.update(note: self.note)
             self.processHandwritingRecognition()
             break
         case .DeleteNote:
@@ -878,11 +877,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         else {
             closeBookshelf()
         }
-//        let storyboard = UIStoryboard(name: "Main", bundle: Bundle.main)
-//        if let testVC = storyboard.instantiateViewController(withIdentifier: "NeoDocumentsVC") as? NeoDocumentsVC {
-//            testVC.setup(note: self.note)
-//            self.present(testVC, animated: true)
-//        }
     }
     
     
@@ -1049,28 +1043,22 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     }
     
     private func updateBookshelf() {
-        documentsVC.updateBookshelf()
-    }
-    
-    private func updateBookshelfState(state: BookshelfState) {
-        documentsVC.updateBookshelfState(state: state)
-    }
-    
-    private func startBookshelfUpdateTimer() {
-        documentsVC.startBookshelfUpdateTimer()
+        documentsVC.update(note: self.note)
     }
     
     // MARK: NoteDelegate
     func noteHasNewDocument(note: Note, document: Document) {
-        documentsVC.noteHasNewDocument(note: note, document: document)
+        documentsVC.update(note: self.note)
+        self.updateTopicsCount()
         NeoLibrary.save(note: self.note.1, url: self.note.0)
     }
     func noteHasRemovedDocument(note: Note, document: Document) {
-        documentsVC.noteDocumentHasChanged(note: note, document: document)
+        documentsVC.update(note: self.note)
+        self.updateTopicsCount()
         NeoLibrary.save(note: self.note.1, url: self.note.0)
     }
     func noteDocumentHasChanged(note: Note, document: Document) {
-        documentsVC.noteDocumentHasChanged(note: note, document: document)
+        documentsVC.update(note: self.note)
         NeoLibrary.save(note: self.note.1, url: self.note.0)
     }
     func noteHasChanged(note: Note) {
@@ -1086,7 +1074,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         if self.saveTimer != nil {
             self.saveTimer!.invalidate()
         }
-        self.documentsVC.bookshelfUpdateTimer?.reset(nil)
+        //self.documentsVC.bookshelfUpdateTimer?.reset(nil)
         self.performSegue(withIdentifier: "CloseNote", sender: self)
     }
     func mergedNotes(note1: Note, note2: Note) {
@@ -1094,7 +1082,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     }
     
     private func showTopicDocuments(documents: [Document]) {
-        documentsVC.showTopicDocuments(documents: documents)
+        //documentsVC.showTopicDocuments(documents: documents)
     }
     
     //MARK: Drawing insertion mode
@@ -1610,14 +1598,12 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             saveTimer!.invalidate()
             saveTimer = nil
         }
-        documentsVC.bookshelfUpdateTimer?.reset(nil)
     }
     
     // MARK: Documents View Controller delegate
     func resetDocuments() {
         self.clearConceptHighlights()
         note.1.clearDocuments()
-        documentsVC.clear()
         NeoLibrary.save(note: note.1, url: note.0)
         self.annotateText(text: note.1.getText())
     }
@@ -1675,14 +1661,12 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                 for (view, documents) in self.conceptHighlights {
                     if view.frame.contains(sender.location(in: canvasView)) {
                         found = true
-                        if documentsVC.bookshelfState == .Topic && documentsVC.selectedTopicDocuments != nil && documentsVC.selectedTopicDocuments! == documents {
-                            documentsVC.clearTopicDocuments()
+                        var text = ""
+                        for doc in documents {
+                            text.append(doc.title.lowercased() + ",")
                         }
-                        else {
-                            documentsVC.selectedTopicDocuments = documents
-                            documentsVC.updateBookshelfState(state: .Topic)
-                            documentsVC.showTopicDocuments(documents: documents)
-                        }
+                        documentsVC.hideDetailView()
+                        documentsVC.performSearch(searchText: text)
                         if bookshelf.isHidden {
                             showBookshelf()
                         }
@@ -1726,10 +1710,11 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     
     
     // MARK: NoteInfoDelegate
-    func noteTitleUpdated(title: String, newURL: URL) {
-        self.noteTitleButton.setTitle(" \(title)", for: .normal)
+    func noteRenamed(newName: String, newURL: URL) {
+        self.noteTitleButton.setTitle(" \(newName)", for: .normal)
         self.note.0 = newURL
-        self.note.1.setName(name: title)
+        self.note.1.setName(name: newName)
         self.saveCurrentPage()
+        self.documentsVC.note = self.note
     }
 }

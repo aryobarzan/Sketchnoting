@@ -167,22 +167,27 @@ class NeoLibrary {
     public static func rename(url: URL, file: File, name: String) -> URL? {
         if FileManager.default.fileExists(atPath: url.path) {
             var newName = name
-            if newName.isEmpty {
-                newName = "Untitled"
-            }
-            var temp = newName
+            var tmp = newName
             if file is Note {
-                temp = temp + ".sketchnote"
+                tmp = name + ".sketchnote"
             }
-            let newURL = url.deletingLastPathComponent().appendingPathComponent(temp)
-            if FileManager.default.fileExists(atPath: newURL.path) {
-                return nil
+            while FileManager.default.fileExists(atPath: url.deletingLastPathComponent().appendingPathComponent(tmp).path) {
+                newName += " 2"
+                if file is Note {
+                    tmp = newName + ".sketchnote"
+                }
             }
+            file.setName(name: newName)
+            if file is Note {
+                newName += ".sketchnote"
+            }
+            let newURL = url.deletingLastPathComponent().appendingPathComponent(newName)
             do {
                 try FileManager.default.moveItem(at: url, to: newURL)
                 return newURL
             } catch {
                 log.error("Error while trying to rename file.")
+                log.error(error)
             }
         }
         return nil

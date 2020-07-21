@@ -730,25 +730,31 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     }
     
     private func renameFile(url: URL, file: File, indexPath: IndexPath) {
-        let alertController = UIAlertController(title: "Rename file", message: nil, preferredStyle: .alert)
+        let alertController = UIAlertController(title: "Rename File", message: nil, preferredStyle: .alert)
         
         let confirmAction = UIAlertAction(title: "Set", style: .default) { (_) in
             
             let name = alertController.textFields?[0].text
-            file.setName(name: name ?? "Untitled")
             let newURL = NeoLibrary.rename(url: url, file: file, name: name ?? "Untitled")
             if newURL == nil {
                 self.view.makeToast("File could not be renamed.")
             }
-            self.noteCollectionView.performBatchUpdates({
-                self.noteCollectionView.reloadItems(at: [indexPath])
-            })
-            self.updateDisplayedNotes(false)
+            else {
+                if let note = file as? Note {
+                    note.setName(name: newURL!.deletingPathExtension().lastPathComponent)
+                    NeoLibrary.save(note: note, url: newURL!)
+                }
+                self.noteCollectionView.performBatchUpdates({
+                    self.noteCollectionView.reloadItems(at: [indexPath])
+                })
+                self.updateDisplayedNotes(false)
+                self.view.makeToast("File renamed.")
+            }
         }
         let cancelAction = UIAlertAction(title: "Cancel", style: .cancel) { (_) in }
         
         alertController.addTextField { (textField) in
-            textField.placeholder = "Enter Note Title"
+            textField.placeholder = "Name..."
             if !file.getName().isEmpty && file.getName() != "Untitled" {
                 textField.text = file.getName()
             }

@@ -13,6 +13,7 @@ class NoteInfoViewController: UIViewController {
     @IBOutlet weak var titleTextField: UITextField!
     @IBOutlet weak var creationDateLabel: UILabel!
     @IBOutlet weak var updateDateLabel: UILabel!
+    @IBOutlet weak var pageIndexLabel: UILabel!
     
     var delegate: NoteInfoDelegate?
     var note: (URL, Note)!
@@ -22,6 +23,7 @@ class NoteInfoViewController: UIViewController {
         titleTextField.text = note.1.getName()
         creationDateLabel.text = "\(NeoLibrary.getCreationDate(url: note.0).getFormattedDate())"
         updateDateLabel.text = "\(NeoLibrary.getModificationDate(url: note.0).getFormattedDate())"
+        pageIndexLabel.text = "\(note.1.activePageIndex+1)/\(note.1.pages.count)"
     }
     
     @IBAction func titleTextViewDone(_ sender: UITextField) {
@@ -29,7 +31,7 @@ class NoteInfoViewController: UIViewController {
             log.info("Note title updated.")
             let newURL = NeoLibrary.rename(url: note.0, file: note.1, name: text)
             if let newURL = newURL {
-                delegate?.noteTitleUpdated(title: text, newURL: newURL)
+                delegate?.noteRenamed(newName: text, newURL: newURL)
             }
         }
         sender.text = note.1.getName()
@@ -38,5 +40,5 @@ class NoteInfoViewController: UIViewController {
 }
 
 protocol NoteInfoDelegate {
-    func noteTitleUpdated(title: String, newURL: URL)
+    func noteRenamed(newName: String, newURL: URL)
 }

@@ -41,6 +41,7 @@ class Document: Codable, Visitable, Equatable, Hashable {
     var description: String?
     var URL: String
     var documentType: DocumentType
+    var isHidden: Bool
     
     var delegate: DocumentDelegate?
     
@@ -49,6 +50,7 @@ class Document: Codable, Visitable, Equatable, Hashable {
         case description = "Description"
         case URL = "URL"
         case documentType = "DocumentType"
+        case isHidden = "IsHidden"
     }
     
     init?(title: String, description: String?, URL: String, documentType: DocumentType){
@@ -59,6 +61,7 @@ class Document: Codable, Visitable, Equatable, Hashable {
         self.description = description
         self.URL = URL
         self.documentType = documentType
+        self.isHidden = false
     }
     
     func encode(to encoder: Encoder) throws {
@@ -67,6 +70,7 @@ class Document: Codable, Visitable, Equatable, Hashable {
         try container.encode(description, forKey: .description)
         try container.encode(URL, forKey: .URL)
         try container.encode(documentType, forKey: .documentType)
+        try container.encode(isHidden, forKey: .isHidden)
     }
     
     required init(from decoder: Decoder) throws {
@@ -74,15 +78,20 @@ class Document: Codable, Visitable, Equatable, Hashable {
         do {
             title = try container.decode(String.self, forKey: CodingKeys.title)
         } catch {
-            print(error)
+            log.error(error)
             title = ""
         }
         do {
             description = try container.decode(String.self, forKey: .description)
         } catch {
             log.error(error)
-            log.error("Note description decoding failed.")
             description = ""
+        }
+        do {
+            isHidden = try container.decode(Bool.self, forKey: .isHidden)
+        } catch {
+            log.error(error)
+            isHidden = false
         }
         URL = try container.decode(String.self, forKey: .URL)
         documentType = DocumentType(rawValue: try container.decode(String.self, forKey: .documentType)) ?? .Other

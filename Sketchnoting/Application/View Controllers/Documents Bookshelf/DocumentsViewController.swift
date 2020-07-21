@@ -49,13 +49,6 @@ class DocumentsViewController: UICollectionViewController{
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         super.prepare(for: segue, sender: sender)
         switch(segue.identifier ?? "") {
-        case "ManageHiddenDocuments":
-            log.info("Managing hidden documents.")
-            let destinationNC = segue.destination as! UINavigationController
-            let destinationVC = destinationNC.topViewController as! HiddenDocumentsViewController
-            destinationVC.note = self.note
-            destinationVC.tableView.setEditing(true, animated: true)
-            break
         default:
             log.info("Unaccounted-for segue.")
         }

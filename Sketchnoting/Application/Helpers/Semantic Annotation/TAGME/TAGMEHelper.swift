@@ -230,7 +230,7 @@ class TAGMEHelper {
                             log.error(error.localizedDescription)
                             return
                         }
-                        log.info("TAGME: API call successful.")
+                        log.info("TAGME (Relatedness): API call successful.")
                         log.info(json)
                         if let result = json["result"].array {
                             for res in result {
@@ -239,6 +239,9 @@ class TAGMEHelper {
                                         log.info(rel)
                                         log.info(doc_two.title)
                                         self.performAdditionalSteps(document: doc_two, note: note)
+                                    }
+                                    else {
+                                        log.info("Related document not saved, as it does not have a high enough related score: \(doc_two.title)")
                                     }
                                 }
                             }

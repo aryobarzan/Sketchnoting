@@ -22,7 +22,7 @@ class NeoDocumentsSectionHeader: UICollectionReusableView {
       ofSize: UIFont.preferredFont(forTextStyle: .title1).pointSize,
       weight: .bold)
     label.adjustsFontForContentSizeCategory = true
-    label.textColor = .label
+    label.textColor = .white
     label.textAlignment = .left
     label.numberOfLines = 1
     label.setContentCompressionResistancePriority(
@@ -34,7 +34,7 @@ class NeoDocumentsSectionHeader: UICollectionReusableView {
   override init(frame: CGRect) {
     super.init(frame: frame)
     // 3
-    backgroundColor = .systemBackground
+    backgroundColor = .clear
     addSubview(titleLabel)
 
     if UIDevice.current.userInterfaceIdiom == .pad {
