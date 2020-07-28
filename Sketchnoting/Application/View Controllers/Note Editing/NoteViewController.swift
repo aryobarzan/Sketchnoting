@@ -392,34 +392,14 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         if let pdfDoc = pdfView.document, let page = pdfDoc.page(at: 0), let body = page.string {
             if !body.isEmpty {
                 for document in documents {
-                    var documentTitle = document.title.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-                    if let tagmeDocument = document as? TAGMEDocument {
-                        if let spot = tagmeDocument.spot {
-                            documentTitle = spot.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-                        }
-                    }
-                    else if let watDocument = document as? WATDocument {
-                        if let spot = watDocument.spot {
-                            documentTitle = spot.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-                        }
-                    }
+                    let documentTitle = self.trimDocumentTitle(document: document)
                     self.addPDFAnnotation(text: documentTitle, document: document)
                 }
             }
         }
         if let textData = note.1.getCurrentPage().getNoteText() {
             for document in documents {
-                var documentTitle = document.title.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-                if let tagmeDocument = document as? TAGMEDocument {
-                    if let spot = tagmeDocument.spot {
-                        documentTitle = spot.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-                    }
-                }
-                else if let watDocument = document as? WATDocument {
-                    if let spot = watDocument.spot {
-                        documentTitle = spot.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-                    }
-                }
+                let documentTitle = self.trimDocumentTitle(document: document)
                 if textData.text.trimmingCharacters(in: .whitespacesAndNewlines).lowercased().contains(documentTitle) {
                     for block in textData.blocks {
                         for line in block.lines {
@@ -451,6 +431,21 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                 }
             }
         }
+    }
+    
+    private func trimDocumentTitle(document: Document) -> String {
+        var documentTitle = document.title.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        if let tagmeDocument = document as? TAGMEDocument {
+            if let spot = tagmeDocument.spot {
+                documentTitle = spot.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+            }
+        }
+        else if let watDocument = document as? WATDocument {
+            if let spot = watDocument.spot {
+                documentTitle = spot.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+            }
+        }
+        return documentTitle
     }
     
     private func addTopicFrame(topicFrame: UIView, document: Document) {
