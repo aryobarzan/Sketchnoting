@@ -24,7 +24,7 @@ import GPUImage
 import Highlightr
 import Toast
 
-class NoteViewController: UIViewController, UIPencilInteractionDelegate, UICollectionViewDelegate, NoteDelegate, PKCanvasViewDelegate, PKToolPickerObserver, UIScreenshotServiceDelegate, NoteOptionsDelegate, DocumentsViewControllerDelegate, NotePagesDelegate, VNDocumentCameraViewControllerDelegate, UIDocumentPickerDelegate, DraggableImageViewDelegate, DraggableTextViewDelegate, RelatedNotesVCDelegate, TextBoxViewControllerDelegate, MoveFileViewControllerDelegate, UIPopoverPresentationControllerDelegate, NoteInfoDelegate {
+class NoteViewController: UIViewController, UIPencilInteractionDelegate, UICollectionViewDelegate, NoteDelegate, PKCanvasViewDelegate, PKToolPickerObserver, UIScreenshotServiceDelegate, NoteOptionsDelegate, DocumentsViewControllerDelegate, NotePagesDelegate, VNDocumentCameraViewControllerDelegate, UIDocumentPickerDelegate, DraggableImageViewDelegate, DraggableTextViewDelegate, RelatedNotesVCDelegate, TextBoxViewControllerDelegate, MoveFileViewControllerDelegate, UIPopoverPresentationControllerDelegate, NoteInfoDelegate, PDFViewDelegate {
     
     //private var documentsVC: DocumentsViewController!
     private var documentsVC: NeoDocumentsVC!
@@ -103,6 +103,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         interaction.delegate = self
         view.addInteraction(interaction)
         
+        pdfView.delegate = self
         pdfView.autoScales = false
         pdfView.maxScaleFactor = 4.0
         pdfView.minScaleFactor = 0.1
@@ -346,12 +347,68 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
       }
     }
     
+    private var pdfAnnotations = [PDFAnnotation : [Document]]()
+    
+    private func addPDFAnnotation(text: String, document: Document) {
+        if let doc = pdfView.document {
+            let found = doc.findString(text, withOptions: [.caseInsensitive])
+            print(text)
+            for f in found {
+                for p in f.pages {
+                    print(1)
+                    let annotation = PDFAnnotation(bounds: f.bounds(for: p), forType: .highlight, withProperties: nil)
+                    annotation.color = .systemBlue
+                    p.addAnnotation(annotation)
+                    if (pdfAnnotations[annotation] != nil) {
+                        var docs = pdfAnnotations[annotation]!
+                        docs.append(document)
+                        pdfAnnotations[annotation] = docs
+                    }
+                    else {
+                        pdfAnnotations[annotation] = [document]
+                    }
+                }
+            }
+            //pdfView.document = doc
+        }
+    }
+    private func clearPDFAnnotations() {
+        for annotation in pdfAnnotations {
+            if let doc = pdfView.document {
+                if let page = doc.page(at: 0) {
+                    page.removeAnnotation(annotation.key)
+                }
+            }
+        }
+        pdfAnnotations = [PDFAnnotation : [Document]]()
+    }
+    
     private func setupTopicAnnotations(recognitionImageSize: CGSize) {
         self.conceptHighlights = [UIView : [Document]]()
         self.removeDetectionAnnotations()
+        self.clearPDFAnnotations()
+        
         let transform = self.transformMatrix(recognitionImageSize)
 
         let documents = note.1.getDocuments()
+        if let pdfDoc = pdfView.document, let page = pdfDoc.page(at: 0), let body = page.string {
+            if !body.isEmpty {
+                for document in documents {
+                    var documentTitle = document.title.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+                    if let tagmeDocument = document as? TAGMEDocument {
+                        if let spot = tagmeDocument.spot {
+                            documentTitle = spot.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+                        }
+                    }
+                    else if let watDocument = document as? WATDocument {
+                        if let spot = watDocument.spot {
+                            documentTitle = spot.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+                        }
+                    }
+                    self.addPDFAnnotation(text: documentTitle, document: document)
+                }
+            }
+        }
         if let textData = note.1.getCurrentPage().getNoteText() {
             for document in documents {
                 var documentTitle = document.title.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
@@ -396,20 +453,8 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                 }
             }
         }
-//        let page = SKFileManager.activeNote!.getCurrentPage().getPDFDocument()!.page(at: 0)!
-//        //let f = page.selectionForWord(at: CGPoint(x: 100, y: 100))?.bounds(for: page)
-//        let sel = SKFileManager.activeNote!.getCurrentPage().getPDFDocument()!.findString("Cryptography", withOptions: .caseInsensitive)
-//        let f = sel[0].bounds(for: sel[0].pages[0])
-//        let test = UIView(frame: f)
-//        test.frame = test.convert(test.bounds, to: pdfView.documentView!)
-//        test.backgroundColor = .blue
-//        pdfView.addSubview(test)
-//        print(sel)
-//        print(f)
-//        let transform2 = self.transformMatrix2(pdfView.documentView!.frame.size)
-//        let v = drawFrame(f, in: .blue, transform: transform2)
-//        self.addTopicFrame(topicFrame: v, document: SKFileManager.activeNote!.documents[0])
     }
+    
     private func addTopicFrame(topicFrame: UIView, document: Document) {
         if let existingTopicAnnotation = conceptHighlightExists(new: topicFrame.frame) {
             var newDocs = self.conceptHighlights[existingTopicAnnotation]!
@@ -446,27 +491,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
       transform = transform.scaledBy(x: scale, y: scale)
       return transform
     }
-//    private func transformMatrix2(_ recognitionImageSize: CGSize) -> CGAffineTransform {
-//      let imageViewWidth = pdfView.frame.size.width
-//      let imageViewHeight = pdfView.frame.size.height
-//      let imageWidth = recognitionImageSize.width
-//      let imageHeight = recognitionImageSize.height
-//
-//      let imageViewAspectRatio = imageViewWidth / imageViewHeight
-//      let imageAspectRatio = imageWidth / imageHeight
-//      let scale = (imageViewAspectRatio > imageAspectRatio) ?
-//        imageViewHeight / imageHeight :
-//        imageViewWidth / imageWidth
-//
-//      let scaledImageWidth = imageWidth * scale
-//      let scaledImageHeight = imageHeight * scale
-//      let xValue = (imageViewWidth - scaledImageWidth) / CGFloat(2.0)
-//      let yValue = (imageViewHeight - scaledImageHeight) / CGFloat(2.0)
-//
-//      var transform = CGAffineTransform.identity.translatedBy(x: xValue, y: yValue)
-//      transform = transform.scaledBy(x: scale, y: scale)
-//      return transform
-//    }
     
     func pencilInteractionDidTap(_ interaction: UIPencilInteraction) {
         switch SettingsManager.pencilSideButton() {
@@ -588,6 +612,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             topicsButton.tintColor = .white
             topicsButton.setTitleColor(.white, for: .normal)
             self.removeDetectionAnnotations()
+            self.clearPDFAnnotations()
         }
     }
     
@@ -1606,6 +1631,13 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         note.1.clearDocuments()
         NeoLibrary.save(note: note.1, url: note.0)
         self.annotateText(text: note.1.getText())
+        if let doc = pdfView.document {
+            if let page = doc.page(at: 0) {
+                if page.string != nil && !page.string!.isEmpty {
+                    self.annotateText(text: page.string!)
+                }
+            }
+        }
     }
     var oldDocuments: [Document]!
     func updateTopicsCount() {
@@ -1672,6 +1704,26 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                         }
                     }
                 }
+                if !found {
+                    if let pdfDoc = pdfView.document, let page = pdfDoc.page(at: 0) {
+                        let tapLocation = pdfView.convert(sender.location(in: canvasView), to: page)
+                        if let annotation = page.annotation(at: tapLocation) {
+                            if let docs = pdfAnnotations[annotation] {
+                                found = true
+                                var text = ""
+                                for doc in docs {
+                                    text.append(doc.title.lowercased() + ",")
+                                }
+                                documentsVC.hideDetailView()
+                                documentsVC.performSearch(searchText: text)
+                                if bookshelf.isHidden {
+                                    showBookshelf()
+                                }
+                            }
+                        }
+                    }
+                }
+                
             }
             if !found {
                 if let highlightedImage = self.highlightedImage {
