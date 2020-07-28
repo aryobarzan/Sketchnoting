@@ -352,10 +352,8 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     private func addPDFAnnotation(text: String, document: Document) {
         if let doc = pdfView.document {
             let found = doc.findString(text, withOptions: [.caseInsensitive])
-            print(text)
             for f in found {
                 for p in f.pages {
-                    print(1)
                     let annotation = PDFAnnotation(bounds: f.bounds(for: p), forType: .highlight, withProperties: nil)
                     annotation.color = .systemBlue
                     p.addAnnotation(annotation)
