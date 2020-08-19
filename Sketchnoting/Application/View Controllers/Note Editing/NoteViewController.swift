@@ -214,6 +214,12 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                 }
             }
             break
+        case "NoteLayers":
+            if let destination = segue.destination as? NoteLayersViewController {
+                //destination.delegate = self
+                destination.note = self.note
+            }
+            break
         case "showRelatedNoteEditing":
             if let destination = segue.destination as? UINavigationController {
                 if let destinationViewController = destination.topViewController as? RelatedNotesViewController {

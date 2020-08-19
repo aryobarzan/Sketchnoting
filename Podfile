@@ -13,4 +13,5 @@ target 'Sketchnoting' do
   pod 'Highlightr'
   pod 'DropDown'
   pod 'Hover'
+  pod 'fluid-slider'
 end

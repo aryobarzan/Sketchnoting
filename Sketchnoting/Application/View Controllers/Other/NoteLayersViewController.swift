@@ -8,33 +8,85 @@
 
 import UIKit
 
+enum NoteLayerItemType {
+    case Canvas
+    case Layer
+    case PDF
+}
+
+class NoteLayerItem {
+    var type: NoteLayerItemType
+    var layer: NoteLayer?
+    
+    init(type: NoteLayerItemType, layer: NoteLayer? = nil) {
+        self.type = type
+        self.layer = layer
+    }
+}
+
+struct LayerSection {
+    let title: String
+    let data : [NoteLayerItem]
+
+    var numberOfItems: Int {
+        return data.count
+    }
+
+    subscript(index: Int) -> NoteLayerItem {
+        return data[index]
+    }
+}
+
 class NoteLayersViewController: UITableViewController {
+    
+    var note: (URL, Note)!
+    
+    var sections = [LayerSection]()
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        self.sections = [LayerSection]()
+        sections.append(LayerSection(title: "Canvas", data: [NoteLayerItem(type: .Canvas)]))
+        
+        var layersData = [NoteLayerItem]()
+        for layer in note.1.getCurrentPage().getLayers() {
+            layersData.append(NoteLayerItem(type: .Layer, layer: layer))
+        }
+        let layersSection = LayerSection(title: "Layers", data: layersData)
+        self.sections.append(layersSection)
+        
+        if note.1.getCurrentPage().getPDFDocument() != nil {
+             sections.append(LayerSection(title: "PDF", data: [NoteLayerItem(type: .PDF)]))
+        }
     }
 
     // MARK: - Table view data source
 
     override func numberOfSections(in tableView: UITableView) -> Int {
-        // #warning Incomplete implementation, return the number of sections
-        return 0
+        return sections.count
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return 0
+        return sections[section].data.count
     }
-
-    /*
+    
+    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        return sections[section].title
+    }
+    
+    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 80.0;
+    }
+    
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "reuseIdentifier", for: indexPath)
-
-        // Configure the cell...
-
+        let cell = tableView.dequeueReusableCell(withIdentifier: "NoteLayersViewCell", for: indexPath) as! NoteLayersViewCell
+        let item = self.sections[indexPath.section].data[indexPath.row]
+        cell.set(item: item)
         return cell
     }
-    */
+    
 
     /*
     // Override to support conditional editing of the table view.
