@@ -16,14 +16,16 @@ class NotePage: Codable {
     private var noteText: NoteText?
     var backdropPDFData: Data?
     var pdfScale: Float? = 1.0
-    var images : [NoteImage]
-    var typedTexts : [NoteTypedText]
+    var layers: [NoteLayer]
+    
+    private enum LayerTypeKey : String, CodingKey {
+        case type = "type"
+    }
     
     init() {
         self.canvasDrawing = PKDrawing()
         self.drawings = [NoteDrawing]()
-        self.images = [NoteImage]()
-        self.typedTexts = [NoteTypedText]()
+        self.layers = [NoteLayer]()
     }
     
     //MARK: Decode / Encode
@@ -33,29 +35,51 @@ class NotePage: Codable {
         case noteText = "noteText"
         case backdropPDFData = "backdropPDFData"
         case pdfScale = "pdfScale"
-        case images = "images"
-        case typedTexts = "typedTexts"
+        case layers = "layers"
     }
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
+        do {
+            try container.encode(layers, forKey: .layers)
+        } catch {
+            log.error("Error while encoding layers of note page.")
+        }
         try container.encode(canvasDrawing, forKey: .canvasDrawing)
         try container.encode(drawings, forKey: .drawings)
         try container.encode(noteText, forKey: .noteText)
         try container.encode(backdropPDFData, forKey: .backdropPDFData)
         try container.encode(pdfScale, forKey: .pdfScale)
-        try container.encode(images, forKey: .images)
-        try container.encode(typedTexts, forKey: .typedTexts)
     }
     required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        
+        var layersArrayForType = try container.nestedUnkeyedContainer(forKey: .layers)
+        var layers = [NoteLayer]()
+        var layersArray = layersArrayForType
+        do {
+            while(!layersArrayForType.isAtEnd) {
+                let layer = try layersArrayForType.nestedContainer(keyedBy: LayerTypeKey.self)
+                let t = try layer.decode(NoteLayerType.self, forKey: LayerTypeKey.type)
+                switch t {
+                case .Image:
+                    layers.append(try layersArray.decode(NoteImage.self))
+                    break
+                case .TypedText:
+                    layers.append(try layersArray.decode(NoteTypedText.self))
+                    break
+                }
+            }
+        } catch {
+            log.error("Decoding a note page's layers failed.")
+            log.error(error)
+        }
+        self.layers = layers
 
         canvasDrawing = try container.decode(PKDrawing.self, forKey: .canvasDrawing)
         drawings = (try? container.decode([NoteDrawing].self, forKey: .drawings)) ?? [NoteDrawing]()
         noteText = try? container.decode(NoteText.self, forKey: .noteText)
         backdropPDFData = try? container.decode(Data.self, forKey: .backdropPDFData)
         pdfScale = try? container.decode(Float.self, forKey: .pdfScale)
-        images = try container.decode([NoteImage].self, forKey: .images)
-        typedTexts = try container.decode([NoteTypedText].self, forKey: .typedTexts)
     }
     
     // MARK: drawing recognition
@@ -110,36 +134,36 @@ class NotePage: Codable {
     }
     
     func updateNoteImage(noteImage: NoteImage) {
-        for i in 0..<images.count {
-            if images[i] == noteImage {
-                images[i] = noteImage
+        for i in 0..<layers.count {
+            if layers[i] == noteImage {
+                layers[i] = noteImage
                 break
             }
         }
     }
     
     func deleteImage(noteImage: NoteImage) {
-        for i in 0..<images.count {
-            if images[i] == noteImage {
-                images.remove(at: i)
+        for i in 0..<layers.count {
+            if layers[i] == noteImage {
+                layers.remove(at: i)
                 break
             }
         }
     }
     
     func updateNoteTypedText(typedText: NoteTypedText) {
-        for i in 0..<typedTexts.count {
-            if typedTexts[i] == typedText {
-                typedTexts[i] = typedText
+        for i in 0..<layers.count {
+            if layers[i] == typedText {
+                layers[i] = typedText
                 break
             }
         }
     }
     
     func deleteTypedText(typedText: NoteTypedText) {
-        for i in 0..<typedTexts.count {
-            if typedTexts[i] == typedText {
-                typedTexts.remove(at: i)
+        for i in 0..<layers.count {
+            if layers[i] == typedText {
+                layers.remove(at: i)
                 break
             }
         }
@@ -155,6 +179,13 @@ class NotePage: Codable {
     
     func clearNoteText() {
         self.noteText = nil
+    }
+    
+    func getLayers(type: NoteLayerType? = nil) -> [NoteLayer] {
+        if let type = type {
+            return layers.filter { $0.type == type }
+        }
+        return layers
     }
     
     //MARK: recognized text
@@ -218,11 +249,15 @@ class NotePage: Codable {
                 if let pdfImage = pdfImage {
                     image = pdfImage.mergeWith2(withImage: canvasImage)
                 }
-                for noteImage in self.images {
-                    image = image.mergeWith3(withImage: noteImage)
+                for layer in self.getLayers(type: .Image) {
+                    if let noteImage = layer as? NoteImage {
+                        image = image.mergeWith3(withImage: noteImage)
+                    }
                 }
-                for noteTypedText in self.typedTexts {
-                    image = image.addText(drawText: noteTypedText)
+                for layer in self.getLayers(type: .TypedText) {
+                    if let noteTypedText = layer as? NoteTypedText {
+                        image = image.addText(drawText: noteTypedText)
+                    }
                 }
                 DispatchQueue.main.async {
                     completion(image)

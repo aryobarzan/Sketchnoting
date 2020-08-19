@@ -285,11 +285,15 @@ class Note: File, DocumentDelegate {
                     if let pdfImage = pdfImage {
                         image = pdfImage.mergeWith2(withImage: canvasImage)
                     }
-                    for noteImage in page.images {
-                        image = image.mergeWith3(withImage: noteImage)
+                    for layer in page.getLayers(type: .Image) {
+                        if let noteImage = layer as? NoteImage {
+                            image = image.mergeWith3(withImage: noteImage)
+                        }
                     }
-                    for noteTypedText in page.typedTexts {
-                        image = image.addText(drawText: noteTypedText)
+                    for layer in page.getLayers(type: .TypedText) {
+                        if let noteTypedText = layer as? NoteTypedText {
+                            image = image.addText(drawText: noteTypedText)
+                        }
                     }
                     image.draw(in: bounds)
                 }

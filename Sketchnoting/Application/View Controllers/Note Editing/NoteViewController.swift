@@ -556,8 +556,11 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     
     private func setupNoteImages() {
         noteImageViews = [DraggableImageView : NoteImage]()
-        for image in note.1.getCurrentPage().images {
-            displayNoteImage(image: image)
+        
+        for layer in note.1.getCurrentPage().getLayers(type: .Image) {
+            if let image = layer as? NoteImage {
+                displayNoteImage(image: image)
+            }
         }
     }
     
@@ -574,8 +577,10 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     
     private func setupNoteTypedTexts() {
         noteTextViews = [DraggableTextView : NoteTypedText]()
-        for typedText in note.1.getCurrentPage().typedTexts {
-            displayTypedText(typedText: typedText)
+        for layer in note.1.getCurrentPage().getLayers(type: .TypedText) {
+            if let typedText = layer as? NoteTypedText {
+                displayTypedText(typedText: typedText)
+            }
         }
     }
     
@@ -1326,7 +1331,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             }
             if let copiedImage = SKClipboard.getImage() {
                 let pasteImageAction = PopMenuDefaultAction(title: "Paste Image", image: UIImage(systemName: "photo"), didSelect: { action in
-                    self.note.1.getCurrentPage().images.append(copiedImage)
+                    self.note.1.getCurrentPage().layers.append(copiedImage)
                     self.displayNoteImage(image: copiedImage)
                     self.saveCurrentPage()
                     self.view.makeToast("Pasted image.", duration: 1, position: .center)
@@ -1335,7 +1340,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             }
             if let copiedTypedText = SKClipboard.getTypedText() {
                 let pasteTypedTextAction = PopMenuDefaultAction(title: "Paste Typed Text", image: UIImage(systemName: "text.alignleft"), didSelect: { action in
-                    self.note.1.getCurrentPage().typedTexts.append(copiedTypedText)
+                    self.note.1.getCurrentPage().layers.append(copiedTypedText)
                     self.displayTypedText(typedText: copiedTypedText)
                     self.saveCurrentPage()
                     self.view.makeToast("Pasted typed text.", duration: 1, position: .center)
@@ -1409,7 +1414,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                 }
             }
             for text in texts {
-                note.1.getCurrentPage().typedTexts.append(text)
+                note.1.getCurrentPage().layers.append(text)
                 let textView = self.createNoteTypedTextView(typedText: text)
                 self.addTypedTextViewToCanvas(textView: textView, typedText: text)
             }
@@ -1538,16 +1543,17 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     }
     
     private func addNoteImage(image: UIImage) {
-        let noteImage = NoteImage(image: image)
-        note.1.getCurrentPage().images.append(noteImage)
-        let frame = CGRect(x: 50, y: 50, width: 0.25 * image.size.width, height: 0.25 * image.size.height)
-        let draggableView = DraggableImageView(frame: frame)
-        draggableView.draggableView.lastScale = 1.0
-        draggableView.image = image
-        draggableView.delegate = self
-        self.canvasView.addSubview(draggableView)
-        self.canvasView.sendSubviewToBack(draggableView)
-        self.noteImageViews[draggableView] = noteImage
+        if let noteImage = NoteImage(image: image) {
+            note.1.getCurrentPage().layers.append(noteImage)
+            let frame = CGRect(x: 50, y: 50, width: 0.25 * image.size.width, height: 0.25 * image.size.height)
+            let draggableView = DraggableImageView(frame: frame)
+            draggableView.draggableView.lastScale = 1.0
+            draggableView.image = image
+            draggableView.delegate = self
+            self.canvasView.addSubview(draggableView)
+            self.canvasView.sendSubviewToBack(draggableView)
+            self.noteImageViews[draggableView] = noteImage
+        }
     }
     
     func draggableImageViewSizeChanged(source: DraggableImageView, scale: CGSize) {

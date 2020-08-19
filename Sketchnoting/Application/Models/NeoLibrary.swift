@@ -268,8 +268,9 @@ class NeoLibrary {
     public static func createNoteFromImages(images: [UIImage], at location: URL = currentLocation) -> (URL, Note) {
         let (url, note) = NeoLibrary.createNote(name: "Imported Images")
         for image in images {
-            let noteImage = NoteImage(image: image)
-            note.getCurrentPage().images.append(noteImage)
+            if let noteImage = NoteImage(image: image) {
+                note.getCurrentPage().layers.append(noteImage)
+            }
         }
         self.saveSynchronously(note: note, url: url)
         return (url, note)
@@ -277,7 +278,9 @@ class NeoLibrary {
     
     public static func createNoteFromTypedTexts(texts: [NoteTypedText], at location: URL = currentLocation) -> (URL, Note) {
         let (url, note) = NeoLibrary.createNote(name: "Imported Text Files")
-        note.getCurrentPage().typedTexts = texts
+        for t in texts {
+            note.getCurrentPage().layers.append(t)
+        }
         self.saveSynchronously(note: note, url: url)
         return (url, note)
     }

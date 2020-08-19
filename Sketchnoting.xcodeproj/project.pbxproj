@@ -37,6 +37,9 @@
 		9F4B38C123EA41C900F87B61 /* ReceivedNotesController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F4B38C023EA41C900F87B61 /* ReceivedNotesController.swift */; };
 		9F4B38C323EB1E6D00F87B61 /* Notifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F4B38C223EB1E6D00F87B61 /* Notifications.swift */; };
 		9F4B38C523EC76F400F87B61 /* DocumentPreviewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F4B38C423EC76F400F87B61 /* DocumentPreviewViewController.swift */; };
+		9F4BB37424ED807A00ED1E2F /* NoteLayersViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F4BB37324ED807A00ED1E2F /* NoteLayersViewController.swift */; };
+		9F4BB37624ED80A200ED1E2F /* NoteLayersViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F4BB37524ED80A200ED1E2F /* NoteLayersViewCell.swift */; };
+		9F4BB37824EDC02800ED1E2F /* NoteLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F4BB37724EDC02800ED1E2F /* NoteLayer.swift */; };
 		9F4D2336239C1FDB0078B364 /* UIColorExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F4D2335239C1FDB0078B364 /* UIColorExtensions.swift */; };
 		9F4D2338239C22FD0078B364 /* OtherExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F4D2337239C22FD0078B364 /* OtherExtensions.swift */; };
 		9F509144235BE29100853E84 /* DataCompression in Frameworks */ = {isa = PBXBuildFile; productRef = 9F509143235BE29100853E84 /* DataCompression */; };
@@ -191,6 +194,9 @@
 		9F4B38C023EA41C900F87B61 /* ReceivedNotesController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceivedNotesController.swift; sourceTree = "<group>"; };
 		9F4B38C223EB1E6D00F87B61 /* Notifications.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notifications.swift; sourceTree = "<group>"; };
 		9F4B38C423EC76F400F87B61 /* DocumentPreviewViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentPreviewViewController.swift; sourceTree = "<group>"; };
+		9F4BB37324ED807A00ED1E2F /* NoteLayersViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteLayersViewController.swift; sourceTree = "<group>"; };
+		9F4BB37524ED80A200ED1E2F /* NoteLayersViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteLayersViewCell.swift; sourceTree = "<group>"; };
+		9F4BB37724EDC02800ED1E2F /* NoteLayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteLayer.swift; sourceTree = "<group>"; };
 		9F4D2335239C1FDB0078B364 /* UIColorExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIColorExtensions.swift; sourceTree = "<group>"; };
 		9F4D2337239C22FD0078B364 /* OtherExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OtherExtensions.swift; sourceTree = "<group>"; };
 		9F5D80EF2332D32600552D58 /* SVGImageProcessorExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SVGImageProcessorExtension.swift; sourceTree = "<group>"; };
@@ -475,6 +481,8 @@
 				9F9898302470DC2700E62CD1 /* TextBoxViewController.swift */,
 				9FC5F90724A8DFEA00CDF2DF /* NoteOptionsViewController.swift */,
 				9FC5F90924A8E20000CDF2DF /* NoteOptionsCollectionViewCell.swift */,
+				9F4BB37324ED807A00ED1E2F /* NoteLayersViewController.swift */,
+				9F4BB37524ED80A200ED1E2F /* NoteLayersViewCell.swift */,
 			);
 			path = Other;
 			sourceTree = "<group>";
@@ -577,6 +585,7 @@
 				9F65983A23EDD29300CDBE0C /* NoteTextBlock.swift */,
 				9F65983823EDD23500CDBE0C /* NoteTextLine.swift */,
 				9F65983623EDD15C00CDBE0C /* NoteTextElement.swift */,
+				9F4BB37724EDC02800ED1E2F /* NoteLayer.swift */,
 				9FF0AC9324412F4C00A82BE8 /* NoteImage.swift */,
 				9F87A47C2445441500F83B12 /* NoteTypedText.swift */,
 				9FFE07E7232A622A00DBD0AC /* Tag.swift */,
@@ -942,6 +951,7 @@
 				9FAE72E824887158002D800B /* Atomable.swift in Sources */,
 				9FD1ADF123A52C090013C68E /* NoteViewController.swift in Sources */,
 				9FD1ADF323A52F7C0013C68E /* NotePagesViewController.swift in Sources */,
+				9F4BB37824EDC02800ED1E2F /* NoteLayer.swift in Sources */,
 				9FAD28F623A52AC700F2203E /* NoteTextViewController.swift in Sources */,
 				9FA8C002239B21D500BAA42B /* TagsCreationViewController.swift in Sources */,
 				9FAE72E524887158002D800B /* StructuralWay.swift in Sources */,
@@ -1022,6 +1032,7 @@
 				9FB9E501237F500B00279F3E /* ShareNoteViewController.swift in Sources */,
 				9FBF6AB822E9F428001FD730 /* VisionTextLineWrapper.swift in Sources */,
 				9FD8BB97243D5BE500542BFA /* ImportHelper.swift in Sources */,
+				9F4BB37424ED807A00ED1E2F /* NoteLayersViewController.swift in Sources */,
 				9FAE72ED24887158002D800B /* Atom.swift in Sources */,
 				9FA5A482244AB14E006D9FB2 /* UILabelExtensions.swift in Sources */,
 				9F318D3B244A20A000A1B4B5 /* UITextViewExtensions.swift in Sources */,
@@ -1030,6 +1041,7 @@
 				9F92D11523202B9900BC0E57 /* KnowledgeGraphHelper.swift in Sources */,
 				9F75E44C230C583200488BBD /* NoteCollectionViewCell.swift in Sources */,
 				9F0F0566244FF0D700318604 /* DraggableView.swift in Sources */,
+				9F4BB37624ED80A200ED1E2F /* NoteLayersViewCell.swift in Sources */,
 				9F87A47B2445430700F83B12 /* DraggableTextView.swift in Sources */,
 				9FBF6AB422E9F391001FD730 /* VisionTextWrapper.swift in Sources */,
 				9FC02C1E23EDB6400051C576 /* Note.swift in Sources */,
