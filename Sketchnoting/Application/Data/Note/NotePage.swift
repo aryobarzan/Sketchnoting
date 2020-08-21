@@ -15,7 +15,7 @@ class NotePage: Codable {
     private var drawings: [NoteDrawing]
     private var noteText: NoteText?
     var backdropPDFData: Data?
-    var pdfScale: Float? = 1.0
+    var pdfScale: Float = 1.0
     var layers: [NoteLayer]
     
     private enum LayerTypeKey : String, CodingKey {
@@ -79,7 +79,11 @@ class NotePage: Codable {
         drawings = (try? container.decode([NoteDrawing].self, forKey: .drawings)) ?? [NoteDrawing]()
         noteText = try? container.decode(NoteText.self, forKey: .noteText)
         backdropPDFData = try? container.decode(Data.self, forKey: .backdropPDFData)
-        pdfScale = try? container.decode(Float.self, forKey: .pdfScale)
+        pdfScale = try container.decode(Float.self, forKey: .pdfScale)
+    }
+    
+    func clearCanvas() {
+        self.canvasDrawing = PKDrawing()
     }
     
     // MARK: drawing recognition
@@ -142,15 +146,6 @@ class NotePage: Codable {
         }
     }
     
-    func deleteImage(noteImage: NoteImage) {
-        for i in 0..<layers.count {
-            if layers[i] == noteImage {
-                layers.remove(at: i)
-                break
-            }
-        }
-    }
-    
     func updateNoteTypedText(typedText: NoteTypedText) {
         for i in 0..<layers.count {
             if layers[i] == typedText {
@@ -160,9 +155,9 @@ class NotePage: Codable {
         }
     }
     
-    func deleteTypedText(typedText: NoteTypedText) {
+    func deleteLayer(layer: NoteLayer) {
         for i in 0..<layers.count {
-            if layers[i] == typedText {
+            if layers[i] == layer {
                 layers.remove(at: i)
                 break
             }

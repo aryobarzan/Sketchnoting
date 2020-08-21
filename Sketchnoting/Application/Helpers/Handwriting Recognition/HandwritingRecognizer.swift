@@ -10,14 +10,15 @@ import UIKit
 import Firebase
 import Alamofire
 import SwiftyJSON
+import MLKit
 
 class HandwritingRecognizer {
     private let vision: Vision!
-    private let textRecognizer: VisionTextRecognizer!
+    private let textRecognizer: TextRecognizer!
     private var textRecognizerCloud: VisionTextRecognizer!
     init() {
         self.vision = Vision.vision()
-        self.textRecognizer = vision.onDeviceTextRecognizer()
+        self.textRecognizer = TextRecognizer.textRecognizer()
         
         let options = VisionCloudTextRecognizerOptions()
         options.modelType = .dense
@@ -25,7 +26,8 @@ class HandwritingRecognizer {
     }
     
     public func recognize(spellcheck: Bool = true, image: UIImage, handleFinish:@escaping ((_ success: Bool, _ param: NoteText?)->())){
-        let visionImage = VisionImage(image: image)
+        let visionImage = MLKit.VisionImage(image: image)
+        let visionImageCloud = Firebase.VisionImage(image: image)
         var offline = false
         
         switch SettingsManager.textRecognitionSetting() {
@@ -34,7 +36,7 @@ class HandwritingRecognizer {
             break
         case .CloudSparse:
             self.textRecognizerCloud = vision.cloudTextRecognizer()
-            textRecognizerCloud.process(visionImage) { result, error in
+            textRecognizerCloud.process(visionImageCloud) { result, error in
                 guard error == nil, let result = result else {
                     log.error(error.debugDescription)
                     handleFinish(false, nil)
@@ -52,7 +54,7 @@ class HandwritingRecognizer {
                     let options = VisionCloudTextRecognizerOptions()
                     options.modelType = .dense
                     self.textRecognizerCloud = self.vision.cloudTextRecognizer(options: options)
-                    self.textRecognizerCloud.process(visionImage) { result, error in
+                    self.textRecognizerCloud.process(visionImageCloud) { result, error in
                         guard error == nil, let result = result else {
                             log.error(error.debugDescription)
                             handleFinish(false, nil)

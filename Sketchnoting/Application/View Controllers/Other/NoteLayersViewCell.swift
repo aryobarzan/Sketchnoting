@@ -8,8 +8,6 @@
 
 import UIKit
 
-import fluid_slider
-
 class NoteLayersViewCell: UITableViewCell {
 
     @IBOutlet weak var typeImageView: UIImageView!
@@ -17,9 +15,11 @@ class NoteLayersViewCell: UITableViewCell {
     @IBOutlet weak var captionLabel: UILabel!
     @IBOutlet weak var draggableImageView: UIImageView!
     @IBOutlet weak var bottomControlImage: UIImageView!
-    @IBOutlet weak var bottomContainerView: UIView!
+    @IBOutlet weak var zoomLabel: UILabel!
+    @IBOutlet weak var zoomStepper: UIStepper!
     
     var item: NoteLayerItem!
+    var delegate: NoteLayersViewCellDelegate?
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
@@ -35,15 +35,20 @@ class NoteLayersViewCell: UITableViewCell {
             captionLabel.text = "Contains your Pencil strokes."
             draggableImageView.isHidden = true
             bottomControlImage.isHidden = true
-            bottomContainerView.isHidden = true
+            zoomLabel.isHidden = true
+            zoomStepper.isHidden = true
         case .Layer:
             draggableImageView.isHidden = false
             bottomControlImage.isHidden = true
-            bottomContainerView.isHidden = true
+            zoomLabel.isHidden = true
+            zoomStepper.isHidden = true
             if let layer = item.layer {
                 switch layer.type {
                 case .Image:
                     typeImageView.image = UIImage(systemName: "photo")
+                    if let noteImage = layer as? NoteImage {
+                        typeImageView.image = noteImage.image
+                    }
                     titleLabel.text = "Photo"
                     captionLabel.text = "Imported photo."
                 case .TypedText:
@@ -58,41 +63,27 @@ class NoteLayersViewCell: UITableViewCell {
             captionLabel.text = "Imported PDF."
             draggableImageView.isHidden = true
             bottomControlImage.isHidden = false
-            bottomContainerView.isHidden = false
+            zoomLabel.isHidden = false
+            zoomStepper.isHidden = false
+            zoomLabel.text = "\(item.zoom! * 100)%"
+            zoomStepper.value = Double((item.zoom! * 100))
             
-            bottomContainerView.subviews.forEach { view in
-                view.removeFromSuperview()
-            }
-            
-            let slider = Slider(frame: bottomContainerView.frame)
-            slider.attributedTextForFraction = { fraction in
-                let formatter = NumberFormatter()
-                formatter.maximumIntegerDigits = 3
-                formatter.maximumFractionDigits = 0
-                let string = formatter.string(from: (fraction * 150) as NSNumber) ?? ""
-                return NSAttributedString(string: string)
-            }
-            slider.setMinimumLabelAttributedText(NSAttributedString(string: "1"))
-            slider.setMaximumLabelAttributedText(NSAttributedString(string: "150"))
-            slider.fraction = 0.5
-            slider.shadowOffset = CGSize(width: 0, height: 10)
-            slider.shadowBlur = 5
-            slider.shadowColor = UIColor(white: 0, alpha: 0.1)
-            slider.contentViewColor = UIColor(red: 78/255.0, green: 77/255.0, blue: 224/255.0, alpha: 1)
-            slider.valueViewColor = .white
-            bottomContainerView.addSubview(slider)
-            slider.addTarget(self, action: #selector(pdfZoomSliderValueChanged), for: .valueChanged)
         }
     }
-    
-    @objc func pdfZoomSliderValueChanged(_ sender: Slider) {
-        log.info(sender.fraction)
-    }
 
+    @IBAction func zoomStepperChanged(_ sender: UIStepper) {
+        delegate?.zoomValueChanged(value: sender.value/100)
+        zoomLabel.text = "\(sender.value)%"
+    }
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
 
         // Configure the view for the selected state
     }
 
+}
+
+
+protocol NoteLayersViewCellDelegate {
+    func zoomValueChanged(value: Double)
 }

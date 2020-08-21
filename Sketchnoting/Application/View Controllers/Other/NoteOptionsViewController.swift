@@ -23,7 +23,6 @@ enum NoteOption: String, Codable {
     case ClearPDFPage = "Clear PDF Page"
     case ResetTextRecognition = "Reset Text Recognition"
     case DeleteNote = "Delete Note"
-    case MoleculeEditor = "Molecule Editor"
     case HelpLines = "Help Lines"
 }
 struct NoteOptionWrapper: Codable {
@@ -53,8 +52,8 @@ class NoteOptionsViewController: UIViewController, UICollectionViewDelegate, UIC
                                               NoteOptionWrapper(option: .ClearPDFPage, image: "text.badge.xmark", isDestructive: true, isInstantAction: true, isToggle: false),
                                               NoteOptionWrapper(option: .ResetTextRecognition, image: "pencil.and.outline", isDestructive: false, isInstantAction: true, isToggle: false),
                                               NoteOptionWrapper(option: .DeleteNote, image: "trash", isDestructive: true, isInstantAction: false, isToggle: false),
-                                              NoteOptionWrapper(option: .HelpLines, image: "line.horizontal.3", isDestructive: false, isInstantAction: true, isToggle: true),
-                                              NoteOptionWrapper(option: .MoleculeEditor, image: "m.circle", isDestructive: false, isInstantAction: false, isToggle: false)]
+                                              NoteOptionWrapper(option: .HelpLines, image: "line.horizontal.3", isDestructive: false, isInstantAction: true, isToggle: true)
+                                              ]
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -182,5 +181,4 @@ class NoteOptionsViewController: UIViewController, UICollectionViewDelegate, UIC
 
 protocol NoteOptionsDelegate  {
     func noteOptionSelected(option: NoteOption)
-    func pdfScaleChanged(scale: Float)
 }

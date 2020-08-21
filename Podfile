@@ -5,7 +5,7 @@ use_modular_headers!
 target 'Sketchnoting' do
   pod 'Firebase/MLVision'
   # If using an on-device API:
-  pod 'Firebase/MLVisionTextModel'
+  # pod 'Firebase/MLVisionTextModel'
   pod 'NewPopMenu'
   pod 'PocketSVG', '~> 2.0'
   pod 'SVGKit'
@@ -13,5 +13,5 @@ target 'Sketchnoting' do
   pod 'Highlightr'
   pod 'DropDown'
   pod 'Hover'
-  pod 'fluid-slider'
+  pod 'GoogleMLKit/TextRecognition'
 end

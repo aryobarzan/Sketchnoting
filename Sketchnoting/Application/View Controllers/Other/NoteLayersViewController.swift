@@ -17,16 +17,18 @@ enum NoteLayerItemType {
 class NoteLayerItem {
     var type: NoteLayerItemType
     var layer: NoteLayer?
+    var zoom: Float?
     
-    init(type: NoteLayerItemType, layer: NoteLayer? = nil) {
+    init(type: NoteLayerItemType, layer: NoteLayer? = nil, zoom: Float? = nil) {
         self.type = type
         self.layer = layer
+        self.zoom = zoom
     }
 }
 
 struct LayerSection {
     let title: String
-    let data : [NoteLayerItem]
+    var data : [NoteLayerItem]
 
     var numberOfItems: Int {
         return data.count
@@ -37,7 +39,9 @@ struct LayerSection {
     }
 }
 
-class NoteLayersViewController: UITableViewController {
+class NoteLayersViewController: UITableViewController, NoteLayersViewCellDelegate {
+    
+    var delegate: NoteLayersDelegate?
     
     var note: (URL, Note)!
     
@@ -53,11 +57,13 @@ class NoteLayersViewController: UITableViewController {
         for layer in note.1.getCurrentPage().getLayers() {
             layersData.append(NoteLayerItem(type: .Layer, layer: layer))
         }
-        let layersSection = LayerSection(title: "Layers", data: layersData)
-        self.sections.append(layersSection)
+        if layersData.count > 0 {
+            let layersSection = LayerSection(title: "Layers", data: layersData)
+            self.sections.append(layersSection)
+        }
         
         if note.1.getCurrentPage().getPDFDocument() != nil {
-             sections.append(LayerSection(title: "PDF", data: [NoteLayerItem(type: .PDF)]))
+            sections.append(LayerSection(title: "PDF", data: [NoteLayerItem(type: .PDF, zoom: note.1.getCurrentPage().pdfScale)]))
         }
     }
 
@@ -77,14 +83,46 @@ class NoteLayersViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 80.0;
+        return 100.0;
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "NoteLayersViewCell", for: indexPath) as! NoteLayersViewCell
         let item = self.sections[indexPath.section].data[indexPath.row]
         cell.set(item: item)
+        cell.delegate = self
         return cell
+    }
+    
+    override func tableView(_ tableView: UITableView, contextMenuConfigurationForRowAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
+        let item = self.sections[indexPath.section].data[indexPath.row]
+        var menuElements = [UIMenuElement]()
+        let deleteAction = UIAction(title: "Delete", image: UIImage(systemName: "xmark.circle.fill"), attributes: .destructive) { action in
+            switch item.type {
+            case .Canvas:
+                self.delegate?.clearCanvas()
+                self.note.1.getCurrentPage().clearCanvas()
+                break
+            case .Layer:
+                if let layer = item.layer {
+                    self.delegate?.deleteLayer(layer: layer)
+                    self.note.1.getCurrentPage().deleteLayer(layer: layer)
+                    self.sections[1].data.remove(at: indexPath.row)
+                    self.tableView.reloadData()
+                }
+                break
+            case .PDF:
+                self.delegate?.deletePDF()
+                self.note.1.getCurrentPage().backdropPDFData = nil
+                self.sections.remove(at: 2)
+                self.tableView.reloadData()
+                break
+            }
+        }
+        menuElements.append(deleteAction)
+        return UIContextMenuConfiguration(identifier: nil, previewProvider: nil, actionProvider: { suggestedActions in
+            return UIMenu(title: "Layer", children: menuElements)
+        })
     }
     
 
@@ -133,4 +171,16 @@ class NoteLayersViewController: UITableViewController {
     }
     */
 
+    // Cell Delegate
+    func zoomValueChanged(value: Double) {
+        note.1.getCurrentPage().pdfScale = Float(value)
+        delegate?.pdfScaleChanged(value: Float(value))
+    }
+}
+
+protocol NoteLayersDelegate {
+    func pdfScaleChanged(value: Float)
+    func deleteLayer(layer: NoteLayer)
+    func deletePDF()
+    func clearCanvas()
 }

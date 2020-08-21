@@ -24,7 +24,7 @@ import GPUImage
 import Highlightr
 import Toast
 
-class NoteViewController: UIViewController, UIPencilInteractionDelegate, UICollectionViewDelegate, NoteDelegate, PKCanvasViewDelegate, PKToolPickerObserver, UIScreenshotServiceDelegate, NoteOptionsDelegate, DocumentsViewControllerDelegate, NotePagesDelegate, VNDocumentCameraViewControllerDelegate, UIDocumentPickerDelegate, DraggableImageViewDelegate, DraggableTextViewDelegate, RelatedNotesVCDelegate, TextBoxViewControllerDelegate, MoveFileViewControllerDelegate, UIPopoverPresentationControllerDelegate, NoteInfoDelegate, PDFViewDelegate {
+class NoteViewController: UIViewController, UIPencilInteractionDelegate, UICollectionViewDelegate, NoteDelegate, PKCanvasViewDelegate, PKToolPickerObserver, UIScreenshotServiceDelegate, NoteOptionsDelegate, DocumentsViewControllerDelegate, NotePagesDelegate, VNDocumentCameraViewControllerDelegate, UIDocumentPickerDelegate, DraggableImageViewDelegate, DraggableTextViewDelegate, RelatedNotesVCDelegate, TextBoxViewControllerDelegate, MoveFileViewControllerDelegate, UIPopoverPresentationControllerDelegate, NoteInfoDelegate, PDFViewDelegate, NoteLayersDelegate {
     
     //private var documentsVC: DocumentsViewController!
     private var documentsVC: NeoDocumentsVC!
@@ -216,7 +216,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             break
         case "NoteLayers":
             if let destination = segue.destination as? NoteLayersViewController {
-                //destination.delegate = self
+                destination.delegate = self
                 destination.note = self.note
             }
             break
@@ -323,12 +323,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         pdfView.document = nil
         if let backdropPDF = page.getPDFDocument() {
             pdfView.document = backdropPDF
-            if let pdfScale = page.pdfScale {
-                pdfView.scaleFactor = CGFloat(pdfScale)
-            }
-            else {
-                pdfView.scaleFactor = 1.0
-            }
+            pdfView.scaleFactor = CGFloat(page.pdfScale)
         }
         
         self.updatePaginationButtons()
@@ -776,9 +771,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             NeoLibrary.delete(url: note.0)
             self.performSegue(withIdentifier: "CloseNote", sender: self)
             break
-        case .MoleculeEditor:
-            self.performSegue(withIdentifier: "ShowMoleculeEditor", sender: self)
-            break
         case .HelpLines:
             self.toggleHelpLinesType()
             break
@@ -788,12 +780,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     // MoveFileViewControllerDelegate
     func movedFiles(items: [(URL, File)]) {
         self.view.makeToast("Note moved.", duration: 1.0, position: .center)
-    }
-    
-    func pdfScaleChanged(scale: Float) {
-        pdfView.scaleFactor = CGFloat(scale)
-        note.1.getCurrentPage().pdfScale = scale
-        self.startSaveTimer()
     }
     
     private func undo() {
@@ -1452,7 +1438,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     func draggableTextViewSizeChanged(source: DraggableTextView, scale: CGSize) {
         if let typedText = self.noteTextViews[source] {
             typedText.size = scale
-            log.info(scale)
             note.1.getCurrentPage().updateNoteTypedText(typedText: typedText)
             self.startSaveTimer()
         }
@@ -1491,7 +1476,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             })
             popMenu.addAction(copyTextAction)
             let action = PopMenuDefaultAction(title: "Delete", didSelect: { action in
-                self.note.1.getCurrentPage().deleteTypedText(typedText: typedText)
+                self.note.1.getCurrentPage().deleteLayer(layer: typedText)
                 source.removeFromSuperview()
                 self.noteTextViews[source] = nil
                 self.startSaveTimer()
@@ -1565,7 +1550,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     func draggableImageViewSizeChanged(source: DraggableImageView, scale: CGSize) {
         if let noteImage = self.noteImageViews[source] {
             noteImage.size = scale
-            log.info(scale)
             note.1.getCurrentPage().updateNoteImage(noteImage: noteImage)
             self.startSaveTimer()
         }
@@ -1590,9 +1574,8 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         })
         let action = PopMenuDefaultAction(title: "Delete Image", didSelect: { action in
             if let noteImage =  self.noteImageViews[source] {
-                self.note.1.getCurrentPage().deleteImage(noteImage: noteImage)
-                source.removeFromSuperview()
-                self.noteImageViews[source] = nil
+                self.note.1.getCurrentPage().deleteLayer(layer: noteImage)
+                self.removeDraggableView(layer: noteImage)
                 self.startSaveTimer()
             }
             
@@ -1765,6 +1748,33 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     var highlightedImage: DraggableImageView?
     var highlightedTextView: DraggableTextView?
     
+    func removeDraggableView(layer: NoteLayer) {
+        switch layer.type {
+        case .Image:
+            if let noteImage = layer as? NoteImage {
+                for (view, image) in self.noteImageViews {
+                    if image == noteImage {
+                        view.removeFromSuperview()
+                        self.noteImageViews[view] = nil
+                        break
+                    }
+                }
+            }
+            break
+        case .TypedText:
+            if let typedText = layer as? NoteTypedText {
+                for (view, text) in self.noteTextViews {
+                    if text == typedText {
+                        view.removeFromSuperview()
+                        self.noteTextViews[view] = nil
+                        break
+                    }
+                }
+            }
+            break
+        }
+    }
+    
     
     // MARK: NoteInfoDelegate
     func noteRenamed(newName: String, newURL: URL) {
@@ -1773,5 +1783,28 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         self.note.1.setName(name: newName)
         self.saveCurrentPage()
         self.documentsVC.note = self.note
+    }
+    
+    // MARK: NoteLayersDelegate
+    func pdfScaleChanged(value: Float) {
+        pdfView.scaleFactor = CGFloat(value)
+        note.1.getCurrentPage().pdfScale = value
+        self.startSaveTimer()
+    }
+    
+    func deleteLayer(layer: NoteLayer) {
+        note.1.getCurrentPage().deleteLayer(layer: layer)
+        self.removeDraggableView(layer: layer)
+        self.startSaveTimer()
+    }
+    func deletePDF() {
+        note.1.getCurrentPage().backdropPDFData = nil
+        pdfView.document = nil
+        self.startSaveTimer()
+    }
+    func clearCanvas() {
+        self.canvasView.drawing = PKDrawing()
+        note.1.getCurrentPage().clearCanvas()
+        self.startSaveTimer()
     }
 }
