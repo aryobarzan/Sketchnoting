@@ -23,8 +23,8 @@ class NoteTypedTextView: NeoDraggableView {
         label.bottomAnchor.constraint(equalTo: margins.bottomAnchor, constant: 0).isActive = true
         label.topAnchor.constraint(equalTo: margins.topAnchor, constant: 0).isActive = true
         
-        self.layer.borderColor = UIColor.systemGray.cgColor
-        self.layer.borderWidth = 0.5
+        self.label.layer.borderColor = UIColor.systemGray.cgColor
+        self.label.layer.borderWidth = 0.5
         
         self.label.leftInset = 1
         self.label.topInset = 1

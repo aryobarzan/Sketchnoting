@@ -265,12 +265,28 @@ class NeoLibrary {
         self.saveSynchronously(note: note, url: url)
         return (url, note)
     }
+    
+    public static func createNoteFromNotePages(notePages: [NotePage], at location: URL = currentLocation) -> (URL, Note) {
+        let (url, note) = NeoLibrary.createNote(name: "Imported Note Pages")
+        note.pages = notePages
+        self.saveSynchronously(note: note, url: url)
+        return (url, note)
+    }
+    
     public static func createNoteFromImages(images: [UIImage], at location: URL = currentLocation) -> (URL, Note) {
-        let (url, note) = NeoLibrary.createNote(name: "Imported Images")
+        var noteImages = [NoteImage]()
         for image in images {
             if let noteImage = NoteImage(image: image) {
-                note.getCurrentPage().layers.append(noteImage)
+                noteImages.append(noteImage)
             }
+        }
+        return createNoteFromNoteImages(noteImages: noteImages)
+    }
+    
+    public static func createNoteFromNoteImages(noteImages: [NoteImage], at location: URL = currentLocation) -> (URL, Note) {
+        let (url, note) = NeoLibrary.createNote(name: "Imported Images")
+        for noteImage in noteImages {
+            note.getCurrentPage().layers.append(noteImage)
         }
         self.saveSynchronously(note: note, url: url)
         return (url, note)

@@ -17,10 +17,8 @@ enum NoteOption: String, Codable {
     case CopyText = "Copy Text"
     case CopyNote = "Copy Note"
     case MoveFile = "Move"
-    case ClearPage = "Clear Page"
     case DeletePage = "Delete Page"
     case Share = "Share"
-    case ClearPDFPage = "Clear PDF Page"
     case ResetTextRecognition = "Reset Text Recognition"
     case DeleteNote = "Delete Note"
     case HelpLines = "Help Lines"
@@ -46,10 +44,8 @@ class NoteOptionsViewController: UIViewController, UICollectionViewDelegate, UIC
                                               NoteOptionWrapper(option: .CopyText, image: "text.quote", isDestructive: false, isInstantAction: true, isToggle: false),
                                               NoteOptionWrapper(option: .CopyNote, image: "doc.circle", isDestructive: false, isInstantAction: true, isToggle: false),
                                               NoteOptionWrapper(option: .MoveFile, image: "folder", isDestructive: false, isInstantAction: false, isToggle: false),
-                                              NoteOptionWrapper(option: .ClearPage, image: "text.badge.xmark", isDestructive: true, isInstantAction: false, isToggle: false),
                                               NoteOptionWrapper(option: .DeletePage, image: "trash", isDestructive: true, isInstantAction: false, isToggle: false),
                                               NoteOptionWrapper(option: .Share, image: "square.and.arrow.up", isDestructive: false, isInstantAction: false, isToggle: false),
-                                              NoteOptionWrapper(option: .ClearPDFPage, image: "text.badge.xmark", isDestructive: true, isInstantAction: true, isToggle: false),
                                               NoteOptionWrapper(option: .ResetTextRecognition, image: "pencil.and.outline", isDestructive: false, isInstantAction: true, isToggle: false),
                                               NoteOptionWrapper(option: .DeleteNote, image: "trash", isDestructive: true, isInstantAction: false, isToggle: false),
                                               NoteOptionWrapper(option: .HelpLines, image: "line.horizontal.3", isDestructive: false, isInstantAction: true, isToggle: true)

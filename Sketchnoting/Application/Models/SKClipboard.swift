@@ -7,17 +7,12 @@
 //
 
 import UIKit
-import Hover
 
 class SKClipboard {
     private static var note: Note?
     private static var page: NotePage?
     private static var noteLayer: NoteLayer?
-    
-    private static var hoverView: HoverView?
-    
-    public static var delegate: SKClipboardDelegate?
-    
+            
     public static func clear() {
         self.note = nil
         self.page = nil
@@ -55,49 +50,4 @@ class SKClipboard {
     public static func getNoteLayer() -> NoteLayer? {
         return noteLayer
     }
-    
-    public static func addClipboardButton(view: UIView) {
-        let configuration = HoverConfiguration(image: UIImage(systemName: "doc.on.clipboard"), color: .gradient(top: .blue, bottom: .cyan))
-
-        var items = [HoverItem]()
-        if self.note != nil {
-            items.append(HoverItem(title: "Paste Note", image: UIImage(systemName: "doc.circle")!) { self.delegate?.pasteNoteTapped() })
-        }
-        if self.page != nil {
-            items.append(HoverItem(title: "Paste Page", image: UIImage(systemName: "doc.text")!) { self.delegate?.pastePageTapped() })
-        }
-        if self.noteLayer != nil {
-            items.append(HoverItem(title: "Paste Layer", image: UIImage(systemName: "photo")!) { self.delegate?.pasteNoteLayerTapped() })
-        }
-        if items.count > 0 {
-            items.append(HoverItem(title: "Clear", image: UIImage(systemName: "clear")!) {
-                self.delegate?.clearClipboardTapped()
-                self.clear()
-                self.hoverView!.removeFromSuperview()
-                self.hoverView = nil
-            })
-            if let h = self.hoverView {
-                h.removeFromSuperview()
-            }
-            self.hoverView = HoverView(with: configuration, items: items)
-            view.addSubview(self.hoverView!)
-            self.hoverView!.translatesAutoresizingMaskIntoConstraints = false
-
-            NSLayoutConstraint.activate(
-                [
-                    self.hoverView!.topAnchor.constraint(equalTo: view.topAnchor),
-                    self.hoverView!.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-                    self.hoverView!.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-                    self.hoverView!.trailingAnchor.constraint(equalTo: view.trailingAnchor)
-                ]
-            )
-        }
-    }
-}
-
-public protocol SKClipboardDelegate {
-    func pasteNoteTapped()
-    func pastePageTapped()
-    func pasteNoteLayerTapped()
-    func clearClipboardTapped()
 }

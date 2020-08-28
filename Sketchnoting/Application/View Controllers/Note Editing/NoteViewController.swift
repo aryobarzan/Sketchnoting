@@ -26,7 +26,6 @@ import Toast
 
 class NoteViewController: UIViewController, UIPencilInteractionDelegate, UICollectionViewDelegate, NoteDelegate, PKCanvasViewDelegate, PKToolPickerObserver, UIScreenshotServiceDelegate, NoteOptionsDelegate, DocumentsViewControllerDelegate, NotePagesDelegate, VNDocumentCameraViewControllerDelegate, UIDocumentPickerDelegate, RelatedNotesVCDelegate, TextBoxViewControllerDelegate, MoveFileViewControllerDelegate, UIPopoverPresentationControllerDelegate, NoteInfoDelegate, PDFViewDelegate, NoteLayersDelegate, NeoDraggableViewDelegate {
     
-    //private var documentsVC: DocumentsViewController!
     private var documentsVC: NeoDocumentsVC!
     
     @IBOutlet var backdropView: UIView!
@@ -755,11 +754,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         case .MoveFile:
             self.performSegue(withIdentifier: "MoveFileNoteEditing", sender: self)
             break
-        case .ClearPage:
-            note.1.getCurrentPage().clear()
-            self.load(page: note.1.getCurrentPage())
-            self.saveCurrentPage()
-            break
         case .DeletePage:
             _ = note.1.deletePage(index: note.1.activePageIndex)
             self.load(page: note.1.getCurrentPage())
@@ -768,10 +762,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         case .Share:
             self.performSegue(withIdentifier: "ShareNote", sender: self)
             break
-        case .ClearPDFPage:
-            note.1.getCurrentPage().backdropPDFData = nil
-            self.pdfView.document = nil
-            NeoLibrary.save(note: note.1, url: note.0)
         case .ResetTextRecognition:
             note.1.clearDocuments()
             self.clearConceptHighlights()

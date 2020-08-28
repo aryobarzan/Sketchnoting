@@ -55,6 +55,9 @@ class NoteLayersViewCell: UITableViewCell {
                     typeImageView.image = UIImage(systemName: "textbox")
                     titleLabel.text = "Text Box"
                     captionLabel.text = "Imported text."
+                    if let noteTypedText = layer as? NoteTypedText {
+                        captionLabel.text = noteTypedText.text
+                    }
                 }
             }
         case .PDF:

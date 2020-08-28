@@ -137,24 +137,6 @@ class NotePage: Codable {
         return self.drawings
     }
     
-    func updateNoteImage(noteImage: NoteImage) {
-        for i in 0..<layers.count {
-            if layers[i] == noteImage {
-                layers[i] = noteImage
-                break
-            }
-        }
-    }
-    
-    func updateNoteTypedText(typedText: NoteTypedText) {
-        for i in 0..<layers.count {
-            if layers[i] == typedText {
-                layers[i] = typedText
-                break
-            }
-        }
-    }
-    
     func deleteLayer(layer: NoteLayer) {
         for i in 0..<layers.count {
             if layers[i] == layer {

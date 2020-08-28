@@ -28,9 +28,6 @@ class NeoDraggableView: UIView {
         super.init(frame: frame)
         self.isUserInteractionEnabled = true
         setUpGestureRecognisers()
-        
-        self.layer.borderColor = UIColor.systemGray.cgColor
-        self.layer.borderWidth = 1
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -81,9 +78,6 @@ class NeoDraggableView: UIView {
                 delegate?.draggableViewSizeChanged(source: self, scale: self.frame.size)
             }
         }
-        if pinchGesture.state == .ended {
-            //view.adjustFontSize()
-        }
     }
     
     @objc func longPressGestureTriggered() {
@@ -118,8 +112,7 @@ class NeoDraggableView: UIView {
             self.layer.borderWidth = 4
         }
         else {
-            self.layer.borderColor = UIColor.systemGray.cgColor
-            self.layer.borderWidth = 1
+            self.layer.borderWidth = 0
         }
     }
 }

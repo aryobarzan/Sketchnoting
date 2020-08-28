@@ -598,16 +598,31 @@
                                             <action selector="newFolderButtonTapped:" destination="BYZ-38-t0r" eventType="touchUpInside" id="VDs-ok-cnH"/>
                                         </connections>
                                     </button>
+                                    <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Psf-Sy-qRg">
+                                        <rect key="frame" x="469" y="13" width="28" height="30"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="28" id="YtX-06-tI0"/>
+                                            <constraint firstAttribute="height" constant="30" id="oH0-e8-gxJ"/>
+                                        </constraints>
+                                        <state key="normal" image="doc.on.clipboard" catalog="system">
+                                            <preferredSymbolConfiguration key="preferredSymbolConfiguration" configurationType="pointSize" pointSize="20"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="clipboardButtonTapped:" destination="BYZ-38-t0r" eventType="touchUpInside" id="yMF-2G-TVW"/>
+                                        </connections>
+                                    </button>
                                 </subviews>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                                 <constraints>
                                     <constraint firstItem="aAp-yO-J3e" firstAttribute="top" secondItem="CoV-ID-6VL" secondAttribute="top" constant="12" id="2k0-iF-eO5"/>
+                                    <constraint firstItem="Psf-Sy-qRg" firstAttribute="centerY" secondItem="CoV-ID-6VL" secondAttribute="centerY" id="6f3-lB-5ma"/>
                                     <constraint firstItem="UAF-TK-CJG" firstAttribute="centerY" secondItem="CoV-ID-6VL" secondAttribute="centerY" id="BKo-Zc-d3o"/>
                                     <constraint firstItem="xyG-l9-rRb" firstAttribute="top" secondItem="CoV-ID-6VL" secondAttribute="top" constant="12" id="Erd-r2-SGV"/>
                                     <constraint firstItem="VsX-f8-E6V" firstAttribute="centerY" secondItem="CoV-ID-6VL" secondAttribute="centerY" id="FYo-gY-T6b"/>
                                     <constraint firstAttribute="trailing" secondItem="aAp-yO-J3e" secondAttribute="trailing" constant="8" id="Hlo-bV-Lff"/>
                                     <constraint firstItem="UAF-TK-CJG" firstAttribute="centerX" secondItem="CoV-ID-6VL" secondAttribute="centerX" id="MQX-Mw-IA1"/>
                                     <constraint firstAttribute="height" constant="56" id="Tbg-8C-qfF"/>
+                                    <constraint firstItem="Psf-Sy-qRg" firstAttribute="leading" secondItem="VsX-f8-E6V" secondAttribute="trailing" constant="16" id="TeN-ET-wGP"/>
                                     <constraint firstItem="aAp-yO-J3e" firstAttribute="leading" secondItem="xyG-l9-rRb" secondAttribute="trailing" constant="8" id="elK-jn-38s"/>
                                     <constraint firstItem="oeF-CX-ZSK" firstAttribute="centerY" secondItem="CoV-ID-6VL" secondAttribute="centerY" id="hLv-ax-08r"/>
                                     <constraint firstItem="UAF-TK-CJG" firstAttribute="leading" secondItem="oeF-CX-ZSK" secondAttribute="trailing" constant="16" id="lRr-KQ-NGu"/>
@@ -845,6 +860,7 @@
                     <navigationItem key="navigationItem" title="Sketchnoting" id="fQM-d5-dnH"/>
                     <nil key="simulatedTopBarMetrics"/>
                     <connections>
+                        <outlet property="clipboardButton" destination="Psf-Sy-qRg" id="r4t-Es-XUY"/>
                         <outlet property="deleteSelectedButton" destination="Is9-l7-CB7" id="cgW-zl-cyz"/>
                         <outlet property="deselectAllButton" destination="Ysg-uh-uEX" id="Qb4-p9-dvW"/>
                         <outlet property="filtersButton" destination="QAN-3k-yxQ" id="66B-EJ-JR9"/>
@@ -2464,6 +2480,11 @@
                         <viewLayoutGuide key="safeArea" id="4Ol-1v-hCA"/>
                     </view>
                     <navigationItem key="navigationItem" title="Related Notes" id="mKD-u7-wUT">
+                        <barButtonItem key="leftBarButtonItem" title="Item" image="arrow.clockwise" catalog="system" id="8ZF-YV-zOU">
+                            <connections>
+                                <action selector="refreshButtonTapped:" destination="KcP-EM-pcP" id="dkw-8B-u1o"/>
+                            </connections>
+                        </barButtonItem>
                         <barButtonItem key="rightBarButtonItem" systemItem="done" id="Ptw-Ya-4oC">
                             <connections>
                                 <action selector="doneTapped:" destination="KcP-EM-pcP" id="QoC-iW-Vxa"/>
@@ -3213,14 +3234,15 @@
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>
-        <segue reference="RAn-aJ-7TA"/>
-        <segue reference="b6T-Lb-KBp"/>
-        <segue reference="odf-CP-ags"/>
-        <segue reference="OAt-q3-0jJ"/>
+        <segue reference="fmI-KU-Ur1"/>
+        <segue reference="ig0-q1-Lq9"/>
+        <segue reference="yvs-ei-HRy"/>
+        <segue reference="58e-4d-iJp"/>
         <segue reference="ct4-u7-KZY"/>
     </inferredMetricsTieBreakers>
     <resources>
         <image name="antenna.radiowaves.left.and.right" catalog="system" width="128" height="109"/>
+        <image name="arrow.clockwise" catalog="system" width="115" height="128"/>
         <image name="arrow.down" catalog="system" width="120" height="128"/>
         <image name="arrow.down.doc" catalog="system" width="115" height="128"/>
         <image name="arrow.left" catalog="system" width="128" height="98"/>

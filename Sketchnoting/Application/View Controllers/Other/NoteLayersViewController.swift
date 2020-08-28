@@ -105,7 +105,19 @@ class NoteLayersViewController: UITableViewController, NoteLayersViewCellDelegat
     override func tableView(_ tableView: UITableView, contextMenuConfigurationForRowAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
         let item = self.sections[indexPath.section].data[indexPath.row]
         var menuElements = [UIMenuElement]()
-        let deleteAction = UIAction(title: "Delete", image: UIImage(systemName: "xmark.circle.fill"), attributes: .destructive) { action in
+        var menuTitle = "Canvas"
+        switch item.type {
+        case .Canvas:
+            menuTitle = "Canvas"
+            break
+        case .Layer:
+            menuTitle = "Layer"
+            break
+        case .PDF:
+            menuTitle = "PDF"
+            break
+        }
+        let deleteAction = UIAction(title: (item.type == .Canvas) ? "Clear" : "Delete", image: UIImage(systemName: "xmark.circle.fill"), attributes: .destructive) { action in
             switch item.type {
             case .Canvas:
                 self.delegate?.clearCanvas()
@@ -129,7 +141,7 @@ class NoteLayersViewController: UITableViewController, NoteLayersViewCellDelegat
         }
         menuElements.append(deleteAction)
         return UIContextMenuConfiguration(identifier: nil, previewProvider: nil, actionProvider: { suggestedActions in
-            return UIMenu(title: "Layer", children: menuElements)
+            return UIMenu(title: menuTitle, children: menuElements)
         })
     }
     

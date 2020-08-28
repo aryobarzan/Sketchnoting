@@ -9,7 +9,6 @@
 import UIKit
 
 class Knowledge {
-    // to update: fetch all notes, not just in the current folder
     static var tf_idfs: Dictionary<URL, (Note, Dictionary<String, Float>)>?
     public static func setupSimilarityMatrix() {
         tf_idfs = Dictionary<URL, (Note, Dictionary<String, Float>)>()
@@ -33,6 +32,14 @@ class Knowledge {
                 for t in d.title.components(separatedBy: " ") {
                     if !bag.contains(t) {
                         bag.append(t)
+                    }
+                }
+            }
+            for page in note.1.pages {
+                for layer in page.getLayers() {
+                    let hashcodeString = String(layer.hashValue)
+                    if !bag.contains(hashcodeString) {
+                        bag.append(hashcodeString)
                     }
                 }
             }
@@ -74,11 +81,14 @@ class Knowledge {
                 }
             }
         }
-        let N = Float(allNotes.count)
-         for (t, f) in termIDFs {
-            let division = N / f
-            termIDFs[t] = log10(division)
+        if allNotes.count > 50 {
+            let N = Float(allNotes.count)
+            for (t, f) in termIDFs {
+                let division = N / f
+                termIDFs[t] = log10(division)
+            }
         }
+        
         for note in allNotes {
             var noteIDFs = Dictionary<String, Float>()
             for (t, f) in termTFs[note.0]!.1 {
@@ -89,11 +99,20 @@ class Knowledge {
         log.info("Setup of similarity matrix complete.")
     }
     
+    public static func similarityMatrixIsSetup() -> Bool {
+        if tf_idfs == nil {
+            return false
+        }
+        else {
+            return true
+        }
+    }
+    
     static func similarNotesFor(url: URL, note: Note) -> [(URL, Note, Float)] {
         var similarNotes = [(URL, Note, Float)]()
         for n in NeoLibrary.getNotes() {
-            if n.0 != url {
-                similarNotes.append((url, note, self.calculateTFIDFSimilarity(n1: url, n2: n.0)))
+            if n.0.absoluteString != url.absoluteString {
+                similarNotes.append((n.0, n.1, self.calculateTFIDFSimilarity(n1: url, n2: n.0)))
             }
         }
         let similarNotesSorted = similarNotes.sorted{$0.2 < $1.2}

@@ -99,7 +99,9 @@ class RelatedNotesViewController: UIViewController, UICollectionViewDataSource, 
     }
     
     private func refreshRelatedNotes() {
-        Knowledge.setupSimilarityMatrix()
+        if !Knowledge.similarityMatrixIsSetup() {
+            Knowledge.setupSimilarityMatrix()
+        }
         let foundNotes = Knowledge.similarNotesFor(url: note.0, note: note.1)
         self.relatedNotes = [(URL, Note)]()
         for (url, note, score) in foundNotes {
@@ -109,5 +111,9 @@ class RelatedNotesViewController: UIViewController, UICollectionViewDataSource, 
         }
         collectionView.reloadData()
         countLabel.text = "Related Notes: (\(relatedNotes.count))"
+    }
+    @IBAction func refreshButtonTapped(_ sender: UIBarButtonItem) {
+        Knowledge.setupSimilarityMatrix()
+        self.refreshRelatedNotes()
     }
 }

@@ -22,7 +22,7 @@ import MobileCoreServices
 import VisionKit
 import Photos
 
-class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextFieldDelegate, MCSessionDelegate, MCBrowserViewControllerDelegate, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UIApplicationDelegate, UIPopoverPresentationControllerDelegate, UIDocumentPickerDelegate, VNDocumentCameraViewControllerDelegate, UICollectionViewDragDelegate, UICollectionViewDropDelegate, FolderButtonDelegate, RelatedNotesVCDelegate, MoveFileViewControllerDelegate, SKClipboardDelegate {
+class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextFieldDelegate, MCSessionDelegate, MCBrowserViewControllerDelegate, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UIApplicationDelegate, UIPopoverPresentationControllerDelegate, UIDocumentPickerDelegate, VNDocumentCameraViewControllerDelegate, UICollectionViewDragDelegate, UICollectionViewDropDelegate, FolderButtonDelegate, RelatedNotesVCDelegate, MoveFileViewControllerDelegate {
     
     @IBOutlet weak var navigationHierarchyScrollView: UIScrollView!
     @IBOutlet weak var navigationHierarchyStackView: UIStackView!
@@ -33,6 +33,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     
     @IBOutlet var newNoteButton: UIButton!
     @IBOutlet var noteLoadingIndicator: NVActivityIndicatorView!
+    @IBOutlet weak var clipboardButton: UIButton!
     
     @IBOutlet var noteListViewButton: UIButton!
     @IBOutlet weak var filtersButton: UIButton!
@@ -115,9 +116,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             noteListViewButton.backgroundColor = self.view.tintColor
             noteListViewButton.tintColor = .black
         }
-        
-        SKClipboard.delegate = self
-        SKClipboard.addClipboardButton(view: self.view)
+        self.updateClipboardButton()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -245,10 +244,18 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
                 }
             }
             self.updateDisplayedNotes(false)
-            SKClipboard.delegate = self
-            SKClipboard.addClipboardButton(view: self.view)
+            self.updateClipboardButton()
         }
         self.tabBarController?.tabBar.isHidden = false
+    }
+    
+    private func updateClipboardButton() {
+        if SKClipboard.hasItems() {
+            clipboardButton.isHidden = false
+        }
+        else {
+            clipboardButton.isHidden = true
+        }
     }
     
     private func manageFileImport(urls: [URL]) {
@@ -486,6 +493,51 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             self.updateDisplayedNotes(false)
         }
     }
+    @IBAction func clipboardButtonTapped(_ sender: UIButton) {
+        let popMenu = PopMenuViewController(sourceView: sender, actions: [PopMenuAction](), appearance: nil)
+        popMenu.appearance.popMenuBackgroundStyle = .none()
+        if (SKClipboard.hasItems()) {
+            if let copiedNote = SKClipboard.getNote() {
+                let pasteNoteAction = PopMenuDefaultAction(title: "Paste Note", image: UIImage(systemName: "square.stack.3d.down.right.fill"), didSelect: { action in
+                    NeoLibrary.add(note: copiedNote)
+                    self.updateDisplayedNotes(true)
+                    self.view.makeToast("Pasted note: \(copiedNote.getName())", duration: 2, position: .center)
+                })
+                popMenu.addAction(pasteNoteAction)
+            }
+            if let copiedPage = SKClipboard.getPage() {
+                let pastePageAction = PopMenuDefaultAction(title: "Paste Page", image: UIImage(systemName: "doc"), didSelect: { action in
+                    let _ = NeoLibrary.createNoteFromNotePages(notePages: [copiedPage])
+                    self.updateDisplayedNotes(true)
+                    self.view.makeToast("New note from pasted page created.", duration: 2, position: .center)
+                })
+                    popMenu.addAction(pastePageAction)
+            }
+            if let copiedNoteLayer = SKClipboard.getNoteLayer() {
+                let pasteImageAction = PopMenuDefaultAction(title: "Paste Layer", image: UIImage(systemName: "photo"), didSelect: { action in
+                    if let noteTypedText = copiedNoteLayer as? NoteTypedText {
+                        let _ = NeoLibrary.createNoteFromTypedTexts(texts: [noteTypedText])
+                        self.view.makeToast("New note from pasted typed text created.", duration: 2, position: .center)
+                    }
+                    else if let noteImage = copiedNoteLayer as? NoteImage {
+                        let _ = NeoLibrary.createNoteFromImages(images: [noteImage.image])
+                        self.view.makeToast("New note from pasted image created.", duration: 2, position: .center)
+                    }
+                    self.updateDisplayedNotes(true)
+                })
+                popMenu.addAction(pasteImageAction)
+            }
+            let clearAction = PopMenuDefaultAction(title: "Paste Note", image: UIImage(systemName: "square.stack.3d.down.right.fill"), didSelect: { action in
+                SKClipboard.clear()
+                self.updateClipboardButton()
+                self.view.makeToast("Cleared SKClipboard.", duration: 1, position: .center)
+            })
+            popMenu.addAction(clearAction)
+        }
+        if popMenu.actions.count > 0 {
+            self.present(popMenu, animated: true, completion: nil)
+        }
+    }
     
     @IBAction func noteSortingTapped(_ sender: UIButton) {
         let popMenu = PopMenuViewController(sourceView: sender, actions: [PopMenuAction](), appearance: nil)
@@ -566,7 +618,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             menuElements.append(duplicateAction)
             let copyNoteAction = UIAction(title: "Copy Note", image: UIImage(systemName: "doc.on.clipboard")) { action in
                 SKClipboard.copy(note: note)
-                SKClipboard.addClipboardButton(view: self.view)
+                self.updateClipboardButton()
                 self.view.makeToast("Copied note to SKClipboard.")
             }
             menuElements.append(copyNoteAction)

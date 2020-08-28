@@ -23,8 +23,8 @@ class NoteImageView: NeoDraggableView {
         imageView.bottomAnchor.constraint(equalTo: margins.bottomAnchor, constant: 0).isActive = true
         imageView.topAnchor.constraint(equalTo: margins.topAnchor, constant: 0).isActive = true
         
-        self.layer.borderColor = UIColor.systemGray.cgColor
-        self.layer.borderWidth = 1
+        //self.layer.borderColor = UIColor.systemGray.cgColor
+        //self.layer.borderWidth = 1
     }
     required init?(coder aDecoder: NSCoder) {
         imageView = UIImageView()
