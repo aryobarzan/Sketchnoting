@@ -24,7 +24,7 @@ import GPUImage
 import Highlightr
 import Toast
 
-class NoteViewController: UIViewController, UIPencilInteractionDelegate, UICollectionViewDelegate, NoteDelegate, PKCanvasViewDelegate, PKToolPickerObserver, UIScreenshotServiceDelegate, NoteOptionsDelegate, DocumentsViewControllerDelegate, NotePagesDelegate, VNDocumentCameraViewControllerDelegate, UIDocumentPickerDelegate, DraggableImageViewDelegate, DraggableTextViewDelegate, RelatedNotesVCDelegate, TextBoxViewControllerDelegate, MoveFileViewControllerDelegate, UIPopoverPresentationControllerDelegate, NoteInfoDelegate, PDFViewDelegate, NoteLayersDelegate {
+class NoteViewController: UIViewController, UIPencilInteractionDelegate, UICollectionViewDelegate, NoteDelegate, PKCanvasViewDelegate, PKToolPickerObserver, UIScreenshotServiceDelegate, NoteOptionsDelegate, DocumentsViewControllerDelegate, NotePagesDelegate, VNDocumentCameraViewControllerDelegate, UIDocumentPickerDelegate, RelatedNotesVCDelegate, TextBoxViewControllerDelegate, MoveFileViewControllerDelegate, UIPopoverPresentationControllerDelegate, NoteInfoDelegate, PDFViewDelegate, NoteLayersDelegate, NeoDraggableViewDelegate {
     
     //private var documentsVC: DocumentsViewController!
     private var documentsVC: NeoDocumentsVC!
@@ -61,11 +61,12 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     
     var conceptHighlightsInitialized = false
     
-    var noteImageViews = [DraggableImageView : NoteImage]()
+    var draggableViews = [NeoDraggableView : NoteLayer]()
+    var draggableViewBeingEdited: NeoDraggableView?
+    var highlightedDraggableView: NeoDraggableView?
+    
     @IBOutlet weak var pdfView: PDFView!
-    
-    var noteTextViews = [DraggableTextView : NoteTypedText]()
-    
+        
     var noteForRelatedNotes: (URL, Note)?
     
     @IBOutlet weak var tagsButton: UIButton!
@@ -234,8 +235,8 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         case "ShowTextBoxVC":
             if let destination = segue.destination as? UINavigationController {
                 if let destinationViewController = destination.topViewController as? TextBoxViewController {
-                    if let textView = self.draggableTextViewBeingEdited {
-                        if let typedText = self.noteTextViews[textView] {
+                    if let draggableView = self.draggableViewBeingEdited {
+                        if let typedText = self.draggableViews[draggableView] as? NoteTypedText {
                             destinationViewController.delegate = self
                             destinationViewController.noteTypedText = typedText
                         }
@@ -304,8 +305,9 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         // Clear any existing images and text boxes
         self.clearFloatingViews()
         // Setup images and text boxes for this page
-        self.setupNoteImages()
-        self.setupNoteTypedTexts()
+        //self.setupNoteImages()
+        //self.setupNoteTypedTexts()
+        self.setupDraggableViews()
         
         // Clear any existing topic highlights on the canvas
         self.clearConceptHighlights()
@@ -555,40 +557,51 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         }
     }
     
-    private func setupNoteImages() {
-        noteImageViews = [DraggableImageView : NoteImage]()
-        
-        for layer in note.1.getCurrentPage().getLayers(type: .Image) {
+    // -----
+    private func setupDraggableViews() {
+        draggableViews = [NeoDraggableView : NoteLayer]()
+        for layer in note.1.getCurrentPage().getLayers() {
             if let image = layer as? NoteImage {
                 displayNoteImage(image: image)
+            }
+            if let typedText = layer as? NoteTypedText {
+                displayNoteTypedText(typedText: typedText)
             }
         }
     }
     
     private func displayNoteImage(image: NoteImage) {
         let frame = CGRect(x: image.location.x, y: image.location.y, width: image.size.width, height: image.size.height)
-        let draggableView = DraggableImageView(frame: frame)
-        draggableView.image = image.image
+        let draggableView = NoteImageView(frame: frame)
+        draggableView.imageView.image = image.image
         draggableView.delegate = self
         self.canvasView.addSubview(draggableView)
         self.canvasView.sendSubviewToBack(draggableView)
-        self.noteImageViews[draggableView] = image
+        self.draggableViews[draggableView] = image
         draggableView.center = image.location
     }
     
-    private func setupNoteTypedTexts() {
-        noteTextViews = [DraggableTextView : NoteTypedText]()
-        for layer in note.1.getCurrentPage().getLayers(type: .TypedText) {
-            if let typedText = layer as? NoteTypedText {
-                displayTypedText(typedText: typedText)
-            }
-        }
+    private func displayNoteTypedText(typedText: NoteTypedText) {
+        let frame = CGRect(x: typedText.location.x, y: typedText.location.y, width: typedText.size.width, height: typedText.size.height)
+        let draggableView = NoteTypedTextView(frame: frame)
+        draggableView.delegate = self
+        draggableView.label.attributedText = self.getAttributedTextForTypedText(typedText: typedText)
+        draggableView.label.adjustFontSize()
+        self.canvasView.addSubview(draggableView)
+        self.canvasView.sendSubviewToBack(draggableView)
+        self.draggableViews[draggableView] = typedText
+        draggableView.center = typedText.location
     }
     
-    private func displayTypedText(typedText: NoteTypedText) {
-        let textView = self.createNoteTypedTextView(typedText: typedText)
-        self.addTypedTextViewToCanvas(textView: textView, typedText: typedText)
+    private func getAttributedTextForTypedText(typedText: NoteTypedText) -> NSAttributedString? {
+        let highlightr = Highlightr()!
+        var highlightedText = highlightr.highlight(typedText.text)
+        if !typedText.codeLanguage.isEmpty {
+            highlightedText = highlightr.highlight(typedText.text, as: typedText.codeLanguage)
+        }
+        return highlightedText
     }
+    // ------
     
     
     private func conceptHighlightExists(new: CGRect) -> UIView? {
@@ -1321,23 +1334,19 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                 })
                 popMenu.addAction(pastePageAction)
             }
-            if let copiedImage = SKClipboard.getImage() {
-                let pasteImageAction = PopMenuDefaultAction(title: "Paste Image", image: UIImage(systemName: "photo"), didSelect: { action in
-                    self.note.1.getCurrentPage().layers.append(copiedImage)
-                    self.displayNoteImage(image: copiedImage)
+            if let copiedNoteLayer = SKClipboard.getNoteLayer() {
+                let pasteImageAction = PopMenuDefaultAction(title: "Paste Layer", image: UIImage(systemName: "photo"), didSelect: { action in
+                    self.note.1.getCurrentPage().layers.append(copiedNoteLayer)
+                    if let noteImage = copiedNoteLayer as? NoteImage {
+                        self.displayNoteImage(image: noteImage)
+                    }
+                    if let noteTypedText = copiedNoteLayer as? NoteTypedText {
+                        self.displayNoteTypedText(typedText: noteTypedText)
+                    }
                     self.saveCurrentPage()
-                    self.view.makeToast("Pasted image.", duration: 1, position: .center)
+                    self.view.makeToast("Pasted note layer.", duration: 1, position: .center)
                 })
                 popMenu.addAction(pasteImageAction)
-            }
-            if let copiedTypedText = SKClipboard.getTypedText() {
-                let pasteTypedTextAction = PopMenuDefaultAction(title: "Paste Typed Text", image: UIImage(systemName: "text.alignleft"), didSelect: { action in
-                    self.note.1.getCurrentPage().layers.append(copiedTypedText)
-                    self.displayTypedText(typedText: copiedTypedText)
-                    self.saveCurrentPage()
-                    self.view.makeToast("Pasted typed text.", duration: 1, position: .center)
-                })
-                popMenu.addAction(pasteTypedTextAction)
             }
         }
         self.present(popMenu, animated: true, completion: nil)
@@ -1407,183 +1416,31 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             }
             for text in texts {
                 note.1.getCurrentPage().layers.append(text)
-                let textView = self.createNoteTypedTextView(typedText: text)
-                self.addTypedTextViewToCanvas(textView: textView, typedText: text)
+                self.displayNoteTypedText(typedText: text)
             }
             NeoLibrary.save(note: note.1, url: note.0)
         }
     }
     
-    private func createNoteTypedTextView(typedText: NoteTypedText) -> DraggableTextView {
-        let frame = CGRect(x: typedText.location.x, y: typedText.location.y, width: typedText.size.width, height: typedText.size.height)
-        let draggableView = DraggableTextView(frame: frame)
-        let highlightr = Highlightr()!
-        var highlightedText = highlightr.highlight(typedText.text)
-        if !typedText.codeLanguage.isEmpty {
-            highlightedText = highlightr.highlight(typedText.text, as: typedText.codeLanguage)
-        }
-        draggableView.attributedText = highlightedText
-        draggableView.adjustFontSize()
-        return draggableView
-    }
-    
-    private func addTypedTextViewToCanvas(textView: DraggableTextView, typedText: NoteTypedText) {
-        textView.draggableDelegate = self
-        self.canvasView.addSubview(textView)
-        self.canvasView.sendSubviewToBack(textView)
-        self.noteTextViews[textView] = typedText
-        textView.center = typedText.location
-    }
-    
-    func draggableTextViewSizeChanged(source: DraggableTextView, scale: CGSize) {
-        if let typedText = self.noteTextViews[source] {
-            typedText.size = scale
-            note.1.getCurrentPage().updateNoteTypedText(typedText: typedText)
-            self.startSaveTimer()
-        }
-    }
-    
-    func draggableTextViewLocationChanged(source: DraggableTextView, location: CGPoint) {
-        if let typedText = self.noteTextViews[source] {
-            typedText.location = location
-            note.1.getCurrentPage().updateNoteTypedText(typedText: typedText)
-            self.startSaveTimer()
-        }
-    }
-    
-    var draggableTextViewBeingEdited: DraggableTextView?
-    func draggableTextViewLongPressed(source: DraggableTextView) {
-        if let typedText =  self.noteTextViews[source] {
-            let popMenu = PopMenuViewController(sourceView: source, actions: [PopMenuAction](), appearance: nil)
-            let editOption = PopMenuDefaultAction(title: "Edit...", didSelect: { action in
-                popMenu.dismiss(animated: true, completion: nil)
-                self.draggableTextViewBeingEdited = source
-                self.performSegue(withIdentifier: "ShowTextBoxVC", sender: self)
-            })
-            popMenu.addAction(editOption)
-            let languageOption = PopMenuDefaultAction(title: "Change Language... (\(typedText.codeLanguage.lowercased().capitalizingFirstLetter()))", didSelect: { action in
-                popMenu.dismiss(animated: true, completion: nil)
-                self.showTypedTextLanguageOptions(source: source, typedText: typedText)
-            })
-            popMenu.addAction(languageOption)
-            let copyAction = PopMenuDefaultAction(title: "Copy", didSelect: { action in
-                SKClipboard.copy(typedText: typedText)
-                self.view.makeToast("Copied note typed text to SKClipboard.")
-            })
-            popMenu.addAction(copyAction)
-            let copyTextAction = PopMenuDefaultAction(title: "Copy Text", didSelect: { action in
-                UIPasteboard.general.string = typedText.text
-            })
-            popMenu.addAction(copyTextAction)
-            let action = PopMenuDefaultAction(title: "Delete", didSelect: { action in
-                self.note.1.getCurrentPage().deleteLayer(layer: typedText)
-                source.removeFromSuperview()
-                self.noteTextViews[source] = nil
-                self.startSaveTimer()
-                self.view.makeToast("Deleted text box.", duration: 1, position: .center)
-            })
-            popMenu.addAction(action)
-            let closeAction = PopMenuDefaultAction(title: "Close")
-            popMenu.addAction(closeAction)
-            self.present(popMenu, animated: true, completion: nil)
-        }
-    }
-    
-    private func showTypedTextLanguageOptions(source: DraggableTextView, typedText: NoteTypedText) {
-        let alert = UIAlertController(title: "Code Language (\(typedText.codeLanguage.lowercased().capitalizingFirstLetter()))", message: "Choose the language for the syntax highlight.", preferredStyle: .alert)
-        for lang in NoteTypedText.supportedLanguages {
-            alert.addAction(UIAlertAction(title: NSLocalizedString(lang.lowercased().capitalizingFirstLetter(), comment: ""), style: .default, handler: { _ in
-                typedText.codeLanguage = lang
-                source.removeFromSuperview()
-                self.noteTextViews[source] = nil
-                self.addTypedTextViewToCanvas(textView: self.createNoteTypedTextView(typedText: typedText), typedText: typedText)
-                self.highlightedTextView = nil
-                self.note.1.getCurrentPage().updateNoteTypedText(typedText: typedText)
-                self.startSaveTimer()
-                self.view.makeToast("Changed code language to \(lang.lowercased().capitalizingFirstLetter()).", duration: 1, position: .center)
-            }))
-        }
-        alert.addAction(UIAlertAction(title: NSLocalizedString("Cancel", comment: ""), style: .default, handler: { _ in
-            log.info("Cancelled: changing code language of text box.")
-        }))
-        self.present(alert, animated: true, completion: nil)
-    }
-    
-    func draggableTextViewTextChanged(source: DraggableTextView, text: String) {
-        if let typedText = self.noteTextViews[source] {
-            typedText.text = text
-            note.1.getCurrentPage().updateNoteTypedText(typedText: typedText)
-            self.startSaveTimer()
-        }
-    }
-    
     // TextBoxViewControllerDelegate
     func noteTypedTextSaveTriggered(typedText: NoteTypedText) {
-        if let textView = draggableTextViewBeingEdited {
-            if self.noteTextViews[textView] != nil {
-                draggableTextViewTextChanged(source: textView, text: typedText.text)
-                let highlightr = Highlightr()!
-                var highlightedText = highlightr.highlight(typedText.text)
-                if !typedText.codeLanguage.isEmpty {
-                    highlightedText = highlightr.highlight(typedText.text, as: typedText.codeLanguage)
-                }
-                textView.attributedText = highlightedText
-                textView.adjustFontSize()
+        self.note.1.getCurrentPage().updateLayer(layer: typedText)
+        self.startSaveTimer()
+        if let noteTypedTextView = draggableViewBeingEdited as? NoteTypedTextView {
+            if self.draggableViews[noteTypedTextView] != nil {
+                noteTypedTextView.label.attributedText = self.getAttributedTextForTypedText(typedText: typedText)
+                noteTypedTextView.label.adjustFontSize()
             }
         }
     }
     
     private func addNoteImage(image: UIImage) {
         if let noteImage = NoteImage(image: image) {
+            noteImage.size = CGSize(width: 0.25 * image.size.width, height: 0.25 * image.size.height)
+            noteImage.location = CGPoint(x: 50, y: 50)
             note.1.getCurrentPage().layers.append(noteImage)
-            let frame = CGRect(x: 50, y: 50, width: 0.25 * image.size.width, height: 0.25 * image.size.height)
-            let draggableView = DraggableImageView(frame: frame)
-            draggableView.draggableView.lastScale = 1.0
-            draggableView.image = image
-            draggableView.delegate = self
-            self.canvasView.addSubview(draggableView)
-            self.canvasView.sendSubviewToBack(draggableView)
-            self.noteImageViews[draggableView] = noteImage
+            self.displayNoteImage(image: noteImage)
         }
-    }
-    
-    func draggableImageViewSizeChanged(source: DraggableImageView, scale: CGSize) {
-        if let noteImage = self.noteImageViews[source] {
-            noteImage.size = scale
-            note.1.getCurrentPage().updateNoteImage(noteImage: noteImage)
-            self.startSaveTimer()
-        }
-    }
-    
-    func draggableImageViewLocationChanged(source: DraggableImageView, location: CGPoint) {
-        if let noteImage = self.noteImageViews[source] {
-            noteImage.location = location
-            note.1.getCurrentPage().updateNoteImage(noteImage: noteImage)
-            self.startSaveTimer()
-        }
-    }
-    
-    func draggableImageViewDelete(source: DraggableImageView) {
-        let popMenu = PopMenuViewController(sourceView: source, actions: [PopMenuAction](), appearance: nil)
-        let closeAction = PopMenuDefaultAction(title: "Close")
-        let copyAction = PopMenuDefaultAction(title: "Copy", didSelect: { action in
-            if let noteImage =  self.noteImageViews[source] {
-                SKClipboard.copy(image: noteImage)
-                self.view.makeToast("Copied note image to SKClipboard.")
-            }
-        })
-        let action = PopMenuDefaultAction(title: "Delete Image", didSelect: { action in
-            if let noteImage =  self.noteImageViews[source] {
-                self.note.1.getCurrentPage().deleteLayer(layer: noteImage)
-                self.removeDraggableView(layer: noteImage)
-                self.startSaveTimer()
-            }
-            
-        })
-        popMenu.addAction(copyAction)
-        popMenu.addAction(action)
-        popMenu.addAction(closeAction)
-        self.present(popMenu, animated: true, completion: nil)
     }
     
     private func updatePaginationButtons() {
@@ -1592,14 +1449,10 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     }
     
     private func clearFloatingViews() {
-        for (view, _) in noteImageViews {
+        for (view, _) in draggableViews {
             view.removeFromSuperview()
         }
-        for (view, _) in noteTextViews {
-            view.removeFromSuperview()
-        }
-        self.noteImageViews = [DraggableImageView : NoteImage]()
-        self.noteTextViews = [DraggableTextView : NoteTypedText]()
+        self.draggableViews = [NeoDraggableView : NoteLayer]()
     }
     
     private func stopTimers() {
@@ -1714,30 +1567,16 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                 
             }
             if !found {
-                if let highlightedImage = self.highlightedImage {
-                    highlightedImage.setHighlight(isHighlighted: false)
-                    canvasView.sendSubviewToBack(highlightedImage)
-                    self.highlightedImage = nil
+                if let highlightedDraggableView = self.highlightedDraggableView {
+                    highlightedDraggableView.setHighlight(isHighlighted: false)
+                    canvasView.sendSubviewToBack(highlightedDraggableView)
+                    self.highlightedDraggableView = nil
                 }
-                for (view, _) in noteImageViews {
+                for (view, _) in draggableViews {
                     if view.frame.contains(sender.location(in: canvasView)) {
-                        self.highlightedImage = view
+                        self.highlightedDraggableView = view
                         view.setHighlight(isHighlighted: true)
-                        log.info("Tapped image on canvas.")
-                        canvasView.bringSubviewToFront(view)
-                        break
-                    }
-                }
-                if let highlightedTextView = self.highlightedTextView {
-                    highlightedTextView.setHighlight(isHighlighted: false)
-                    canvasView.sendSubviewToBack(highlightedTextView)
-                    self.highlightedTextView = nil
-                }
-                for (view, _) in noteTextViews {
-                    if view.frame.contains(sender.location(in: canvasView)) {
-                        self.highlightedTextView = view
-                        view.setHighlight(isHighlighted: true)
-                        log.info("Tapped text box on canvas.")
+                        log.info("Tapped note layer on canvas.")
                         canvasView.bringSubviewToFront(view)
                         break
                     }
@@ -1745,33 +1584,14 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             }
         }
     }
-    var highlightedImage: DraggableImageView?
-    var highlightedTextView: DraggableTextView?
     
     func removeDraggableView(layer: NoteLayer) {
-        switch layer.type {
-        case .Image:
-            if let noteImage = layer as? NoteImage {
-                for (view, image) in self.noteImageViews {
-                    if image == noteImage {
-                        view.removeFromSuperview()
-                        self.noteImageViews[view] = nil
-                        break
-                    }
-                }
+        for (view, layer) in self.draggableViews {
+            if layer == layer {
+                view.removeFromSuperview()
+                self.draggableViews[view] = nil
+                break
             }
-            break
-        case .TypedText:
-            if let typedText = layer as? NoteTypedText {
-                for (view, text) in self.noteTextViews {
-                    if text == typedText {
-                        view.removeFromSuperview()
-                        self.noteTextViews[view] = nil
-                        break
-                    }
-                }
-            }
-            break
         }
     }
     
@@ -1806,5 +1626,87 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         self.canvasView.drawing = PKDrawing()
         note.1.getCurrentPage().clearCanvas()
         self.startSaveTimer()
+    }
+    
+    // MARK: NeoDraggableViewDelegate
+    func draggableViewSizeChanged(source: NeoDraggableView, scale: CGSize) {
+        if let noteLayer = self.draggableViews[source] {
+            noteLayer.size = scale
+            note.1.getCurrentPage().updateLayer(layer: noteLayer)
+            self.startSaveTimer()
+        }
+    }
+    
+    func draggableViewLocationChanged(source: NeoDraggableView, location: CGPoint) {
+        if let noteLayer = self.draggableViews[source] {
+            noteLayer.location = location
+            note.1.getCurrentPage().updateLayer(layer: noteLayer)
+            self.startSaveTimer()
+        }
+    }
+    
+    func draggableViewDelete(source: NeoDraggableView) {
+        if let noteLayer =  self.draggableViews[source] {
+            self.note.1.getCurrentPage().deleteLayer(layer: noteLayer)
+            self.removeDraggableView(layer: noteLayer)
+            self.startSaveTimer()
+        }
+    }
+    
+    func draggableViewLongPressed(source: NeoDraggableView) {
+        if let noteLayer =  self.draggableViews[source] {
+            let popMenu = PopMenuViewController(sourceView: source, actions: [PopMenuAction](), appearance: nil)
+            if let typedText = noteLayer as? NoteTypedText {
+                let editOption = PopMenuDefaultAction(title: "Edit...", didSelect: { action in
+                    popMenu.dismiss(animated: true, completion: nil)
+                    self.draggableViewBeingEdited = source
+                    self.performSegue(withIdentifier: "ShowTextBoxVC", sender: self)
+                })
+                popMenu.addAction(editOption)
+                let languageOption = PopMenuDefaultAction(title: "Change Language... (\(typedText.codeLanguage.lowercased().capitalizingFirstLetter()))", didSelect: { action in
+                    popMenu.dismiss(animated: true, completion: {
+                        let alert = UIAlertController(title: "Code Language (\(typedText.codeLanguage.lowercased().capitalizingFirstLetter()))", message: "Choose the language for the syntax highlight.", preferredStyle: .alert)
+                        for lang in NoteTypedText.supportedLanguages {
+                            alert.addAction(UIAlertAction(title: NSLocalizedString(lang.lowercased().capitalizingFirstLetter(), comment: ""), style: .default, handler: { _ in
+                                typedText.codeLanguage = lang
+                                if let noteTypedTextView = source as? NoteTypedTextView {
+                                    noteTypedTextView.label.attributedText = self.getAttributedTextForTypedText(typedText: typedText)
+                                    noteTypedTextView.label.adjustFontSize()
+                                }
+                                self.highlightedDraggableView = nil
+                                self.note.1.getCurrentPage().updateLayer(layer: typedText)
+                                self.startSaveTimer()
+                                self.view.makeToast("Changed code language to \(lang.lowercased().capitalizingFirstLetter()).", duration: 1, position: .center)
+                            }))
+                        }
+                        alert.addAction(UIAlertAction(title: NSLocalizedString("Cancel", comment: ""), style: .default, handler: { _ in
+                            log.info("Cancelled: changing code language of text box.")
+                        }))
+                        self.present(alert, animated: true, completion: nil)
+                    })
+                })
+                popMenu.addAction(languageOption)
+                let copyTextAction = PopMenuDefaultAction(title: "Copy Text", didSelect: { action in
+                    UIPasteboard.general.string = typedText.text
+                })
+                popMenu.addAction(copyTextAction)
+            }
+            let copyAction = PopMenuDefaultAction(title: "Copy", didSelect: { action in
+                SKClipboard.copy(noteLayer: noteLayer)
+                self.view.makeToast("Copied note layer to SKClipboard.")
+            })
+            popMenu.addAction(copyAction)
+            let action = PopMenuDefaultAction(title: "Delete", didSelect: { action in
+                self.note.1.getCurrentPage().deleteLayer(layer: noteLayer)
+                source.removeFromSuperview()
+                self.draggableViews[source] = nil
+                self.startSaveTimer()
+                self.view.makeToast("Deleted note layer.", duration: 1, position: .center)
+            })
+            popMenu.addAction(action)
+            let closeAction = PopMenuDefaultAction(title: "Close")
+            popMenu.addAction(closeAction)
+            self.present(popMenu, animated: true, completion: nil)
+        }
     }
 }

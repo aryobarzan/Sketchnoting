@@ -8,7 +8,7 @@
 
 import UIKit
 
-enum NoteLayerItemType {
+enum NoteLayerItemType: String {
     case Canvas
     case Layer
     case PDF
@@ -39,7 +39,7 @@ struct LayerSection {
     }
 }
 
-class NoteLayersViewController: UITableViewController, NoteLayersViewCellDelegate {
+class NoteLayersViewController: UITableViewController, NoteLayersViewCellDelegate, UITableViewDragDelegate, UITableViewDropDelegate {
     
     var delegate: NoteLayersDelegate?
     
@@ -50,6 +50,14 @@ class NoteLayersViewController: UITableViewController, NoteLayersViewCellDelegat
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        tableView.dragDelegate = self
+        tableView.dropDelegate = self
+        tableView.dragInteractionEnabled = true
+        
+        self.loadData()
+    }
+    
+    private func loadData() {
         self.sections = [LayerSection]()
         sections.append(LayerSection(title: "Canvas", data: [NoteLayerItem(type: .Canvas)]))
         
@@ -123,6 +131,60 @@ class NoteLayersViewController: UITableViewController, NoteLayersViewCellDelegat
         return UIContextMenuConfiguration(identifier: nil, previewProvider: nil, actionProvider: { suggestedActions in
             return UIMenu(title: "Layer", children: menuElements)
         })
+    }
+    
+    // Drag and drop delegates for re-ordering
+    func tableView(_ tableView: UITableView, itemsForBeginning session: UIDragSession, at indexPath: IndexPath) -> [UIDragItem] {
+        if indexPath.section != 1 {
+            return [UIDragItem]()
+        }
+        let item = self.sections[indexPath.section].data[indexPath.row]
+        let itemProvider = NSItemProvider(object: item.type.rawValue as NSString)
+        let dragItem = UIDragItem(itemProvider: itemProvider)
+        return [dragItem]
+    }
+    
+    func tableView(_ tableView: UITableView, canHandle session: UIDropSession) -> Bool {
+        return true
+    }
+    
+    func tableView(_ tableView: UITableView, performDropWith coordinator: UITableViewDropCoordinator) {
+        guard let destinationIndexPath = coordinator.destinationIndexPath else {
+          return
+        }
+        
+        coordinator.items.forEach { dropItem in
+          guard let sourceIndexPath = dropItem.sourceIndexPath else {
+            return
+          }
+          tableView.performBatchUpdates({
+            let layer = note.1.getCurrentPage().getLayers()[sourceIndexPath.item]
+            note.1.getCurrentPage().deleteLayer(at: sourceIndexPath)
+            note.1.getCurrentPage().insertLayer(layer, at: destinationIndexPath)
+            let layerItem = self.sections[sourceIndexPath.section].data[sourceIndexPath.row]
+            sections[1].data.remove(at: sourceIndexPath.row)
+            sections[1].data.insert(layerItem, at: destinationIndexPath.row)
+            tableView.deleteRows(at: [sourceIndexPath], with: .automatic)
+            tableView.insertRows(at: [destinationIndexPath], with: .automatic)
+            //NeoLibrary.save(note: note.1, url: note.0)
+          }, completion: { _ in
+            coordinator.drop(dropItem.dragItem,
+                             toRowAt: destinationIndexPath)
+           DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                //self.delegate?.notePagesReordered(note: self.note.1)
+          }
+          })
+        }
+    }
+    
+    func tableView(_ tableView: UITableView, dropSessionDidUpdate session: UIDropSession, withDestinationIndexPath destinationIndexPath: IndexPath?) -> UITableViewDropProposal {
+        if let destination = destinationIndexPath {
+            if (destination.section != 1) {
+                return UITableViewDropProposal(operation: .forbidden, intent: .insertAtDestinationIndexPath)
+            }
+            return UITableViewDropProposal(operation: .move, intent: .insertAtDestinationIndexPath)
+        }
+        return UITableViewDropProposal(operation: .forbidden, intent: .insertAtDestinationIndexPath)
     }
     
 

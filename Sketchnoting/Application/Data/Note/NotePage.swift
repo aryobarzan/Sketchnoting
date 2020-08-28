@@ -164,6 +164,23 @@ class NotePage: Codable {
         }
     }
     
+    func deleteLayer(at indexPath: IndexPath) {
+        layers.remove(at: indexPath.row)
+    }
+    
+    func insertLayer(_ layer: NoteLayer, at indexPath: IndexPath) {
+        layers.insert(layer, at: indexPath.row)
+    }
+    
+    func updateLayer(layer: NoteLayer) {
+        for i in 0..<layers.count {
+            if layers[i] == layer {
+                layers[i] = layer
+                break
+            }
+        }
+    }
+    
     func setNoteText(noteText: NoteText) {
         self.noteText = noteText
     }

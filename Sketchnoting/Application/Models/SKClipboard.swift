@@ -12,8 +12,7 @@ import Hover
 class SKClipboard {
     private static var note: Note?
     private static var page: NotePage?
-    private static var image: NoteImage?
-    private static var typedText: NoteTypedText?
+    private static var noteLayer: NoteLayer?
     
     private static var hoverView: HoverView?
     
@@ -22,12 +21,11 @@ class SKClipboard {
     public static func clear() {
         self.note = nil
         self.page = nil
-        self.image = nil
-        self.typedText = nil
+        self.noteLayer = nil
     }
     
     public static func hasItems() -> Bool {
-        if self.note != nil || self.page != nil || self.image != nil || self.typedText != nil {
+        if self.note != nil || self.page != nil || self.noteLayer != nil {
             return true
         }
         return false
@@ -41,12 +39,8 @@ class SKClipboard {
         self.page = page
     }
     
-    public static func copy(image: NoteImage) {
-        self.image = image
-    }
-    
-    public static func copy(typedText: NoteTypedText) {
-        self.typedText = typedText
+    public static func copy(noteLayer: NoteLayer) {
+        self.noteLayer = noteLayer
     }
     
     // Missing: rework
@@ -58,12 +52,8 @@ class SKClipboard {
         return page
     }
     
-    public static func getImage() -> NoteImage? {
-        return image
-    }
-    
-    public static func getTypedText() -> NoteTypedText? {
-        return typedText
+    public static func getNoteLayer() -> NoteLayer? {
+        return noteLayer
     }
     
     public static func addClipboardButton(view: UIView) {
@@ -76,11 +66,8 @@ class SKClipboard {
         if self.page != nil {
             items.append(HoverItem(title: "Paste Page", image: UIImage(systemName: "doc.text")!) { self.delegate?.pastePageTapped() })
         }
-        if self.image != nil {
-            items.append(HoverItem(title: "Paste Image", image: UIImage(systemName: "photo")!) { self.delegate?.pasteImageTapped() })
-        }
-        if self.typedText != nil {
-            items.append(HoverItem(title: "Paste Text", image: UIImage(systemName: "text.alignleft")!) { self.delegate?.pasteTypedTextTapped() })
+        if self.noteLayer != nil {
+            items.append(HoverItem(title: "Paste Layer", image: UIImage(systemName: "photo")!) { self.delegate?.pasteNoteLayerTapped() })
         }
         if items.count > 0 {
             items.append(HoverItem(title: "Clear", image: UIImage(systemName: "clear")!) {
@@ -111,7 +98,6 @@ class SKClipboard {
 public protocol SKClipboardDelegate {
     func pasteNoteTapped()
     func pastePageTapped()
-    func pasteImageTapped()
-    func pasteTypedTextTapped()
+    func pasteNoteLayerTapped()
     func clearClipboardTapped()
 }

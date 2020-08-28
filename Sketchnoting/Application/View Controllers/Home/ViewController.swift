@@ -940,20 +940,19 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         }
         
     }
-    func pasteImageTapped() {
-        log.info("Pasting note image.")
-        if let i = SKClipboard.getImage() {
-            _ = NeoLibrary.createNoteFromImages(images: [i.image])
-            self.updateDisplayedNotes(true)
-            self.view.makeToast("Created new note \"Note Image Copy\" from pasted note image.")
-        }
-    }
-    func pasteTypedTextTapped() {
-        log.info("Pasting note typed text.")
-        if let t = SKClipboard.getTypedText() {
-            _ = NeoLibrary.createNoteFromTypedTexts(texts: [t])
-            self.updateDisplayedNotes(true)
-            self.view.makeToast("Created new note \"Note Typed Text Copy\" from pasted note typed text.")
+    func pasteNoteLayerTapped() {
+        log.info("Pasting note layer.")
+        if let layer = SKClipboard.getNoteLayer() {
+            if let noteImage = layer as? NoteImage {
+                _ = NeoLibrary.createNoteFromImages(images: [noteImage.image])
+                self.updateDisplayedNotes(true)
+                self.view.makeToast("Created new note \"Note Image Copy\" from pasted note image.")
+            }
+            if let noteTypedText = layer as? NoteTypedText {
+                _ = NeoLibrary.createNoteFromTypedTexts(texts: [noteTypedText])
+                self.updateDisplayedNotes(true)
+                self.view.makeToast("Created new note \"Note Typed Text Copy\" from pasted note typed text.")
+            }
         }
     }
     func clearClipboardTapped() {
