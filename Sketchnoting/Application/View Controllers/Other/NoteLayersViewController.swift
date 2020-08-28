@@ -178,12 +178,11 @@ class NoteLayersViewController: UITableViewController, NoteLayersViewCellDelegat
             sections[1].data.insert(layerItem, at: destinationIndexPath.row)
             tableView.deleteRows(at: [sourceIndexPath], with: .automatic)
             tableView.insertRows(at: [destinationIndexPath], with: .automatic)
-            //NeoLibrary.save(note: note.1, url: note.0)
+            delegate?.noteLayerReordered(layer: layer, index: destinationIndexPath)
           }, completion: { _ in
             coordinator.drop(dropItem.dragItem,
                              toRowAt: destinationIndexPath)
            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                //self.delegate?.notePagesReordered(note: self.note.1)
           }
           })
         }
@@ -257,4 +256,5 @@ protocol NoteLayersDelegate {
     func deleteLayer(layer: NoteLayer)
     func deletePDF()
     func clearCanvas()
+    func noteLayerReordered(layer: NoteLayer, index: IndexPath)
 }

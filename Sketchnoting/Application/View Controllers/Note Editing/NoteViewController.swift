@@ -567,6 +567,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                 displayNoteTypedText(typedText: typedText)
             }
         }
+        self.reorderNoteLayers()
     }
     
     private func displayNoteImage(image: NoteImage) {
@@ -599,6 +600,32 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             highlightedText = highlightr.highlight(typedText.text, as: typedText.codeLanguage)
         }
         return highlightedText
+    }
+    
+    private func reorderNoteLayer(layer: NoteLayer) {
+        for (key, value) in self.draggableViews {
+            if value == layer {
+                key.removeFromSuperview()
+                if self.canvasView.subviews.count == 0 {
+                    self.canvasView.addSubview(key)
+                }
+                else {
+                    self.canvasView.insertSubview(key, at: self.note.1.getCurrentPage().layers.firstIndex(of: layer) ?? 0)
+                }
+            }
+        }
+    }
+    
+    private func reorderNoteLayers() {
+        for (key, value) in self.draggableViews {
+            key.removeFromSuperview()
+            if self.canvasView.subviews.count == 0 {
+                self.canvasView.addSubview(key)
+            }
+            else {
+                self.canvasView.insertSubview(key, at: self.note.1.getCurrentPage().layers.firstIndex(of: value) ?? 0)
+            }
+        }
     }
     // ------
     
@@ -1559,7 +1586,9 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             if !found {
                 if let highlightedDraggableView = self.highlightedDraggableView {
                     highlightedDraggableView.setHighlight(isHighlighted: false)
-                    canvasView.sendSubviewToBack(highlightedDraggableView)
+                    if let layer = self.draggableViews[highlightedDraggableView] {
+                        self.reorderNoteLayer(layer: layer)
+                    }
                     self.highlightedDraggableView = nil
                 }
                 for (view, _) in draggableViews {
@@ -1616,6 +1645,19 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         self.canvasView.drawing = PKDrawing()
         note.1.getCurrentPage().clearCanvas()
         self.startSaveTimer()
+    }
+    
+    func noteLayerReordered(layer: NoteLayer, index: IndexPath) {
+        self.note.1.getCurrentPage().deleteLayer(layer: layer)
+        self.note.1.getCurrentPage().insertLayer(layer, at: index)
+        for (key, value) in self.draggableViews {
+            if value == layer {
+                self.draggableViews[key] = layer
+                break
+            }
+        }
+        self.startSaveTimer()
+        self.reorderNoteLayer(layer: layer)
     }
     
     // MARK: NeoDraggableViewDelegate
@@ -1683,7 +1725,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             }
             let copyAction = PopMenuDefaultAction(title: "Copy", didSelect: { action in
                 SKClipboard.copy(noteLayer: noteLayer)
-                self.view.makeToast("Copied note layer to SKClipboard.")
+                self.view.makeToast("Copied note layer to SKClipboard.", duration: 2, position: .center)
             })
             popMenu.addAction(copyAction)
             let action = PopMenuDefaultAction(title: "Delete", didSelect: { action in
