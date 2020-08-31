@@ -80,7 +80,6 @@
 		9F96895724679D4000D02F81 /* NoteDoc.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F96895624679D4000D02F81 /* NoteDoc.swift */; };
 		9F9898312470DC2700E62CD1 /* TextBoxViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F9898302470DC2700E62CD1 /* TextBoxViewController.swift */; };
 		9F9DAFE0242CB7C100713E75 /* DrawingRecognition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F9DAFDF242CB7C100713E75 /* DrawingRecognition.swift */; };
-		9FA09CE7248AB9A200B4B9D1 /* Periodic_Table.json in Resources */ = {isa = PBXBuildFile; fileRef = 9FA09CE6248AB9A100B4B9D1 /* Periodic_Table.json */; };
 		9FA5A482244AB14E006D9FB2 /* UILabelExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA5A481244AB14E006D9FB2 /* UILabelExtensions.swift */; };
 		9FA6238822CEA7FE007ED794 /* MapHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA6238722CEA7FE007ED794 /* MapHelper.swift */; };
 		9FA6238B22D37213007ED794 /* BioPortalHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA6238A22D37213007ED794 /* BioPortalHelper.swift */; };
@@ -89,21 +88,9 @@
 		9FA6239E22E66D73007ED794 /* HandwritingRecognizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA6239D22E66D73007ED794 /* HandwritingRecognizer.swift */; };
 		9FA8C000239B18BA00BAA42B /* TagsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA8BFFF239B18BA00BAA42B /* TagsViewController.swift */; };
 		9FA8C002239B21D500BAA42B /* TagsCreationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA8C001239B21D500BAA42B /* TagsCreationViewController.swift */; };
-		9FAA827E236DD45200B2004F /* ViewAnimator in Frameworks */ = {isa = PBXBuildFile; productRef = 9FAA827D236DD45200B2004F /* ViewAnimator */; };
 		9FAB4B7C244BEF2700DEA46F /* FittableFontLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FAB4B7B244BEF2700DEA46F /* FittableFontLabel.swift */; };
 		9FAB4B7E244BEF2F00DEA46F /* UILabelExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FAB4B7D244BEF2E00DEA46F /* UILabelExtension.swift */; };
 		9FAD28F623A52AC700F2203E /* NoteTextViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F05BC7E23761C4A00D49A88 /* NoteTextViewController.swift */; };
-		9FAE72E324887158002D800B /* DirectionalAtom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FAE72D824887154002D800B /* DirectionalAtom.swift */; };
-		9FAE72E424887158002D800B /* LineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FAE72D924887155002D800B /* LineView.swift */; };
-		9FAE72E524887158002D800B /* StructuralWay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FAE72DA24887155002D800B /* StructuralWay.swift */; };
-		9FAE72E624887158002D800B /* DirectionalLineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FAE72DB24887155002D800B /* DirectionalLineView.swift */; };
-		9FAE72E724887158002D800B /* Bonds.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FAE72DC24887156002D800B /* Bonds.swift */; };
-		9FAE72E824887158002D800B /* Atomable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FAE72DD24887156002D800B /* Atomable.swift */; };
-		9FAE72E924887158002D800B /* HeisenbergBoard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FAE72DE24887156002D800B /* HeisenbergBoard.swift */; };
-		9FAE72EA24887158002D800B /* Representable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FAE72DF24887157002D800B /* Representable.swift */; };
-		9FAE72EB24887158002D800B /* CustomViewConvertible.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FAE72E024887157002D800B /* CustomViewConvertible.swift */; };
-		9FAE72EC24887158002D800B /* Heisenberg.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FAE72E124887157002D800B /* Heisenberg.swift */; };
-		9FAE72ED24887158002D800B /* Atom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FAE72E224887158002D800B /* Atom.swift */; };
 		9FB87CF624B0061200A262D8 /* ARDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB87CF524B0061200A262D8 /* ARDocument.swift */; };
 		9FB87CF924B006B900A262D8 /* ALMAARHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB87CF824B006B900A262D8 /* ALMAARHelper.swift */; };
 		9FB9984724868561003773F2 /* MoveFileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB9984624868561003773F2 /* MoveFileViewController.swift */; };
@@ -235,7 +222,6 @@
 		9F96895624679D4000D02F81 /* NoteDoc.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteDoc.swift; sourceTree = "<group>"; };
 		9F9898302470DC2700E62CD1 /* TextBoxViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextBoxViewController.swift; sourceTree = "<group>"; };
 		9F9DAFDF242CB7C100713E75 /* DrawingRecognition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrawingRecognition.swift; sourceTree = "<group>"; };
-		9FA09CE6248AB9A100B4B9D1 /* Periodic_Table.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = Periodic_Table.json; sourceTree = "<group>"; };
 		9FA5A481244AB14E006D9FB2 /* UILabelExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UILabelExtensions.swift; sourceTree = "<group>"; };
 		9FA6238722CEA7FE007ED794 /* MapHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapHelper.swift; sourceTree = "<group>"; };
 		9FA6238A22D37213007ED794 /* BioPortalHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BioPortalHelper.swift; sourceTree = "<group>"; };
@@ -246,17 +232,6 @@
 		9FA8C001239B21D500BAA42B /* TagsCreationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagsCreationViewController.swift; sourceTree = "<group>"; };
 		9FAB4B7B244BEF2700DEA46F /* FittableFontLabel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FittableFontLabel.swift; sourceTree = "<group>"; };
 		9FAB4B7D244BEF2E00DEA46F /* UILabelExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UILabelExtension.swift; sourceTree = "<group>"; };
-		9FAE72D824887154002D800B /* DirectionalAtom.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DirectionalAtom.swift; sourceTree = "<group>"; };
-		9FAE72D924887155002D800B /* LineView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LineView.swift; sourceTree = "<group>"; };
-		9FAE72DA24887155002D800B /* StructuralWay.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StructuralWay.swift; sourceTree = "<group>"; };
-		9FAE72DB24887155002D800B /* DirectionalLineView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DirectionalLineView.swift; sourceTree = "<group>"; };
-		9FAE72DC24887156002D800B /* Bonds.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Bonds.swift; sourceTree = "<group>"; };
-		9FAE72DD24887156002D800B /* Atomable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Atomable.swift; sourceTree = "<group>"; };
-		9FAE72DE24887156002D800B /* HeisenbergBoard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HeisenbergBoard.swift; sourceTree = "<group>"; };
-		9FAE72DF24887157002D800B /* Representable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Representable.swift; sourceTree = "<group>"; };
-		9FAE72E024887157002D800B /* CustomViewConvertible.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomViewConvertible.swift; sourceTree = "<group>"; };
-		9FAE72E124887157002D800B /* Heisenberg.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Heisenberg.swift; sourceTree = "<group>"; };
-		9FAE72E224887158002D800B /* Atom.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Atom.swift; sourceTree = "<group>"; };
 		9FB87CF524B0061200A262D8 /* ARDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARDocument.swift; sourceTree = "<group>"; };
 		9FB87CF824B006B900A262D8 /* ALMAARHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ALMAARHelper.swift; sourceTree = "<group>"; };
 		9FB9984624868561003773F2 /* MoveFileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoveFileViewController.swift; sourceTree = "<group>"; };
@@ -316,7 +291,6 @@
 				9F560FAA240855F700932A55 /* GPUImage in Frameworks */,
 				9F0D8565242052E600B8BE2F /* BSImagePicker in Frameworks */,
 				9F10EC162347D64C005340AA /* Kingfisher in Frameworks */,
-				9FAA827E236DD45200B2004F /* ViewAnimator in Frameworks */,
 				9F2C00062351123700D53EE9 /* SwiftyJSON in Frameworks */,
 				9FC5F90D24AFB07D00CDF2DF /* NVActivityIndicatorView in Frameworks */,
 				9F9460E223F5BAA10073D709 /* Connectivity in Frameworks */,
@@ -593,24 +567,6 @@
 			path = Note;
 			sourceTree = "<group>";
 		};
-		9FAE72D724887144002D800B /* Heisenberg */ = {
-			isa = PBXGroup;
-			children = (
-				9FAE72E224887158002D800B /* Atom.swift */,
-				9FAE72DD24887156002D800B /* Atomable.swift */,
-				9FAE72DC24887156002D800B /* Bonds.swift */,
-				9FAE72E024887157002D800B /* CustomViewConvertible.swift */,
-				9FAE72D824887154002D800B /* DirectionalAtom.swift */,
-				9FAE72DB24887155002D800B /* DirectionalLineView.swift */,
-				9FAE72E124887157002D800B /* Heisenberg.swift */,
-				9FAE72DE24887156002D800B /* HeisenbergBoard.swift */,
-				9FAE72D924887155002D800B /* LineView.swift */,
-				9FAE72DF24887157002D800B /* Representable.swift */,
-				9FAE72DA24887155002D800B /* StructuralWay.swift */,
-			);
-			path = Heisenberg;
-			sourceTree = "<group>";
-		};
 		9FB87CF724B006A200A262D8 /* ALMA_AR */ = {
 			isa = PBXGroup;
 			children = (
@@ -679,7 +635,6 @@
 				9FD29C452239587D00CC969A /* Extensions */,
 				9F5D8B2B228B9D7000F56FEC /* CREDITS.md */,
 				9F5D8B2C228B9EF800F56FEC /* README.md */,
-				9FA09CE6248AB9A100B4B9D1 /* Periodic_Table.json */,
 			);
 			path = Sketchnoting;
 			sourceTree = "<group>";
@@ -751,7 +706,6 @@
 		9FD29C69224589FE00CC969A /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
-				9FAE72D724887144002D800B /* Heisenberg */,
 				9FA6239F22E66D92007ED794 /* Handwriting Recognition */,
 				9FA6238922D371F1007ED794 /* Semantic Annotation */,
 				9FA6238722CEA7FE007ED794 /* MapHelper.swift */,
@@ -818,7 +772,6 @@
 				9F2C00052351123700D53EE9 /* SwiftyJSON */,
 				9F2C00082351126800D53EE9 /* Alamofire */,
 				9F509143235BE29100853E84 /* DataCompression */,
-				9FAA827D236DD45200B2004F /* ViewAnimator */,
 				9F9460E123F5BAA10073D709 /* Connectivity */,
 				9F560FA9240855F700932A55 /* GPUImage */,
 				9F0D8564242052E600B8BE2F /* BSImagePicker */,
@@ -861,7 +814,6 @@
 				9F2C00042351123700D53EE9 /* XCRemoteSwiftPackageReference "SwiftyJSON" */,
 				9F2C00072351126800D53EE9 /* XCRemoteSwiftPackageReference "Alamofire" */,
 				9F509142235BE29100853E84 /* XCRemoteSwiftPackageReference "DataCompression" */,
-				9FAA827C236DD45200B2004F /* XCRemoteSwiftPackageReference "ViewAnimator" */,
 				9FCD3D5723EA08A1005CB98D /* XCRemoteSwiftPackageReference "CocoaLumberjack" */,
 				9F9460E023F5BAA10073D709 /* XCRemoteSwiftPackageReference "Connectivity" */,
 				9F560FA8240855F700932A55 /* XCRemoteSwiftPackageReference "GPUImage2" */,
@@ -888,7 +840,6 @@
 				9FD29BB12220525000CC969A /* LaunchScreen.storyboard in Resources */,
 				9FD29BAE2220525000CC969A /* Assets.xcassets in Resources */,
 				9F05B5A1232BE4EC00983AF2 /* NoteCollectionViewDetailCell.xib in Resources */,
-				9FA09CE7248AB9A200B4B9D1 /* Periodic_Table.json in Resources */,
 				9FD29BAC2220524D00CC969A /* Main.storyboard in Resources */,
 				9F92D11A23217CFA00BC0E57 /* SearchFilterView.xib in Resources */,
 				9FD29C6622431C0000CC969A /* labels.txt in Resources */,
@@ -945,13 +896,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9FAE72E824887158002D800B /* Atomable.swift in Sources */,
 				9FD1ADF123A52C090013C68E /* NoteViewController.swift in Sources */,
 				9FD1ADF323A52F7C0013C68E /* NotePagesViewController.swift in Sources */,
 				9F4BB37824EDC02800ED1E2F /* NoteLayer.swift in Sources */,
 				9FAD28F623A52AC700F2203E /* NoteTextViewController.swift in Sources */,
 				9FA8C002239B21D500BAA42B /* TagsCreationViewController.swift in Sources */,
-				9FAE72E524887158002D800B /* StructuralWay.swift in Sources */,
 				9F0F4E0A2451260700B1F2EA /* UIUtilities.swift in Sources */,
 				9F942506238A341E006B0E81 /* UIStoryboardSegueWithCompletion.swift in Sources */,
 				9F87A47D2445441500F83B12 /* NoteTypedText.swift in Sources */,
@@ -960,7 +909,6 @@
 				9F75E451230D8AE100488BBD /* SettingsManager.swift in Sources */,
 				9F75E482231410A100488BBD /* TAGMEHelper.swift in Sources */,
 				9F65984823F315FE00CDBE0C /* SearchFilterCollectionViewCell.swift in Sources */,
-				9FAE72E324887158002D800B /* DirectionalAtom.swift in Sources */,
 				9FFE9B3424B3C77200D92FBA /* NeoLibrary.swift in Sources */,
 				9FA6238B22D37213007ED794 /* BioPortalHelper.swift in Sources */,
 				9F77DBCA23FFD619007C8B7D /* AnnotationUtilities.swift in Sources */,
@@ -974,19 +922,16 @@
 				9F65984B23F3175E00CDBE0C /* SearchViewController.swift in Sources */,
 				9F65983723EDD15C00CDBE0C /* NoteTextElement.swift in Sources */,
 				9FA6238822CEA7FE007ED794 /* MapHelper.swift in Sources */,
-				9FAE72E924887158002D800B /* HeisenbergBoard.swift in Sources */,
 				9F4B38C123EA41C900F87B61 /* ReceivedNotesController.swift in Sources */,
 				9F05B5A3232BF0C800983AF2 /* NoteCollectionViewDetailCell.swift in Sources */,
 				9F5D8A322461157200934C0E /* WATDocument.swift in Sources */,
 				9F92D110231E97DF00BC0E57 /* UserDefaultsExtensions.swift in Sources */,
-				9FAE72E724887158002D800B /* Bonds.swift in Sources */,
 				9F92D11F23217FFF00BC0E57 /* SearchFilter.swift in Sources */,
 				9FAB4B7E244BEF2F00DEA46F /* UILabelExtension.swift in Sources */,
 				9FF0AC962441308B00A82BE8 /* CodableExtensions.swift in Sources */,
 				9FA6239522DE3741007ED794 /* BioPortalDocument.swift in Sources */,
 				9FBC2E0924904DAD002AC8A3 /* AppSearch.swift in Sources */,
 				9FFE07E6232A5FE500DBD0AC /* TagTableViewCell.swift in Sources */,
-				9FAE72E424887158002D800B /* LineView.swift in Sources */,
 				9F5D8A30246113DC00934C0E /* WATHelper.swift in Sources */,
 				9FE38C6824F8603E00421BAE /* NeoDraggableView.swift in Sources */,
 				9F5D80F02332D32600552D58 /* SVGImageProcessorExtension.swift in Sources */,
@@ -1012,7 +957,6 @@
 				9FD29C56223C3C3900CC969A /* StringExtensions.swift in Sources */,
 				9F65983F23EDD80B00CDBE0C /* HelpLinesType.swift in Sources */,
 				9FE38C6C24F8670B00421BAE /* NoteTypedTextView.swift in Sources */,
-				9FAE72EB24887158002D800B /* CustomViewConvertible.swift in Sources */,
 				9F96895724679D4000D02F81 /* NoteDoc.swift in Sources */,
 				9F65983D23EDD2FA00CDBE0C /* NoteTextComplete.swift in Sources */,
 				9F92D11C23217D0500BC0E57 /* SearchFilterView.swift in Sources */,
@@ -1032,7 +976,6 @@
 				9FBF6AB822E9F428001FD730 /* VisionTextLineWrapper.swift in Sources */,
 				9FD8BB97243D5BE500542BFA /* ImportHelper.swift in Sources */,
 				9F4BB37424ED807A00ED1E2F /* NoteLayersViewController.swift in Sources */,
-				9FAE72ED24887158002D800B /* Atom.swift in Sources */,
 				9FA5A482244AB14E006D9FB2 /* UILabelExtensions.swift in Sources */,
 				9F318D3B244A20A000A1B4B5 /* UITextViewExtensions.swift in Sources */,
 				9F75E44F230D848200488BBD /* SettingsViewController.swift in Sources */,
@@ -1050,18 +993,15 @@
 				9F9898312470DC2700E62CD1 /* TextBoxViewController.swift in Sources */,
 				9F5F340623AC64E400EB2804 /* Knowledge.swift in Sources */,
 				9FBF6AB622E9F3FE001FD730 /* VisionTextBlockWrapper.swift in Sources */,
-				9FAE72EA24887158002D800B /* Representable.swift in Sources */,
 				9FE38C6A24F8607800421BAE /* NoteImageView.swift in Sources */,
 				9F4B38BD23EA3D8500F87B61 /* ReceivedNoteCollectionViewCell.swift in Sources */,
 				9F0EC7DD2446A8AE000A28CB /* GestureExtensions.swift in Sources */,
-				9FAE72E624887158002D800B /* DirectionalLineView.swift in Sources */,
 				9F65983323EDCEA300CDBE0C /* NotePage.swift in Sources */,
 				9FA6239E22E66D73007ED794 /* HandwritingRecognizer.swift in Sources */,
 				9F2FF43A249B083D00597AD6 /* NoteDrawing.swift in Sources */,
 				9FF0AC9424412F4C00A82BE8 /* NoteImage.swift in Sources */,
 				9F65983523EDD09F00CDBE0C /* NoteText.swift in Sources */,
 				9FC5F90A24A8E20000CDF2DF /* NoteOptionsCollectionViewCell.swift in Sources */,
-				9FAE72EC24887158002D800B /* Heisenberg.swift in Sources */,
 				9FD5516E246A4364005D14D2 /* RelatedNotesViewController.swift in Sources */,
 				9F18E7A823FB4F1600543D78 /* FolderButton.swift in Sources */,
 				9FFE07E8232A622A00DBD0AC /* Tag.swift in Sources */,
@@ -1299,7 +1239,7 @@
 			repositoryURL = "https://github.com/onevcat/Kingfisher.git";
 			requirement = {
 				kind = exactVersion;
-				version = 5.13.2;
+				version = 5.15.0;
 			};
 		};
 		9F10EC172347E4B3005340AA /* XCRemoteSwiftPackageReference "SwiftyBeaver" */ = {
@@ -1356,14 +1296,6 @@
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 3.3.3;
-			};
-		};
-		9FAA827C236DD45200B2004F /* XCRemoteSwiftPackageReference "ViewAnimator" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/marcosgriselli/ViewAnimator";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 2.7.0;
 			};
 		};
 		9FC5F90B24AFB07D00CDF2DF /* XCRemoteSwiftPackageReference "NVActivityIndicatorView" */ = {
@@ -1437,11 +1369,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 9F9460E023F5BAA10073D709 /* XCRemoteSwiftPackageReference "Connectivity" */;
 			productName = Connectivity;
-		};
-		9FAA827D236DD45200B2004F /* ViewAnimator */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 9FAA827C236DD45200B2004F /* XCRemoteSwiftPackageReference "ViewAnimator" */;
-			productName = ViewAnimator;
 		};
 		9FC5F90C24AFB07D00CDF2DF /* NVActivityIndicatorView */ = {
 			isa = XCSwiftPackageProductDependency;

@@ -9,7 +9,6 @@
 import UIKit
 
 import ViewAnimator
-import PopMenu
 
 protocol DocumentsViewControllerDelegate  {
     func resetDocuments()
@@ -184,7 +183,7 @@ class NeoDocumentsVC: UIViewController, UICollectionViewDelegate, UISearchBarDel
         }
         documentDetailVC.setDocument(document: document)
         documentDetailVC.view.isHidden = false
-        let animation = AnimationType.from(direction: .right, offset: 100.0)
+        let animation = AnimationType.vector(CGVector(dx: 100, dy: 0))
         documentDetailVC.view.animate(animations: [animation])
     }
     
@@ -253,45 +252,48 @@ class NeoDocumentsVC: UIViewController, UICollectionViewDelegate, UISearchBarDel
     // MARK: Settings
     
     @IBAction func settingsTapped(_ sender: UIButton) {
-        let popMenu = PopMenuViewController(sourceView: sender, actions: [PopMenuAction](), appearance: nil)
-        popMenu.appearance.popMenuBackgroundStyle = .none()
-        let tagmeEpsilonAction = PopMenuDefaultAction(title: "Change TAGME Accuracy", image: UIImage(systemName: "dial"),  didSelect: { action in
-            popMenu.dismiss(animated: true, completion: nil)
-            var title = "Favor Common Topics (More)"
-            if self.note.1.tagmeEpsilon == Float(0.0) {
-                title = "✔︎ Favor Common Topics (More)"
-            }
-            let alert = UIAlertController(title: "TAGME Accuracy", message: "Choose how documents are fetched.", preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: NSLocalizedString(title, comment: ""), style: .default, handler: { _ in
-                self.note.1.tagmeEpsilon = 0.0
-                NeoLibrary.save(note: self.note.1, url: self.note.0)
-            }))
-            
-            title = "Balanced"
-            if self.note.1.tagmeEpsilon == Float(0.3) {
-                title = "✔︎ Balanced"
-            }
-            alert.addAction(UIAlertAction(title: NSLocalizedString(title, comment: ""), style: .default, handler: { _ in
-                self.note.1.tagmeEpsilon = 0.3
-                NeoLibrary.save(note: self.note.1, url: self.note.0)
-            }))
-            
-            title = "Favor Contextual Topics (Less)"
-            if self.note.1.tagmeEpsilon == Float(0.5) {
-                title = "✔︎ Favor Contextual Topics (Less)"
-            }
-            alert.addAction(UIAlertAction(title: NSLocalizedString(title, comment: ""), style: .default, handler: { _ in
-                self.note.1.tagmeEpsilon = 0.5
-                NeoLibrary.save(note: self.note.1, url: self.note.0)
-            }))
-            self.present(alert, animated: true, completion: nil)
-        })
-        popMenu.addAction(tagmeEpsilonAction)
-        let resetAction = PopMenuDefaultAction(title: "Reset Documents", image: UIImage(systemName: "wand.and.rays"),  didSelect: { action in
+        let alert = UIAlertController(title: "Bookshelf", message: "Change the accuracy based on which TAGME documents should be fetched, or reset your bookshelf.", preferredStyle: .actionSheet)
+        alert.popoverPresentationController?.sourceView = sender
+        let tagmeAccuracyAction = UIAlertAction(title: "Change TAGME Accuracy", style: .default) { action in
+            self.showTAGMEAccuracyAlert()
+        }
+        alert.addAction(tagmeAccuracyAction)
+        let resetDocumentsAction = UIAlertAction(title: "Reset Documents", style: .destructive) { action in
             self.resetDocuments()
-        })
-        popMenu.addAction(resetAction)
-        self.present(popMenu, animated: true, completion: nil)
+        }
+        alert.addAction(resetDocumentsAction)
+        self.present(alert, animated: true)
+    }
+    
+    private func showTAGMEAccuracyAlert() {
+        var title = "Favor Common Topics (More)"
+        if self.note.1.tagmeEpsilon == Float(0.0) {
+            title = "✔︎ Favor Common Topics (More)"
+        }
+        let alert = UIAlertController(title: "TAGME Accuracy", message: "Choose how documents are fetched.", preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: NSLocalizedString(title, comment: ""), style: .default, handler: { _ in
+            self.note.1.tagmeEpsilon = 0.0
+            NeoLibrary.save(note: self.note.1, url: self.note.0)
+        }))
+        
+        title = "Balanced"
+        if self.note.1.tagmeEpsilon == Float(0.3) {
+            title = "✔︎ Balanced"
+        }
+        alert.addAction(UIAlertAction(title: NSLocalizedString(title, comment: ""), style: .default, handler: { _ in
+            self.note.1.tagmeEpsilon = 0.3
+            NeoLibrary.save(note: self.note.1, url: self.note.0)
+        }))
+        
+        title = "Favor Contextual Topics (Less)"
+        if self.note.1.tagmeEpsilon == Float(0.5) {
+            title = "✔︎ Favor Contextual Topics (Less)"
+        }
+        alert.addAction(UIAlertAction(title: NSLocalizedString(title, comment: ""), style: .default, handler: { _ in
+            self.note.1.tagmeEpsilon = 0.5
+            NeoLibrary.save(note: self.note.1, url: self.note.0)
+        }))
+        self.present(alert, animated: true, completion: nil)
     }
     
     @IBAction func showHiddenSwitchChanged(_ sender: UISwitch) {

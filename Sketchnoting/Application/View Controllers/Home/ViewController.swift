@@ -8,7 +8,6 @@
 
 import UIKit
 
-import PopMenu
 import NVActivityIndicatorView
 import DataCompression
 import ViewAnimator
@@ -308,24 +307,21 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     }
     
     @IBAction func importDocumentTapped(_ sender: UIButton) {
-        let popMenu = PopMenuViewController(sourceView: sender, actions: [PopMenuAction](), appearance: nil)
-        popMenu.appearance.popMenuBackgroundStyle = .none()
-        let noteImportAction = PopMenuDefaultAction(title: "Import Files", image: UIImage(systemName: "doc"),  didSelect: { action in
-            popMenu.dismiss(animated: true, completion: nil)
+        let filesImportAction = UIAlertAction(title: "Import Files", style: .default) { action in
             self.displayDocumentPicker()
-        })
-        popMenu.addAction(noteImportAction)
-        let scanAction = PopMenuDefaultAction(title: "Scan Documents", image: UIImage(systemName: "camera.viewfinder"),  didSelect: { action in
-            popMenu.dismiss(animated: true, completion: nil)
+        }
+        let scanDocumentsAction = UIAlertAction(title: "Scan Documents", style: .default) { action in
             self.showDocumentScanner()
-        })
-        popMenu.addAction(scanAction)
-        let imageImportAction = PopMenuDefaultAction(title: "Camera Roll", image: UIImage(systemName: "photo"),  didSelect: { action in
-            popMenu.dismiss(animated: true, completion: nil)
+        }
+        let cameraRollAction = UIAlertAction(title: "Camera Roll", style: .default) { action in
             self.displayImagePicker()
-        })
-        popMenu.addAction(imageImportAction)
-        self.present(popMenu, animated: true, completion: nil)
+        }
+        let alert = UIAlertController(title: "Import", message: "Import files, scan physical documents using your camera or choose photos from your camera roll.", preferredStyle: .actionSheet)
+        alert.addAction(filesImportAction)
+        alert.addAction(scanDocumentsAction)
+        alert.addAction(cameraRollAction)
+        alert.popoverPresentationController?.sourceView = sender
+        self.present(alert, animated: true)
     }
     
     private func showDocumentScanner() {
@@ -402,7 +398,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         }
         noteCollectionView.reloadData()
         if animated {
-            let animations = [AnimationType.from(direction: .bottom, offset: 200.0)]
+            let animations = [AnimationType.vector(CGVector(dx: 200, dy: 0))]
             noteCollectionView.performBatchUpdates({
                 UIView.animate(views: noteCollectionView.orderedVisibleCells,
                 animations: animations, completion: {
@@ -468,7 +464,8 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         }
         self.noteCollectionView.reloadData()
         self.noteCollectionView.collectionViewLayout.invalidateLayout()
-        let animations = [AnimationType.from(direction: .left, offset: 200.0)]
+        
+        let animations = [AnimationType.vector(CGVector(dx: 200, dy: 0))]
         noteCollectionView.performBatchUpdates({
             UIView.animate(views: noteCollectionView.orderedVisibleCells,
             animations: animations, completion: {
@@ -494,92 +491,97 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         }
     }
     @IBAction func clipboardButtonTapped(_ sender: UIButton) {
-        let popMenu = PopMenuViewController(sourceView: sender, actions: [PopMenuAction](), appearance: nil)
-        popMenu.appearance.popMenuBackgroundStyle = .none()
-        if (SKClipboard.hasItems()) {
+        if SKClipboard.hasItems() {
+            let alert = UIAlertController(title: "Clipboard", message: "Paste a copied note, page, image or typed text.", preferredStyle: .actionSheet)
+            alert.popoverPresentationController?.sourceView = sender
             if let copiedNote = SKClipboard.getNote() {
-                let pasteNoteAction = PopMenuDefaultAction(title: "Paste Note", image: UIImage(systemName: "square.stack.3d.down.right.fill"), didSelect: { action in
+                let pasteNoteAction = UIAlertAction(title: "Paste Note", style: .default) { action in
                     NeoLibrary.add(note: copiedNote)
                     self.updateDisplayedNotes(true)
                     self.view.makeToast("Pasted note: \(copiedNote.getName())", duration: 2, position: .center)
-                })
-                popMenu.addAction(pasteNoteAction)
+                }
+                alert.addAction(pasteNoteAction)
             }
             if let copiedPage = SKClipboard.getPage() {
-                let pastePageAction = PopMenuDefaultAction(title: "Paste Page", image: UIImage(systemName: "doc"), didSelect: { action in
+                let pastePageAction = UIAlertAction(title: "Paste Page", style: .default) { action in
                     let _ = NeoLibrary.createNoteFromNotePages(notePages: [copiedPage])
                     self.updateDisplayedNotes(true)
                     self.view.makeToast("New note from pasted page created.", duration: 2, position: .center)
-                })
-                    popMenu.addAction(pastePageAction)
+                }
+                alert.addAction(pastePageAction)
             }
             if let copiedNoteLayer = SKClipboard.getNoteLayer() {
-                let pasteImageAction = PopMenuDefaultAction(title: "Paste Layer", image: UIImage(systemName: "photo"), didSelect: { action in
-                    if let noteTypedText = copiedNoteLayer as? NoteTypedText {
-                        let _ = NeoLibrary.createNoteFromTypedTexts(texts: [noteTypedText])
-                        self.view.makeToast("New note from pasted typed text created.", duration: 2, position: .center)
+                switch copiedNoteLayer.type {
+                case .Image:
+                    let pasteLayerAction = UIAlertAction(title: "Paste Image", style: .default) { action in
+                        if let noteImage = copiedNoteLayer as? NoteImage {
+                            let _ = NeoLibrary.createNoteFromImages(images: [noteImage.image])
+                            self.view.makeToast("New note from pasted image created.", duration: 2, position: .center)
+                            self.updateDisplayedNotes(true)
+                        }
                     }
-                    else if let noteImage = copiedNoteLayer as? NoteImage {
-                        let _ = NeoLibrary.createNoteFromImages(images: [noteImage.image])
-                        self.view.makeToast("New note from pasted image created.", duration: 2, position: .center)
+                    alert.addAction(pasteLayerAction)
+                    break
+                case .TypedText:
+                    let pasteLayerAction = UIAlertAction(title: "Paste Text", style: .default) { action in
+                        if let noteTypedText = copiedNoteLayer as? NoteTypedText {
+                            let _ = NeoLibrary.createNoteFromTypedTexts(texts: [noteTypedText])
+                            self.view.makeToast("New note from pasted typed text created.", duration: 2, position: .center)
+                            self.updateDisplayedNotes(true)
+                        }
                     }
-                    self.updateDisplayedNotes(true)
-                })
-                popMenu.addAction(pasteImageAction)
+                    alert.addAction(pasteLayerAction)
+                    break
+                }
             }
-            let clearAction = PopMenuDefaultAction(title: "Paste Note", image: UIImage(systemName: "square.stack.3d.down.right.fill"), didSelect: { action in
+            let clearAction = UIAlertAction(title: "Clear Clipboard", style: .destructive) { action in
                 SKClipboard.clear()
                 self.updateClipboardButton()
                 self.view.makeToast("Cleared SKClipboard.", duration: 1, position: .center)
-            })
-            popMenu.addAction(clearAction)
-        }
-        if popMenu.actions.count > 0 {
-            self.present(popMenu, animated: true, completion: nil)
+            }
+            alert.addAction(clearAction)
+            self.present(alert, animated: true)
         }
     }
     
     @IBAction func noteSortingTapped(_ sender: UIButton) {
-        let popMenu = PopMenuViewController(sourceView: sender, actions: [PopMenuAction](), appearance: nil)
-        popMenu.appearance.popMenuBackgroundStyle = .none()
-        
-        var newestFirstImage: UIImage? = nil
-        var oldestFirstImage: UIImage? = nil
-        var nameAZFirstImage: UIImage? = nil
-        var nameZAFirstImage: UIImage? = nil
+        var newestTitle = "Newest First"
+        var oldestTitle = "Oldest First"
+        var nameAZTitle = "Alphabetically (A-Z)"
+        var nameZATitle = "Alphabetically (Z-A)"
         switch SettingsManager.getFileSorting() {
-        case .ByNewest:
-            newestFirstImage = UIImage(systemName: "checkmark.circle.fill")
-        case .ByOldest:
-            oldestFirstImage = UIImage(systemName: "checkmark.circle.fill")
-        case .ByNameAZ:
-            nameAZFirstImage = UIImage(systemName: "checkmark.circle.fill")
-        case .ByNameZA:
-            nameZAFirstImage = UIImage(systemName: "checkmark.circle.fill")
+            case .ByNewest:
+                newestTitle += " ✔︎"
+            case .ByOldest:
+                oldestTitle += " ✔︎"
+            case .ByNameAZ:
+                nameAZTitle += " ✔︎"
+            case .ByNameZA:
+                nameZATitle += " ✔︎"
         }
-        let newestFirstAction = PopMenuDefaultAction(title: "Newest First", image: newestFirstImage,  didSelect: { action in
+        let newestAction = UIAlertAction(title: newestTitle, style: .default) { action in
             SettingsManager.setFileSorting(type: .ByNewest)
             self.updateDisplayedNotes(false)
-            
-        })
-        popMenu.addAction(newestFirstAction)
-        let oldestFirstAction = PopMenuDefaultAction(title: "Oldest First", image: oldestFirstImage, didSelect: { action in
+        }
+        let oldestAction = UIAlertAction(title: oldestTitle, style: .default) { action in
             SettingsManager.setFileSorting(type: .ByOldest)
             self.updateDisplayedNotes(false)
-        })
-        popMenu.addAction(oldestFirstAction)
-        let nameAZAction = PopMenuDefaultAction(title: "Alphabetically (A-Z)", image: nameAZFirstImage, didSelect: { action in
+        }
+        let nameAZAction = UIAlertAction(title: nameAZTitle, style: .default) { action in
             SettingsManager.setFileSorting(type: .ByNameAZ)
             self.updateDisplayedNotes(false)
-        })
-        popMenu.addAction(nameAZAction)
-        let nameZAAction = PopMenuDefaultAction(title: "Alphabetically (Z-A)", image: nameZAFirstImage, didSelect: { action in
+        }
+        let nameZAAction = UIAlertAction(title: nameZATitle, style: .default) { action in
             SettingsManager.setFileSorting(type: .ByNameZA)
             self.updateDisplayedNotes(false)
-        })
-        popMenu.addAction(nameZAAction)
-        
-        self.present(popMenu, animated: true, completion: nil)
+        }
+        let alert = UIAlertController(title: "Sorting", message: "Sort your files by date or alphabetically.", preferredStyle: .actionSheet)
+        alert.addAction(newestAction)
+        alert.addAction(oldestAction)
+        alert.addAction(nameAZAction)
+        alert.addAction(nameZAAction)
+        alert.popoverPresentationController?.sourceView = sender
+        self.present(alert, animated: true)
     }
     func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
 

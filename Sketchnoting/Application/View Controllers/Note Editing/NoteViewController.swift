@@ -19,7 +19,6 @@ import Repeat
 import ViewAnimator
 import Connectivity
 import GPUImage
-import PopMenu
 import GPUImage
 import Highlightr
 import Toast
@@ -928,7 +927,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     private func showBookshelf() {
         bookshelfButton.tintColor = self.view.tintColor
         self.bookshelf.isHidden = false
-        let animation = AnimationType.from(direction: .right, offset: 500)
+        let animation = AnimationType.vector(CGVector(dx: 500, dy: 0))
         bookshelf.animate(animations: [animation])
     }
     
@@ -1245,18 +1244,20 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     }
     @objc func handleDrawingRegionTap(_ sender: UITapGestureRecognizer) {
         if sender.view != nil {
-            let popMenu = PopMenuViewController(sourceView: sender.view, actions: [PopMenuAction](), appearance: nil)
-            let closeAction = PopMenuDefaultAction(title: "Close")
-            let action = PopMenuDefaultAction(title: "Delete Drawing Region", didSelect: { action in
+            let deleteDrawingRegionAction = UIAlertAction(title: "Delete Drawing Region", style: .destructive) { action in
                 if let drawingRegion = sender.view {
                     drawingRegion.removeFromSuperview()
                     self.note.1.getCurrentPage().removeDrawing(region: drawingRegion.frame)
                     NeoLibrary.save(note: self.note.1, url: self.note.0)
                 }
-            })
-            popMenu.addAction(action)
-            popMenu.addAction(closeAction)
-            self.present(popMenu, animated: true, completion: nil)
+            }
+            let cancelAction = UIAlertAction(title: "Cancel", style: .default) { action in
+            }
+            let alert = UIAlertController(title: "Drawing", message: "Manage the region designated to contain a drawing.", preferredStyle: .actionSheet)
+            alert.addAction(deleteDrawingRegionAction)
+            alert.addAction(cancelAction)
+            alert.popoverPresentationController?.sourceView = sender.view
+            self.present(alert, animated: true)
         }
     }
     
@@ -1306,67 +1307,75 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     }
     
     @IBAction func newItemTapped(_ sender: UIButton) {
-        let popMenu = PopMenuViewController(sourceView: sender, actions: [PopMenuAction](), appearance: nil)
-        popMenu.appearance.popMenuBackgroundStyle = .none()
-        let newPageAction = PopMenuDefaultAction(title: "New Page", image: UIImage(systemName: "plus.circle"), color: .link, didSelect: { action in
-            let newPage = NotePage()
-            self.note.1.add(page: newPage)
+        let alert = UIAlertController(title: "Import", message: "Create a new page, import files, scan physical documents using your camera or choose photos from your camera roll.", preferredStyle: .actionSheet)
+        alert.popoverPresentationController?.sourceView = sender
+        let newPageAction = UIAlertAction(title: "New Page", style: .default) { action in
+            self.note.1.add(page: NotePage())
             self.saveCurrentPage()
             self.note.1.nextPage()
             self.load(page: self.note.1.getCurrentPage())
             self.saveCurrentPage()
-        })
-        popMenu.addAction(newPageAction)
-        let importItemsAction = PopMenuDefaultAction(title: "Import Files", image: UIImage(systemName: "doc"), didSelect: { action in
-            popMenu.dismiss(animated: true, completion: nil)
+        }
+        alert.addAction(newPageAction)
+        let filesImportAction = UIAlertAction(title: "Import Files", style: .default) { action in
             self.displayDocumentPicker()
-        })
-        popMenu.addAction(importItemsAction)
-        let scanAction = PopMenuDefaultAction(title: "Scan Documents", image: UIImage(systemName: "doc.text.viewfinder"), didSelect: { action in
-            popMenu.dismiss(animated: true, completion: nil)
+        }
+        alert.addAction(filesImportAction)
+        let scanDocumentsAction = UIAlertAction(title: "Scan Documents", style: .default) { action in
             let scannerVC = VNDocumentCameraViewController()
             scannerVC.delegate = self
             self.present(scannerVC, animated: true)
-        })
-        popMenu.addAction(scanAction)
-        let imageImportAction = PopMenuDefaultAction(title: "Camera Roll", image: UIImage(systemName: "photo"), didSelect: { action in
-            popMenu.dismiss(animated: true, completion: nil)
+        }
+        alert.addAction(scanDocumentsAction)
+        let cameraRollAction = UIAlertAction(title: "Camera Roll", style: .default) { action in
             self.displayImagePicker()
-        })
-        popMenu.addAction(imageImportAction)
+        }
+        alert.addAction(cameraRollAction)
         if (SKClipboard.hasItems()) {
             if let copiedNote = SKClipboard.getNote() {
-                let pasteNoteAction = PopMenuDefaultAction(title: "Paste Note", image: UIImage(systemName: "square.stack.3d.down.right.fill"), didSelect: { action in
+                let pasteNoteAction = UIAlertAction(title: "Paste Note", style: .default) { action in
                     self.note.1.add(pages: copiedNote.pages)
                     self.saveCurrentPage()
                     self.view.makeToast("Pasted \(copiedNote.pages.count) page(s).", duration: 2, position: .center)
-                })
-                popMenu.addAction(pasteNoteAction)
+                }
+                alert.addAction(pasteNoteAction)
             }
             if let copiedPage = SKClipboard.getPage() {
-                let pastePageAction = PopMenuDefaultAction(title: "Paste Page", image: UIImage(systemName: "doc"), didSelect: { action in
+                let pastePageAction = UIAlertAction(title: "Paste Page", style: .default) { action in
                     self.note.1.add(page: copiedPage)
                     self.saveCurrentPage()
                     self.view.makeToast("Pasted page.", duration: 1, position: .center)
-                })
-                popMenu.addAction(pastePageAction)
+                }
+                alert.addAction(pastePageAction)
             }
             if let copiedNoteLayer = SKClipboard.getNoteLayer() {
-                let pasteImageAction = PopMenuDefaultAction(title: "Paste Layer", image: UIImage(systemName: "photo"), didSelect: { action in
-                    self.note.1.getCurrentPage().layers.append(copiedNoteLayer)
-                    if let noteImage = copiedNoteLayer as? NoteImage {
-                        self.displayNoteImage(image: noteImage)
+                switch copiedNoteLayer.type {
+                case .Image:
+                    let pasteLayerAction = UIAlertAction(title: "Paste Image", style: .default) { action in
+                        self.note.1.getCurrentPage().layers.append(copiedNoteLayer)
+                        if let noteImage = copiedNoteLayer as? NoteImage {
+                            self.displayNoteImage(image: noteImage)
+                        }
+                        self.saveCurrentPage()
+                        self.view.makeToast("Pasted note image.", duration: 1, position: .center)
                     }
-                    if let noteTypedText = copiedNoteLayer as? NoteTypedText {
-                        self.displayNoteTypedText(typedText: noteTypedText)
+                    alert.addAction(pasteLayerAction)
+                    break
+                case .TypedText:
+                    let pasteLayerAction = UIAlertAction(title: "Paste Text", style: .default) { action in
+                        self.note.1.getCurrentPage().layers.append(copiedNoteLayer)
+                        if let noteTypedText = copiedNoteLayer as? NoteTypedText {
+                            self.displayNoteTypedText(typedText: noteTypedText)
+                        }
+                        self.saveCurrentPage()
+                        self.view.makeToast("Pasted note typed text.", duration: 1, position: .center)
                     }
-                    self.saveCurrentPage()
-                    self.view.makeToast("Pasted note layer.", duration: 1, position: .center)
-                })
-                popMenu.addAction(pasteImageAction)
+                    alert.addAction(pasteLayerAction)
+                    break
+                }
             }
         }
-        self.present(popMenu, animated: true, completion: nil)
+        self.present(alert, animated: true)
     }
     
     func documentCameraViewController(_ controller: VNDocumentCameraViewController, didFinishWith scan: VNDocumentCameraScan) {
@@ -1686,59 +1695,60 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     }
     
     func draggableViewLongPressed(source: NeoDraggableView) {
+        let alert = UIAlertController(title: "Note Layer", message: "Manage the note layer.", preferredStyle: .actionSheet)
+        alert.popoverPresentationController?.sourceView = source
         if let noteLayer =  self.draggableViews[source] {
-            let popMenu = PopMenuViewController(sourceView: source, actions: [PopMenuAction](), appearance: nil)
+            //
             if let typedText = noteLayer as? NoteTypedText {
-                let editOption = PopMenuDefaultAction(title: "Edit...", didSelect: { action in
-                    popMenu.dismiss(animated: true, completion: nil)
+                let editAction = UIAlertAction(title: "Edit...", style: .default) { action in
                     self.draggableViewBeingEdited = source
                     self.performSegue(withIdentifier: "ShowTextBoxVC", sender: self)
-                })
-                popMenu.addAction(editOption)
-                let languageOption = PopMenuDefaultAction(title: "Change Language... (\(typedText.codeLanguage.lowercased().capitalizingFirstLetter()))", didSelect: { action in
-                    popMenu.dismiss(animated: true, completion: {
-                        let alert = UIAlertController(title: "Code Language (\(typedText.codeLanguage.lowercased().capitalizingFirstLetter()))", message: "Choose the language for the syntax highlight.", preferredStyle: .alert)
-                        for lang in NoteTypedText.supportedLanguages {
-                            alert.addAction(UIAlertAction(title: NSLocalizedString(lang.lowercased().capitalizingFirstLetter(), comment: ""), style: .default, handler: { _ in
-                                typedText.codeLanguage = lang
-                                if let noteTypedTextView = source as? NoteTypedTextView {
-                                    noteTypedTextView.label.attributedText = self.getAttributedTextForTypedText(typedText: typedText)
-                                    noteTypedTextView.label.adjustFontSize()
-                                }
-                                self.highlightedDraggableView = nil
-                                self.note.1.getCurrentPage().updateLayer(layer: typedText)
-                                self.startSaveTimer()
-                                self.view.makeToast("Changed code language to \(lang.lowercased().capitalizingFirstLetter()).", duration: 1, position: .center)
-                            }))
-                        }
-                        alert.addAction(UIAlertAction(title: NSLocalizedString("Cancel", comment: ""), style: .default, handler: { _ in
-                            log.info("Cancelled: changing code language of text box.")
+                }
+                alert.addAction(editAction)
+                let languageAction = UIAlertAction(title: "Change Language... (\(typedText.codeLanguage.lowercased().capitalizingFirstLetter()))", style: .default) { action in
+                    let alert = UIAlertController(title: "Code Language (\(typedText.codeLanguage.lowercased().capitalizingFirstLetter()))", message: "Choose the language for the syntax highlight.", preferredStyle: .alert)
+                    for lang in NoteTypedText.supportedLanguages {
+                        alert.addAction(UIAlertAction(title: NSLocalizedString(lang.lowercased().capitalizingFirstLetter(), comment: ""), style: .default, handler: { _ in
+                            typedText.codeLanguage = lang
+                            if let noteTypedTextView = source as? NoteTypedTextView {
+                                noteTypedTextView.label.attributedText = self.getAttributedTextForTypedText(typedText: typedText)
+                                noteTypedTextView.label.adjustFontSize()
+                            }
+                            self.highlightedDraggableView = nil
+                            self.note.1.getCurrentPage().updateLayer(layer: typedText)
+                            self.startSaveTimer()
+                            self.view.makeToast("Changed code language to \(lang.lowercased().capitalizingFirstLetter()).", duration: 1, position: .center)
                         }))
-                        self.present(alert, animated: true, completion: nil)
-                    })
-                })
-                popMenu.addAction(languageOption)
-                let copyTextAction = PopMenuDefaultAction(title: "Copy Text", didSelect: { action in
+                    }
+                    alert.addAction(UIAlertAction(title: NSLocalizedString("Cancel", comment: ""), style: .default, handler: { _ in
+                        log.info("Cancelled: changing code language of text box.")
+                    }))
+                    self.present(alert, animated: true, completion: nil)
+                }
+                alert.addAction(languageAction)
+                let copyTextAction = UIAlertAction(title: "Copy Text", style: .default) { action in
                     UIPasteboard.general.string = typedText.text
-                })
-                popMenu.addAction(copyTextAction)
+                }
+                alert.addAction(copyTextAction)
             }
-            let copyAction = PopMenuDefaultAction(title: "Copy", didSelect: { action in
+            let copyAction = UIAlertAction(title: "Copy", style: .default) { action in
                 SKClipboard.copy(noteLayer: noteLayer)
                 self.view.makeToast("Copied note layer to SKClipboard.", duration: 2, position: .center)
-            })
-            popMenu.addAction(copyAction)
-            let action = PopMenuDefaultAction(title: "Delete", didSelect: { action in
+            }
+            alert.addAction(copyAction)
+            let deleteAction = UIAlertAction(title: "Delete", style: .destructive) { action in
                 self.note.1.getCurrentPage().deleteLayer(layer: noteLayer)
                 source.removeFromSuperview()
                 self.draggableViews[source] = nil
                 self.startSaveTimer()
                 self.view.makeToast("Deleted note layer.", duration: 1, position: .center)
-            })
-            popMenu.addAction(action)
-            let closeAction = PopMenuDefaultAction(title: "Close")
-            popMenu.addAction(closeAction)
-            self.present(popMenu, animated: true, completion: nil)
+            }
+            alert.addAction(deleteAction)
+            let cancelAction = UIAlertAction(title: "Cancel", style: .default) { action in
+            }
+            alert.addAction(cancelAction)
+            
+            self.present(alert, animated: true)
         }
     }
 }
