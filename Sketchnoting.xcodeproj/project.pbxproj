@@ -625,16 +625,16 @@
 		9FD29BA52220524D00CC969A /* Sketchnoting */ = {
 			isa = PBXGroup;
 			children = (
-				9FD29BB22220525000CC969A /* Info.plist */,
-				9FD29C432239525900CC969A /* GoogleService-Info.plist */,
 				9FD29BA62220524D00CC969A /* AppDelegate.swift */,
-				9FD29BAF2220525000CC969A /* LaunchScreen.storyboard */,
 				9FD29BAA2220524D00CC969A /* Main.storyboard */,
-				9FD29BAD2220525000CC969A /* Assets.xcassets */,
 				9FD29C67224589BE00CC969A /* Application */,
 				9FD29C452239587D00CC969A /* Extensions */,
 				9F5D8B2B228B9D7000F56FEC /* CREDITS.md */,
 				9F5D8B2C228B9EF800F56FEC /* README.md */,
+				9FD29BB22220525000CC969A /* Info.plist */,
+				9FD29C432239525900CC969A /* GoogleService-Info.plist */,
+				9FD29BAF2220525000CC969A /* LaunchScreen.storyboard */,
+				9FD29BAD2220525000CC969A /* Assets.xcassets */,
 			);
 			path = Sketchnoting;
 			sourceTree = "<group>";

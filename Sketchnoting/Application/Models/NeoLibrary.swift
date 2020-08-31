@@ -343,31 +343,30 @@ class NeoLibrary {
         return (duplicateURL, duplicate)
     }
     
-    public static func createBackup(progressView: UIProgressView? = nil) -> URL? {
-        let fileManager = FileManager()
-        let sourceURL = URL(fileURLWithPath: getHomeDirectoryURL().path)
-        let date = Date()
-        let calendar = Calendar.current
-        let year = calendar.component(.year, from: date)
-        let month = calendar.component(.month, from: date)
-        let day = calendar.component(.day, from: date)
-        let hour = calendar.component(.hour, from: date)
-        let minutes = calendar.component(.minute, from: date)
-        let destinationURL = URL(fileURLWithPath: getDocumentsURL().path).appendingPathComponent("Backup-\(year)\(month)\(day)\(hour)\(minutes).zip")
-        do {
-            let progress = Progress()
-            var _: NSKeyValueObservation = progress.observe(\.fractionCompleted) { [] object, change in
-                log.info("Backup ZIP creation progress: \(object.fractionCompleted)")
-                if let progressView = progressView {
-                    progressView.progress = Float(object.fractionCompleted)
+    public static func createBackup(completion: @escaping (URL?) -> ()) {
+        DispatchQueue.global().async {
+            let fileManager = FileManager()
+            let sourceURL = URL(fileURLWithPath: getHomeDirectoryURL().path)
+            let date = Date()
+            let calendar = Calendar.current
+            let year = calendar.component(.year, from: date)
+            let month = calendar.component(.month, from: date)
+            let day = calendar.component(.day, from: date)
+            let hour = calendar.component(.hour, from: date)
+            let minutes = calendar.component(.minute, from: date)
+            let destinationURL = URL(fileURLWithPath: getDocumentsURL().path).appendingPathComponent("Backup-\(year)\(month)\(day)\(hour)\(minutes).zip")
+            do {
+                let progress = Progress()
+                var _: NSKeyValueObservation = progress.observe(\.fractionCompleted) { [] object, change in
+                    log.info("Backup ZIP creation progress: \(object.fractionCompleted)")
                 }
+                try fileManager.zipItem(at: sourceURL, to: destinationURL, shouldKeepParent: false, compressionMethod: .deflate, progress: progress)
+            } catch {
+                log.error("Failed to create backup of library: \(error)")
+                completion(nil)
             }
-            try fileManager.zipItem(at: sourceURL, to: destinationURL, shouldKeepParent: false, compressionMethod: .deflate, progress: progress)
-        } catch {
-            log.error("Failed to create backup of library: \(error)")
-            return nil
+            completion(destinationURL)
         }
-        return destinationURL
     }
     
     enum ImportZIPResult {

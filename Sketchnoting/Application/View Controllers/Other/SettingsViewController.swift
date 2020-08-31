@@ -86,43 +86,47 @@ class SettingsViewController: UITableViewController {
         }
     }
     @IBAction func backupNotesTapped(_ sender: UIButton) {
-        let alertView = UIAlertController(title: "Please wait", message: "Creating backup...", preferredStyle: .alert)
+        let alertView = UIAlertController(title: "Creating backup...", message: "", preferredStyle: .alert)
         var isCancelled = false
         alertView.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: {(alert: UIAlertAction!) in
             isCancelled = true
-            
         }))
-        var progressView = UIProgressView()
-        present(alertView, animated: true, completion: {
-            let margin: CGFloat = 8.0
-            let rect = CGRect(x: margin, y: 72.0, width: alertView.view.frame.width - margin * 2.0 , height: 2.0)
-            progressView = UIProgressView(frame: rect)
-            progressView.tintColor = self.view.tintColor
-            alertView.view.addSubview(progressView)
-            if let backupFileURL = NeoLibrary.createBackup(progressView: progressView) {
-                if FileManager.default.fileExists(atPath: backupFileURL.path) {
-                    if (!isCancelled) {
-                        let activityController = UIActivityViewController(activityItems: [backupFileURL], applicationActivities: nil)
-                        alertView.dismiss(animated: true, completion: {
-                            self.present(activityController, animated: true)
-                            if let popOver = activityController.popoverPresentationController {
-                                popOver.sourceView = sender
-                            }
-                            activityController.completionWithItemsHandler = {(activityType, completed, returnedItems, error) in
-                                if (completed) {
-                                    NeoLibrary.delete(url: backupFileURL)
-                                    log.info("Deleted temporary backup zip file.")
+        self.present(alertView, animated: true)
+        let activityIndicator = UIActivityIndicatorView(frame: CGRect(x: 120, y: 40.0, width: 25, height: 25))
+        activityIndicator.startAnimating()
+        alertView.view.addSubview(activityIndicator)
+        NeoLibrary.createBackup() { url in
+            DispatchQueue.main.async {
+                if let backupFileURL = url {
+                    if FileManager.default.fileExists(atPath: backupFileURL.path) {
+                        if (!isCancelled) {
+                            let activityController = UIActivityViewController(activityItems: [backupFileURL], applicationActivities: nil)
+                            alertView.dismiss(animated: true, completion: {
+                                self.present(activityController, animated: true)
+                                if let popOver = activityController.popoverPresentationController {
+                                    popOver.sourceView = sender
                                 }
-                            }
-                        })
+                                activityController.completionWithItemsHandler = {(activityType, completed, returnedItems, error) in
+                                    if (completed) {
+                                        NeoLibrary.delete(url: backupFileURL)
+                                        log.info("Deleted temporary backup zip file.")
+                                    }
+                                }
+                            })
+                        }
+                        else {
+                            NeoLibrary.delete(url: backupFileURL)
+                            log.info("Deleted temporary backup zip file.")
+                        }
                     }
-                    else {
-                        NeoLibrary.delete(url: backupFileURL)
-                        log.info("Deleted temporary backup zip file.")
+                }
+                else {
+                    alertView.dismiss(animated: true) {
+                        log.error("Backup failed.")
                     }
                 }
             }
-        })
+        }
     }
 }
 
