@@ -16,7 +16,7 @@ class NotePage: Codable {
     private var noteText: NoteText?
     var backdropPDFData: Data?
     var pdfScale: Float = 1.0
-    var layers: [NoteLayer]
+    private var layers: [NoteLayer]
     
     private enum LayerTypeKey : String, CodingKey {
         case type = "type"
@@ -137,6 +137,18 @@ class NotePage: Codable {
         return self.drawings
     }
     
+    // MARK: Layers
+    func add(layer: NoteLayer) {
+        self.layers.append(layer)
+    }
+    
+    func getLayers(type: NoteLayerType? = nil) -> [NoteLayer] {
+        if let type = type {
+            return layers.filter { $0.type == type }
+        }
+        return layers
+    }
+    
     func deleteLayer(layer: NoteLayer) {
         for i in 0..<layers.count {
             if layers[i] == layer {
@@ -171,18 +183,12 @@ class NotePage: Codable {
         return self.noteText
     }
     
+    //MARK: recognized text
+    
     func clearNoteText() {
         self.noteText = nil
     }
     
-    func getLayers(type: NoteLayerType? = nil) -> [NoteLayer] {
-        if let type = type {
-            return layers.filter { $0.type == type }
-        }
-        return layers
-    }
-    
-    //MARK: recognized text
     public func getText(raw: Bool = false) -> String {
         var text: String = ""
         if let noteText = self.noteText {

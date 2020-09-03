@@ -266,42 +266,41 @@ class NeoLibrary {
         return (url, note)
     }
     
-    public static func createNoteFromNotePages(notePages: [NotePage], at location: URL = currentLocation) -> (URL, Note) {
+    public static func createNoteFrom(notePages: [NotePage], at location: URL = currentLocation) -> (URL, Note) {
         let (url, note) = NeoLibrary.createNote(name: "Imported Note Pages")
         note.pages = notePages
         self.saveSynchronously(note: note, url: url)
         return (url, note)
     }
     
-    public static func createNoteFromImages(images: [UIImage], at location: URL = currentLocation) -> (URL, Note) {
+    public static func createNoteFrom(images: [UIImage], at location: URL = currentLocation) -> (URL, Note) {
         var noteImages = [NoteImage]()
         for image in images {
-            if let noteImage = NoteImage(image: image) {
-                noteImages.append(noteImage)
-            }
+            let noteImage = NoteImage(image: image)
+            noteImages.append(noteImage)
         }
-        return createNoteFromNoteImages(noteImages: noteImages)
+        return createNoteFrom(noteImages: noteImages)
     }
     
-    public static func createNoteFromNoteImages(noteImages: [NoteImage], at location: URL = currentLocation) -> (URL, Note) {
+    public static func createNoteFrom(noteImages: [NoteImage], at location: URL = currentLocation) -> (URL, Note) {
         let (url, note) = NeoLibrary.createNote(name: "Imported Images")
         for noteImage in noteImages {
-            note.getCurrentPage().layers.append(noteImage)
+            note.getCurrentPage().add(layer: noteImage)
         }
         self.saveSynchronously(note: note, url: url)
         return (url, note)
     }
     
-    public static func createNoteFromTypedTexts(texts: [NoteTypedText], at location: URL = currentLocation) -> (URL, Note) {
+    public static func createNoteFrom(typedTexts: [NoteTypedText], at location: URL = currentLocation) -> (URL, Note) {
         let (url, note) = NeoLibrary.createNote(name: "Imported Text Files")
-        for t in texts {
-            note.getCurrentPage().layers.append(t)
+        for typedText in typedTexts {
+            note.getCurrentPage().add(layer: typedText)
         }
         self.saveSynchronously(note: note, url: url)
         return (url, note)
     }
     
-    public static func createNoteFromPDF(pdf: PDFDocument, at location: URL = currentLocation) -> (URL, Note) {
+    public static func createNoteFrom(pdf: PDFDocument, at location: URL = currentLocation) -> (URL, Note) {
         var pdfTitle = "Imported PDF"
         if let attributes = pdf.documentAttributes {
             if let title = attributes["Title"] as? String {

@@ -265,16 +265,16 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
                 log.info("Imported note \(note.1.getName()).")
             }
             if importedImages.count > 0 {
-                _ = NeoLibrary.createNoteFromImages(images: importedImages)
+                _ = NeoLibrary.createNoteFrom(images: importedImages)
                 log.info("New note from imported images.")
             }
             if importedTexts.count > 0 {
-                _ = NeoLibrary.createNoteFromTypedTexts(texts: importedTexts)
+                _ = NeoLibrary.createNoteFrom(typedTexts: importedTexts)
                 log.info("New note from imported text files.")
             }
             for pdf in importedPDFs {
                 if pdf.pageCount > 0 {
-                    _ = NeoLibrary.createNoteFromPDF(pdf: pdf)
+                    _ = NeoLibrary.createNoteFrom(pdf: pdf)
                     log.info("New note from imported pdf.")
                 }
             }
@@ -299,7 +299,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     private func displayImagePicker() {
         ImagePickerHelper.displayImagePickerWithImageOutput(vc: self, completion: { images in
             if images.count > 0 {
-                _ = NeoLibrary.createNoteFromImages(images: images)
+                _ = NeoLibrary.createNoteFrom(images: images)
                 log.info("New note from imported images (camera roll).")
                 self.updateDisplayedNotes(true)
             }
@@ -338,7 +338,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             let image = scan.imageOfPage(at: i)
             images.append(image)
         }
-        _ = NeoLibrary.createNoteFromImages(images: images)
+        _ = NeoLibrary.createNoteFrom(images: images)
         log.info("New note from scanned images.")
         self.updateDisplayedNotes(true)
     }
@@ -504,7 +504,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             }
             if let copiedPage = SKClipboard.getPage() {
                 let pastePageAction = UIAlertAction(title: "Paste Page", style: .default) { action in
-                    let _ = NeoLibrary.createNoteFromNotePages(notePages: [copiedPage])
+                    let _ = NeoLibrary.createNoteFrom(notePages: [copiedPage])
                     self.updateDisplayedNotes(true)
                     self.view.makeToast("New note from pasted page created.", duration: 2, position: .center)
                 }
@@ -515,7 +515,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
                 case .Image:
                     let pasteLayerAction = UIAlertAction(title: "Paste Image", style: .default) { action in
                         if let noteImage = copiedNoteLayer as? NoteImage {
-                            let _ = NeoLibrary.createNoteFromImages(images: [noteImage.image])
+                            let _ = NeoLibrary.createNoteFrom(images: [noteImage.image])
                             self.view.makeToast("New note from pasted image created.", duration: 2, position: .center)
                             self.updateDisplayedNotes(true)
                         }
@@ -525,7 +525,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
                 case .TypedText:
                     let pasteLayerAction = UIAlertAction(title: "Paste Text", style: .default) { action in
                         if let noteTypedText = copiedNoteLayer as? NoteTypedText {
-                            let _ = NeoLibrary.createNoteFromTypedTexts(texts: [noteTypedText])
+                            let _ = NeoLibrary.createNoteFrom(typedTexts: [noteTypedText])
                             self.view.makeToast("New note from pasted typed text created.", duration: 2, position: .center)
                             self.updateDisplayedNotes(true)
                         }
@@ -998,12 +998,12 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         log.info("Pasting note layer.")
         if let layer = SKClipboard.getNoteLayer() {
             if let noteImage = layer as? NoteImage {
-                _ = NeoLibrary.createNoteFromImages(images: [noteImage.image])
+                _ = NeoLibrary.createNoteFrom(images: [noteImage.image])
                 self.updateDisplayedNotes(true)
                 self.view.makeToast("Created new note \"Note Image Copy\" from pasted note image.")
             }
             if let noteTypedText = layer as? NoteTypedText {
-                _ = NeoLibrary.createNoteFromTypedTexts(texts: [noteTypedText])
+                _ = NeoLibrary.createNoteFrom(typedTexts: [noteTypedText])
                 self.updateDisplayedNotes(true)
                 self.view.makeToast("Created new note \"Note Typed Text Copy\" from pasted note typed text.")
             }

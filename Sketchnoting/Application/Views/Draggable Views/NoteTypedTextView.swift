@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Highlightr
 
 class NoteTypedTextView: NeoDraggableView {
     var label: FittableFontLabel
@@ -30,7 +31,6 @@ class NoteTypedTextView: NeoDraggableView {
         self.label.topInset = 1
         self.label.rightInset = 1
         self.label.bottomInset = 1
-        
         self.label.numberOfLines = 0
         self.label.textAlignment = .left
         self.label.lineBreakMode = .byWordWrapping
@@ -39,5 +39,28 @@ class NoteTypedTextView: NeoDraggableView {
     required init?(coder aDecoder: NSCoder) {
         label = FittableFontLabel()
         super.init(coder: aDecoder)
+    }
+    
+    func setText(typedText: NoteTypedText) {
+        if let attributedCode = self.getAttributedTextForTypedText(typedText: typedText) {
+            label.attributedText = attributedCode
+        }
+        else {
+            label.attributedText = nil
+            label.text = typedText.text
+        }
+        //label.adjustFontSize()
+    }
+    
+    private func getAttributedTextForTypedText(typedText: NoteTypedText) -> NSAttributedString? {
+        if (typedText.codeLanguage == "Plain") {
+            return NSAttributedString(string: typedText.text)
+        }
+        let highlightr = Highlightr()!
+        var highlightedText = highlightr.highlight(typedText.text)
+        if !typedText.codeLanguage.isEmpty {
+            highlightedText = highlightr.highlight(typedText.text, as: typedText.codeLanguage)
+        }
+        return highlightedText
     }
 }

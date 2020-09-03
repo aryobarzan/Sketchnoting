@@ -27,7 +27,7 @@ class NoteLayer: Codable, Equatable, Hashable {
         case id = "id"
     }
     
-    init?(type: NoteLayerType, location: CGPoint, size: CGSize){
+    init(type: NoteLayerType, location: CGPoint, size: CGSize){
         self.type = type
         self.location = location
         self.size = size

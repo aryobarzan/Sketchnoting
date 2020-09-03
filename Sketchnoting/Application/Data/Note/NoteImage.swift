@@ -16,9 +16,14 @@ class NoteImage: NoteLayer {
         case image
     }
     
-    init?(image: UIImage) {
+    init(image: UIImage, location: CGPoint = CGPoint(x: 50, y: 50), size: CGSize? = nil) {
         self.image = image
-        super.init(type: NoteLayerType.Image, location: CGPoint(x: 50, y: 50), size: CGSize(width: 0.25 * image.size.width, height: 0.25 * image.size.height))
+        if let size = size {
+            super.init(type: NoteLayerType.Image, location: location, size: size)
+        }
+        else {
+            super.init(type: NoteLayerType.Image, location: location, size: CGSize(width: 0.25 * image.size.width, height: 0.25 * image.size.height))
+        }
     }
     
     override func encode(to encoder: Encoder) throws {

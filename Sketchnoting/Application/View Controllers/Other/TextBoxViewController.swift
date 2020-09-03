@@ -22,13 +22,18 @@ class TextBoxViewController: UIViewController {
     @IBOutlet weak var textView: UITextView!
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        let highlightr = Highlightr()!
-        var highlightedText = highlightr.highlight(noteTypedText.text)
-        if !noteTypedText.codeLanguage.isEmpty {
-            highlightedText = highlightr.highlight(noteTypedText.text, as: noteTypedText.codeLanguage)
+        if noteTypedText.codeLanguage == "Plain" {
+            textView.attributedText = nil
+            textView.text = noteTypedText.text
         }
-        textView.attributedText = highlightedText
+        else {
+            let highlightr = Highlightr()!
+            var highlightedText = highlightr.highlight(noteTypedText.text)
+            if !noteTypedText.codeLanguage.isEmpty {
+                highlightedText = highlightr.highlight(noteTypedText.text, as: noteTypedText.codeLanguage)
+            }
+            textView.attributedText = highlightedText
+        }
     }
     
     @IBAction func cancelTapped(_ sender: UIBarButtonItem) {

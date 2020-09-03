@@ -584,8 +584,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         let frame = CGRect(x: typedText.location.x, y: typedText.location.y, width: typedText.size.width, height: typedText.size.height)
         let draggableView = NoteTypedTextView(frame: frame)
         draggableView.delegate = self
-        draggableView.label.attributedText = self.getAttributedTextForTypedText(typedText: typedText)
-        draggableView.label.adjustFontSize()
+        draggableView.setText(typedText: typedText)
         self.canvasView.addSubview(draggableView)
         self.canvasView.sendSubviewToBack(draggableView)
         self.draggableViews[draggableView] = typedText
@@ -609,7 +608,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                     self.canvasView.addSubview(key)
                 }
                 else {
-                    self.canvasView.insertSubview(key, at: self.note.1.getCurrentPage().layers.firstIndex(of: layer) ?? 0)
+                    self.canvasView.insertSubview(key, at: self.note.1.getCurrentPage().getLayers().firstIndex(of: layer) ?? 0)
                 }
             }
         }
@@ -622,7 +621,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                 self.canvasView.addSubview(key)
             }
             else {
-                self.canvasView.insertSubview(key, at: self.note.1.getCurrentPage().layers.firstIndex(of: value) ?? 0)
+                self.canvasView.insertSubview(key, at: self.note.1.getCurrentPage().getLayers().firstIndex(of: value) ?? 0)
             }
         }
     }
@@ -1317,6 +1316,14 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             self.saveCurrentPage()
         }
         alert.addAction(newPageAction)
+        let newTextBoxAction = UIAlertAction(title: "New Text Box", style: .default) { action in
+            let newTypedText = NoteTypedText(text: "Empty Text Box", codeLanguage: "Plain")
+            self.note.1.getCurrentPage().add(layer: newTypedText)
+            self.displayNoteTypedText(typedText: newTypedText)
+            self.reorderNoteLayer(layer: newTypedText)
+            self.saveCurrentPage()
+        }
+        alert.addAction(newTextBoxAction)
         let filesImportAction = UIAlertAction(title: "Import Files", style: .default) { action in
             self.displayDocumentPicker()
         }
@@ -1352,7 +1359,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                 switch copiedNoteLayer.type {
                 case .Image:
                     let pasteLayerAction = UIAlertAction(title: "Paste Image", style: .default) { action in
-                        self.note.1.getCurrentPage().layers.append(copiedNoteLayer)
+                        self.note.1.getCurrentPage().add(layer: copiedNoteLayer)
                         if let noteImage = copiedNoteLayer as? NoteImage {
                             self.displayNoteImage(image: noteImage)
                         }
@@ -1363,7 +1370,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                     break
                 case .TypedText:
                     let pasteLayerAction = UIAlertAction(title: "Paste Text", style: .default) { action in
-                        self.note.1.getCurrentPage().layers.append(copiedNoteLayer)
+                        self.note.1.getCurrentPage().add(layer: copiedNoteLayer)
                         if let noteTypedText = copiedNoteLayer as? NoteTypedText {
                             self.displayNoteTypedText(typedText: noteTypedText)
                         }
@@ -1441,7 +1448,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                 }
             }
             for text in texts {
-                note.1.getCurrentPage().layers.append(text)
+                note.1.getCurrentPage().add(layer: text)
                 self.displayNoteTypedText(typedText: text)
             }
             NeoLibrary.save(note: note.1, url: note.0)
@@ -1454,19 +1461,15 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         self.startSaveTimer()
         if let noteTypedTextView = draggableViewBeingEdited as? NoteTypedTextView {
             if self.draggableViews[noteTypedTextView] != nil {
-                noteTypedTextView.label.attributedText = self.getAttributedTextForTypedText(typedText: typedText)
-                noteTypedTextView.label.adjustFontSize()
+                noteTypedTextView.setText(typedText: typedText)
             }
         }
     }
     
     private func addNoteImage(image: UIImage) {
-        if let noteImage = NoteImage(image: image) {
-            noteImage.size = CGSize(width: 0.25 * image.size.width, height: 0.25 * image.size.height)
-            noteImage.location = CGPoint(x: 50, y: 50)
-            note.1.getCurrentPage().layers.append(noteImage)
-            self.displayNoteImage(image: noteImage)
-        }
+        let noteImage = NoteImage(image: image)
+        note.1.getCurrentPage().add(layer: noteImage)
+        self.displayNoteImage(image: noteImage)
     }
     
     private func updatePaginationButtons() {
@@ -1711,8 +1714,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                         alert.addAction(UIAlertAction(title: NSLocalizedString(lang.lowercased().capitalizingFirstLetter(), comment: ""), style: .default, handler: { _ in
                             typedText.codeLanguage = lang
                             if let noteTypedTextView = source as? NoteTypedTextView {
-                                noteTypedTextView.label.attributedText = self.getAttributedTextForTypedText(typedText: typedText)
-                                noteTypedTextView.label.adjustFontSize()
+                                noteTypedTextView.setText(typedText: typedText)
                             }
                             self.highlightedDraggableView = nil
                             self.note.1.getCurrentPage().updateLayer(layer: typedText)

@@ -8,7 +8,7 @@
 
 import UIKit
 class NoteTypedText: NoteLayer {
-    static let supportedLanguages = ["C", "Java", "Python", "Swift"]
+    static let supportedLanguages = ["Plain", "C", "Java", "Python", "Swift"]
     var text: String
     var codeLanguage: String
     
@@ -17,7 +17,7 @@ class NoteTypedText: NoteLayer {
         case codeLanguage
     }
     
-    init?(text: String, codeLanguage: String) {
+    init(text: String, codeLanguage: String) {
         self.text = text
         self.codeLanguage = codeLanguage
         let location = CGPoint(x: 150, y: 150)

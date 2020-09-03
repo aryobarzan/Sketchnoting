@@ -74,7 +74,7 @@ class ImportHelper {
     }
     
     private static func createNoteTypedText(text: String, codeLanguage: String?, fileExtension: String?) -> NoteTypedText {
-        let noteTypedText = NoteTypedText(text: text, codeLanguage: "Java")!
+        let noteTypedText = NoteTypedText(text: text, codeLanguage: "Java")
         if let codeLanguage = codeLanguage {
             noteTypedText.codeLanguage = codeLanguage
         }
