@@ -750,15 +750,18 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let item = self.items[indexPath.item]
         if self.isSelectionModeActive {
+            var selection = false
             if self.selectedFiles[item.0] != nil {
                 self.selectedFiles[item.0] = nil
             }
             else {
                 self.selectedFiles[item.0] = item.1
+                selection = true
             }
-            collectionView.performBatchUpdates({
-                collectionView.reloadItems(at: [indexPath])
-            })
+            // Update UI
+            if let cell = collectionView.cellForItem(at: indexPath) {
+                self.updateFileCellSelection(cell: cell, selection: selection)
+            }
         }
         else {
             if let note = item.1 as? Note {
@@ -766,6 +769,19 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             }
             else {
                 self.open(url: item.0, folder: item.1)
+            }
+        }
+    }
+    
+    private func updateFileCellSelection(cell: UICollectionViewCell, selection: Bool) {
+        switch noteCollectionViewState {
+        case .Grid:
+            if let cell = cell as? NoteCollectionViewCell {
+                cell.toggleSelected(isFileSelected: selection)
+            }
+        case .List:
+            if let cell = cell as? NoteCollectionViewDetailCell {
+                cell.toggleSelected(isFileSelected: selection)
             }
         }
     }
@@ -924,7 +940,16 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     
     
     func collectionView(_ collectionView: UICollectionView, dropSessionDidUpdate session: UIDropSession, withDestinationIndexPath destinationIndexPath: IndexPath?) -> UICollectionViewDropProposal {
-        return UICollectionViewDropProposal(operation: .move, intent: .insertIntoDestinationIndexPath)
+        if let destinationIndexPath = destinationIndexPath {
+            let file = self.items[destinationIndexPath.row]
+            if file.1 is Note {
+                return UICollectionViewDropProposal(operation: .forbidden, intent: .insertIntoDestinationIndexPath)
+            }
+            else {
+                return UICollectionViewDropProposal(operation: .move, intent: .insertIntoDestinationIndexPath)
+            }
+        }
+        return UICollectionViewDropProposal(operation: .forbidden, intent: .insertIntoDestinationIndexPath)
     }
     
     // Selection
@@ -940,8 +965,22 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         }
         self.isSelectionModeActive = !self.isSelectionModeActive
         selectionControlsView.isHidden = !self.isSelectionModeActive
-        self.updateDisplayedNotes(false)
+        for cell in noteCollectionView.visibleCells {
+            switch noteCollectionViewState {
+            case .Grid:
+                if let gridCell = cell as? NoteCollectionViewCell {
+                    gridCell.toggleSelectionModeIndicator(status: self.isSelectionModeActive)
+                }
+                break
+            case .List:
+                if let listCell = cell as? NoteCollectionViewDetailCell {
+                    listCell.toggleSelectionModeIndicator(status: self.isSelectionModeActive)
+                }
+                break
+            }
+        }
     }
+    
     @IBAction func selectAllButtonTapped(_ sender: UIButton) {
         for item in self.items {
             self.selectedFiles[item.0] = item.1

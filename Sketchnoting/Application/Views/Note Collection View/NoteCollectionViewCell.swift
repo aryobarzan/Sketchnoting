@@ -49,12 +49,7 @@ class NoteCollectionViewCell: UICollectionViewCell {
             self.imageView.backgroundColor = .clear
             self.imageView.layer.borderColor = nil
         }
-        if isInSelectionMode {
-            self.selectedImage.isHidden = false
-        }
-        else {
-            self.selectedImage.isHidden = true
-        }
+        self.toggleSelectionModeIndicator(status: isInSelectionMode)
         self.toggleSelected(isFileSelected: isFileSelected)
             
     }
@@ -66,5 +61,9 @@ class NoteCollectionViewCell: UICollectionViewCell {
         else {
             self.selectedImage.image = UIImage(systemName: "checkmark.circle")
         }
+    }
+    
+    func toggleSelectionModeIndicator(status: Bool) {
+        self.selectedImage.isHidden = !status
     }
 }

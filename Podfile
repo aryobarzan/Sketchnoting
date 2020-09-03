@@ -10,8 +10,6 @@ target 'Sketchnoting' do
   pod 'SVGKit'
   pod 'Repeat'
   pod 'Highlightr'
-  pod 'DropDown'
-  pod 'Hover'
   pod 'GoogleMLKit/TextRecognition'
   pod "ViewAnimator"
 end
