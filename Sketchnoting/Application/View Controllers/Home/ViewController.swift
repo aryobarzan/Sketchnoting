@@ -181,10 +181,12 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         case "NoteSharing":
             self.navigationController?.setNavigationBarHidden(false, animated: false)
             break
-        case "ShareNote":
+        case "Share":
             if let destination = segue.destination as? UINavigationController {
-                if let destinationViewController = destination.topViewController as? ShareNoteViewController {
-                    destinationViewController.note = shareNoteObject
+                if let destinationViewController = destination.topViewController as? ShareViewController {
+                    if let shareNoteObject = shareNoteObject {
+                        destinationViewController.files = [shareNoteObject]
+                    }
                 }
             }
             break
@@ -878,7 +880,8 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
        }
 
     private func shareNote(url: URL, note: Note, sender: UIView) {
-        self.performSegue(withIdentifier: "ShareNote", sender: sender)
+        //self.performSegue(withIdentifier: "ShareNote", sender: sender)
+        self.performSegue(withIdentifier: "Share", sender: sender)
     }
     
     func importNote(url: URL) {

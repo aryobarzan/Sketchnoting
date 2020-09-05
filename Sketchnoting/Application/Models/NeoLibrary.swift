@@ -41,6 +41,23 @@ class NeoLibrary {
         return homeURL
     }
     
+    public static func getTemporaryExportURL() -> URL {
+        let documentsPath = self.getDocumentsURL()
+        let exportTemporaryURL = documentsPath.appendingPathComponent("ExportTemporary")
+        do
+        {
+            if !FileManager.default.fileExists(atPath: exportTemporaryURL.path) {
+                try FileManager.default.createDirectory(atPath: exportTemporaryURL.path, withIntermediateDirectories: true, attributes: nil)
+            }
+            return exportTemporaryURL
+        }
+        catch let error as NSError
+        {
+            log.error("Unable to create directory \(error.debugDescription)")
+        }
+        return exportTemporaryURL
+    }
+    
     public static func isHomeDirectory(url: URL) -> Bool {
         var temp0 = url.absoluteString
         if temp0.starts(with: "file:///private") {
@@ -367,6 +384,31 @@ class NeoLibrary {
             completion(destinationURL)
         }
     }
+    
+    public static func clearTemporaryExportFolder() {
+        let fileManager = FileManager()
+        do {
+            let filePaths = try fileManager.contentsOfDirectory(atPath: getTemporaryExportURL().path)
+            for filePath in filePaths {
+                try fileManager.removeItem(atPath: getTemporaryExportURL().path + filePath)
+            }
+        } catch {
+            log.error("Could not clear temporary export folder: \(error)")
+        }
+    }
+    
+    public static func createZIPForExportOf(folder: URL) -> URL {
+        let fileManager = FileManager()
+        let sourceURL = URL(fileURLWithPath: folder.path)
+        let destinationURL = URL(fileURLWithPath: getTemporaryExportURL().path).appendingPathComponent(folder.lastPathComponent + ".zip")
+        do {
+            try fileManager.zipItem(at: sourceURL, to: destinationURL, shouldKeepParent: false, compressionMethod: .deflate)
+        } catch {
+            log.error("Failed to create zip of folder: \(error)")
+        }
+        return destinationURL
+    }
+    // ----
     
     enum ImportZIPResult {
         case Success
