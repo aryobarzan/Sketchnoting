@@ -390,7 +390,7 @@ class NeoLibrary {
         do {
             let filePaths = try fileManager.contentsOfDirectory(atPath: getTemporaryExportURL().path)
             for filePath in filePaths {
-                try fileManager.removeItem(atPath: getTemporaryExportURL().path + filePath)
+                try fileManager.removeItem(atPath: getTemporaryExportURL().appendingPathComponent(filePath).path)
             }
         } catch {
             log.error("Could not clear temporary export folder: \(error)")

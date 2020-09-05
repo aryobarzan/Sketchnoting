@@ -505,7 +505,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             var canvasImage = canvasView.drawing.image(from: UIScreen.main.bounds, scale: 1.0)
             canvasImage = canvasImage.blackAndWhite() ?? canvasImage.toGrayscale
             DispatchQueue.main.async {
-                var merged = whiteBackground.mergeWith(withImage: canvasImage)
+                var merged = whiteBackground.merge(with: canvasImage)
                 merged = merged.invertedImage() ?? merged
                 for region in self.drawingViews {
                     let image = UIImage(cgImage: merged.cgImage!.cropping(to: region.frame)!)
@@ -705,7 +705,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             var canvasImage = self.canvasView.drawing.image(from: UIScreen.main.bounds, scale: 1.0)
             canvasImage = canvasImage.blackAndWhite() ?? canvasImage.toGrayscale
              
-            var merged = whiteBackground.mergeWith(withImage: canvasImage)
+            var merged = whiteBackground.merge(with: canvasImage)
             merged = merged.invertedImage() ?? merged
             DispatchQueue.main.async {
                 
@@ -862,7 +862,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             }
             DispatchQueue.global(qos: .utility).async {
                 if let pdfImage = pdfImage {
-                    image = pdfImage.mergeWith2(withImage: canvasImage)
+                    image = pdfImage.mergeAlternatively(with: canvasImage)
                 }
                 DispatchQueue.main.async {
                     completion(image)
@@ -1212,7 +1212,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                         var canvasImage = canvasView.drawing.image(from: UIScreen.main.bounds, scale: 1.0)
                         canvasImage = canvasImage.blackAndWhite() ?? canvasImage.toGrayscale
                         DispatchQueue.main.async {
-                            var merged = whiteBackground.mergeWith(withImage: canvasImage)
+                            var merged = whiteBackground.merge(with: canvasImage)
                             merged = merged.invertedImage() ?? merged
                             let image = UIImage(cgImage: merged.cgImage!.cropping(to: currentDrawingRegion.frame)!)
                             if let recognition = self.drawingRecognition.recognize(image: image) {

@@ -118,7 +118,9 @@ extension UIImage {
         guard let outputImageCopy = context.createCGImage(outputImage, from: outputImage.extent) else { return nil }
         return UIImage(cgImage: outputImageCopy, scale: self.scale, orientation: .up)
     }
-    func mergeWith(withImage topImage: UIImage) -> UIImage {
+    
+    // For handwriting and drawing recognition
+    func merge(with topImage: UIImage) -> UIImage {
       let bottomImage = self
 
       UIGraphicsBeginImageContext(size)
@@ -133,20 +135,20 @@ extension UIImage {
       return mergedImage
     }
     
-    func mergeWith2(withImage secondImage: UIImage) -> UIImage {
+    func mergeAlternatively(with secondImage: UIImage) -> UIImage {
         var image = self
-        let newImageWidth  = max(self.size.width,  secondImage.size.width )
+        let newImageWidth = max(self.size.width, secondImage.size.width)
         let newImageHeight = max(self.size.height, secondImage.size.height)
-        let newImageSize = CGSize(width : newImageWidth, height: newImageHeight)
+        let newImageSize = CGSize(width: newImageWidth, height: newImageHeight)
         
         UIGraphicsBeginImageContextWithOptions(newImageSize, false, UIScreen.main.scale)
         
-        let firstImageDrawX  = round((newImageSize.width  - self.size.width  )/2)
-        let firstImageDrawY  = round((newImageSize.height - self.size.height )/2)
-        let secondImageDrawX = round((newImageSize.width  - secondImage.size.width )/2)
+        let firstImageDrawX  = round((newImageSize.width - self.size.width)/2)
+        let firstImageDrawY  = round((newImageSize.height - self.size.height)/2)
+        let secondImageDrawX = round((newImageSize.width - secondImage.size.width)/2)
         let secondImageDrawY = round((newImageSize.height - secondImage.size.height)/2)
         
-        self .draw(at: CGPoint(x: firstImageDrawX,  y: firstImageDrawY))
+        self.draw(at: CGPoint(x: firstImageDrawX, y: firstImageDrawY))
         secondImage.draw(at: CGPoint(x: secondImageDrawX, y: secondImageDrawY))
         
         if let img = UIGraphicsGetImageFromCurrentImageContext() {
@@ -157,7 +159,7 @@ extension UIImage {
         return image
     }
     
-    func mergeWith3(withImage secondImage: NoteImage) -> UIImage {
+    func add(image secondImage: NoteImage) -> UIImage {
         let image = self
         UIGraphicsBeginImageContext(size)
        

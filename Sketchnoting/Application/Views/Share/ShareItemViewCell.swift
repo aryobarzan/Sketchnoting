@@ -2,7 +2,7 @@
 //  ShareItemViewCell.swift
 //  Sketchnoting
 //
-//  Created by Kael on 04/09/2020.
+//  Created by Aryobarzan on 04/09/2020.
 //  Copyright © 2020 Aryobarzan. All rights reserved.
 //
 
@@ -31,16 +31,18 @@ class ShareItemViewCell: UICollectionViewCell {
     }
     
     func update(exportType: ExportAsType) {
-        switch exportType {
-        case .PDF:
-            self.exportingAsLabel.text = "Exporting as: PDF"
-            break
-        case .Image:
-            self.exportingAsLabel.text = "Exporting as: Image"
-            break
-        case .Sketchnote:
-            self.exportingAsLabel.text = "Exporting as: Sketchnote"
-            break
+        if self.typeLabel.text != "Folder" {
+            switch exportType {
+            case .PDF:
+                self.exportingAsLabel.text = "Exporting as: PDF"
+                break
+            case .Image:
+                self.exportingAsLabel.text = "Exporting as: Image"
+                break
+            case .Sketchnote:
+                self.exportingAsLabel.text = "Exporting as: Sketchnote"
+                break
+            }
         }
     }
 }

@@ -14,7 +14,7 @@ enum ExportAsType: String, CaseIterable {
     case Sketchnote = "Sketchnote"
 }
 
-struct ShareNoteSettings {
+struct ExportNoteSettings {
     var exportAsType: ExportAsType
     var selectedPages: [Int]
 }
@@ -25,8 +25,9 @@ class ExportViewController: UIViewController, UICollectionViewDelegate, UICollec
     @IBOutlet weak var shareButton: UIButton!
     @IBOutlet weak var quickActionsButton: UIButton!
     @IBOutlet weak var exportAsSingleFileSwitch: UISwitch!
+    @IBOutlet weak var shareButtonBlurView: UIVisualEffectView!
     var files = [(URL, File)]()
-    private var noteSettings = [URL : ShareNoteSettings]()
+    private var noteSettings = [URL : ExportNoteSettings]()
     
     let queue = OperationQueue()
 
@@ -35,9 +36,9 @@ class ExportViewController: UIViewController, UICollectionViewDelegate, UICollec
         
         shareButton.layer.cornerRadius = 5
         shareButton.isEnabled = true
+        shareButtonBlurView.layer.cornerRadius = 5
         
         // Not implemented
-        quickActionsButton.isEnabled = false
         exportAsSingleFileSwitch.isEnabled = false
 
         shareItemsCollectionView.delegate = self
@@ -45,7 +46,7 @@ class ExportViewController: UIViewController, UICollectionViewDelegate, UICollec
         
         for file in files {
             if let note = file.1 as? Note {
-                let settings = ShareNoteSettings(exportAsType: .PDF, selectedPages: Array(0..<note.pages.count))
+                let settings = ExportNoteSettings(exportAsType: .PDF, selectedPages: Array(0..<note.pages.count))
                 noteSettings[file.0] = settings
             }
         }
@@ -77,7 +78,7 @@ class ExportViewController: UIViewController, UICollectionViewDelegate, UICollec
         if let note = file.1 as? Note {
             var settings = noteSettings[file.0]
             if settings == nil {
-                settings = ShareNoteSettings(exportAsType: .PDF, selectedPages: Array(0..<note.pages.count))
+                settings = ExportNoteSettings(exportAsType: .PDF, selectedPages: Array(0..<note.pages.count))
             }
             for exportType in ExportAsType.allCases {
                 let exportAction = UIAlertAction(title: "Export as \(exportType.rawValue)", style: .default) { action in
@@ -102,6 +103,7 @@ class ExportViewController: UIViewController, UICollectionViewDelegate, UICollec
     }
     
     @IBAction func shareButtonTapped(_ sender: UIButton) {
+        shareButtonBlurView.isHidden = false
         NeoLibrary.clearTemporaryExportFolder()
         queue.cancelAllOperations()
         var activityItems = [Any]()
@@ -149,16 +151,40 @@ class ExportViewController: UIViewController, UICollectionViewDelegate, UICollec
                     }
                 }
             }
-            queue.waitUntilAllOperationsAreFinished()
-            let activityController = UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
-            self.present(activityController, animated: true, completion: nil)
-            if let popOver = activityController.popoverPresentationController {
-                popOver.sourceView = self.shareButton
+            queue.maxConcurrentOperationCount = 3
+            queue.addBarrierBlock {
+                DispatchQueue.main.async {
+                    let activityController = UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
+                    self.present(activityController, animated: true, completion: nil)
+                    if let popOver = activityController.popoverPresentationController {
+                        popOver.sourceView = self.shareButton
+                    }
+                    self.shareButtonBlurView.isHidden = true
+                }
             }
         }
     }
     
     @IBAction func quickActionsButtonTapped(_ sender: UIButton) {
+        let alert = UIAlertController(title: "Quick Actions", message: "Change the export format for all the selected notes.", preferredStyle: .actionSheet)
+        alert.popoverPresentationController?.sourceView = sender
+        
+        for exportType in ExportAsType.allCases {
+            let exportAllNotesAsAction = UIAlertAction(title: "Export Notes as \(exportType.rawValue)s", style: .default) { action in
+                for (key, _) in self.noteSettings {
+                    var settings = self.noteSettings[key]!
+                    settings.exportAsType = exportType
+                    self.noteSettings[key] = settings
+                }
+                for cell in self.shareItemsCollectionView.visibleCells {
+                    if let shareItemViewCell = cell as? ShareItemViewCell {
+                        shareItemViewCell.update(exportType: exportType)
+                    }
+                }
+            }
+            alert.addAction(exportAllNotesAsAction)
+        }
+        self.present(alert, animated: true)
     }
     
     @IBAction func doneTapped(_ sender: UIBarButtonItem) {

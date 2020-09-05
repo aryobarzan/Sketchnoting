@@ -787,18 +787,34 @@
                                                     <action selector="deselectAllButtonTapped:" destination="BYZ-38-t0r" eventType="touchUpInside" id="pun-18-cfA"/>
                                                 </connections>
                                             </button>
+                                            <button opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="249" contentHorizontalAlignment="leading" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Hwh-HZ-MqI">
+                                                <rect key="frame" x="536" y="12" width="65" height="18"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="height" constant="18" id="iNY-Gn-ZtC"/>
+                                                </constraints>
+                                                <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                                <state key="normal" title=" Export" image="square.and.arrow.up" catalog="system">
+                                                    <color key="titleColor" red="0.26875244110000002" green="0.49985405119999998" blue="0.82210710099999995" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="small"/>
+                                                </state>
+                                                <connections>
+                                                    <action selector="exportSelectedButtonTapped:" destination="BYZ-38-t0r" eventType="touchUpInside" id="AAb-8L-rpC"/>
+                                                </connections>
+                                            </button>
                                         </subviews>
                                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                                         <constraints>
                                             <constraint firstItem="wHb-fC-SNw" firstAttribute="centerY" secondItem="OkZ-qt-G8e" secondAttribute="centerY" id="3P2-LD-QoP"/>
                                             <constraint firstItem="Ysg-uh-uEX" firstAttribute="centerY" secondItem="OkZ-qt-G8e" secondAttribute="centerY" id="6PP-x6-Wiq"/>
                                             <constraint firstItem="Is9-l7-CB7" firstAttribute="centerY" secondItem="OkZ-qt-G8e" secondAttribute="centerY" id="AOG-HU-N5l"/>
+                                            <constraint firstItem="Hwh-HZ-MqI" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="Ysg-uh-uEX" secondAttribute="trailing" constant="8" symbolic="YES" id="CK4-w4-xlx"/>
                                             <constraint firstItem="Hdy-fw-B6W" firstAttribute="leading" secondItem="OkZ-qt-G8e" secondAttribute="leading" constant="8" id="ISC-mH-E8Q"/>
+                                            <constraint firstItem="Hwh-HZ-MqI" firstAttribute="centerY" secondItem="OkZ-qt-G8e" secondAttribute="centerY" id="OSk-ji-C7v"/>
+                                            <constraint firstItem="wHb-fC-SNw" firstAttribute="leading" secondItem="Hwh-HZ-MqI" secondAttribute="trailing" constant="8" id="ZZt-dZ-4s1"/>
                                             <constraint firstItem="Hdy-fw-B6W" firstAttribute="centerY" secondItem="OkZ-qt-G8e" secondAttribute="centerY" id="a3K-IL-saR"/>
                                             <constraint firstAttribute="trailing" secondItem="Is9-l7-CB7" secondAttribute="trailing" constant="8" id="ftH-gX-MCS"/>
                                             <constraint firstAttribute="height" constant="42" id="gwS-zk-pyi"/>
                                             <constraint firstItem="Is9-l7-CB7" firstAttribute="leading" secondItem="wHb-fC-SNw" secondAttribute="trailing" constant="8" id="iAE-Ib-pKQ"/>
-                                            <constraint firstItem="wHb-fC-SNw" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="Ysg-uh-uEX" secondAttribute="trailing" constant="398" id="od1-kN-L8T"/>
                                             <constraint firstItem="Ysg-uh-uEX" firstAttribute="leading" secondItem="Hdy-fw-B6W" secondAttribute="trailing" constant="8" id="qXT-GK-Q6N"/>
                                         </constraints>
                                     </view>
@@ -884,7 +900,7 @@
                         </segue>
                         <segue destination="Od9-Xc-VPJ" kind="presentation" identifier="showRelatedHomePage" id="ig0-q1-Lq9"/>
                         <segue destination="h1g-fm-D3K" kind="presentation" identifier="MoveFileHome" modalPresentationStyle="formSheet" id="fmI-KU-Ur1"/>
-                        <segue destination="hE0-U7-ctX" kind="presentation" identifier="Share" id="Oxs-CX-vPt"/>
+                        <segue destination="hE0-U7-ctX" kind="presentation" identifier="Export" id="Oxs-CX-vPt"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
@@ -3054,10 +3070,10 @@
             </objects>
             <point key="canvasLocation" x="1079.6875" y="2358.984375"/>
         </scene>
-        <!--Share-->
+        <!--Export-->
         <scene sceneID="78s-kW-y0A">
             <objects>
-                <viewController modalPresentationStyle="formSheet" id="Yfm-qW-EH4" customClass="ShareViewController" customModule="Sketchnoting" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController modalPresentationStyle="formSheet" id="Yfm-qW-EH4" customClass="ExportViewController" customModule="Sketchnoting" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="iXc-fX-057">
                         <rect key="frame" x="0.0" y="0.0" width="540" height="620"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -3135,28 +3151,18 @@
                                     </collectionViewCell>
                                 </cells>
                             </collectionView>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="RPG-Ja-7zg">
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="RPG-Ja-7zg">
                                 <rect key="frame" x="141" y="555" width="258" height="45"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" systemColor="systemBlueColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="258" id="KCm-LM-NAB"/>
+                                    <constraint firstAttribute="height" constant="45" id="Lmv-ja-qTd"/>
+                                </constraints>
                                 <state key="normal" title="Share">
                                     <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 </state>
                                 <connections>
                                     <action selector="shareButtonTapped:" destination="Yfm-qW-EH4" eventType="touchUpInside" id="8Td-YY-XCH"/>
-                                </connections>
-                            </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ALu-w3-Uqi">
-                                <rect key="frame" x="355" y="173" width="165" height="22"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="22" id="aVq-A6-lrs"/>
-                                    <constraint firstAttribute="width" constant="165" id="zf1-oO-Xyj"/>
-                                </constraints>
-                                <state key="normal" title=" Quick Actions" image="chevron.down.circle" catalog="system">
-                                    <color key="titleColor" systemColor="systemBlueColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                </state>
-                                <connections>
-                                    <action selector="quickActionsButtonTapped:" destination="Yfm-qW-EH4" eventType="touchUpInside" id="ppa-4j-f6w"/>
                                 </connections>
                             </button>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Qtw-zU-3Ea">
@@ -3182,21 +3188,56 @@
                                     <constraint firstItem="59u-K2-ylH" firstAttribute="centerY" secondItem="Qtw-zU-3Ea" secondAttribute="centerY" id="vih-Pm-stH"/>
                                 </constraints>
                             </view>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ALu-w3-Uqi">
+                                <rect key="frame" x="355" y="173" width="165" height="22"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="22" id="aVq-A6-lrs"/>
+                                    <constraint firstAttribute="width" constant="165" id="zf1-oO-Xyj"/>
+                                </constraints>
+                                <state key="normal" title=" Quick Actions" image="chevron.down.circle" catalog="system">
+                                    <color key="titleColor" systemColor="systemBlueColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                </state>
+                                <connections>
+                                    <action selector="quickActionsButtonTapped:" destination="Yfm-qW-EH4" eventType="touchUpInside" id="ppa-4j-f6w"/>
+                                </connections>
+                            </button>
+                            <visualEffectView hidden="YES" opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="vdi-TQ-Z6x">
+                                <rect key="frame" x="141" y="555" width="258" height="45"/>
+                                <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="ic6-Yc-s34">
+                                    <rect key="frame" x="0.0" y="0.0" width="258" height="45"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <subviews>
+                                        <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" animating="YES" style="medium" translatesAutoresizingMaskIntoConstraints="NO" id="wS9-39-ppU">
+                                            <rect key="frame" x="119" y="12" width="20" height="20"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        </activityIndicatorView>
+                                    </subviews>
+                                </view>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="45" id="BYm-zV-K1A"/>
+                                    <constraint firstAttribute="width" constant="258" id="bql-LX-eC4"/>
+                                </constraints>
+                                <blurEffect style="regular"/>
+                            </visualEffectView>
                         </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                         <constraints>
                             <constraint firstItem="xjC-v5-Oil" firstAttribute="leading" secondItem="gr3-tU-8N4" secondAttribute="leading" constant="20" id="5Ec-mu-i56"/>
                             <constraint firstItem="ALu-w3-Uqi" firstAttribute="top" secondItem="xjC-v5-Oil" secondAttribute="bottom" constant="8" id="7Kc-cP-Ee3"/>
+                            <constraint firstItem="vdi-TQ-Z6x" firstAttribute="centerX" secondItem="iXc-fX-057" secondAttribute="centerX" id="7j1-Ax-a0P"/>
                             <constraint firstItem="gr3-tU-8N4" firstAttribute="trailing" secondItem="Qtw-zU-3Ea" secondAttribute="trailing" constant="20" id="Eam-RW-ID0"/>
                             <constraint firstItem="Qtw-zU-3Ea" firstAttribute="leading" secondItem="gr3-tU-8N4" secondAttribute="leading" constant="20" id="IzF-r3-C2z"/>
+                            <constraint firstItem="gr3-tU-8N4" firstAttribute="bottom" secondItem="vdi-TQ-Z6x" secondAttribute="bottom" constant="20" id="L9o-Dl-ZcV"/>
+                            <constraint firstItem="RPG-Ja-7zg" firstAttribute="centerX" secondItem="iXc-fX-057" secondAttribute="centerX" id="SBf-gs-hlS"/>
                             <constraint firstItem="gr3-tU-8N4" firstAttribute="trailing" secondItem="ALu-w3-Uqi" secondAttribute="trailing" constant="20" id="TVj-Ye-o5a"/>
                             <constraint firstItem="xjC-v5-Oil" firstAttribute="top" secondItem="gr3-tU-8N4" secondAttribute="top" constant="9" id="WYV-1Z-l5g"/>
                             <constraint firstItem="Qtw-zU-3Ea" firstAttribute="top" secondItem="ALu-w3-Uqi" secondAttribute="bottom" constant="8" id="X4Z-U5-naf"/>
                             <constraint firstItem="gr3-tU-8N4" firstAttribute="trailing" secondItem="xjC-v5-Oil" secondAttribute="trailing" constant="20" id="fyx-Ec-jFb"/>
+                            <constraint firstItem="gr3-tU-8N4" firstAttribute="bottom" secondItem="RPG-Ja-7zg" secondAttribute="bottom" constant="20" id="jIf-uA-Yru"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="gr3-tU-8N4"/>
                     </view>
-                    <navigationItem key="navigationItem" title="Share" id="XKY-4k-bC3">
+                    <navigationItem key="navigationItem" title="Export" id="XKY-4k-bC3">
                         <barButtonItem key="rightBarButtonItem" systemItem="done" id="iKs-UM-Stp">
                             <connections>
                                 <action selector="doneTapped:" destination="Yfm-qW-EH4" id="RvC-Ln-dne"/>
@@ -3207,6 +3248,7 @@
                         <outlet property="exportAsSingleFileSwitch" destination="vjd-cO-G4O" id="15S-KR-dFP"/>
                         <outlet property="quickActionsButton" destination="ALu-w3-Uqi" id="AP9-U3-dNC"/>
                         <outlet property="shareButton" destination="RPG-Ja-7zg" id="aAQ-cJ-Zf7"/>
+                        <outlet property="shareButtonBlurView" destination="vdi-TQ-Z6x" id="Wxv-SZ-dR7"/>
                         <outlet property="shareItemsCollectionView" destination="xjC-v5-Oil" id="yGE-EA-ajV"/>
                     </connections>
                 </viewController>
@@ -3465,6 +3507,7 @@
         <image name="scribble" catalog="system" width="128" height="109"/>
         <image name="slider.horizontal.3" catalog="system" width="128" height="100"/>
         <image name="square.and.arrow.down" catalog="system" width="121" height="128"/>
+        <image name="square.and.arrow.up" catalog="system" width="115" height="128"/>
         <image name="square.and.arrow.up.on.square.fill" catalog="system" width="117" height="128"/>
         <image name="square.stack.3d.down.right.fill" catalog="system" width="124" height="128"/>
         <image name="square.stack.fill" catalog="system" width="113" height="128"/>

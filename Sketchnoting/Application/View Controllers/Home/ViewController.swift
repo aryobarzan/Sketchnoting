@@ -60,6 +60,9 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     //
     var noteToEdit: (URL, Note)?
     
+    //
+    var filesToExport = [(URL, File)]()
+    
     @IBOutlet weak var selectionModeButton: UIButton!
     @IBOutlet weak var selectAllButton: UIButton!
     @IBOutlet weak var deselectAllButton: UIButton!
@@ -181,12 +184,10 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         case "NoteSharing":
             self.navigationController?.setNavigationBarHidden(false, animated: false)
             break
-        case "Share":
+        case "Export":
             if let destination = segue.destination as? UINavigationController {
-                if let destinationViewController = destination.topViewController as? ShareViewController {
-                    if let shareNoteObject = shareNoteObject {
-                        destinationViewController.files = [shareNoteObject]
-                    }
+                if let destinationViewController = destination.topViewController as? ExportViewController {
+                    destinationViewController.files = filesToExport
                 }
             }
             break
@@ -593,9 +594,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         })
     }
     
-    var shareNoteObject: (URL, Note)?
     private func makeFileContextMenu(url: URL, file: File, point: CGPoint, cellIndexPath: IndexPath) -> UIMenu {
-        // To rework
         var menuElements = [UIMenuElement]()
         let renameAction = UIAction(title: "Rename...", image: UIImage(systemName: "text.cursor")) { action in
             self.renameFile(url: url, file: file, indexPath: cellIndexPath)
@@ -605,6 +604,11 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             self.moveFile(url: url, file: file)
         }
         menuElements.append(moveAction)
+        let exportAction = UIAction(title: "Export...", image: UIImage(systemName: "square.and.arrow.up")) { action in
+            self.filesToExport = [(url, file)]
+            self.displayExportWindow()
+        }
+        menuElements.append(exportAction)
         if let note = file as? Note {
             let tagsAction = UIAction(title: "Manage Tags...", image: UIImage(systemName: "tag.fill")) { action in
                 self.editNoteTags(url: url, note: note, cell: self.noteCollectionView.cellForItem(at: cellIndexPath))
@@ -631,11 +635,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
                 self.view.makeToast("Copied text to Clipboard.")
             }
             menuElements.append(copyTextAction)
-            let shareAction = UIAction(title: "Share...", image: UIImage(systemName: "square.and.arrow.up")) { action in
-                self.shareNoteObject = (url, note)
-                self.shareNote(url: url, note: note, sender: UIView(frame: CGRect(x: point.x, y: point.y, width: point.x, height: point.y)))
-            }
-            menuElements.append(shareAction)
+            
             let sendAction = UIAction(title: "Send...", image: UIImage(systemName: "paperplane")) { action in
                 self.sendNote(url: url, note: note)
             }
@@ -879,9 +879,8 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         self.performSegue(withIdentifier: "EditNoteTags", sender: self)
        }
 
-    private func shareNote(url: URL, note: Note, sender: UIView) {
-        //self.performSegue(withIdentifier: "ShareNote", sender: sender)
-        self.performSegue(withIdentifier: "Share", sender: sender)
+    private func displayExportWindow() {
+        self.performSegue(withIdentifier: "Export", sender: self)
     }
     
     func importNote(url: URL) {
@@ -988,11 +987,17 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         for item in self.items {
             self.selectedFiles[item.0] = item.1
         }
-        self.updateDisplayedNotes(false)
+        for cell in noteCollectionView.visibleCells {
+            self.updateFileCellSelection(cell: cell, selection: true)
+        }
+        //self.updateDisplayedNotes(false)
     }
     @IBAction func deselectAllButtonTapped(_ sender: UIButton) {
         self.selectedFiles = [URL : File]()
-        self.updateDisplayedNotes(false)
+        for cell in noteCollectionView.visibleCells {
+            self.updateFileCellSelection(cell: cell, selection: false)
+        }
+        //self.updateDisplayedNotes(false)
     }
     @IBAction func moveSelectedButtonTapped(_ sender: UIButton) {
         if !self.selectedFiles.isEmpty {
@@ -1013,6 +1018,15 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
                   log.info("Not deleting selected files.")
             }))
             self.present(alert, animated: true, completion: nil)
+        }
+    }
+    @IBAction func exportSelectedButtonTapped(_ sender: UIButton) {
+        if !self.selectedFiles.isEmpty {
+            self.filesToExport = [(URL, File)]()
+            for (url, file) in selectedFiles {
+                self.filesToExport.append((url, file))
+            }
+            self.displayExportWindow()
         }
     }
     

@@ -68,7 +68,7 @@ class ShareNoteViewController: UIViewController {
             }
         }
         else if asType == 1 {
-            note.1.createPDF2() { pdf in
+            note.1.createPDF() { pdf in
                 if let pdf = pdf {
                     let activityController = UIActivityViewController(activityItems: [pdf], applicationActivities: nil)
                     self.present(activityController, animated: true, completion: nil)

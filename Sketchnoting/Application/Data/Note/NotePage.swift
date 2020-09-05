@@ -209,32 +209,6 @@ class NotePage: Codable {
         self.noteText = nil
     }
     
-    func createPDF() -> Data? {
-        let pdfWidth = UIScreen.main.bounds.width
-        let pdfHeight = UIScreen.main.bounds.height
-                
-        let bounds = CGRect(x: 0, y: 0, width: pdfWidth, height: pdfHeight)
-        let mutableData = NSMutableData()
-        UIGraphicsBeginPDFContextToData(mutableData, bounds, nil)
-        UIGraphicsBeginPDFPage()
-                        
-        var yOrigin: CGFloat = 0
-        while yOrigin < bounds.maxY {
-            let imgBounds = CGRect(x: 0, y: yOrigin, width: pdfWidth, height: pdfHeight)
-            var image = canvasDrawing.image(from: imgBounds, scale: 2)
-            if let pdfDocument = getPDFDocument() {
-                if let page = pdfDocument.page(at: 0) {
-                    let pdfImage = page.thumbnail(of: bounds.size, for: .mediaBox)
-                    image = pdfImage.mergeWith(withImage: image)
-                }
-            }
-            image.draw(in: imgBounds)
-            yOrigin += pdfHeight
-        }
-        UIGraphicsEndPDFContext()
-        return mutableData as Data
-    }
-    
     public func getAsImage(completion: @escaping (UIImage) -> Void) {
         UITraitCollection(userInterfaceStyle: .light).performAsCurrent {
             var image = canvasDrawing.image(from: UIScreen.main.bounds, scale: 1.0)
@@ -247,11 +221,11 @@ class NotePage: Codable {
             }
             DispatchQueue.global(qos: .utility).async {
                 if let pdfImage = pdfImage {
-                    image = pdfImage.mergeWith2(withImage: canvasImage)
+                    image = pdfImage.mergeAlternatively(with: canvasImage)
                 }
                 for layer in self.getLayers(type: .Image) {
                     if let noteImage = layer as? NoteImage {
-                        image = image.mergeWith3(withImage: noteImage)
+                        image = image.add(image: noteImage)
                     }
                 }
                 for layer in self.getLayers(type: .TypedText) {
