@@ -254,7 +254,7 @@ class NeoLibrary {
     }
     // File Creation
     
-    public static func createFolder(name: String, root: URL = getHomeDirectoryURL()) -> (URL, File)? {
+    public static func createFolder(name: String, root: URL = currentLocation) -> (URL, File)? {
         do
         {
             var n = name
@@ -388,21 +388,79 @@ class NeoLibrary {
     public static func clearTemporaryExportFolder() {
         let fileManager = FileManager()
         do {
-            let filePaths = try fileManager.contentsOfDirectory(atPath: getTemporaryExportURL().path)
-            for filePath in filePaths {
-                try fileManager.removeItem(atPath: getTemporaryExportURL().appendingPathComponent(filePath).path)
+            let enumerator = FileManager.default.enumerator(at: getTemporaryExportURL(),
+                                    includingPropertiesForKeys: nil,
+                                                       options: [.skipsHiddenFiles], errorHandler: { (url, error) -> Bool in
+                                                        log.error(error)
+                                                                return true
+            })!
+            for case let fileURL as URL in enumerator {
+                try fileManager.removeItem(at: fileURL)
             }
         } catch {
             log.error("Could not clear temporary export folder: \(error)")
         }
     }
     
-    public static func createZIPForExportOf(folder: URL) -> URL {
-        let fileManager = FileManager()
+    public static func createZIPForExportOf(folder: URL, exportType: ExportAsType = .Sketchnote) -> URL {
+        let fileManager = FileManager.default
         let sourceURL = URL(fileURLWithPath: folder.path)
         let destinationURL = URL(fileURLWithPath: getTemporaryExportURL().path).appendingPathComponent(folder.lastPathComponent + ".zip")
         do {
-            try fileManager.zipItem(at: sourceURL, to: destinationURL, shouldKeepParent: false, compressionMethod: .deflate)
+            switch exportType {
+            case .Sketchnote:
+                try fileManager.zipItem(at: sourceURL, to: destinationURL, shouldKeepParent: false, compressionMethod: .deflate)
+                break
+            case .PDF, .Image:
+                let tempDestinationURL = getTemporaryExportURL().appendingPathComponent(folder.lastPathComponent)
+                try fileManager.copyItem(at: sourceURL, to: tempDestinationURL)
+                let resourceKeys : [URLResourceKey] = [.isDirectoryKey]
+                let enumerator = FileManager.default.enumerator(at: tempDestinationURL,
+                                        includingPropertiesForKeys: resourceKeys,
+                                                           options: [.skipsHiddenFiles], errorHandler: { (url, error) -> Bool in
+                                                            log.error(error)
+                                                                    return true
+                })!
+                let queue = OperationQueue()
+                for case let fileURL as URL in enumerator {
+                    let resourceValues = try fileURL.resourceValues(forKeys: Set(resourceKeys))
+                    if !resourceValues.isDirectory! {
+                        if let data = try? Data(contentsOf: fileURL) {
+                            if let note = decodeNoteFromData(data: data) {
+                                queue.addOperation {
+                                    switch exportType {
+                                    case .PDF:
+                                        note.createPDF() { pdf in
+                                            if let pdf = pdf {
+                                                do {
+                                                    try pdf.write(to: fileURL.deletingPathExtension().appendingPathExtension("pdf"))
+                                                    try fileManager.removeItem(at: fileURL)
+                                                }
+                                                catch {
+                                                    log.error(error)
+                                                }
+                                            }
+                                        }
+                                        break
+                                    default:
+                                        log.error("Non-implemented export type for folder.")
+                                        break
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                queue.addBarrierBlock {
+                    do {
+                        try fileManager.zipItem(at: tempDestinationURL, to: destinationURL, shouldKeepParent: false, compressionMethod: .deflate)
+                        try fileManager.removeItem(at: tempDestinationURL)
+                    } catch {
+                        log.error(error)
+                    }
+                }
+                break
+            }
         } catch {
             log.error("Failed to create zip of folder: \(error)")
         }

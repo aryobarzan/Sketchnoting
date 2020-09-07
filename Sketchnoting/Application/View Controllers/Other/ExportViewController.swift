@@ -14,9 +14,8 @@ enum ExportAsType: String, CaseIterable {
     case Sketchnote = "Sketchnote"
 }
 
-struct ExportNoteSettings {
+struct ExportFileSettings {
     var exportAsType: ExportAsType
-    var selectedPages: [Int]
 }
 
 class ExportViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
@@ -27,7 +26,7 @@ class ExportViewController: UIViewController, UICollectionViewDelegate, UICollec
     @IBOutlet weak var exportAsSingleFileSwitch: UISwitch!
     @IBOutlet weak var shareButtonBlurView: UIVisualEffectView!
     var files = [(URL, File)]()
-    private var noteSettings = [URL : ExportNoteSettings]()
+    private var exportSettings = [URL : ExportFileSettings]()
     
     let queue = OperationQueue()
 
@@ -45,9 +44,11 @@ class ExportViewController: UIViewController, UICollectionViewDelegate, UICollec
         shareItemsCollectionView.dataSource = self
         
         for file in files {
-            if let note = file.1 as? Note {
-                let settings = ExportNoteSettings(exportAsType: .PDF, selectedPages: Array(0..<note.pages.count))
-                noteSettings[file.0] = settings
+            if file.1 is Note {
+                exportSettings[file.0] = ExportFileSettings(exportAsType: .PDF)
+            }
+            else {
+                exportSettings[file.0] = ExportFileSettings(exportAsType: .Sketchnote)
             }
         }
     }
@@ -75,19 +76,22 @@ class ExportViewController: UIViewController, UICollectionViewDelegate, UICollec
         let alert = UIAlertController(title: "File", message: "Remove this file from being exported, or change the format in which it should be exported.", preferredStyle: .actionSheet)
         alert.popoverPresentationController?.sourceView = cell
         
-        if let note = file.1 as? Note {
-            var settings = noteSettings[file.0]
-            if settings == nil {
-                settings = ExportNoteSettings(exportAsType: .PDF, selectedPages: Array(0..<note.pages.count))
-            }
-            for exportType in ExportAsType.allCases {
-                let exportAction = UIAlertAction(title: "Export as \(exportType.rawValue)", style: .default) { action in
-                    settings!.exportAsType = exportType
-                    self.noteSettings[file.0] = settings!
-                    cell.update(exportType: exportType)
+        var settings = exportSettings[file.0]
+        if settings == nil {
+            settings = ExportFileSettings(exportAsType: .PDF)
+        }
+        for exportType in ExportAsType.allCases {
+            if exportType == .Image {
+                if !(file.1 is Note) {
+                    continue
                 }
-                alert.addAction(exportAction)
             }
+            let exportAction = UIAlertAction(title: "Export as \(exportType.rawValue)", style: .default) { action in
+                settings!.exportAsType = exportType
+                self.exportSettings[file.0] = settings!
+                cell.update(exportType: exportType)
+            }
+            alert.addAction(exportAction)
         }
         
         let removeAction = UIAlertAction(title: "Remove", style: .destructive) { action in
@@ -114,7 +118,7 @@ class ExportViewController: UIViewController, UICollectionViewDelegate, UICollec
         else {
             for file in files {
                 if let note = file.1 as? Note {
-                    switch noteSettings[file.0]!.exportAsType {
+                    switch exportSettings[file.0]!.exportAsType {
                     case .PDF:
                         queue.addOperation {
                             note.createPDF() { pdf in
@@ -143,9 +147,10 @@ class ExportViewController: UIViewController, UICollectionViewDelegate, UICollec
                     }
                 }
                 else { // Folder is exported
+                    let exportType = exportSettings[file.0]!.exportAsType
                     if FileManager.default.fileExists(atPath: file.0.path) {
                         queue.addOperation {
-                            let zippedURL = NeoLibrary.createZIPForExportOf(folder: file.0)
+                            let zippedURL = NeoLibrary.createZIPForExportOf(folder: file.0, exportType: exportType)
                             activityItems.append(zippedURL)
                         }
                     }
@@ -171,10 +176,10 @@ class ExportViewController: UIViewController, UICollectionViewDelegate, UICollec
         
         for exportType in ExportAsType.allCases {
             let exportAllNotesAsAction = UIAlertAction(title: "Export Notes as \(exportType.rawValue)s", style: .default) { action in
-                for (key, _) in self.noteSettings {
-                    var settings = self.noteSettings[key]!
+                for (key, _) in self.exportSettings {
+                    var settings = self.exportSettings[key]!
                     settings.exportAsType = exportType
-                    self.noteSettings[key] = settings
+                    self.exportSettings[key] = settings
                 }
                 for cell in self.shareItemsCollectionView.visibleCells {
                     if let shareItemViewCell = cell as? ShareItemViewCell {

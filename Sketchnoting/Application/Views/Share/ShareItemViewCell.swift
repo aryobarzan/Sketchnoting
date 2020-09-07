@@ -26,23 +26,21 @@ class ShareItemViewCell: UICollectionViewCell {
             self.typeLabel.text = "Folder"
             self.typeImageView.image = UIImage(systemName: "folder.circle")
             self.titleLabel.text = file.getName()
-            self.exportingAsLabel.text = "Exporting as: ZIP"
+            self.exportingAsLabel.text = "Exporting as: Sketchnote"
         }
     }
     
     func update(exportType: ExportAsType) {
-        if self.typeLabel.text != "Folder" {
-            switch exportType {
-            case .PDF:
-                self.exportingAsLabel.text = "Exporting as: PDF"
-                break
-            case .Image:
-                self.exportingAsLabel.text = "Exporting as: Image"
-                break
-            case .Sketchnote:
-                self.exportingAsLabel.text = "Exporting as: Sketchnote"
-                break
-            }
+        switch exportType {
+        case .PDF:
+            self.exportingAsLabel.text = "Exporting as: PDF"
+            break
+        case .Image:
+            self.exportingAsLabel.text = "Exporting as: Image"
+            break
+        case .Sketchnote:
+            self.exportingAsLabel.text = "Exporting as: Sketchnote"
+            break
         }
     }
 }
