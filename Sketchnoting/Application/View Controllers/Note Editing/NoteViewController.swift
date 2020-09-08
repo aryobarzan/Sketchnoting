@@ -206,10 +206,10 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                 }
             }
             break
-        case "ShareNote":
+        case "Export":
             if let destination = segue.destination as? UINavigationController {
-                if let destinationViewController = destination.topViewController as? ShareNoteViewController {
-                    destinationViewController.note = note
+                if let destinationViewController = destination.topViewController as? ExportViewController {
+                    destinationViewController.files = [note]
                 }
             }
             break
@@ -303,8 +303,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         // Clear any existing images and text boxes
         self.clearFloatingViews()
         // Setup images and text boxes for this page
-        //self.setupNoteImages()
-        //self.setupNoteTypedTexts()
         self.setupDraggableViews()
         
         // Clear any existing topic highlights on the canvas
@@ -784,8 +782,8 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             self.load(page: note.1.getCurrentPage())
             NeoLibrary.save(note: note.1, url: note.0)
             break
-        case .Share:
-            self.performSegue(withIdentifier: "ShareNote", sender: self)
+        case .Export:
+            self.performSegue(withIdentifier: "Export", sender: self)
             break
         case .ResetTextRecognition:
             note.1.clearDocuments()

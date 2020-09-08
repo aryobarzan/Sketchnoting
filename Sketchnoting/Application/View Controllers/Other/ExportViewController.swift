@@ -36,9 +36,6 @@ class ExportViewController: UIViewController, UICollectionViewDelegate, UICollec
         shareButton.layer.cornerRadius = 5
         shareButton.isEnabled = true
         shareButtonBlurView.layer.cornerRadius = 5
-        
-        // Not implemented
-        exportAsSingleFileSwitch.isEnabled = false
 
         shareItemsCollectionView.delegate = self
         shareItemsCollectionView.dataSource = self
@@ -62,7 +59,7 @@ class ExportViewController: UIViewController, UICollectionViewDelegate, UICollec
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-         let cell = shareItemsCollectionView.dequeueReusableCell(withReuseIdentifier: "ShareItemViewCell", for: indexPath as IndexPath) as! ShareItemViewCell
+         let cell = shareItemsCollectionView.dequeueReusableCell(withReuseIdentifier: "ExportItemViewCell", for: indexPath as IndexPath) as! ExportItemViewCell
         let file = files[indexPath.row]
         cell.layer.borderColor = UIColor.gray.cgColor
         cell.layer.borderWidth = 1
@@ -72,7 +69,7 @@ class ExportViewController: UIViewController, UICollectionViewDelegate, UICollec
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let file = files[indexPath.row]
-        let cell = shareItemsCollectionView.cellForItem(at: indexPath) as! ShareItemViewCell
+        let cell = shareItemsCollectionView.cellForItem(at: indexPath) as! ExportItemViewCell
         let alert = UIAlertController(title: "File", message: "Remove this file from being exported, or change the format in which it should be exported.", preferredStyle: .actionSheet)
         alert.popoverPresentationController?.sourceView = cell
         
@@ -112,78 +109,64 @@ class ExportViewController: UIViewController, UICollectionViewDelegate, UICollec
         queue.cancelAllOperations()
         var activityItems = [Any]()
         
-        if exportAsSingleFileSwitch.isOn {
-            log.error("Not implemented.")
-        }
-        else {
-            for file in files {
-                if let note = file.1 as? Note {
-                    switch exportSettings[file.0]!.exportAsType {
-                    case .PDF:
-                        queue.addOperation {
-                            note.createPDF() { pdf in
-                                if let pdf = pdf {
-                                    activityItems.append(pdf)
-                                }
-                            }
-                        }
-                        break
-                    case .Image:
-                        queue.addOperation {
-                            for page in note.pages {
-                                page.getAsImage() { image in
-                                    if let jpegData = image.jpegData(compressionQuality: 1) {
-                                        activityItems.append(jpegData)
-                                    }
-                                }
-                            }
-                        }
-                        break
-                    case .Sketchnote:
-                        queue.addOperation {
-                            activityItems.append(file.0)
-                        }
-                        break
-                    }
-                }
-                else { // Folder is exported
-                    let exportType = exportSettings[file.0]!.exportAsType
-                    if FileManager.default.fileExists(atPath: file.0.path) {
-                        queue.addOperation {
-                            let zippedURL = NeoLibrary.createZIPForExportOf(folder: file.0, exportType: exportType)
-                            activityItems.append(zippedURL)
-                        }
+        for file in files {
+            if let note = file.1 as? Note {
+                queue.addOperation {
+                    let exportType = self.exportSettings[file.0]!.exportAsType
+                    if let noteURL = NeoLibrary.createFileForExportOf(note: note, exportType: exportType) {
+                        activityItems.append(noteURL)
                     }
                 }
             }
-            queue.maxConcurrentOperationCount = 3
-            queue.addBarrierBlock {
-                DispatchQueue.main.async {
-                    let activityController = UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
-                    self.present(activityController, animated: true, completion: nil)
-                    if let popOver = activityController.popoverPresentationController {
-                        popOver.sourceView = self.shareButton
+            else { // Folder is exported
+                let exportType = exportSettings[file.0]!.exportAsType
+                if FileManager.default.fileExists(atPath: file.0.path) {
+                    queue.addOperation {
+                        let zippedURL = NeoLibrary.createZIPForExportOf(folder: file.0, exportType: exportType)
+                        activityItems.append(zippedURL)
                     }
-                    self.shareButtonBlurView.isHidden = true
                 }
+            }
+        }
+        queue.maxConcurrentOperationCount = 3
+        if self.exportAsSingleFileSwitch.isOn {
+            queue.addBarrierBlock {
+                if let zipped = NeoLibrary.createZIPOfExportFolder() {
+                    activityItems = [zipped]
+                }
+                else {
+                    activityItems = [Any]()
+                }
+            }
+        }
+        queue.addBarrierBlock {
+            DispatchQueue.main.async {
+                let activityController = UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
+                self.present(activityController, animated: true, completion: nil)
+                if let popOver = activityController.popoverPresentationController {
+                    popOver.sourceView = self.shareButton
+                }
+                self.shareButtonBlurView.isHidden = true
             }
         }
     }
     
+    
+    
     @IBAction func quickActionsButtonTapped(_ sender: UIButton) {
-        let alert = UIAlertController(title: "Quick Actions", message: "Change the export format for all the selected notes.", preferredStyle: .actionSheet)
+        let alert = UIAlertController(title: "Quick Actions", message: "Change the export format for all selected files.", preferredStyle: .actionSheet)
         alert.popoverPresentationController?.sourceView = sender
         
         for exportType in ExportAsType.allCases {
-            let exportAllNotesAsAction = UIAlertAction(title: "Export Notes as \(exportType.rawValue)s", style: .default) { action in
+            let exportAllNotesAsAction = UIAlertAction(title: "Export All as \(exportType.rawValue)s", style: .default) { action in
                 for (key, _) in self.exportSettings {
                     var settings = self.exportSettings[key]!
                     settings.exportAsType = exportType
                     self.exportSettings[key] = settings
                 }
                 for cell in self.shareItemsCollectionView.visibleCells {
-                    if let shareItemViewCell = cell as? ShareItemViewCell {
-                        shareItemViewCell.update(exportType: exportType)
+                    if let exportItemViewCell = cell as? ExportItemViewCell {
+                        exportItemViewCell.update(exportType: exportType)
                     }
                 }
             }

@@ -18,7 +18,7 @@ enum NoteOption: String, Codable {
     case CopyNote = "Copy Note"
     case MoveFile = "Move"
     case DeletePage = "Delete Page"
-    case Share = "Share"
+    case Export = "Export"
     case ResetTextRecognition = "Reset Text Recognition"
     case DeleteNote = "Delete Note"
     case HelpLines = "Help Lines"
@@ -45,7 +45,7 @@ class NoteOptionsViewController: UIViewController, UICollectionViewDelegate, UIC
                                               NoteOptionWrapper(option: .CopyNote, image: "doc.circle", isDestructive: false, isInstantAction: true, isToggle: false),
                                               NoteOptionWrapper(option: .MoveFile, image: "folder", isDestructive: false, isInstantAction: false, isToggle: false),
                                               NoteOptionWrapper(option: .DeletePage, image: "trash", isDestructive: true, isInstantAction: false, isToggle: false),
-                                              NoteOptionWrapper(option: .Share, image: "square.and.arrow.up", isDestructive: false, isInstantAction: false, isToggle: false),
+                                              NoteOptionWrapper(option: .Export, image: "square.and.arrow.up", isDestructive: false, isInstantAction: false, isToggle: false),
                                               NoteOptionWrapper(option: .ResetTextRecognition, image: "pencil.and.outline", isDestructive: false, isInstantAction: true, isToggle: false),
                                               NoteOptionWrapper(option: .DeleteNote, image: "trash", isDestructive: true, isInstantAction: false, isToggle: false),
                                               NoteOptionWrapper(option: .HelpLines, image: "line.horizontal.3", isDestructive: false, isInstantAction: true, isToggle: true)

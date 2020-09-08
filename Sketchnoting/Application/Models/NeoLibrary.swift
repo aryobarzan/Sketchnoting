@@ -387,6 +387,10 @@ class NeoLibrary {
     
     public static func clearTemporaryExportFolder() {
         let fileManager = FileManager()
+        let tempExportFile = getDocumentsURL().appendingPathComponent("Sketchnoting-Export.zip")
+        if fileManager.fileExists(atPath: tempExportFile.path) {
+            try? fileManager.removeItem(at: tempExportFile)
+        }
         do {
             let enumerator = FileManager.default.enumerator(at: getTemporaryExportURL(),
                                     includingPropertiesForKeys: nil,
@@ -399,6 +403,96 @@ class NeoLibrary {
             }
         } catch {
             log.error("Could not clear temporary export folder: \(error)")
+        }
+    }
+    
+    public static func createFileForExportOf(note: Note, exportType: ExportAsType = .Sketchnote) -> URL? {
+        var destinationURL = URL(fileURLWithPath: getTemporaryExportURL().path).appendingPathComponent(note.getName())
+        let queue = OperationQueue()
+        do {
+            switch exportType {
+            case .Sketchnote:
+                destinationURL = destinationURL.appendingPathExtension("sketchnote")
+                if let data = note.encodeFileAsData() {
+                    try data.write(to: destinationURL)
+                }
+                break
+            case .PDF:
+                destinationURL = destinationURL.appendingPathExtension("pdf")
+                queue.addOperation {
+                    note.createPDF() { pdf in
+                        do {
+                            if let pdf = pdf {
+                                try pdf.write(to: destinationURL)
+                            }
+                        } catch {
+                            log.error("PDF generation for note failed.")
+                            log.error(error)
+                        }
+                    }
+                }
+                break
+            case .Image:
+                destinationURL = destinationURL.appendingPathExtension(".jpg")
+                if note.pages.count == 1 {
+                    queue.addOperation {
+                        note.getPreviewImage() { image in
+                            do {
+                                if let jpg = image.jpegData(compressionQuality: 1.0) {
+                                    try jpg.write(to: destinationURL)
+                                }
+                            } catch {
+                                log.error("Image generation for note failed.")
+                                log.error(error)
+                            }
+                        }
+                    }
+                }
+                else if note.pages.count > 1 {
+                    let exportNoteAsImagesFolderURL = getTemporaryExportURL().appendingPathComponent(note.getName() + " (Images)")
+                    do
+                    {
+                        if !FileManager.default.fileExists(atPath: exportNoteAsImagesFolderURL.path) {
+                            try FileManager.default.createDirectory(atPath: exportNoteAsImagesFolderURL.path, withIntermediateDirectories: true, attributes: nil)
+                        }
+                    }
+                    catch let error as NSError
+                    {
+                        log.error("Unable to create directory \(error.debugDescription)")
+                    }
+                    for i in 0..<note.pages.count {
+                        
+                        let pageURL = exportNoteAsImagesFolderURL.appendingPathComponent( "Page_\(i+1).jpg")
+                        queue.addOperation {
+                            let page = note.pages[i]
+                            page.getAsImage() { image in
+                                do {
+                                    if let jpg = image.jpegData(compressionQuality: 1.0) {
+                                        try jpg.write(to: pageURL)
+                                    }
+                                } catch {
+                                    log.error("Image generation for note failed.")
+                                    log.error(error)
+                                }
+                            }
+                        }
+                    }
+                    destinationURL = exportNoteAsImagesFolderURL
+                }
+                break
+            }
+        }
+        catch {
+            log.error("Creating file for export of note \(note.getName()) failed.")
+            log.error(error)
+            return nil
+        }
+        queue.waitUntilAllOperationsAreFinished()
+        if FileManager.default.fileExists(atPath: destinationURL.path) {
+            return destinationURL
+        }
+        else {
+            return nil
         }
     }
     
@@ -465,6 +559,27 @@ class NeoLibrary {
             log.error("Failed to create zip of folder: \(error)")
         }
         return destinationURL
+    }
+    
+    public static func createZIPOfExportFolder() -> URL? {
+        let destinationURL = getDocumentsURL().appendingPathComponent("Sketchnoting-Export.zip")
+        log.info(destinationURL.absoluteString)
+        do {
+            log.info(1)
+            try FileManager.default.zipItem(at: getTemporaryExportURL(), to: destinationURL, shouldKeepParent: false, compressionMethod: .none)
+            log.info(2)
+        }
+        catch {
+            log.error("Created a ZIP of the export folder failed.")
+            log.error(error)
+            return nil
+        }
+        if FileManager.default.fileExists(atPath: destinationURL.path) {
+            return destinationURL
+        }
+        else {
+            return nil
+        }
     }
     // ----
     

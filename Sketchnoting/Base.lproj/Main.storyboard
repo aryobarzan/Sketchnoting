@@ -1560,6 +1560,7 @@
                         <segue destination="aTo-Yd-YX3" kind="presentation" identifier="ShowTextBoxVC" id="S3h-ZS-57D"/>
                         <segue destination="h1g-fm-D3K" kind="presentation" identifier="MoveFileNoteEditing" modalPresentationStyle="formSheet" id="RAn-aJ-7TA"/>
                         <segue destination="PI1-Q1-ufO" kind="presentation" identifier="ShowMoleculeEditor" id="isy-Bg-HmA"/>
+                        <segue destination="hE0-U7-ctX" kind="presentation" identifier="Export" id="Rwz-f1-cd3"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="HI4-3w-NN7" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -1650,7 +1651,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="aJk-De-WiL" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="6466.40625" y="1633.59375"/>
+            <point key="canvasLocation" x="5734" y="1753"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="xdO-4n-2vR">
@@ -3091,7 +3092,7 @@
                                     <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
                                 </collectionViewFlowLayout>
                                 <cells>
-                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="ShareItemViewCell" id="3bt-cC-SOy" customClass="ShareItemViewCell" customModule="Sketchnoting" customModuleProvider="target">
+                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="ExportItemViewCell" id="3bt-cC-SOy" customClass="ExportItemViewCell" customModule="Sketchnoting" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="17.5" width="220" height="65"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="mbh-QJ-sOj">
@@ -3158,7 +3159,7 @@
                                     <constraint firstAttribute="width" constant="258" id="KCm-LM-NAB"/>
                                     <constraint firstAttribute="height" constant="45" id="Lmv-ja-qTd"/>
                                 </constraints>
-                                <state key="normal" title="Share">
+                                <state key="normal" title="Export">
                                     <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 </state>
                                 <connections>
@@ -3189,10 +3190,10 @@
                                 </constraints>
                             </view>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ALu-w3-Uqi">
-                                <rect key="frame" x="355" y="173" width="165" height="22"/>
+                                <rect key="frame" x="382" y="173" width="140" height="22"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="22" id="aVq-A6-lrs"/>
-                                    <constraint firstAttribute="width" constant="165" id="zf1-oO-Xyj"/>
+                                    <constraint firstAttribute="width" constant="140" id="zf1-oO-Xyj"/>
                                 </constraints>
                                 <state key="normal" title=" Quick Actions" image="chevron.down.circle" catalog="system">
                                     <color key="titleColor" systemColor="systemBlueColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -3229,7 +3230,7 @@
                             <constraint firstItem="Qtw-zU-3Ea" firstAttribute="leading" secondItem="gr3-tU-8N4" secondAttribute="leading" constant="20" id="IzF-r3-C2z"/>
                             <constraint firstItem="gr3-tU-8N4" firstAttribute="bottom" secondItem="vdi-TQ-Z6x" secondAttribute="bottom" constant="20" id="L9o-Dl-ZcV"/>
                             <constraint firstItem="RPG-Ja-7zg" firstAttribute="centerX" secondItem="iXc-fX-057" secondAttribute="centerX" id="SBf-gs-hlS"/>
-                            <constraint firstItem="gr3-tU-8N4" firstAttribute="trailing" secondItem="ALu-w3-Uqi" secondAttribute="trailing" constant="20" id="TVj-Ye-o5a"/>
+                            <constraint firstItem="gr3-tU-8N4" firstAttribute="trailing" secondItem="ALu-w3-Uqi" secondAttribute="trailing" constant="18" id="TVj-Ye-o5a"/>
                             <constraint firstItem="xjC-v5-Oil" firstAttribute="top" secondItem="gr3-tU-8N4" secondAttribute="top" constant="9" id="WYV-1Z-l5g"/>
                             <constraint firstItem="Qtw-zU-3Ea" firstAttribute="top" secondItem="ALu-w3-Uqi" secondAttribute="bottom" constant="8" id="X4Z-U5-naf"/>
                             <constraint firstItem="gr3-tU-8N4" firstAttribute="trailing" secondItem="xjC-v5-Oil" secondAttribute="trailing" constant="20" id="fyx-Ec-jFb"/>
@@ -3456,10 +3457,11 @@
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>
-        <segue reference="fmI-KU-Ur1"/>
-        <segue reference="ig0-q1-Lq9"/>
-        <segue reference="yvs-ei-HRy"/>
-        <segue reference="58e-4d-iJp"/>
+        <segue reference="Rwz-f1-cd3"/>
+        <segue reference="RAn-aJ-7TA"/>
+        <segue reference="b6T-Lb-KBp"/>
+        <segue reference="odf-CP-ags"/>
+        <segue reference="OAt-q3-0jJ"/>
         <segue reference="ct4-u7-KZY"/>
     </inferredMetricsTieBreakers>
     <resources>

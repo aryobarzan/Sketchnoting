@@ -8,7 +8,7 @@
 
 import UIKit
 
-class ShareItemViewCell: UICollectionViewCell {
+class ExportItemViewCell: UICollectionViewCell {
     
     @IBOutlet weak var typeImageView: UIImageView!
     @IBOutlet weak var typeLabel: UILabel!
