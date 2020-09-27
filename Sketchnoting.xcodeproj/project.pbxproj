@@ -104,6 +104,7 @@
 		9FC02C1C23EDB6290051C576 /* File.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FC02C1B23EDB6290051C576 /* File.swift */; };
 		9FC02C1E23EDB6400051C576 /* Note.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FC02C1D23EDB6400051C576 /* Note.swift */; };
 		9FC114D9243919BD004F576A /* ImagePickerHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FC114D8243919BD004F576A /* ImagePickerHelper.swift */; };
+		9FC5386B2520DB7700911DBF /* SKRecognizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FC5386A2520DB7700911DBF /* SKRecognizer.swift */; };
 		9FC5F90824A8DFEA00CDF2DF /* NoteOptionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FC5F90724A8DFEA00CDF2DF /* NoteOptionsViewController.swift */; };
 		9FC5F90A24A8E20000CDF2DF /* NoteOptionsCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FC5F90924A8E20000CDF2DF /* NoteOptionsCollectionViewCell.swift */; };
 		9FC5F90D24AFB07D00CDF2DF /* NVActivityIndicatorView in Frameworks */ = {isa = PBXBuildFile; productRef = 9FC5F90C24AFB07D00CDF2DF /* NVActivityIndicatorView */; };
@@ -247,6 +248,7 @@
 		9FC02C1B23EDB6290051C576 /* File.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = File.swift; sourceTree = "<group>"; };
 		9FC02C1D23EDB6400051C576 /* Note.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Note.swift; sourceTree = "<group>"; };
 		9FC114D8243919BD004F576A /* ImagePickerHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePickerHelper.swift; sourceTree = "<group>"; };
+		9FC5386A2520DB7700911DBF /* SKRecognizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SKRecognizer.swift; sourceTree = "<group>"; };
 		9FC5F90724A8DFEA00CDF2DF /* NoteOptionsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteOptionsViewController.swift; sourceTree = "<group>"; };
 		9FC5F90924A8E20000CDF2DF /* NoteOptionsCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteOptionsCollectionViewCell.swift; sourceTree = "<group>"; };
 		9FCD3D5C23EA0A59005CB98D /* CocoaLumberjack.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = CocoaLumberjack.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -354,6 +356,7 @@
 				9F5F340523AC64E400EB2804 /* Knowledge.swift */,
 				9F1A0C54249DA60B00E507BC /* SKClipboard.swift */,
 				9FFE9B3324B3C77200D92FBA /* NeoLibrary.swift */,
+				9FC5386A2520DB7700911DBF /* SKRecognizer.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -913,6 +916,7 @@
 				9FD1ADF123A52C090013C68E /* NoteViewController.swift in Sources */,
 				9FD1ADF323A52F7C0013C68E /* NotePagesViewController.swift in Sources */,
 				9F4BB37824EDC02800ED1E2F /* NoteLayer.swift in Sources */,
+				9FC5386B2520DB7700911DBF /* SKRecognizer.swift in Sources */,
 				9FAD28F623A52AC700F2203E /* NoteTextViewController.swift in Sources */,
 				9FA8C002239B21D500BAA42B /* TagsCreationViewController.swift in Sources */,
 				9F0F4E0A2451260700B1F2EA /* UIUtilities.swift in Sources */,
@@ -1176,7 +1180,7 @@
 					"$(PROJECT_DIR)",
 				);
 				INFOPLIST_FILE = Sketchnoting/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1204,7 +1208,7 @@
 					"$(PROJECT_DIR)",
 				);
 				INFOPLIST_FILE = Sketchnoting/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

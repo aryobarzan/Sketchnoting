@@ -22,6 +22,7 @@ import GPUImage
 import GPUImage
 import Highlightr
 import Toast
+import MLKitDigitalInkRecognition
 
 class NoteViewController: UIViewController, UIPencilInteractionDelegate, UICollectionViewDelegate, NoteDelegate, PKCanvasViewDelegate, PKToolPickerObserver, UIScreenshotServiceDelegate, NoteOptionsDelegate, DocumentsViewControllerDelegate, NotePagesDelegate, VNDocumentCameraViewControllerDelegate, UIDocumentPickerDelegate, RelatedNotesVCDelegate, TextBoxViewControllerDelegate, MoveFileViewControllerDelegate, UIPopoverPresentationControllerDelegate, NoteInfoDelegate, PDFViewDelegate, NoteLayersDelegate, NeoDraggableViewDelegate {
     
@@ -87,7 +88,9 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         self.navigationController?.setNavigationBarHidden(true, animated: false)
         self.tabBarController?.tabBar.isHidden = true
         
-        self.canvasView.allowsFingerDrawing = false
+        SKRecognizer.initializeRecognizers()
+        
+        self.canvasView.drawingPolicy = PKCanvasViewDrawingPolicy.pencilOnly
         self.canvasView.delegate = self
         if let window = parent?.view.window {
             let toolPicker = PKToolPicker.shared(for: window)!
@@ -951,7 +954,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         }
     }
     
-    
     var pageChanged = false
     func canvasViewDrawingDidChange(_ canvasView: PKCanvasView) {
         self.resetHandwritingRecognition = true
@@ -962,6 +964,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             note.1.getCurrentPage().canvasDrawing = self.canvasView.drawing
             self.startSaveTimer()
         }
+        self.inspectStrokes()
     }
     
     private func startRecognitionTimer() {
@@ -1749,6 +1752,22 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             alert.addAction(cancelAction)
             
             self.present(alert, animated: true)
+        }
+    }
+    
+    // MARK: Experimental (Strokes)
+    private func inspectStrokes() {
+        SKRecognizer.recognize(canvasView: canvasView, recognitionType: .Text) { success, result in
+            if success {
+                if let result = result {
+                    log.info("Text recognition successful: \(result)")
+                    self.view.hideAllToasts()
+                    self.view.makeToast(result, duration: 3, position: .center)
+                }
+            }
+            else {
+                log.error("Text recognition failed.")
+            }
         }
     }
 }

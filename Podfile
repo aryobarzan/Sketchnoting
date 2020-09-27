@@ -12,4 +12,5 @@ target 'Sketchnoting' do
   pod 'Highlightr'
   pod 'GoogleMLKit/TextRecognition'
   pod "ViewAnimator"
+  pod 'GoogleMLKit/DigitalInkRecognition'
 end

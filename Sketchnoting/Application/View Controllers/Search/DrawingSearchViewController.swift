@@ -20,12 +20,14 @@ class DrawingSearchViewController: UIViewController, PKCanvasViewDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        canvasView.tool = PKInkingTool(.pen, color: .black, width: 75)
+        canvasView.tool = PKInkingTool(.pen, color: .black, width: 4)
         canvasView.drawing = PKDrawing()
         canvasView.delegate = self
         canvasView.overrideUserInterfaceStyle = .dark
         canvasView.layer.masksToBounds = true
         canvasView.layer.cornerRadius = 5
+        
+        SKRecognizer.initializeRecognizers()
     }
 
     @IBAction func searchTapped(_ sender: UIButton) {
@@ -40,18 +42,21 @@ class DrawingSearchViewController: UIViewController, PKCanvasViewDelegate {
         self.searchButton.isEnabled = false
     }
     func canvasViewDrawingDidChange(_ canvasView: PKCanvasView) {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
-            let image = canvasView.asImage()
-            
-            if let recognition = self.drawingRecognition.recognize(image: image) {
-                self.searchButton.setTitle(" " + recognition.0, for: .normal)
-                self.searchButton.isEnabled = true
-                self.searchLabel = recognition.0
-                log.info("Best prediction: \(recognition)")
-            }
-            else {
-                self.searchButton.setTitle(" Not recognized", for: .normal)
-                self.searchButton.isEnabled = false
+        if canvasView.drawing.strokes.isEmpty {
+            self.searchButton.setTitle(" Not recognized", for: .normal)
+            self.searchButton.isEnabled = false
+        } else {
+            SKRecognizer.recognize(canvasView: canvasView, recognitionType: .Drawing) { success, result in
+                if success {
+                    self.searchButton.setTitle(" " + result!, for: .normal)
+                    self.searchButton.isEnabled = true
+                    self.searchLabel = result!
+                    log.info("Best prediction: \(result!)")
+                }
+                else {
+                    self.searchButton.setTitle(" Not recognized", for: .normal)
+                    self.searchButton.isEnabled = false
+                }
             }
         }
     }
