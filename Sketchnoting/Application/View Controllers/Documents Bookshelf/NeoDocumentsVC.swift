@@ -159,7 +159,7 @@ class NeoDocumentsVC: UIViewController, UICollectionViewDelegate, UISearchBarDel
                 ofKind: kind,
                 withReuseIdentifier: NeoDocumentsSectionHeader.reuseIdentifier,
                 for: indexPath) as? NeoDocumentsSectionHeader
-            view?.titleLabel.text = section.documentType.rawValue
+            view?.titleLabel.text = (section.documentType == DocumentType.ALMAAR) ? "AR4OER" : section.documentType.rawValue
             return view
         }
         return dataSource
