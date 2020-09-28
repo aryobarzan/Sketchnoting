@@ -15,7 +15,7 @@ class TAGMEHelper {
     //var requestDelay: Double = 0
     private let tagmeQueue = DispatchQueue(label: "TAGMEQueue", qos: .background)
     func fetch(text: String, note: (URL, Note), parentConcept: TAGMEDocument? = nil) {
-        let chunks = text.split(by: 6000)
+        let chunks = text.replacingOccurrences(of: "\n", with: " ").split(by: 6000)
         for chunk in chunks {
             let parameters: Parameters = ["text": chunk, "lang": "en", "include_abstract": "true", "include_categories": "true", "gcube-token": "5f57008b-3114-47e9-9ee2-742c877d37b2-843339462", "epsilon": note.1.tagmeEpsilon]
             let headers: HTTPHeaders = [
@@ -35,6 +35,7 @@ class TAGMEHelper {
                     }
                     log.info("TAGME: API call successful.")
                     var results = [String: String]()
+                    log.info(json)
                     if let annotations = json["annotations"].array {
                         for annotation in annotations {
                             if let spot = annotation["spot"].string, let id = annotation["id"].double, let abstract = annotation["abstract"].string, let title = annotation["title"].string, let rho = annotation["rho"].double {
@@ -48,7 +49,7 @@ class TAGMEHelper {
                                             }
                                         }
                                     }
-                                    if rho > 0.1 {
+                                    if rho > 0.05 {
                                         if let document = TAGMEDocument(title: title, description: abstract, URL: "tagme.d4science.org/tagme", type: .TAGME, spot: spot, categories: categories, wikiPageID: id) {
                                             if let parentConcept = parentConcept {
                                                 self.checkRelatedness(doc_one: parentConcept, doc_two: document, note: note)

@@ -13,6 +13,7 @@ import ViewAnimator
 protocol DocumentsViewControllerDelegate  {
     func resetDocuments()
     func updateTopicsCount()
+    func tagmeEpsilonUpdated(value: Float)
 }
 
 class NeoDocumentsVC: UIViewController, UICollectionViewDelegate, UISearchBarDelegate {
@@ -274,6 +275,7 @@ class NeoDocumentsVC: UIViewController, UICollectionViewDelegate, UISearchBarDel
         alert.addAction(UIAlertAction(title: NSLocalizedString(title, comment: ""), style: .default, handler: { _ in
             self.note.1.tagmeEpsilon = 0.0
             NeoLibrary.save(note: self.note.1, url: self.note.0)
+            self.delegate?.tagmeEpsilonUpdated(value: 0.0)
         }))
         
         title = "Balanced"
@@ -283,6 +285,7 @@ class NeoDocumentsVC: UIViewController, UICollectionViewDelegate, UISearchBarDel
         alert.addAction(UIAlertAction(title: NSLocalizedString(title, comment: ""), style: .default, handler: { _ in
             self.note.1.tagmeEpsilon = 0.3
             NeoLibrary.save(note: self.note.1, url: self.note.0)
+            self.delegate?.tagmeEpsilonUpdated(value: 0.3)
         }))
         
         title = "Favor Contextual Topics (Less)"
@@ -292,6 +295,7 @@ class NeoDocumentsVC: UIViewController, UICollectionViewDelegate, UISearchBarDel
         alert.addAction(UIAlertAction(title: NSLocalizedString(title, comment: ""), style: .default, handler: { _ in
             self.note.1.tagmeEpsilon = 0.5
             NeoLibrary.save(note: self.note.1, url: self.note.0)
+            self.delegate?.tagmeEpsilonUpdated(value: 0.5)
         }))
         self.present(alert, animated: true, completion: nil)
     }

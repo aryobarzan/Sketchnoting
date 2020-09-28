@@ -1510,6 +1510,10 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             }
         }
     }
+    func tagmeEpsilonUpdated(value: Float) {
+        note.1.tagmeEpsilon = value
+        NeoLibrary.save(note: note.1, url: note.0)
+    }
     var oldDocuments: [Document]!
     func updateTopicsCount() {
         self.topicsBadgeHub.setCount(note.1.getDocuments(forCurrentPage: true).count)
