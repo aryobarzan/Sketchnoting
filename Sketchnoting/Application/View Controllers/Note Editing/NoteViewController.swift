@@ -1761,17 +1761,22 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     
     // MARK: Experimental (Strokes)
     private func inspectStrokes() {
-        SKRecognizer.recognize(canvasView: canvasView, recognitionType: .Text) { success, result in
+        SKRecognizer.recognizeText(pkStrokes: canvasView.drawing.strokes) { success, text, lineNumber in
             if success {
-                if let result = result {
-                    log.info("Text recognition successful: \(result)")
-                    self.view.hideAllToasts()
-                    self.view.makeToast(result, duration: 3, position: .center)
-                }
-            }
-            else {
-                log.error("Text recognition failed.")
+                log.info("Line \(lineNumber): \(text)")
             }
         }
+//        SKRecognizer.recognize(canvasView: canvasView, recognitionType: .Text) { success, result in
+//            if success {
+//                if let result = result {
+//                    log.info("Text recognition successful: \(result)")
+//                    self.view.hideAllToasts()
+//                    self.view.makeToast(result, duration: 3, position: .center)
+//                }
+//            }
+//            else {
+//                log.error("Text recognition failed.")
+//            }
+//        }
     }
 }

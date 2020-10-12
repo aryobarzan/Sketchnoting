@@ -62,9 +62,6 @@ class SKRecognizer {
                 if !strokes.isEmpty {
                     inks.append(Ink.init(strokes: strokes))
                 }
-                // let preContext = ""
-                // let writingArea = WritingArea.init(width: width, height: height)
-                // let context = DigitalInkRecognitionContext.init(preContext: preContext, writingArea: writingArea)
                 for ink in inks {
                     textRecognizer.recognize(
                         ink: ink,
@@ -111,6 +108,80 @@ class SKRecognizer {
                 }
                 break
             }
+        }
+    }
+    
+    public static func recognizeText(pkStrokes: [PKStroke], handleFinish:@escaping ((_ success: Bool, _ param: String, _ lineNumber: Int)->())) {
+        var strokesByLine = [[PKStroke]]()
+        for stroke in pkStrokes {
+            var groupIndex: Int?
+            var groupMean: CGFloat?
+            for i in 0..<strokesByLine.count {
+                var groupMeanY: CGFloat = 0.0;
+                var groupMinY: CGFloat = 9999.0;
+                var groupMaxY: CGFloat = 0.0;
+                for s in strokesByLine[i] {
+                    groupMeanY += s.renderBounds.minY
+                    groupMinY = min(groupMinY, s.renderBounds.minY)
+                    groupMaxY = max(groupMaxY, s.renderBounds.maxY)
+                }
+                groupMeanY = groupMeanY / CGFloat(strokesByLine[i].count)
+                if groupMean == nil {
+                    if stroke.renderBounds.midY >= groupMinY && stroke.renderBounds.midY <= groupMaxY {
+                        groupMean = groupMeanY
+                        groupIndex = i
+                    }
+                }
+                else {
+                    if abs(stroke.renderBounds.minY - groupMeanY) < abs(stroke.renderBounds.minY - groupMean!) {
+                        groupMean = groupMeanY
+                        groupIndex = i
+                    }
+                }
+            }
+            if groupIndex == nil {
+                var newGroup = [PKStroke]()
+                newGroup.append(stroke)
+                strokesByLine.append(newGroup)
+            }
+            else {
+                var updatedGroup = strokesByLine[groupIndex!]
+                updatedGroup.append(stroke)
+                strokesByLine[groupIndex!] = updatedGroup
+            }
+        }
+        log.info("Detected \(strokesByLine.count) line(s).")
+        var strokes: [Stroke] = [Stroke]()
+        var points: [StrokePoint] = [StrokePoint]()
+        var inks: [Ink] = [Ink]()
+        for line in strokesByLine {
+            for s in line {
+                for point in s.path.interpolatedPoints(by: .parametricStep(1.0)) {
+                    points.append(StrokePoint.init(x: Float(point.location.x), y: Float(point.location.y), t: Int(point.timeOffset * 1000)))
+                }
+                strokes.append(Stroke.init(points: points))
+                points = []
+            }
+            if !strokes.isEmpty {
+                inks.append(Ink.init(strokes: strokes))
+            }
+            strokes = [Stroke]()
+        }
+        var recognitions = [Int : String]()
+        for i in 0..<inks.count {
+            textRecognizer.recognize(
+                ink: inks[i],
+                completion: {
+                    (result: DigitalInkRecognitionResult?, error: Error?) in
+                    if let result = result, let candidate = result.candidates.first {
+                        log.info("Recognized: \(candidate.text)")
+                        recognitions[i] = candidate.text
+                        handleFinish(true, candidate.text, i)
+                    } else {
+                        log.error(error.debugDescription)
+                        handleFinish(false, "", -1)
+                    }
+                })
         }
     }
     
