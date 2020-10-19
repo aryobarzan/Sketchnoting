@@ -1761,10 +1761,13 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     
     // MARK: Experimental (Strokes)
     private func inspectStrokes() {
-        SKRecognizer.recognizeText(pkStrokes: canvasView.drawing.strokes) { success, text, lineNumber in
+        self.note.1.getCurrentPage().clearRecognizedText()
+        SKRecognizer.recognizeText(pkStrokes: canvasView.drawing.strokes) { success, line, lineNumber in
             if success {
-                log.info("Line \(lineNumber): \(text)")
+                self.note.1.getCurrentPage().addRecognizedLine(line: line!, lineNumber: lineNumber)
+                log.info("Line \(lineNumber): \(line!.text)")
             }
+            self.startSaveTimer()
         }
 //        SKRecognizer.recognize(canvasView: canvasView, recognitionType: .Text) { success, result in
 //            if success {

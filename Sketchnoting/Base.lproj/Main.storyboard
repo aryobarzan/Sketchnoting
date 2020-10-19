@@ -3,6 +3,7 @@
     <device id="ipad9_7" orientation="portrait" layout="fullscreen" appearance="light"/>
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17125"/>
+        <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
@@ -549,7 +550,7 @@
                                             <constraint firstAttribute="width" constant="32" id="idC-Te-iJ5"/>
                                         </constraints>
                                         <fontDescription key="fontDescription" name=".SFNSDisplay" family=".SF NS Display" pointSize="40"/>
-                                        <state key="normal" image="slider.horizontal.3" catalog="system">
+                                        <state key="normal" image="gearshape.fill" catalog="system">
                                             <preferredSymbolConfiguration key="preferredSymbolConfiguration" configurationType="pointSize" pointSize="15" scale="large"/>
                                         </state>
                                         <connections>
@@ -683,7 +684,7 @@
                                             <constraint firstAttribute="width" constant="25" id="kbW-Ja-QOc"/>
                                         </constraints>
                                         <fontDescription key="fontDescription" type="system" pointSize="15"/>
-                                        <state key="normal" image="list.dash" catalog="system">
+                                        <state key="normal" image="square.fill.text.grid.1x2" catalog="system">
                                             <color key="titleColor" red="0.26875244110000002" green="0.49985405119999998" blue="0.82210710099999995" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                             <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="large"/>
                                         </state>
@@ -1185,7 +1186,7 @@
                                             <constraint firstAttribute="height" constant="30" id="hUn-GH-EVo"/>
                                         </constraints>
                                         <fontDescription key="fontDescription" type="system" pointSize="13"/>
-                                        <state key="normal" image="arrow.left" catalog="system">
+                                        <state key="normal" image="arrowshape.turn.up.left.circle.fill" catalog="system">
                                             <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="large"/>
                                         </state>
                                         <connections>
@@ -1222,7 +1223,7 @@
                                             <constraint firstAttribute="width" constant="24" id="Ahz-WM-S1d"/>
                                         </constraints>
                                         <fontDescription key="fontDescription" type="system" pointSize="15"/>
-                                        <state key="normal" image="ellipsis" catalog="system">
+                                        <state key="normal" image="ellipsis.rectangle.fill" catalog="system">
                                             <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="large"/>
                                         </state>
                                         <connections>
@@ -1253,7 +1254,7 @@
                                             <constraint firstAttribute="height" constant="24" id="xEV-Tl-Z38"/>
                                         </constraints>
                                         <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                        <state key="normal" image="book.circle" catalog="system">
+                                        <state key="normal" image="books.vertical" catalog="system">
                                             <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="large"/>
                                         </state>
                                         <connections>
@@ -1313,13 +1314,13 @@
                                         </connections>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="g83-cE-vKX">
-                                        <rect key="frame" x="181" y="8" width="25" height="24"/>
+                                        <rect key="frame" x="181" y="8" width="26" height="24"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="24" id="dP9-IB-i91"/>
                                         </constraints>
                                         <fontDescription key="fontDescription" type="system" pointSize="15"/>
                                         <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                        <state key="normal" image="scribble" catalog="system">
+                                        <state key="normal" image="scribble.variable" catalog="system">
                                             <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="large"/>
                                         </state>
                                         <connections>
@@ -1342,12 +1343,15 @@
                                         </connections>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="vVR-Uw-SQ8">
-                                        <rect key="frame" x="284" y="10.5" width="200" height="19"/>
+                                        <rect key="frame" x="284" y="10" width="200" height="20"/>
                                         <constraints>
                                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="200" id="5XX-QY-D1i"/>
                                         </constraints>
                                         <fontDescription key="fontDescription" type="system" pointSize="15"/>
-                                        <state key="normal" title=" Note Title" image="info.circle" catalog="system"/>
+                                        <state key="normal" title=" Note Title">
+                                            <imageReference key="image" image="info.circle.fill" catalog="system" symbolScale="small"/>
+                                            <preferredSymbolConfiguration key="preferredSymbolConfiguration" configurationType="pointSize" pointSize="20" scale="small"/>
+                                        </state>
                                         <connections>
                                             <segue destination="NOn-L7-Vqa" kind="popoverPresentation" identifier="ShowNoteInfo" popoverAnchorView="vVR-Uw-SQ8" id="SSp-9s-wWN">
                                                 <popoverArrowDirection key="popoverArrowDirection" up="YES" down="YES" left="YES" right="YES"/>
@@ -1355,13 +1359,13 @@
                                         </connections>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="F3q-nK-e3w">
-                                        <rect key="frame" x="214" y="8" width="23" height="24"/>
+                                        <rect key="frame" x="215" y="8" width="26.5" height="24"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="24" id="CQo-2T-87o"/>
                                         </constraints>
                                         <fontDescription key="fontDescription" type="system" pointSize="15"/>
                                         <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                        <state key="normal" image="square.stack.fill" catalog="system">
+                                        <state key="normal" image="square.stack.3d.forward.dottedline.fill" catalog="system">
                                             <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="large"/>
                                         </state>
                                         <connections>
@@ -3474,7 +3478,8 @@
         <image name="arrow.left.circle" catalog="system" width="128" height="121"/>
         <image name="arrow.right.circle" catalog="system" width="128" height="121"/>
         <image name="arrow.up.arrow.down.circle" catalog="system" width="128" height="121"/>
-        <image name="book.circle" catalog="system" width="128" height="121"/>
+        <image name="arrowshape.turn.up.left.circle.fill" catalog="system" width="128" height="121"/>
+        <image name="books.vertical" catalog="system" width="128" height="103"/>
         <image name="calendar.circle" catalog="system" width="128" height="121"/>
         <image name="calendar.circle.fill" catalog="system" width="128" height="121"/>
         <image name="checkmark.circle" catalog="system" width="128" height="121"/>
@@ -3487,17 +3492,17 @@
         <image name="doc.plaintext" catalog="system" width="115" height="128"/>
         <image name="doc.richtext" catalog="system" width="115" height="128"/>
         <image name="doc.text.viewfinder" catalog="system" width="128" height="115"/>
-        <image name="ellipsis" catalog="system" width="128" height="37"/>
         <image name="ellipsis.circle.fill" catalog="system" width="128" height="121"/>
+        <image name="ellipsis.rectangle.fill" catalog="system" width="128" height="81"/>
         <image name="folder" catalog="system" width="128" height="97"/>
         <image name="folder.badge.plus" catalog="system" width="128" height="91"/>
         <image name="folder.fill.badge.plus" catalog="system" width="128" height="91"/>
+        <image name="gearshape.fill" catalog="system" width="128" height="121"/>
         <image name="hand.thumbsdown.fill" catalog="system" width="128" height="121"/>
         <image name="hand.thumbsup.fill" catalog="system" width="128" height="121"/>
         <image name="house.fill" catalog="system" width="128" height="106"/>
-        <image name="info.circle" catalog="system" width="128" height="121"/>
+        <image name="info.circle.fill" catalog="system" width="128" height="121"/>
         <image name="line.horizontal.3" catalog="system" width="128" height="64"/>
-        <image name="list.dash" catalog="system" width="128" height="85"/>
         <image name="magnifyingglass" catalog="system" width="128" height="115"/>
         <image name="magnifyingglass.circle.fill" catalog="system" width="128" height="121"/>
         <image name="pencil.and.outline" catalog="system" width="128" height="128"/>
@@ -3508,12 +3513,14 @@
         <image name="plus.circle.fill" catalog="system" width="128" height="121"/>
         <image name="plus.square" catalog="system" width="128" height="114"/>
         <image name="scribble" catalog="system" width="128" height="118"/>
+        <image name="scribble.variable" catalog="system" width="128" height="118"/>
         <image name="slider.horizontal.3" catalog="system" width="128" height="100"/>
         <image name="square.and.arrow.down" catalog="system" width="121" height="128"/>
         <image name="square.and.arrow.up" catalog="system" width="115" height="128"/>
         <image name="square.and.arrow.up.on.square.fill" catalog="system" width="117" height="128"/>
+        <image name="square.fill.text.grid.1x2" catalog="system" width="128" height="100"/>
         <image name="square.stack.3d.down.right.fill" catalog="system" width="124" height="128"/>
-        <image name="square.stack.fill" catalog="system" width="113" height="128"/>
+        <image name="square.stack.3d.forward.dottedline.fill" catalog="system" width="128" height="113"/>
         <image name="tag.circle" catalog="system" width="128" height="121"/>
         <image name="tag.fill" catalog="system" width="128" height="119"/>
         <image name="xmark.circle.fill" catalog="system" width="128" height="121"/>

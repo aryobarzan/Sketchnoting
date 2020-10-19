@@ -111,7 +111,7 @@ class SKRecognizer {
         }
     }
     
-    public static func recognizeText(pkStrokes: [PKStroke], handleFinish:@escaping ((_ success: Bool, _ param: String, _ lineNumber: Int)->())) {
+    public static func recognizeText(pkStrokes: [PKStroke], handleFinish:@escaping ((_ success: Bool, _ param: SKRecognizedLine?, _ lineNumber: Int)->())) {
         var strokesByLine = [[PKStroke]]()
         for stroke in pkStrokes {
             var groupIndex: Int?
@@ -151,38 +151,101 @@ class SKRecognizer {
             }
         }
         log.info("Detected \(strokesByLine.count) line(s).")
-        var strokes: [Stroke] = [Stroke]()
-        var points: [StrokePoint] = [StrokePoint]()
-        var inks: [Ink] = [Ink]()
+        var inks = [([PKStroke], Ink)]()
         for line in strokesByLine {
-            for s in line {
-                for point in s.path.interpolatedPoints(by: .parametricStep(1.0)) {
-                    points.append(StrokePoint.init(x: Float(point.location.x), y: Float(point.location.y), t: Int(point.timeOffset * 1000)))
-                }
-                strokes.append(Stroke.init(points: points))
-                points = []
+            if let ink = self.createInkFrom(pkStrokes: line) {
+                inks.append((line, ink))
             }
-            if !strokes.isEmpty {
-                inks.append(Ink.init(strokes: strokes))
-            }
-            strokes = [Stroke]()
         }
         var recognitions = [Int : String]()
         for i in 0..<inks.count {
             textRecognizer.recognize(
-                ink: inks[i],
+                ink: inks[i].1,
                 completion: {
                     (result: DigitalInkRecognitionResult?, error: Error?) in
                     if let result = result, let candidate = result.candidates.first {
-                        log.info("Recognized: \(candidate.text)")
-                        recognitions[i] = candidate.text
-                        handleFinish(true, candidate.text, i)
+                        if !candidate.text.isEmpty {
+                            var recognizedWords = [SKRecognizedWord]()
+                            let words = candidate.text.components(separatedBy: " ")
+                            
+                            var iterations = 5
+                            var strokesByWord = [[PKStroke]]()
+                            var modifier: CGFloat = 0
+                            // to update: retain bestResult during iterations
+                            repeat {
+                                strokesByWord = [[PKStroke]]()
+                                var currentWordStrokes = [PKStroke]()
+                                var previousStroke: PKStroke?
+                                for j in 0..<inks[i].0.count {
+                                    let stroke = inks[i].0[j]
+                                    if previousStroke != nil {
+                                        if stroke.renderBounds.intersects(previousStroke!.renderBounds) || (stroke.renderBounds.minX - previousStroke!.renderBounds.maxX) <= (10 + modifier) {
+                                            currentWordStrokes.append(stroke)
+                                        }
+                                        else {
+                                            if !currentWordStrokes.isEmpty {
+                                                strokesByWord.append(currentWordStrokes)
+                                                currentWordStrokes = [PKStroke]()
+                                                currentWordStrokes.append(stroke)
+                                            }
+                                        }
+                                        previousStroke = stroke
+                                    }
+                                    else {
+                                        currentWordStrokes.append(stroke)
+                                        previousStroke = stroke
+                                    }
+                                }
+                                if !currentWordStrokes.isEmpty {
+                                    strokesByWord.append(currentWordStrokes)
+                                }
+                                log.info("Number of words segmented: \(strokesByWord.count)")
+                                iterations -= 1
+                                if strokesByWord.count > words.count {
+                                    modifier -= 2
+                                }
+                                else if strokesByWord.count < words.count {
+                                    modifier += 2
+                                }
+                            } while (strokesByWord.count != words.count && iterations > 0)
+                            
+                            for j in 0..<words.count {
+                                var renderBounds: CGRect?
+                                if (j < strokesByWord.count && strokesByWord[j].count > 0) {
+                                    renderBounds = CGRect(x: strokesByWord[j].first!.renderBounds.minX, y: strokesByWord[j].first!.renderBounds.minY, width: strokesByWord[j].last!.renderBounds.maxX, height: strokesByWord[j].last!.renderBounds.maxY)
+                                }
+                                recognizedWords.append(SKRecognizedWord(text: words[j], renderBounds: renderBounds))
+                            }
+                            let recognizedLine = SKRecognizedLine(text: result.candidates.first!.text, words: recognizedWords)
+                            log.info("Recognized: \(candidate.text)")
+                            recognitions[i] = candidate.text
+                            handleFinish(true, recognizedLine, i)
+                        }
+                        else {
+                            handleFinish(false, nil, -1)
+                        }
                     } else {
                         log.error(error.debugDescription)
-                        handleFinish(false, "", -1)
+                        handleFinish(false, nil, -1)
                     }
                 })
         }
+    }
+    
+    private static func createInkFrom(pkStrokes: [PKStroke]) -> Ink? {
+        var strokes: [Stroke] = [Stroke]()
+        var points: [StrokePoint] = [StrokePoint]()
+        for s in pkStrokes {
+            for point in s.path.interpolatedPoints(by: .parametricStep(1.0)) {
+                points.append(StrokePoint.init(x: Float(point.location.x), y: Float(point.location.y), t: Int(point.timeOffset * 1000)))
+            }
+            strokes.append(Stroke.init(points: points))
+            points = []
+        }
+        if !strokes.isEmpty {
+            return Ink.init(strokes: strokes)
+        }
+        return nil
     }
     
     private static func downloadModels() {

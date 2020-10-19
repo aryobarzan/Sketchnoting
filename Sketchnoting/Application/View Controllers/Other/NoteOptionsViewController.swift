@@ -44,7 +44,7 @@ class NoteOptionsViewController: UIViewController, UICollectionViewDelegate, UIC
                                               NoteOptionWrapper(option: .CopyText, image: "text.quote", isDestructive: false, isInstantAction: true, isToggle: false),
                                               NoteOptionWrapper(option: .CopyNote, image: "doc.circle", isDestructive: false, isInstantAction: true, isToggle: false),
                                               NoteOptionWrapper(option: .MoveFile, image: "folder", isDestructive: false, isInstantAction: false, isToggle: false),
-                                              NoteOptionWrapper(option: .DeletePage, image: "trash", isDestructive: true, isInstantAction: false, isToggle: false),
+                                              NoteOptionWrapper(option: .DeletePage, image: "text.badge.minus", isDestructive: true, isInstantAction: false, isToggle: false),
                                               NoteOptionWrapper(option: .Export, image: "square.and.arrow.up", isDestructive: false, isInstantAction: false, isToggle: false),
                                               NoteOptionWrapper(option: .ResetTextRecognition, image: "pencil.and.outline", isDestructive: false, isInstantAction: true, isToggle: false),
                                               NoteOptionWrapper(option: .DeleteNote, image: "trash", isDestructive: true, isInstantAction: false, isToggle: false),

@@ -14,6 +14,7 @@ class NotePage: Codable {
     var canvasDrawing: PKDrawing
     private var drawings: [NoteDrawing]
     private var noteText: NoteText?
+    private var recognizedText: SKRecognizedText
     var backdropPDFData: Data?
     var pdfScale: Float = 1.0
     private var layers: [NoteLayer]
@@ -26,12 +27,14 @@ class NotePage: Codable {
         self.canvasDrawing = PKDrawing()
         self.drawings = [NoteDrawing]()
         self.layers = [NoteLayer]()
+        self.recognizedText = SKRecognizedText()
     }
     
     //MARK: Decode / Encode
     enum CodingKeys: String, CodingKey {
         case canvasDrawing = "canvasDrawing"
         case drawings = "noteDrawings"
+        case recognizedText = "recognizedText"
         case noteText = "noteText"
         case backdropPDFData = "backdropPDFData"
         case pdfScale = "pdfScale"
@@ -46,6 +49,7 @@ class NotePage: Codable {
         }
         try container.encode(canvasDrawing, forKey: .canvasDrawing)
         try container.encode(drawings, forKey: .drawings)
+        try container.encode(recognizedText, forKey: .recognizedText)
         try container.encode(noteText, forKey: .noteText)
         try container.encode(backdropPDFData, forKey: .backdropPDFData)
         try container.encode(pdfScale, forKey: .pdfScale)
@@ -77,6 +81,7 @@ class NotePage: Codable {
 
         canvasDrawing = try container.decode(PKDrawing.self, forKey: .canvasDrawing)
         drawings = (try? container.decode([NoteDrawing].self, forKey: .drawings)) ?? [NoteDrawing]()
+        recognizedText = (try? container.decode(SKRecognizedText.self, forKey: .recognizedText)) ?? SKRecognizedText()
         noteText = try? container.decode(NoteText.self, forKey: .noteText)
         backdropPDFData = try? container.decode(Data.self, forKey: .backdropPDFData)
         pdfScale = try container.decode(Float.self, forKey: .pdfScale)
@@ -184,6 +189,23 @@ class NotePage: Codable {
     }
     
     //MARK: recognized text
+    
+    public func addRecognizedLine(line: SKRecognizedLine, lineNumber: Int) {
+        if recognizedText.lines.isEmpty {
+            recognizedText.lines.append(line)
+        }
+        else {
+            recognizedText.lines.insert(line, at: lineNumber)
+        }
+    }
+    
+    public func clearRecognizedText() {
+        self.recognizedText = SKRecognizedText()
+    }
+    
+    public func getRecognizedText() -> SKRecognizedText {
+        return self.recognizedText
+    }
     
     func clearNoteText() {
         self.noteText = nil

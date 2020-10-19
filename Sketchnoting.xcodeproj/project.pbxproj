@@ -16,6 +16,9 @@
 		9F05B5A3232BF0C800983AF2 /* NoteCollectionViewDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F05B5A2232BF0C800983AF2 /* NoteCollectionViewDetailCell.swift */; };
 		9F06977024427823002DCE47 /* URLExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F06976F24427823002DCE47 /* URLExtensions.swift */; };
 		9F0ABB282412E5D400CA5A4E /* SKCacheManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0ABB272412E5D400CA5A4E /* SKCacheManager.swift */; };
+		9F0C8D98253DB000002E9811 /* SKRecognizedText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0C8D97253DB000002E9811 /* SKRecognizedText.swift */; };
+		9F0C8D9A253DB12B002E9811 /* SKRecognizedLine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0C8D99253DB12B002E9811 /* SKRecognizedLine.swift */; };
+		9F0C8D9C253DB142002E9811 /* SKRecognizedWord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0C8D9B253DB142002E9811 /* SKRecognizedWord.swift */; };
 		9F0D8565242052E600B8BE2F /* BSImagePicker in Frameworks */ = {isa = PBXBuildFile; productRef = 9F0D8564242052E600B8BE2F /* BSImagePicker */; };
 		9F0EC7DD2446A8AE000A28CB /* GestureExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0EC7DC2446A8AE000A28CB /* GestureExtensions.swift */; };
 		9F0F4E0A2451260700B1F2EA /* UIUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0F4E092451260700B1F2EA /* UIUtilities.swift */; };
@@ -168,6 +171,9 @@
 		9F05BC7E23761C4A00D49A88 /* NoteTextViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteTextViewController.swift; sourceTree = "<group>"; };
 		9F06976F24427823002DCE47 /* URLExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLExtensions.swift; sourceTree = "<group>"; };
 		9F0ABB272412E5D400CA5A4E /* SKCacheManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SKCacheManager.swift; sourceTree = "<group>"; };
+		9F0C8D97253DB000002E9811 /* SKRecognizedText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SKRecognizedText.swift; sourceTree = "<group>"; };
+		9F0C8D99253DB12B002E9811 /* SKRecognizedLine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SKRecognizedLine.swift; sourceTree = "<group>"; };
+		9F0C8D9B253DB142002E9811 /* SKRecognizedWord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SKRecognizedWord.swift; sourceTree = "<group>"; };
 		9F0EC7DC2446A8AE000A28CB /* GestureExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GestureExtensions.swift; sourceTree = "<group>"; };
 		9F0F4E092451260700B1F2EA /* UIUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIUtilities.swift; sourceTree = "<group>"; };
 		9F18E7A723FB4F1600543D78 /* FolderButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderButton.swift; sourceTree = "<group>"; };
@@ -600,6 +606,9 @@
 				9FBF6AB522E9F3FE001FD730 /* VisionTextBlockWrapper.swift */,
 				9FBF6AB722E9F428001FD730 /* VisionTextLineWrapper.swift */,
 				9FBF6AB922E9F439001FD730 /* VisionTextElementWrapper.swift */,
+				9F0C8D97253DB000002E9811 /* SKRecognizedText.swift */,
+				9F0C8D99253DB12B002E9811 /* SKRecognizedLine.swift */,
+				9F0C8D9B253DB142002E9811 /* SKRecognizedWord.swift */,
 			);
 			path = "Handwriting Recognition";
 			sourceTree = "<group>";
@@ -947,6 +956,7 @@
 				9F92D110231E97DF00BC0E57 /* UserDefaultsExtensions.swift in Sources */,
 				9FCE9ECA2502E3EB00166AE2 /* ExportItemViewCell.swift in Sources */,
 				9F92D11F23217FFF00BC0E57 /* SearchFilter.swift in Sources */,
+				9F0C8D9C253DB142002E9811 /* SKRecognizedWord.swift in Sources */,
 				9FAB4B7E244BEF2F00DEA46F /* UILabelExtension.swift in Sources */,
 				9FF0AC962441308B00A82BE8 /* CodableExtensions.swift in Sources */,
 				9FA6239522DE3741007ED794 /* BioPortalDocument.swift in Sources */,
@@ -961,8 +971,10 @@
 				9FA6239722DE3806007ED794 /* CHEBIDocument.swift in Sources */,
 				9F5F5D1524328CC100AF79A5 /* DateExtensions.swift in Sources */,
 				9F4D2338239C22FD0078B364 /* OtherExtensions.swift in Sources */,
+				9F0C8D98253DB000002E9811 /* SKRecognizedText.swift in Sources */,
 				9FD29BA72220524D00CC969A /* AppDelegate.swift in Sources */,
 				9FD29C6422431BFA00CC969A /* DrawnImageClassifier.mlmodel in Sources */,
+				9F0C8D9A253DB12B002E9811 /* SKRecognizedLine.swift in Sources */,
 				9FC114D9243919BD004F576A /* ImagePickerHelper.swift in Sources */,
 				9FC02C1C23EDB6290051C576 /* File.swift in Sources */,
 				9F9DAFE0242CB7C100713E75 /* DrawingRecognition.swift in Sources */,

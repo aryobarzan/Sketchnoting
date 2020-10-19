@@ -16,11 +16,11 @@ class NoteTextViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.title = note.1.getName()
-        textView.text = note.1.getText()
+        textView.text = note.1.getCurrentPage().getRecognizedText().getText()
     }
    
     @IBAction func copyTapped(_ sender: UIBarButtonItem) {
-        UIPasteboard.general.string = note.1.getText()
+        UIPasteboard.general.string = textView.text
         self.view.makeToast("Copied text to clipboard.")
     }
     
