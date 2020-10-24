@@ -212,11 +212,24 @@ class SKRecognizer {
                             for j in 0..<words.count {
                                 var renderBounds: CGRect?
                                 if (j < strokesByWord.count && strokesByWord[j].count > 0) {
-                                    renderBounds = CGRect(x: strokesByWord[j].first!.renderBounds.minX, y: strokesByWord[j].first!.renderBounds.minY, width: strokesByWord[j].last!.renderBounds.maxX, height: strokesByWord[j].last!.renderBounds.maxY)
+                                    var wordHeight = strokesByWord[j].last!.renderBounds.height
+                                    for stroke in strokesByWord[j] {
+                                        if stroke.renderBounds.height > wordHeight {
+                                            wordHeight = stroke.renderBounds.height
+                                        }
+                                    }
+                                    renderBounds = CGRect(x: strokesByWord[j].first!.renderBounds.minX, y: strokesByWord[j].first!.renderBounds.minY, width: strokesByWord[j].last!.renderBounds.maxX - strokesByWord[j].first!.renderBounds.minX, height: wordHeight)
                                 }
                                 recognizedWords.append(SKRecognizedWord(text: words[j], renderBounds: renderBounds))
                             }
-                            let recognizedLine = SKRecognizedLine(text: result.candidates.first!.text, words: recognizedWords)
+                            var lineHeight = inks[i].0.last!.renderBounds.height
+                            for stroke in inks[i].0 {
+                                if stroke.renderBounds.height > lineHeight {
+                                    lineHeight = stroke.renderBounds.height
+                                }
+                            }
+                            let lineRenderBounds = CGRect(x: inks[i].0.first!.renderBounds.minX, y: inks[i].0.first!.renderBounds.minY, width: inks[i].0.last!.renderBounds.maxX - inks[i].0.first!.renderBounds.minX, height: lineHeight)
+                            let recognizedLine = SKRecognizedLine(text: result.candidates.first!.text, words: recognizedWords, renderBounds: lineRenderBounds)
                             log.info("Recognized: \(candidate.text)")
                             recognitions[i] = candidate.text
                             handleFinish(true, recognizedLine, i)

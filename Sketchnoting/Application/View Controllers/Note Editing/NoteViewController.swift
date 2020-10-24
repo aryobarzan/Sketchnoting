@@ -1769,17 +1769,5 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             }
             self.startSaveTimer()
         }
-//        SKRecognizer.recognize(canvasView: canvasView, recognitionType: .Text) { success, result in
-//            if success {
-//                if let result = result {
-//                    log.info("Text recognition successful: \(result)")
-//                    self.view.hideAllToasts()
-//                    self.view.makeToast(result, duration: 3, position: .center)
-//                }
-//            }
-//            else {
-//                log.error("Text recognition failed.")
-//            }
-//        }
     }
 }
