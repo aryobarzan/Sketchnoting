@@ -837,9 +837,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         self.annotateText(text: self.note.1.getText())
     }
     
-    //MARK: Handwriting recognition process
-    let handwritingRecognizer = HandwritingRecognizer()
-    
     var connectivity: Connectivity?
     func annotateText(text: String) {
         self.clearConceptHighlights()
@@ -1721,15 +1718,52 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         }
     }
     
-    // MARK: Experimental (Strokes)
+    // MARK: Stroke recognition for handwriting
     private func inspectStrokes() {
         self.note.1.getCurrentPage().clearRecognizedText()
-        SKRecognizer.recognizeText(pkStrokes: canvasView.drawing.strokes) { success, line, lineNumber in
+        
+        let isolatedStrokes = isolateStrokes()
+        SKRecognizer.recognizeText(pkStrokes: isolatedStrokes.1) { success, line, lineNumber in
             if success {
                 self.note.1.getCurrentPage().addRecognizedLine(line: line!, lineNumber: lineNumber)
                 log.info("Line \(lineNumber): \(line!.text)")
             }
             self.startSaveTimer()
         }
+        
+        for comp in isolatedStrokes.0 {
+            SKRecognizer.recognizeNoteDrawing(noteDrawing: comp.0, pkStrokes: comp.1) { success, noteDrawing in
+                if success && noteDrawing != nil {
+                    self.note.1.getCurrentPage().removeDrawing(drawing: comp.0)
+                    self.note.1.getCurrentPage().addDrawing(drawing: noteDrawing!)
+                    self.startSaveTimer()
+                }
+            }
+        }
+    }
+    
+    private func isolateStrokes() -> ([(NoteDrawing, [PKStroke])], [PKStroke]) {
+        var drawingStrokesToRemove = [Int]()
+        
+        var strokesForNoteDrawing = [(NoteDrawing, [PKStroke])]()
+        var textStrokes = [PKStroke]()
+        for noteDrawing in note.1.getCurrentPage().getDrawings() {
+            var strokesForDrawing = [PKStroke]()
+            for i in 0..<canvasView.drawing.strokes.count {
+                if noteDrawing.getRegion().contains(canvasView.drawing.strokes[i].renderBounds) {
+                    drawingStrokesToRemove.append(i)
+                    strokesForDrawing.append(canvasView.drawing.strokes[i])
+                }
+            }
+            strokesForNoteDrawing.append((noteDrawing, strokesForDrawing))
+        }
+        
+        for i in 0..<canvasView.drawing.strokes.count {
+            if !drawingStrokesToRemove.contains(i) {
+                textStrokes.append(canvasView.drawing.strokes[i])
+            }
+        }
+        
+        return (strokesForNoteDrawing, textStrokes)
     }
 }

@@ -245,6 +245,37 @@ class SKRecognizer {
         }
     }
     
+    public static func recognizeNoteDrawing(noteDrawing: NoteDrawing, pkStrokes: [PKStroke], handleFinish:@escaping ((_ success: Bool, _ param: NoteDrawing?)->())) {
+        var strokes: [Stroke] = [Stroke]()
+        var points: [StrokePoint] = [StrokePoint]()
+        for stroke in pkStrokes {
+            for point in stroke.path.interpolatedPoints(by: .parametricStep(1.0)) {
+                points.append(StrokePoint.init(x: Float(point.location.x), y: Float(point.location.y), t: Int(point.timeOffset * 1000)))
+            }
+            strokes.append(Stroke.init(points: points))
+            points = []
+        }
+        if !strokes.isEmpty {
+            let ink = Ink.init(strokes: strokes)
+            let drawingArea = WritingArea.init(width: Float(noteDrawing.getRegion().size.width), height: Float(noteDrawing.getRegion().size.height))
+            let context = DigitalInkRecognitionContext.init(preContext: "", writingArea: drawingArea)
+            drawingRecognizer.recognize(
+                ink: ink,
+                context: context,
+                completion: {
+                    (result: DigitalInkRecognitionResult?, error: Error?) in
+                    if let result = result, let candidate = result.candidates.first {
+                        log.info("Recognized Drawing: \(candidate.text)")
+                        let updatedNoteDrawing = NoteDrawing(label: candidate.text, region: noteDrawing.getRegion())
+                        handleFinish(true, updatedNoteDrawing)
+                    } else {
+                        log.error(error.debugDescription)
+                        handleFinish(false, nil)
+                    }
+                })
+        }
+    }
+    
     private static func createInkFrom(pkStrokes: [PKStroke]) -> Ink? {
         var strokes: [Stroke] = [Stroke]()
         var points: [StrokePoint] = [StrokePoint]()
