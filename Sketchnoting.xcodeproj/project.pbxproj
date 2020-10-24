@@ -98,7 +98,6 @@
 		9FB87CF924B006B900A262D8 /* ALMAARHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB87CF824B006B900A262D8 /* ALMAARHelper.swift */; };
 		9FB9984724868561003773F2 /* MoveFileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB9984624868561003773F2 /* MoveFileViewController.swift */; };
 		9FB9984924868700003773F2 /* MoveFileViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB9984824868700003773F2 /* MoveFileViewCell.swift */; };
-		9FB9E501237F500B00279F3E /* ShareNoteViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB9E500237F500B00279F3E /* ShareNoteViewController.swift */; };
 		9FBC2E0924904DAD002AC8A3 /* AppSearch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FBC2E0824904DAD002AC8A3 /* AppSearch.swift */; };
 		9FBF6AB422E9F391001FD730 /* VisionTextWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FBF6AB322E9F391001FD730 /* VisionTextWrapper.swift */; };
 		9FBF6AB622E9F3FE001FD730 /* VisionTextBlockWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FBF6AB522E9F3FE001FD730 /* VisionTextBlockWrapper.swift */; };
@@ -245,7 +244,6 @@
 		9FB87CF824B006B900A262D8 /* ALMAARHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ALMAARHelper.swift; sourceTree = "<group>"; };
 		9FB9984624868561003773F2 /* MoveFileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoveFileViewController.swift; sourceTree = "<group>"; };
 		9FB9984824868700003773F2 /* MoveFileViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoveFileViewCell.swift; sourceTree = "<group>"; };
-		9FB9E500237F500B00279F3E /* ShareNoteViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareNoteViewController.swift; sourceTree = "<group>"; };
 		9FBC2E0824904DAD002AC8A3 /* AppSearch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSearch.swift; sourceTree = "<group>"; };
 		9FBF6AB322E9F391001FD730 /* VisionTextWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisionTextWrapper.swift; sourceTree = "<group>"; };
 		9FBF6AB522E9F3FE001FD730 /* VisionTextBlockWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisionTextBlockWrapper.swift; sourceTree = "<group>"; };
@@ -463,7 +461,6 @@
 			children = (
 				9F75E44E230D848200488BBD /* SettingsViewController.swift */,
 				9F05BC7E23761C4A00D49A88 /* NoteTextViewController.swift */,
-				9FB9E500237F500B00279F3E /* ShareNoteViewController.swift */,
 				9F9898302470DC2700E62CD1 /* TextBoxViewController.swift */,
 				9FC5F90724A8DFEA00CDF2DF /* NoteOptionsViewController.swift */,
 				9FC5F90924A8E20000CDF2DF /* NoteOptionsCollectionViewCell.swift */,
@@ -1004,7 +1001,6 @@
 				9FD29C472239588E00CC969A /* UIViewExtensions.swift in Sources */,
 				9FB9984924868700003773F2 /* MoveFileViewCell.swift in Sources */,
 				9FA8C000239B18BA00BAA42B /* TagsViewController.swift in Sources */,
-				9FB9E501237F500B00279F3E /* ShareNoteViewController.swift in Sources */,
 				9FBF6AB822E9F428001FD730 /* VisionTextLineWrapper.swift in Sources */,
 				9FD8BB97243D5BE500542BFA /* ImportHelper.swift in Sources */,
 				9F4BB37424ED807A00ED1E2F /* NoteLayersViewController.swift in Sources */,

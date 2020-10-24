@@ -291,8 +291,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     }
     
     private func displayDocumentPicker() {
-        let types: [String] = ImportHelper.importUTTypes
-        let documentPicker = UIDocumentPickerViewController(documentTypes: types, in: .import)
+        let documentPicker = UIDocumentPickerViewController(forOpeningContentTypes: ImportHelper.importUTTypes)
         documentPicker.delegate = self
         documentPicker.modalPresentationStyle = .pageSheet
         documentPicker.allowsMultipleSelection = true

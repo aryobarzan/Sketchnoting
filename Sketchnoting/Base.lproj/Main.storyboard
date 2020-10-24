@@ -2,7 +2,7 @@
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17156" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="c3X-aa-9QU">
     <device id="ipad9_7" orientation="portrait" layout="fullscreen" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17125"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17126"/>
         <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
@@ -896,7 +896,6 @@
                         <outlet property="selectionModeButton" destination="lgv-jf-NTo" id="iA0-hj-klJ"/>
                         <segue destination="lDo-DG-9fX" kind="show" identifier="NewSketchnote" id="ct4-u7-KZY"/>
                         <segue destination="lDo-DG-9fX" kind="show" identifier="EditSketchnote" id="lta-QB-BHq"/>
-                        <segue destination="riE-Ei-xpK" kind="presentation" identifier="ShareNote" modalPresentationStyle="formSheet" id="58e-4d-iJp"/>
                         <segue destination="rTB-ZY-UKo" kind="popoverPresentation" identifier="EditNoteTags" popoverAnchorView="QAN-3k-yxQ" id="yvs-ei-HRy">
                             <popoverArrowDirection key="popoverArrowDirection" up="YES" down="YES" left="YES" right="YES"/>
                         </segue>
@@ -1560,7 +1559,6 @@
                         <outlet property="tagsButton" destination="yGF-Hj-T4k" id="fRv-DA-0HD"/>
                         <outlet property="topicsButton" destination="RnC-a4-JG6" id="Mbd-F4-fiv"/>
                         <segue destination="phx-Z7-ZDE" kind="presentation" identifier="ViewNoteText" id="M8J-A4-lvC"/>
-                        <segue destination="riE-Ei-xpK" kind="presentation" identifier="ShareNote" modalPresentationStyle="formSheet" id="OAt-q3-0jJ"/>
                         <segue destination="Od9-Xc-VPJ" kind="presentation" identifier="showRelatedNoteEditing" id="b6T-Lb-KBp"/>
                         <segue destination="aTo-Yd-YX3" kind="presentation" identifier="ShowTextBoxVC" id="S3h-ZS-57D"/>
                         <segue destination="h1g-fm-D3K" kind="presentation" identifier="MoveFileNoteEditing" modalPresentationStyle="formSheet" id="RAn-aJ-7TA"/>
@@ -1675,102 +1673,6 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="qnQ-PW-Qq9" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="2052.34375" y="993.74999999999989"/>
-        </scene>
-        <!--Share Note-->
-        <scene sceneID="oWe-gy-fk0">
-            <objects>
-                <viewController modalPresentationStyle="formSheet" id="SQo-js-3ck" customClass="ShareNoteViewController" customModule="Sketchnoting" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="RPx-jo-deN">
-                        <rect key="frame" x="0.0" y="0.0" width="540" height="620"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <subviews>
-                            <textField opaque="NO" contentMode="scaleToFill" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Page number" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="oOI-3r-bBK">
-                                <rect key="frame" x="213" y="104" width="114" height="34"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                <textInputTraits key="textInputTraits" autocorrectionType="no" spellCheckingType="no" keyboardType="numberPad" textContentType="one-time-code"/>
-                            </textField>
-                            <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="WFJ-14-jWK">
-                                <rect key="frame" x="181.5" y="65" width="177" height="32"/>
-                                <segments>
-                                    <segment title="Entire Note"/>
-                                    <segment title="Page..."/>
-                                </segments>
-                                <connections>
-                                    <action selector="typeSegmentedControlChanged:" destination="SQo-js-3ck" eventType="valueChanged" id="eRp-iC-Pr7"/>
-                                </connections>
-                            </segmentedControl>
-                            <stackView opaque="NO" contentMode="scaleToFill" spacing="15" translatesAutoresizingMaskIntoConstraints="NO" id="bN0-ie-NfR">
-                                <rect key="frame" x="156" y="146" width="228.5" height="25"/>
-                                <subviews>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ic7-vI-E0c">
-                                        <rect key="frame" x="0.0" y="0.0" width="55" height="25"/>
-                                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                        <color key="tintColor" systemColor="linkColor"/>
-                                        <state key="normal" title=" File" image="arrow.down.doc" catalog="system">
-                                            <color key="titleColor" systemColor="linkColor"/>
-                                            <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="large"/>
-                                        </state>
-                                        <connections>
-                                            <action selector="fileTapped:" destination="SQo-js-3ck" eventType="touchUpInside" id="uzJ-oR-gQR"/>
-                                        </connections>
-                                    </button>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Px9-VS-PQm">
-                                        <rect key="frame" x="70" y="0.0" width="60" height="25"/>
-                                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                        <color key="tintColor" systemColor="linkColor"/>
-                                        <state key="normal" title=" PDF" image="doc.plaintext" catalog="system">
-                                            <color key="titleColor" systemColor="linkColor"/>
-                                            <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="large"/>
-                                        </state>
-                                        <connections>
-                                            <action selector="pdfTapped:" destination="SQo-js-3ck" eventType="touchUpInside" id="WXy-oh-dyx"/>
-                                        </connections>
-                                    </button>
-                                    <button opaque="NO" contentMode="scaleToFill" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="5N1-uy-U7o">
-                                        <rect key="frame" x="145" y="0.0" width="83.5" height="25"/>
-                                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                        <color key="tintColor" systemColor="linkColor"/>
-                                        <state key="normal" title=" Image" image="photo" catalog="system">
-                                            <color key="titleColor" systemColor="linkColor"/>
-                                            <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="large"/>
-                                        </state>
-                                        <connections>
-                                            <action selector="imageTapped:" destination="SQo-js-3ck" eventType="touchUpInside" id="4lX-UA-dYz"/>
-                                        </connections>
-                                    </button>
-                                </subviews>
-                            </stackView>
-                        </subviews>
-                        <viewLayoutGuide key="safeArea" id="xDA-0x-jaW"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                        <constraints>
-                            <constraint firstItem="WFJ-14-jWK" firstAttribute="centerX" secondItem="RPx-jo-deN" secondAttribute="centerX" id="2GH-wk-jb2"/>
-                            <constraint firstItem="WFJ-14-jWK" firstAttribute="top" secondItem="xDA-0x-jaW" secondAttribute="top" constant="9" id="VXc-vL-OPs"/>
-                            <constraint firstItem="oOI-3r-bBK" firstAttribute="top" secondItem="WFJ-14-jWK" secondAttribute="bottom" constant="8" id="WAd-CY-Eac"/>
-                            <constraint firstItem="bN0-ie-NfR" firstAttribute="centerX" secondItem="RPx-jo-deN" secondAttribute="centerX" id="coW-tF-5UA"/>
-                            <constraint firstItem="bN0-ie-NfR" firstAttribute="top" secondItem="oOI-3r-bBK" secondAttribute="bottom" constant="8" id="lcH-Me-fbU"/>
-                            <constraint firstItem="oOI-3r-bBK" firstAttribute="centerX" secondItem="RPx-jo-deN" secondAttribute="centerX" id="sY0-uK-bfc"/>
-                        </constraints>
-                    </view>
-                    <navigationItem key="navigationItem" title="Share Note" id="PkC-y8-STy">
-                        <barButtonItem key="rightBarButtonItem" style="done" systemItem="done" id="XxU-yN-Z7e">
-                            <connections>
-                                <action selector="doneTapped:" destination="SQo-js-3ck" id="Jga-GS-LNb"/>
-                            </connections>
-                        </barButtonItem>
-                    </navigationItem>
-                    <modalFormSheetSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
-                    <connections>
-                        <outlet property="fileButton" destination="ic7-vI-E0c" id="JYb-FP-qzc"/>
-                        <outlet property="imageButton" destination="5N1-uy-U7o" id="cfF-A1-3A6"/>
-                        <outlet property="pageNumberField" destination="oOI-3r-bBK" id="A2I-p5-Yq9"/>
-                        <outlet property="pdfButton" destination="Px9-VS-PQm" id="Ebf-oj-DQW"/>
-                        <outlet property="typeSegmentedControl" destination="WFJ-14-jWK" id="o8N-s7-KCo"/>
-                    </connections>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="jyN-0z-aGs" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="3748.4375" y="1685.7421875"/>
         </scene>
         <!--Note Info View Controller-->
         <scene sceneID="sUO-08-BxB">
@@ -2894,24 +2796,6 @@
             <point key="canvasLocation" x="4946.875" y="3771.6796874999995"/>
         </scene>
         <!--Navigation Controller-->
-        <scene sceneID="com-Ei-8ib">
-            <objects>
-                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="riE-Ei-xpK" sceneMemberID="viewController">
-                    <toolbarItems/>
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="WS2-tY-kyH">
-                        <rect key="frame" x="0.0" y="0.0" width="540" height="56"/>
-                        <autoresizingMask key="autoresizingMask"/>
-                    </navigationBar>
-                    <nil name="viewControllers"/>
-                    <connections>
-                        <segue destination="SQo-js-3ck" kind="relationship" relationship="rootViewController" id="8NL-My-4IG"/>
-                    </connections>
-                </navigationController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="FGY-bp-lj3" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="2982.8125" y="1685.7421875"/>
-        </scene>
-        <!--Navigation Controller-->
         <scene sceneID="S4h-T9-mzD">
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="rTB-ZY-UKo" sceneMemberID="viewController">
@@ -3466,14 +3350,12 @@
         <segue reference="RAn-aJ-7TA"/>
         <segue reference="b6T-Lb-KBp"/>
         <segue reference="odf-CP-ags"/>
-        <segue reference="OAt-q3-0jJ"/>
         <segue reference="ct4-u7-KZY"/>
     </inferredMetricsTieBreakers>
     <resources>
         <image name="antenna.radiowaves.left.and.right" catalog="system" width="128" height="109"/>
         <image name="arrow.clockwise" catalog="system" width="115" height="128"/>
         <image name="arrow.down" catalog="system" width="120" height="128"/>
-        <image name="arrow.down.doc" catalog="system" width="115" height="128"/>
         <image name="arrow.left" catalog="system" width="128" height="98"/>
         <image name="arrow.left.circle" catalog="system" width="128" height="121"/>
         <image name="arrow.right.circle" catalog="system" width="128" height="121"/>
@@ -3489,7 +3371,6 @@
         <image name="clear.fill" catalog="system" width="128" height="114"/>
         <image name="doc.circle" catalog="system" width="128" height="121"/>
         <image name="doc.on.clipboard" catalog="system" width="116" height="128"/>
-        <image name="doc.plaintext" catalog="system" width="115" height="128"/>
         <image name="doc.richtext" catalog="system" width="115" height="128"/>
         <image name="doc.text.viewfinder" catalog="system" width="128" height="115"/>
         <image name="ellipsis.circle.fill" catalog="system" width="128" height="121"/>
@@ -3507,7 +3388,6 @@
         <image name="magnifyingglass.circle.fill" catalog="system" width="128" height="121"/>
         <image name="pencil.and.outline" catalog="system" width="128" height="128"/>
         <image name="person.circle" catalog="system" width="128" height="121"/>
-        <image name="photo" catalog="system" width="128" height="93"/>
         <image name="plus" catalog="system" width="128" height="113"/>
         <image name="plus.circle" catalog="system" width="128" height="121"/>
         <image name="plus.circle.fill" catalog="system" width="128" height="121"/>

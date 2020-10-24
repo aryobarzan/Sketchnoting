@@ -222,7 +222,7 @@ class Note: File, DocumentDelegate {
     public func getText(raw: Bool = false) -> String {
         var text: String = ""
         for page in pages {
-            text = text + page.getText()
+            text = text + page.getRecognizedText().getText()
         }
         return text
     }

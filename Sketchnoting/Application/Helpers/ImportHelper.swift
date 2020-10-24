@@ -9,12 +9,13 @@
 import UIKit
 import PDFKit
 import MobileCoreServices
+import UniformTypeIdentifiers
 
 import Highlightr
 
 class ImportHelper {
-    static var importUTTypes = ["public.image", "public.jpeg", "public.jpg", "public.png", "com.sketchnote", "com.adobe.pdf", String(kUTTypeText), String(kUTTypeJavaClass), String(kUTTypeCSource), String(kUTTypePlainText), String(kUTTypeSourceCode), "com.sun.java-source", "com.pkware.zip-archive", "public.zip-archive"]
-    static var noteEditingUTTypes = ["public.image", "public.jpeg", "public.jpg", "public.png", "com.sketchnote", "com.adobe.pdf", String(kUTTypeText), String(kUTTypeJavaClass), String(kUTTypeCSource), String(kUTTypePlainText), String(kUTTypeSourceCode), "com.sun.java-source"]
+    static var importUTTypes = [UTType.image, UTType("com.sketchnote")!, UTType.pdf, UTType.text, UTType.cSource, UTType.plainText, UTType.sourceCode, UTType("com.sun.java-source")!, UTType.archive, UTType("com.pkware.zip-archive")!, UTType.zip]
+    static var noteEditingUTTypes = [UTType.image, UTType("com.sketchnote")!, UTType.pdf, UTType.text, UTType.cSource, UTType.plainText, UTType.sourceCode, UTType("com.sun.java-source")!]
     static func importItems(urls: [URL]) -> ([(URL, Note)], [UIImage], [PDFDocument], [NoteTypedText]) {
         var notes = [(URL, Note)]()
         var images = [UIImage]()

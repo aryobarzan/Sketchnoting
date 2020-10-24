@@ -12,6 +12,7 @@ import VisionKit
 import MobileCoreServices
 import PDFKit
 import SafariServices
+import UniformTypeIdentifiers
 
 import Firebase
 import NVActivityIndicatorView
@@ -165,10 +166,8 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         }
     }
     
-    // This function is called when the user closes the page, i.e. stops editing the note, and the app returns to the home page.
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         super.prepare(for: segue, sender: sender)
-        
         switch(segue.identifier ?? "") {
         case "Placeholder":
             log.info("Placeholder")
@@ -312,7 +311,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         self.clearConceptHighlights()
         // Setup concept highlights
         if self.previousStateOfTopicsShown {
-            self.setupTopicAnnotations(recognitionImageSize: canvasView.frame.size)
+            self.setupTopicAnnotations()
         }
         self.updateTopicsCount()
         
@@ -383,12 +382,12 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         pdfAnnotations = [PDFAnnotation : [Document]]()
     }
     
-    private func setupTopicAnnotations(recognitionImageSize: CGSize) {
+    private func setupTopicAnnotations() {
         self.conceptHighlights = [UIView : [Document]]()
         self.removeDetectionAnnotations()
         self.clearPDFAnnotations()
         
-        let transform = self.transformMatrix(recognitionImageSize)
+        let transform = self.transformMatrix(self.canvasView.bounds.size)
 
         let documents = note.1.getDocuments()
         if let pdfDoc = pdfView.document, let page = pdfDoc.page(at: 0), let body = page.string {
@@ -399,33 +398,36 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                 }
             }
         }
-        if let textData = note.1.getCurrentPage().getNoteText() {
-            for document in documents {
-                let documentTitle = self.trimDocumentTitle(document: document)
-                if textData.text.trimmingCharacters(in: .whitespacesAndNewlines).lowercased().contains(documentTitle) {
-                    for block in textData.blocks {
-                        for line in block.lines {
-                            for element in line.elements {
-                                let elementText = element.text.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-                                if elementText == documentTitle {
-                                    let v = drawFrame(element.frame, in: .green, transform: transform)
-                                    self.addTopicFrame(topicFrame: v, document: document)
+        let textData = note.1.getCurrentPage().getRecognizedText()
+        for document in documents {
+            let documentTitle = self.trimDocumentTitle(document: document)
+            if textData.getText().trimmingCharacters(in: .whitespacesAndNewlines).lowercased().contains(documentTitle) {
+                for line in textData.lines {
+                    for element in line.words {
+                        let elementText = element.text.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+                        if elementText == documentTitle && element.renderBounds != nil {
+                            let v = drawFrame(element.renderBounds!, in: .green, transform: transform)
+                            self.addTopicFrame(topicFrame: v, document: document)
+                        }
+                    }
+                    for index in 0..<line.words.count {
+                        var elementText = line.words[index].text.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+                        if line.words[index].renderBounds == nil {
+                            break
+                        }
+                        var width = line.words[index].renderBounds!.width
+                        if index < line.words.count-1 {
+                            for j in index+1..<line.words.count {
+                                if line.words[j].renderBounds == nil {
+                                    break
                                 }
-                            }
-                            for index in 0..<line.elements.count {
-                                var elementText = line.elements[index].text.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-                                var width = line.elements[index].frame.width
-                                if index < line.elements.count-1 {
-                                    for j in index+1..<line.elements.count {
-                                        elementText = elementText + " " + line.elements[j].text.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-                                        width = width + line.elements[j].frame.width
-                                        if elementText == documentTitle {
-                                            let fr = CGRect(x: line.elements[index].frame.minX, y: line.elements[index].frame.minY, width: width, height: line.elements[index].frame.height)
-                                            let v = drawFrame(fr, in: .green, transform: transform)
-                                            self.addTopicFrame(topicFrame: v, document: document)
-                                            break
-                                        }
-                                    }
+                                elementText = elementText + " " + line.words[j].text.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+                                width = width + line.words[j].renderBounds!.width
+                                if elementText == documentTitle {
+                                    let fr = CGRect(x: line.words[index].renderBounds!.minX, y: line.words[index].renderBounds!.minY, width: width, height: line.words[index].renderBounds!.height)
+                                    let v = drawFrame(fr, in: .green, transform: transform)
+                                    self.addTopicFrame(topicFrame: v, document: document)
+                                    break
                                 }
                             }
                         }
@@ -641,7 +643,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     private func toggleConceptHighlight() {
         topicsShown = !topicsShown
         if topicsShown {
-            setupTopicAnnotations(recognitionImageSize: canvasView.frame.size)
+            setupTopicAnnotations()
             topicsButton.tintColor = self.view.tintColor
             topicsButton.setTitleColor(self.view.tintColor, for: .normal)
         }
@@ -760,7 +762,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     func noteOptionSelected(option: NoteOption) {
         switch option {
         case .Annotate:
-            self.processHandwritingRecognition()
+            self.annotate()
             break
         case .RelatedNotes:
             self.noteForRelatedNotes = self.note
@@ -793,7 +795,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             self.clearConceptHighlights()
             documentsVC.clear()
             documentsVC.update(note: self.note)
-            self.processHandwritingRecognition()
+            self.inspectStrokes()
             break
         case .DeleteNote:
             self.isDeletingNote = true
@@ -828,49 +830,15 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         }
     }
     
+    private func annotate() {
+        if self.topicsShown {
+            self.setupTopicAnnotations()
+        }
+        self.annotateText(text: self.note.1.getText())
+    }
+    
     //MARK: Handwriting recognition process
     let handwritingRecognizer = HandwritingRecognizer()
-    
-    private func processHandwritingRecognition() {
-        self.generateHandwritingRecognitionImage(completion: { image in
-            self.handwritingRecognizer.recognize(spellcheck: false, image: image) { (success, noteText) in
-                if success {
-                    self.note.1.getCurrentPage().clearNoteText()
-                    if let noteText = noteText {
-                        self.note.1.getCurrentPage().setNoteText(noteText: noteText)
-                        self.startSaveTimer()
-                        if self.topicsShown {
-                            self.setupTopicAnnotations(recognitionImageSize: image.size)
-                        }
-                        self.annotateText(text: self.note.1.getText())
-                        log.info(noteText.spellchecked)
-                    }
-                }
-                else {
-                    log.error("Handwriting recognition returned no result.")
-                }
-            }
-        })
-    }
-    private func generateHandwritingRecognitionImage(completion: @escaping (UIImage) -> Void){
-        let page = note.1.getCurrentPage()
-        UITraitCollection(userInterfaceStyle: .light).performAsCurrent {
-            var image = canvasView.drawing.image(from: canvasView.bounds, scale: 1.0)
-            let canvasImage = image
-            var pdfImage: UIImage?
-            if let _ = page.getPDFDocument() {
-                pdfImage = pdfView.asImage()
-            }
-            DispatchQueue.global(qos: .utility).async {
-                if let pdfImage = pdfImage {
-                    image = pdfImage.mergeAlternatively(with: canvasImage)
-                }
-                DispatchQueue.main.async {
-                    completion(image)
-                }
-            }
-        }
-    }
     
     var connectivity: Connectivity?
     func annotateText(text: String) {
@@ -947,16 +915,12 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     var resetHandwritingRecognition = false
 
     func canvasViewDidEndUsingTool(_ canvasView: PKCanvasView) {
-        if (canvasView.tool is PKInkingTool && (canvasView.tool as! PKInkingTool).inkType != PKInkingTool.InkType.marker) || canvasView.tool is PKEraserTool {
-            if SettingsManager.automaticAnnotation() {
-                self.startRecognitionTimer()
-            }
-        }
     }
     
     var pageChanged = false
     func canvasViewDrawingDidChange(_ canvasView: PKCanvasView) {
         self.resetHandwritingRecognition = true
+        startRecognitionTimer()
         if pageChanged {
             pageChanged = false
         }
@@ -964,7 +928,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             note.1.getCurrentPage().canvasDrawing = self.canvasView.drawing
             self.startSaveTimer()
         }
-        self.inspectStrokes()
     }
     
     private func startRecognitionTimer() {
@@ -979,7 +942,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     {
         textRecognitionTimer?.invalidate()
         textRecognitionTimer = nil
-        self.processHandwritingRecognition()
+        self.inspectStrokes()
     }
     
     var saveTimer: Timer?
@@ -1412,8 +1375,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     }
     
     private func displayDocumentPicker() {
-        let types: [String] = ImportHelper.noteEditingUTTypes
-        let documentPicker = UIDocumentPickerViewController(documentTypes: types, in: .import)
+        let documentPicker = UIDocumentPickerViewController(forOpeningContentTypes: ImportHelper.noteEditingUTTypes)
         documentPicker.delegate = self
         documentPicker.modalPresentationStyle = .pageSheet
         documentPicker.allowsMultipleSelection = true
@@ -1520,7 +1482,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         let differences = zip(oldDocuments, note.1.getDocuments()).map {$0.0 == $0.1}
         if differences.count > 0 {
             if self.topicsShown {
-                self.setupTopicAnnotations(recognitionImageSize: canvasView.frame.size)
+                self.setupTopicAnnotations()
             }
         }
     }
@@ -1766,10 +1728,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             if success {
                 self.note.1.getCurrentPage().addRecognizedLine(line: line!, lineNumber: lineNumber)
                 log.info("Line \(lineNumber): \(line!.text)")
-//                let fr = line!.words[0].renderBounds!//line!.renderBounds
-//                let transform = self.transformMatrix(self.canvasView.bounds.size)
-//                let v = self.drawFrame(fr, in: .green, transform: transform)
-//                self.addTopicFrame(topicFrame: v, document: WATDocument(title: "test", description: "...", URL: "someURL", type: .WAT, spot: nil, wikiPageID: nil)!)
             }
             self.startSaveTimer()
         }
