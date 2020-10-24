@@ -70,6 +70,8 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     
     @IBOutlet weak var tagsButton: UIButton!
     
+    private var pkToolPicker: PKToolPicker!
+    
     private lazy var topicsOverlayView: UIView = {
       precondition(isViewLoaded)
       let topicsOverlayView = UIView(frame: .zero)
@@ -92,13 +94,11 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         
         self.canvasView.drawingPolicy = PKCanvasViewDrawingPolicy.pencilOnly
         self.canvasView.delegate = self
-        if let window = parent?.view.window {
-            let toolPicker = PKToolPicker.shared(for: window)!
-            toolPicker.setVisible(true, forFirstResponder: canvasView)
-            toolPicker.addObserver(canvasView)
-            toolPicker.addObserver(self)
-            canvasView.becomeFirstResponder()
-        }
+        pkToolPicker = PKToolPicker.init()
+        pkToolPicker.setVisible(true, forFirstResponder: canvasView)
+        pkToolPicker.addObserver(canvasView)
+        pkToolPicker.addObserver(self)
+        canvasView.becomeFirstResponder()
         canvasViewLongPressGesture.allowedTouchTypes = [0]
                 
         let interaction = UIPencilInteraction()
@@ -1766,6 +1766,10 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             if success {
                 self.note.1.getCurrentPage().addRecognizedLine(line: line!, lineNumber: lineNumber)
                 log.info("Line \(lineNumber): \(line!.text)")
+//                let fr = line!.words[0].renderBounds!//line!.renderBounds
+//                let transform = self.transformMatrix(self.canvasView.bounds.size)
+//                let v = self.drawFrame(fr, in: .green, transform: transform)
+//                self.addTopicFrame(topicFrame: v, document: WATDocument(title: "test", description: "...", URL: "someURL", type: .WAT, spot: nil, wikiPageID: nil)!)
             }
             self.startSaveTimer()
         }
