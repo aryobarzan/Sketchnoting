@@ -16,7 +16,6 @@ class DrawingSearchViewController: UIViewController, PKCanvasViewDelegate {
     @IBOutlet weak var searchButton: UIButton!
     var searchLabel: String?
     var delegate: DrawingSearchDelegate?
-    var drawingRecognition = DrawingRecognition()
     override func viewDidLoad() {
         super.viewDidLoad()
         

@@ -203,7 +203,7 @@ class SKRecognizer {
                                 if !currentWordStrokes.isEmpty {
                                     strokesByWord.append(currentWordStrokes)
                                 }
-                                log.info("Number of words segmented: \(strokesByWord.count)")
+                                log.info("(Iteration \(iterations)) Number of words segmented: \(strokesByWord.count)")
                                 iterations -= 1
                                 if strokesByWord.count > words.count {
                                     modifier -= 2

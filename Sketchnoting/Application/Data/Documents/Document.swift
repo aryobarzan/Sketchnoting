@@ -114,7 +114,7 @@ class Document: Codable, Visitable, Equatable, Hashable {
         let key = type.rawValue + "-" + self.documentType.rawValue + "-" + self.title
         let downloader = ImageDownloader.default
         if !url.absoluteString.lowercased().contains(".svg") {
-            downloader.downloadImage(with: url) { result in
+            downloader.downloadImage(with: url, completionHandler:  { result in
                 switch result {
                 case .success(let value):
                     if value.originalData.count < 10000000 {
@@ -124,7 +124,7 @@ class Document: Codable, Visitable, Equatable, Hashable {
                 case .failure(let error):
                     log.error(error)
                 }
-            }
+            })
         }
         else {
             log.info("SVG preview image detected.")

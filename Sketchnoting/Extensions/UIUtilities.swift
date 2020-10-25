@@ -128,14 +128,17 @@ public class UIUtilities {
 
   private static func currentUIOrientation() -> UIDeviceOrientation {
     let deviceOrientation = { () -> UIDeviceOrientation in
-      switch UIApplication.shared.statusBarOrientation {
+      switch UIApplication.shared.windows
+        .first?
+        .windowScene?
+        .interfaceOrientation {
       case .landscapeLeft:
         return .landscapeRight
       case .landscapeRight:
         return .landscapeLeft
       case .portraitUpsideDown:
         return .portraitUpsideDown
-      case .portrait, .unknown:
+      case .portrait, .unknown, .none:
         return .portrait
       @unknown default:
         return .portrait

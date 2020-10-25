@@ -499,29 +499,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         }
     }
     
-    // Drawing recognition
-    // In case the user's drawing has been recognized with at least a >30% confidence, the recognized drawing's label, e.g. "light bulb", is stored for the sketchnote.
-    private var drawingRecognition = DrawingRecognition()
-    private func processDrawingRecognition() {
-        UITraitCollection(userInterfaceStyle: .light).performAsCurrent {
-            let whiteBackground = UIColor.white.image(CGSize(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height))
-            var canvasImage = canvasView.drawing.image(from: UIScreen.main.bounds, scale: 1.0)
-            canvasImage = canvasImage.blackAndWhite() ?? canvasImage.toGrayscale
-            DispatchQueue.main.async {
-                var merged = whiteBackground.merge(with: canvasImage)
-                merged = merged.invertedImage() ?? merged
-                for region in self.drawingViews {
-                    let image = UIImage(cgImage: merged.cgImage!.cropping(to: region.frame)!)
-                    if let recognition = self.drawingRecognition.recognize(image: image) {
-                        log.info("Recognized drawing: \(recognition)")
-                        self.note.1.getCurrentPage().addDrawing(label: recognition.0, region: region.frame)
-                        NeoLibrary.save(note: self.note.1, url: self.note.0)
-                    }
-                }
-            }
-        }
-    }
-    
     private func refreshHelpLines() {
         if let gridView = gridView {
             gridView.removeFromSuperview()
@@ -697,64 +674,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                 }
             }
             if isRecognizingDrawing {
-                self.processDrawingRecognition(atTouch: sender.location(in: canvasView))
-            }
-        }
-    }
-    
-    private func processDrawingRecognition(atTouch loc: CGPoint) {
-        UITraitCollection(userInterfaceStyle: .light).performAsCurrent {
-            let whiteBackground = UIColor.white.image(CGSize(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height))
-            var canvasImage = self.canvasView.drawing.image(from: UIScreen.main.bounds, scale: 1.0)
-            canvasImage = canvasImage.blackAndWhite() ?? canvasImage.toGrayscale
-             
-            var merged = whiteBackground.merge(with: canvasImage)
-            merged = merged.invertedImage() ?? merged
-            DispatchQueue.main.async {
-                
-                let regionSizes = [75, 100, 125]
-                let offsets = [0, 10, 20, -10, -20]
-                var bestPredictionLabel: String?
-                var bestScore: Double?
-                var bestRegion: UIView?
-                for regionSize in regionSizes {
-                    for offset in offsets {
-                        let region = UIView(frame: CGRect(x: Int(loc.x)-regionSize/2+offset, y: Int(loc.y)-regionSize/2+offset, width: regionSize, height: regionSize))
-                        let image = UIImage(cgImage: merged.cgImage!.cropping(to: region.frame)!)
-                        if let recognition = self.drawingRecognition.recognize(image: image) {
-                            if bestPredictionLabel == nil || bestScore! < recognition.1 {
-                                bestPredictionLabel = recognition.0
-                                bestScore = recognition.1
-                                bestRegion = region
-                            }
-                        }
-                    }
-                }
-                if bestPredictionLabel != nil {
-                    log.info("Recognized drawing at touched point: \(bestPredictionLabel!) (\(Double(round(1000*bestScore!*100)/1000))% confidence)")
-                    let drawing = NoteDrawing(label: bestPredictionLabel!, region: bestRegion!.frame)
-                    if !self.note.1.getCurrentPage().hasDrawing(drawing: drawing) {
-                        bestRegion!.layer.borderColor = UIColor.label.cgColor
-                        bestRegion!.layer.borderWidth = 1
-                        self.drawingInsertionCanvas.addSubview(bestRegion!)
-                        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(self.handleDrawingRegionTap(_:)))
-                        bestRegion!.addGestureRecognizer(tapGesture)
-                        bestRegion!.isUserInteractionEnabled = true
-                        self.drawingViews.append(bestRegion!)
-                        self.note.1.getCurrentPage().addDrawing(drawing: drawing)
-                        NeoLibrary.save(note: self.note.1, url: self.note.0)
-                        self.view.makeToast("Recognized drawing: \(bestPredictionLabel!)", duration: 1.0, position: .center)
-                        self.canvasView.rippleFill(location: loc, color: .systemGreen)
-                    }
-                    else {
-                        self.view.makeToast("Drawing is already recognized: \(bestPredictionLabel!)", duration: 1.0, position: .center)
-                        self.canvasView.rippleFill(location: loc, color: .systemOrange)
-                    }
-                }
-                else {
-                    self.view.makeToast("No drawing recognized. Try long-pressing in the center of your drawing!", duration: 1.0, position: .center)
-                    self.canvasView.rippleFill(location: loc, color: .systemRed)
-                }
+                // to update
             }
         }
     }
@@ -1168,18 +1088,12 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             endPoint = tapPoint
             if let currentDrawingRegion = currentDrawingRegion {
                 if currentDrawingRegion.frame.width >= 50 {
-                    UITraitCollection(userInterfaceStyle: .light).performAsCurrent {
-                        let whiteBackground = UIColor.white.image(CGSize(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height))
-                        var canvasImage = canvasView.drawing.image(from: UIScreen.main.bounds, scale: 1.0)
-                        canvasImage = canvasImage.blackAndWhite() ?? canvasImage.toGrayscale
-                        DispatchQueue.main.async {
-                            var merged = whiteBackground.merge(with: canvasImage)
-                            merged = merged.invertedImage() ?? merged
-                            let image = UIImage(cgImage: merged.cgImage!.cropping(to: currentDrawingRegion.frame)!)
-                            if let recognition = self.drawingRecognition.recognize(image: image) {
-                                log.info("Recognized drawing: \(recognition)")
-                                self.view.makeToast("Recognized drawing: \(recognition.0)")
-                                self.note.1.getCurrentPage().addDrawing(label: recognition.0, region: currentDrawingRegion.frame)
+                    SKRecognizer.recognizeNoteDrawing(noteDrawing: NoteDrawing(label: "", region: currentDrawingRegion.bounds), pkStrokes: getStrokesIn(region: currentDrawingRegion.frame)) { success, noteDrawing in
+                        if success && noteDrawing != nil {
+                            DispatchQueue.main.async {
+                                log.info("Recognized drawing: \(noteDrawing!.getLabel())")
+                                self.view.makeToast("Recognized drawing: \(noteDrawing!.getLabel())")
+                                self.note.1.getCurrentPage().addDrawing(drawing: NoteDrawing(label: noteDrawing!.getLabel(), region: currentDrawingRegion.frame))
                                 self.drawingViews.append(currentDrawingRegion)
                                 
                                 let tapGesture = UITapGestureRecognizer(target: self, action: #selector(self.handleDrawingRegionTap(_:)))
@@ -1237,7 +1151,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         if topicsShown {
             self.toggleConceptHighlight()
         }
-        self.processDrawingRecognition()
         note.1.getCurrentPage().canvasDrawing = self.canvasView.drawing
         NeoLibrary.save(note: note.1, url: note.0)
         log.info("Saved note for current page.")
@@ -1769,5 +1682,15 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         }
         
         return (strokesForNoteDrawing, textStrokes)
+    }
+    
+    private func getStrokesIn(region: CGRect) -> [PKStroke] {
+        var strokes = [PKStroke]()
+        for stroke in canvasView.drawing.strokes {
+            if region.contains(stroke.renderBounds) {
+                strokes.append(stroke)
+            }
+        }
+        return strokes
     }
 }

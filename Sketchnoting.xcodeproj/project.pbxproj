@@ -82,7 +82,6 @@
 		9F9460E223F5BAA10073D709 /* Connectivity in Frameworks */ = {isa = PBXBuildFile; productRef = 9F9460E123F5BAA10073D709 /* Connectivity */; };
 		9F96895724679D4000D02F81 /* NoteDoc.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F96895624679D4000D02F81 /* NoteDoc.swift */; };
 		9F9898312470DC2700E62CD1 /* TextBoxViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F9898302470DC2700E62CD1 /* TextBoxViewController.swift */; };
-		9F9DAFE0242CB7C100713E75 /* DrawingRecognition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F9DAFDF242CB7C100713E75 /* DrawingRecognition.swift */; };
 		9FA5A482244AB14E006D9FB2 /* UILabelExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA5A481244AB14E006D9FB2 /* UILabelExtensions.swift */; };
 		9FA6238822CEA7FE007ED794 /* MapHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA6238722CEA7FE007ED794 /* MapHelper.swift */; };
 		9FA6238B22D37213007ED794 /* BioPortalHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA6238A22D37213007ED794 /* BioPortalHelper.swift */; };
@@ -229,7 +228,6 @@
 		9F9460DE23F5B0460073D709 /* GridView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GridView.swift; sourceTree = "<group>"; };
 		9F96895624679D4000D02F81 /* NoteDoc.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteDoc.swift; sourceTree = "<group>"; };
 		9F9898302470DC2700E62CD1 /* TextBoxViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextBoxViewController.swift; sourceTree = "<group>"; };
-		9F9DAFDF242CB7C100713E75 /* DrawingRecognition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrawingRecognition.swift; sourceTree = "<group>"; };
 		9FA5A481244AB14E006D9FB2 /* UILabelExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UILabelExtensions.swift; sourceTree = "<group>"; };
 		9FA6238722CEA7FE007ED794 /* MapHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapHelper.swift; sourceTree = "<group>"; };
 		9FA6238A22D37213007ED794 /* BioPortalHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BioPortalHelper.swift; sourceTree = "<group>"; };
@@ -736,7 +734,6 @@
 				9F4B38C023EA41C900F87B61 /* ReceivedNotesController.swift */,
 				9F4B38C223EB1E6D00F87B61 /* Notifications.swift */,
 				9F0ABB272412E5D400CA5A4E /* SKCacheManager.swift */,
-				9F9DAFDF242CB7C100713E75 /* DrawingRecognition.swift */,
 				9FC114D8243919BD004F576A /* ImagePickerHelper.swift */,
 				9FD8BB96243D5BE500542BFA /* ImportHelper.swift */,
 				9FBC2E0824904DAD002AC8A3 /* AppSearch.swift */,
@@ -974,7 +971,6 @@
 				9F0C8D9A253DB12B002E9811 /* SKRecognizedLine.swift in Sources */,
 				9FC114D9243919BD004F576A /* ImagePickerHelper.swift in Sources */,
 				9FC02C1C23EDB6290051C576 /* File.swift in Sources */,
-				9F9DAFE0242CB7C100713E75 /* DrawingRecognition.swift in Sources */,
 				9FAB4B7C244BEF2700DEA46F /* FittableFontLabel.swift in Sources */,
 				9FB9984724868561003773F2 /* MoveFileViewController.swift in Sources */,
 				9F00B9F824C5D56E000153A8 /* NeoDocumentsVC.swift in Sources */,
