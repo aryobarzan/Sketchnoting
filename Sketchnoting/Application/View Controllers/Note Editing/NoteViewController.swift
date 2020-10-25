@@ -1723,20 +1723,24 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         self.note.1.getCurrentPage().clearRecognizedText()
         
         let isolatedStrokes = isolateStrokes()
-        SKRecognizer.recognizeText(pkStrokes: isolatedStrokes.1) { success, line, lineNumber in
-            if success {
-                self.note.1.getCurrentPage().addRecognizedLine(line: line!, lineNumber: lineNumber)
-                log.info("Line \(lineNumber): \(line!.text)")
+        if isolatedStrokes.1.count > 0 {
+            SKRecognizer.recognizeText(pkStrokes: isolatedStrokes.1) { success, line, lineNumber in
+                if success && line != nil {
+                    self.note.1.getCurrentPage().addRecognizedLine(line: line!, lineNumber: lineNumber)
+                    log.info("Line \(lineNumber): \(line!.text)")
+                }
+                self.startSaveTimer()
             }
-            self.startSaveTimer()
         }
         
-        for comp in isolatedStrokes.0 {
-            SKRecognizer.recognizeNoteDrawing(noteDrawing: comp.0, pkStrokes: comp.1) { success, noteDrawing in
-                if success && noteDrawing != nil {
-                    self.note.1.getCurrentPage().removeDrawing(drawing: comp.0)
-                    self.note.1.getCurrentPage().addDrawing(drawing: noteDrawing!)
-                    self.startSaveTimer()
+        if isolatedStrokes.0.count > 0 {
+            for comp in isolatedStrokes.0 {
+                SKRecognizer.recognizeNoteDrawing(noteDrawing: comp.0, pkStrokes: comp.1) { success, noteDrawing in
+                    if success && noteDrawing != nil {
+                        self.note.1.getCurrentPage().removeDrawing(drawing: comp.0)
+                        self.note.1.getCurrentPage().addDrawing(drawing: noteDrawing!)
+                        self.startSaveTimer()
+                    }
                 }
             }
         }

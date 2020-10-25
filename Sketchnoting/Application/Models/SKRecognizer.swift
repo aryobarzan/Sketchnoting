@@ -112,6 +112,11 @@ class SKRecognizer {
     }
     
     public static func recognizeText(pkStrokes: [PKStroke], handleFinish:@escaping ((_ success: Bool, _ param: SKRecognizedLine?, _ lineNumber: Int)->())) {
+        if !isInitialized() {
+            initializeRecognizers()
+            log.error("Cannot recognize ink yet: recognizers are not initialized.")
+            return
+        }
         var strokesByLine = [[PKStroke]]()
         for stroke in pkStrokes {
             var groupIndex: Int?
@@ -157,7 +162,6 @@ class SKRecognizer {
                 inks.append((line, ink))
             }
         }
-        var recognitions = [Int : String]()
         for i in 0..<inks.count {
             textRecognizer.recognize(
                 ink: inks[i].1,
@@ -212,13 +216,15 @@ class SKRecognizer {
                             for j in 0..<words.count {
                                 var renderBounds: CGRect?
                                 if (j < strokesByWord.count && strokesByWord[j].count > 0) {
-                                    var wordHeight = strokesByWord[j].last!.renderBounds.height
-                                    for stroke in strokesByWord[j] {
-                                        if stroke.renderBounds.height > wordHeight {
-                                            wordHeight = stroke.renderBounds.height
+                                    if strokesByWord[j].first != nil && strokesByWord[j].last != nil {
+                                        var wordHeight = strokesByWord[j].last!.renderBounds.height
+                                        for stroke in strokesByWord[j] {
+                                            if stroke.renderBounds.height > wordHeight {
+                                                wordHeight = stroke.renderBounds.height
+                                            }
                                         }
+                                        renderBounds = CGRect(x: strokesByWord[j].first!.renderBounds.minX, y: strokesByWord[j].first!.renderBounds.minY, width: strokesByWord[j].last!.renderBounds.maxX - strokesByWord[j].first!.renderBounds.minX, height: wordHeight)
                                     }
-                                    renderBounds = CGRect(x: strokesByWord[j].first!.renderBounds.minX, y: strokesByWord[j].first!.renderBounds.minY, width: strokesByWord[j].last!.renderBounds.maxX - strokesByWord[j].first!.renderBounds.minX, height: wordHeight)
                                 }
                                 recognizedWords.append(SKRecognizedWord(text: words[j], renderBounds: renderBounds))
                             }
@@ -228,11 +234,16 @@ class SKRecognizer {
                                     lineHeight = stroke.renderBounds.height
                                 }
                             }
-                            let lineRenderBounds = CGRect(x: inks[i].0.first!.renderBounds.minX, y: inks[i].0.first!.renderBounds.minY, width: inks[i].0.last!.renderBounds.maxX - inks[i].0.first!.renderBounds.minX, height: lineHeight)
-                            let recognizedLine = SKRecognizedLine(text: result.candidates.first!.text, words: recognizedWords, renderBounds: lineRenderBounds)
-                            log.info("Recognized: \(candidate.text)")
-                            recognitions[i] = candidate.text
-                            handleFinish(true, recognizedLine, i)
+                            if inks[i].0.first != nil && inks[i].0.last != nil {
+                                let lineRenderBounds = CGRect(x: inks[i].0.first!.renderBounds.minX, y: inks[i].0.first!.renderBounds.minY, width: inks[i].0.last!.renderBounds.maxX - inks[i].0.first!.renderBounds.minX, height: lineHeight)
+                                let recognizedLine = SKRecognizedLine(text: result.candidates.first!.text, words: recognizedWords, renderBounds: lineRenderBounds)
+                                log.info("Recognized: \(candidate.text)")
+                                handleFinish(true, recognizedLine, i)
+                            }
+                            else {
+                                log.error("Unknown error (1) when recognizing line of text.")
+                                handleFinish(false, nil, -1)
+                            }
                         }
                         else {
                             handleFinish(false, nil, -1)
@@ -246,6 +257,11 @@ class SKRecognizer {
     }
     
     public static func recognizeNoteDrawing(noteDrawing: NoteDrawing, pkStrokes: [PKStroke], handleFinish:@escaping ((_ success: Bool, _ param: NoteDrawing?)->())) {
+        if !isInitialized() {
+            initializeRecognizers()
+            log.error("Cannot recognize ink yet: recognizers are not initialized.")
+            return
+        }
         var strokes: [Stroke] = [Stroke]()
         var points: [StrokePoint] = [StrokePoint]()
         for stroke in pkStrokes {
