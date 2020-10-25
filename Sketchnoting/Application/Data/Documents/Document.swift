@@ -118,10 +118,15 @@ class Document: Codable, Visitable, Equatable, Hashable {
                 switch result {
                 case .success(let value):
                     if value.originalData.count < 10000000 {
+                        log.info("Downloaded non-svg image for document: \(self.title)")
                         cache.store(value.image, original: value.originalData, forKey: key)
                         self.reload()
                     }
+                    else {
+                        log.error("Failed to download non-svg image for document due to large file size: \(self.title)")
+                    }
                 case .failure(let error):
+                    log.error("Failed to download non-svg image for document due to unknown reason: \(self.title)")
                     log.error(error)
                 }
             })
@@ -155,6 +160,7 @@ class Document: Codable, Visitable, Equatable, Hashable {
     }
     
     internal func retrieveImage(type: DocumentImageType, completion:@escaping (Result<KFCrossPlatformImage?, KingfisherError>) -> ()) {
+        
         let key = type.rawValue + "-" + self.documentType.rawValue + "-" + self.title
         let cache = SKCacheManager.cache
         cache.retrieveImageInDiskCache(forKey: key, completionHandler: { result in

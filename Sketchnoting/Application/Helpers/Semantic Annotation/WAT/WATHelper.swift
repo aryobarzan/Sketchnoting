@@ -121,7 +121,7 @@ class WATHelper {
                     json = JSON(res)
                     
                     if let wikiTitle = json["query"]["pages"][String(format: "%.0f", document.wikiPageID!)]["title"].string {
-                        let parameters: Parameters = ["action": "query", "prop": "pageimages", "format": "json", "piprop": "original", "titles": wikiTitle]
+                        let parameters: Parameters = ["action": "query", "prop": "pageimages", "format": "json", "piprop": "thumbnail", "titles": wikiTitle, "pithumbsize": 200]
                         let headers: HTTPHeaders = [
                             "Accept": "application/json"
                         ]
@@ -132,7 +132,7 @@ class WATHelper {
                             case .success(let res):
                                 json = JSON(res)
                                 
-                                if let imageURL = json["query"]["pages"][String(format: "%.0f", document.wikiPageID!)]["original"]["source"].string {
+                                if let imageURL = json["query"]["pages"][String(format: "%.0f", document.wikiPageID!)]["thumbnail"]["source"].string {
                                     DispatchQueue.global(qos: .utility).async {
                                         if let url = URL(string: imageURL) {
                                             log.info("Found Wikipedia preview image for: \(document.title)")
