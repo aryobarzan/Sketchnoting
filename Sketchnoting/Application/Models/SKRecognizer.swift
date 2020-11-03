@@ -171,6 +171,14 @@ class SKRecognizer {
                         if !candidate.text.isEmpty {
                             var recognizedWords = [SKRecognizedWord]()
                             let words = candidate.text.components(separatedBy: " ")
+//                            let centersTest = kmeans(centersCount: words.count, strokes: inks[i].0)
+//                            print("Found these centers:")
+//                            for (wordIndex, strokeArray) in centersTest {
+//                                print("Word \(wordIndex)")
+//                                for sTemp in strokeArray {
+//                                    print("Stroke - \(sTemp.renderBounds)")
+//                                }
+//                            }
                             
                             var iterations = 5
                             var strokesByWord = [[PKStroke]]()
@@ -254,6 +262,81 @@ class SKRecognizer {
                     }
                 })
         }
+    }
+    
+    private static func kmeans(centersCount: Int, strokes: [PKStroke]) -> [Int : [PKStroke]] {
+        var centers = [CGPoint]()
+        let sampledStrokes = strokes.choose(centersCount)
+        for s in sampledStrokes {
+            centers.append(s.renderBounds.origin)
+        }
+        
+        var centerDistanceChange = 0.0
+        var iteration = 0
+        repeat {
+            var newCenters = [CGPoint](repeating: CGPoint(x: 0, y: 0), count: centersCount)
+            
+            var counts = [Double](repeating: 0, count: centersCount)
+            
+            for stroke in strokes {
+                var indexOfClosestCenter = 0
+                var distance: Float = 9999
+                for i in 0..<centers.count {
+                    if cgpointDistance(from: centers[i], to: stroke.renderBounds.origin) < distance {
+                        indexOfClosestCenter = i
+                        distance = cgpointDistance(from: centers[i], to: stroke.renderBounds.origin)
+                    }
+                }
+                let temp = newCenters[indexOfClosestCenter]
+                newCenters[indexOfClosestCenter] = CGPoint(x: temp.x + stroke.renderBounds.origin.x, y: temp.y + stroke.renderBounds.origin.y)
+                counts[indexOfClosestCenter] += 1
+            }
+            
+            for i in 0..<centersCount {
+                newCenters[i] = CGPoint(x: newCenters[i].x/CGFloat(counts[i]), y: newCenters[i].y/CGFloat(counts[i]))
+            }
+            
+            centerDistanceChange = 0.0
+            for i in 0..<centersCount {
+                centerDistanceChange += Double(cgpointDistance(from: centers[i], to: newCenters[i]))
+            }
+            print("Iteration #\(iteration)")
+            print("Convergence: \(centerDistanceChange)")
+            centers = newCenters
+            iteration += 1
+        } while centerDistanceChange > 5 && iteration < 50
+        
+        var segmentedStrokes = [Int : [PKStroke]]()
+        for stroke in strokes {
+            var indexOfClosestCenter = 0
+            var distance: Float = 9999
+            for i in 0..<centers.count {
+                let temp = cgpointDistance(from: centers[i], to: stroke.renderBounds.origin)
+                if temp < distance {
+                    distance = temp
+                    indexOfClosestCenter = i
+                }
+            }
+            if segmentedStrokes[indexOfClosestCenter] == nil {
+                segmentedStrokes[indexOfClosestCenter] =  [PKStroke]()
+            }
+            var temp = segmentedStrokes[indexOfClosestCenter]!
+            temp.append(stroke)
+            segmentedStrokes[indexOfClosestCenter] = temp
+            
+        }
+        return segmentedStrokes
+    }
+    
+    private static func cgpointDistanceSquared(from: CGPoint, to: CGPoint) -> Float {
+        let x_1 = (from.x - to.x) * (from.x - to.x)
+        let y_1 = (from.y - to.y) * (from.y - to.y)
+        return Float(y_1 + x_1)
+    }
+    
+    private static func cgpointDistance(from: CGPoint, to: CGPoint) -> Float {
+        let result: Float = cgpointDistanceSquared(from: from, to: to)
+        return result.squareRoot()
     }
     
     public static func recognizeNoteDrawing(noteDrawing: NoteDrawing, pkStrokes: [PKStroke], handleFinish:@escaping ((_ success: Bool, _ param: NoteDrawing?)->())) {

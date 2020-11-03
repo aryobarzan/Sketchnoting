@@ -131,6 +131,8 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         self.topicsBadgeHub = BadgeHub(view: topicsButton)
         self.topicsBadgeHub.scaleCircleSize(by: 0.55)
         self.topicsBadgeHub.moveCircleBy(x: 4, y: -6)
+        self.topicsButton.layer.cornerRadius = 4
+        self.bookshelfButton.layer.cornerRadius = 4
         
         bioportalHelper = BioPortalHelper()
         
@@ -621,11 +623,14 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         topicsShown = !topicsShown
         if topicsShown {
             setupTopicAnnotations()
-            topicsButton.tintColor = self.view.tintColor
-            topicsButton.setTitleColor(self.view.tintColor, for: .normal)
+            //topicsButton.tintColor = self.view.tintColor
+            topicsButton.backgroundColor = self.view.tintColor
+            //topicsButton.setTitleColor(self.view.tintColor, for: .normal)
+            topicsButton.setTitleColor(.white, for: .normal)
         }
         else {
             topicsButton.tintColor = .white
+            topicsButton.backgroundColor = .clear
             topicsButton.setTitleColor(.white, for: .normal)
             self.removeDetectionAnnotations()
             self.clearPDFAnnotations()
@@ -810,7 +815,8 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     
     
     private func showBookshelf() {
-        bookshelfButton.tintColor = self.view.tintColor
+        bookshelfButton.tintColor = .white
+        bookshelfButton.backgroundColor = self.view.tintColor
         self.bookshelf.isHidden = false
         let animation = AnimationType.vector(CGVector(dx: 500, dy: 0))
         bookshelf.animate(animations: [animation])
@@ -818,6 +824,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     
     private func closeBookshelf() {
         bookshelfButton.tintColor = .white
+        bookshelfButton.backgroundColor = .clear
         bookshelfLeftConstraint.constant = UIScreen.main.bounds.maxX - 500
         self.isBookshelfDraggedOut = true
         UIView.animate(withDuration: 0.25, delay: 0, options: UIView.AnimationOptions.curveEaseIn, animations: {

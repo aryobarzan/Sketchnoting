@@ -367,7 +367,7 @@ class Note: File, DocumentDelegate {
                         documentTitle = spot.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
                     }
                 }
-                if self.getCurrentPage().getText().lowercased().contains(documentTitle) && !docs.contains(doc) {
+                if self.getCurrentPage().getRecognizedText().getText().lowercased().contains(documentTitle) && !docs.contains(doc) {
                     if doc.isHidden {
                         if includeHidden {
                             docs.append(doc)
