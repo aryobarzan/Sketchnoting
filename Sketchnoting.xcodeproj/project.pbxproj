@@ -91,6 +91,7 @@
 		9FA6239E22E66D73007ED794 /* HandwritingRecognizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA6239D22E66D73007ED794 /* HandwritingRecognizer.swift */; };
 		9FA8C000239B18BA00BAA42B /* TagsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA8BFFF239B18BA00BAA42B /* TagsViewController.swift */; };
 		9FA8C002239B21D500BAA42B /* TagsCreationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA8C001239B21D500BAA42B /* TagsCreationViewController.swift */; };
+		9FAADE88255A1FE800A5E6A3 /* CGRectExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FAADE87255A1FE800A5E6A3 /* CGRectExtensions.swift */; };
 		9FAB4B7C244BEF2700DEA46F /* FittableFontLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FAB4B7B244BEF2700DEA46F /* FittableFontLabel.swift */; };
 		9FAB4B7E244BEF2F00DEA46F /* UILabelExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FAB4B7D244BEF2E00DEA46F /* UILabelExtension.swift */; };
 		9FAD28F623A52AC700F2203E /* NoteTextViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F05BC7E23761C4A00D49A88 /* NoteTextViewController.swift */; };
@@ -238,6 +239,7 @@
 		9FA6239D22E66D73007ED794 /* HandwritingRecognizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandwritingRecognizer.swift; sourceTree = "<group>"; };
 		9FA8BFFF239B18BA00BAA42B /* TagsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagsViewController.swift; sourceTree = "<group>"; };
 		9FA8C001239B21D500BAA42B /* TagsCreationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagsCreationViewController.swift; sourceTree = "<group>"; };
+		9FAADE87255A1FE800A5E6A3 /* CGRectExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGRectExtensions.swift; sourceTree = "<group>"; };
 		9FAB4B7B244BEF2700DEA46F /* FittableFontLabel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FittableFontLabel.swift; sourceTree = "<group>"; };
 		9FAB4B7D244BEF2E00DEA46F /* UILabelExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UILabelExtension.swift; sourceTree = "<group>"; };
 		9FB87CF524B0061200A262D8 /* ARDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARDocument.swift; sourceTree = "<group>"; };
@@ -690,6 +692,7 @@
 				9F2C0D74248F0E2600F58F5E /* ArrayExtensions.swift */,
 				9F1A0C52249DA1C600E507BC /* YRipple.swift */,
 				9F6A9F3D2550CE4900CF8CF1 /* CollectionExtensions.swift */,
+				9FAADE87255A1FE800A5E6A3 /* CGRectExtensions.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -1011,6 +1014,7 @@
 				9F75E44C230C583200488BBD /* NoteCollectionViewCell.swift in Sources */,
 				9F4BB37624ED80A200ED1E2F /* NoteLayersViewCell.swift in Sources */,
 				9FBF6AB422E9F391001FD730 /* VisionTextWrapper.swift in Sources */,
+				9FAADE88255A1FE800A5E6A3 /* CGRectExtensions.swift in Sources */,
 				9FC02C1E23EDB6400051C576 /* Note.swift in Sources */,
 				9F318D39244A207300A1B4B5 /* UIFontExtensions.swift in Sources */,
 				9F2C0D75248F0E2600F58F5E /* ArrayExtensions.swift in Sources */,

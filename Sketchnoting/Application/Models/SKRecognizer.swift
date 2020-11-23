@@ -173,17 +173,18 @@ class SKRecognizer {
                             let words = candidate.text.components(separatedBy: " ")
 //                            let centersTest = kmeans(centersCount: words.count, strokes: inks[i].0)
 //                            print("Found these centers:")
-//                            for (wordIndex, strokeArray) in centersTest {
-//                                print("Word \(wordIndex)")
+//                            for strokeArray in centersTest {
+//                                print("Word:")
 //                                for sTemp in strokeArray {
 //                                    print("Stroke - \(sTemp.renderBounds)")
 //                                }
 //                            }
                             
-                            var iterations = 5
+                            var iterations = 0
                             var strokesByWord = [[PKStroke]]()
                             var modifier: CGFloat = 0
-                            // to update: retain bestResult during iterations
+                            var bestStrokesByWord = [[PKStroke]]()
+                            var bestStrokesByWordCount = -1
                             repeat {
                                 strokesByWord = [[PKStroke]]()
                                 var currentWordStrokes = [PKStroke]()
@@ -212,15 +213,31 @@ class SKRecognizer {
                                     strokesByWord.append(currentWordStrokes)
                                 }
                                 log.info("(Iteration \(iterations)) Number of words segmented: \(strokesByWord.count)")
-                                iterations -= 1
+                                iterations += 1
+                                if bestStrokesByWordCount == -1 {
+                                    bestStrokesByWord = strokesByWord
+                                    bestStrokesByWordCount = strokesByWord.count
+                                }
                                 if strokesByWord.count > words.count {
                                     modifier -= 2
+                                    if bestStrokesByWordCount > words.count && words.count - strokesByWord.count < words.count - bestStrokesByWordCount {
+                                        bestStrokesByWord = strokesByWord
+                                        bestStrokesByWordCount = strokesByWord.count
+                                    }
                                 }
                                 else if strokesByWord.count < words.count {
                                     modifier += 2
+                                    if bestStrokesByWordCount < words.count && words.count - strokesByWord.count > words.count - bestStrokesByWordCount {
+                                        bestStrokesByWord = strokesByWord
+                                        bestStrokesByWordCount = strokesByWord.count
+                                    }
                                 }
-                            } while (strokesByWord.count != words.count && iterations > 0)
-                            
+                                else {
+                                    bestStrokesByWord = strokesByWord
+                                    break
+                                }
+                            } while (strokesByWord.count != words.count && iterations < 5)
+                            strokesByWord = bestStrokesByWord
                             for j in 0..<words.count {
                                 var renderBounds: CGRect?
                                 if (j < strokesByWord.count && strokesByWord[j].count > 0) {
@@ -264,11 +281,11 @@ class SKRecognizer {
         }
     }
     
-    private static func kmeans(centersCount: Int, strokes: [PKStroke]) -> [Int : [PKStroke]] {
+    private static func kmeans(centersCount: Int, strokes: [PKStroke]) -> [[PKStroke]] {
         var centers = [CGPoint]()
         let sampledStrokes = strokes.choose(centersCount)
         for s in sampledStrokes {
-            centers.append(s.renderBounds.origin)
+            centers.append(s.renderBounds.center)
         }
         
         var centerDistanceChange = 0.0
@@ -282,13 +299,13 @@ class SKRecognizer {
                 var indexOfClosestCenter = 0
                 var distance: Float = 9999
                 for i in 0..<centers.count {
-                    if cgpointDistance(from: centers[i], to: stroke.renderBounds.origin) < distance {
+                    if cgpointDistance(from: centers[i], to: stroke.renderBounds.center) < distance {
                         indexOfClosestCenter = i
-                        distance = cgpointDistance(from: centers[i], to: stroke.renderBounds.origin)
+                        distance = cgpointDistance(from: centers[i], to: stroke.renderBounds.center)
                     }
                 }
                 let temp = newCenters[indexOfClosestCenter]
-                newCenters[indexOfClosestCenter] = CGPoint(x: temp.x + stroke.renderBounds.origin.x, y: temp.y + stroke.renderBounds.origin.y)
+                newCenters[indexOfClosestCenter] = CGPoint(x: temp.x + stroke.renderBounds.center.x, y: temp.y + stroke.renderBounds.center.y)
                 counts[indexOfClosestCenter] += 1
             }
             
@@ -304,14 +321,14 @@ class SKRecognizer {
             print("Convergence: \(centerDistanceChange)")
             centers = newCenters
             iteration += 1
-        } while centerDistanceChange > 5 && iteration < 50
+        } while centerDistanceChange > 1 && iteration < 50
         
         var segmentedStrokes = [Int : [PKStroke]]()
         for stroke in strokes {
             var indexOfClosestCenter = 0
             var distance: Float = 9999
             for i in 0..<centers.count {
-                let temp = cgpointDistance(from: centers[i], to: stroke.renderBounds.origin)
+                let temp = cgpointDistance(from: centers[i], to: stroke.renderBounds.center)
                 if temp < distance {
                     distance = temp
                     indexOfClosestCenter = i
@@ -322,10 +339,15 @@ class SKRecognizer {
             }
             var temp = segmentedStrokes[indexOfClosestCenter]!
             temp.append(stroke)
-            segmentedStrokes[indexOfClosestCenter] = temp
+            segmentedStrokes[indexOfClosestCenter] = temp.sorted(by: {x_1, x_2 in
+                return x_1.renderBounds.minX < x_2.renderBounds.minX
+            })
             
         }
-        return segmentedStrokes
+        var ordered = segmentedStrokes.values.sorted(by: {word_1, word_2 in
+            return word_1[0].renderBounds.minX < word_2[0].renderBounds.minX
+        })
+        return ordered
     }
     
     private static func cgpointDistanceSquared(from: CGPoint, to: CGPoint) -> Float {
