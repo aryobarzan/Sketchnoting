@@ -36,7 +36,7 @@ class NeoLibrary {
         }
         catch let error as NSError
         {
-            log.error("Unable to create directory \(error.debugDescription)")
+            log.error("Home folder could not be created: \(error.debugDescription)")
         }
         return homeURL
     }
@@ -53,7 +53,7 @@ class NeoLibrary {
         }
         catch let error as NSError
         {
-            log.error("Unable to create directory \(error.debugDescription)")
+            log.error("ExportTemporary folder could not be created: \(error.debugDescription)")
         }
         return exportTemporaryURL
     }
@@ -148,30 +148,35 @@ class NeoLibrary {
             log.error("Failed to delete file \(url.lastPathComponent).")
         }
     }
+    
+    private enum FileModificationType {
+        case Move
+        case Rename
+    }
+    
+    private static func constructUniqueName(rename: String? = nil, file: File, url: URL, modificationType: FileModificationType = .Rename) -> (String, URL)? {
+        var name = file.getName()
+        if rename != nil {
+            name = rename!
+        }
+        var tmp = (modificationType == .Move ? url : url.deletingLastPathComponent()).appendingPathComponent((file is Note) ? name + ".sketchnote" : name)
+        while FileManager.default.fileExists(atPath: tmp.path) {
+            name += " (2)"
+            tmp = (modificationType == .Move ? url : url.deletingLastPathComponent()).appendingPathComponent((file is Note) ? name + ".sketchnote" : name)
+        }
+        file.setName(name: name)
+        return (name, tmp)
+    }
 
     public static func move(file: File, from source: URL, to destination: URL) -> URL? {
-        // Missing: recursive destination handling necessary?
         if source != destination {
             do
             {
-                var name = file.getName()
-                var tmp = name
-                if file is Note {
-                    tmp = name + ".sketchnote"
+                if let (_, uniqueURL) = self.constructUniqueName(file: file, url: destination, modificationType: .Move) {
+                    try FileManager.default.moveItem(at: source, to: uniqueURL)
+                    log.info("Moved file \(file.getName()) to \(uniqueURL.absoluteString).")
+                    return uniqueURL
                 }
-                while FileManager.default.fileExists(atPath: destination.appendingPathComponent(tmp).path) {
-                    name = name + " 2"
-                    if file is Note {
-                        tmp = name + ".sketchnote"
-                    }
-                }
-                file.setName(name: name)
-                if file is Note {
-                    name = name + ".sketchnote"
-                }
-                try FileManager.default.moveItem(at: source, to: destination.appendingPathComponent(name))
-                log.info("Moved file \(file.getName()).")
-                return destination.appendingPathComponent(name)
             }
             catch _ as NSError
             {
@@ -183,28 +188,14 @@ class NeoLibrary {
     
     public static func rename(url: URL, file: File, name: String) -> URL? {
         if FileManager.default.fileExists(atPath: url.path) {
-            var newName = name
-            var tmp = newName
-            if file is Note {
-                tmp = name + ".sketchnote"
-            }
-            while FileManager.default.fileExists(atPath: url.deletingLastPathComponent().appendingPathComponent(tmp).path) {
-                newName += " 2"
-                if file is Note {
-                    tmp = newName + ".sketchnote"
+            if let (_, uniqueURL) = self.constructUniqueName(rename: name, file: file, url: url, modificationType: .Rename) {
+                do {
+                    try FileManager.default.moveItem(at: url, to: uniqueURL)
+                    return uniqueURL
+                } catch {
+                    log.error("Error while trying to rename file.")
+                    log.error(error)
                 }
-            }
-            file.setName(name: newName)
-            if file is Note {
-                newName += ".sketchnote"
-            }
-            let newURL = url.deletingLastPathComponent().appendingPathComponent(newName)
-            do {
-                try FileManager.default.moveItem(at: url, to: newURL)
-                return newURL
-            } catch {
-                log.error("Error while trying to rename file.")
-                log.error(error)
             }
         }
         return nil
@@ -216,7 +207,7 @@ class NeoLibrary {
             if let note = self.decodeNoteFromData(data: data) {
                 var n = note.getName()
                 while FileManager.default.fileExists(atPath: self.currentLocation.appendingPathComponent(n + ".sketchnote").path) {
-                    n = n + " 2"
+                    n = n + " (2)"
                 }
                 let url = self.currentLocation.appendingPathComponent(n + ".sketchnote")
                 let note = Note(name: n, documents: nil)
@@ -231,7 +222,7 @@ class NeoLibrary {
     public static func add(note: Note) {
         var n = note.getName()
         while FileManager.default.fileExists(atPath: self.currentLocation.appendingPathComponent(n + ".sketchnote").path) {
-            n = n + " 2"
+            n = n + " (2)"
         }
         let url = self.currentLocation.appendingPathComponent(n + ".sketchnote")
         note.setName(name: n)
@@ -252,8 +243,8 @@ class NeoLibrary {
         }
         return nil
     }
-    // File Creation
     
+    // File Creation
     public static func createFolder(name: String, root: URL = currentLocation) -> (URL, File)? {
         do
         {

@@ -595,55 +595,68 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     
     private func makeFileContextMenu(url: URL, file: File, point: CGPoint, cellIndexPath: IndexPath) -> UIMenu {
         var menuElements = [UIMenuElement]()
+        var firstMenuElements = [UIMenuElement]()
+        var secondMenuElements = [UIMenuElement]()
+        var thirdMenuElements = [UIMenuElement]()
+        var fourthMenuElements = [UIMenuElement]()
         let renameAction = UIAction(title: "Rename...", image: UIImage(systemName: "text.cursor")) { action in
             self.renameFile(url: url, file: file, indexPath: cellIndexPath)
         }
-        menuElements.append(renameAction)
+        firstMenuElements.append(renameAction)
         let moveAction = UIAction(title: "Move...", image: UIImage(systemName: "folder")) { action in
             self.moveFile(url: url, file: file)
         }
-        menuElements.append(moveAction)
+        firstMenuElements.append(moveAction)
         let exportAction = UIAction(title: "Export...", image: UIImage(systemName: "square.and.arrow.up")) { action in
             self.filesToExport = [(url, file)]
             self.displayExportWindow()
         }
-        menuElements.append(exportAction)
+        firstMenuElements.append(exportAction)
+        
         if let note = file as? Note {
-            let tagsAction = UIAction(title: "Manage Tags...", image: UIImage(systemName: "tag.fill")) { action in
-                self.editNoteTags(url: url, note: note, cell: self.noteCollectionView.cellForItem(at: cellIndexPath))
+            let sendAction = UIAction(title: "Send...", image: UIImage(systemName: "paperplane")) { action in
+                self.sendNote(url: url, note: note)
             }
-            menuElements.append(tagsAction)
-            let similarNotesAction = UIAction(title: "Related Notes...", image: UIImage(systemName: "link")) { action in
-                self.showRelatedNotesFor(url: url, note: note)
-                self.view.makeToast("Showing related notes.", title: note.getName())
-            }
-            menuElements.append(similarNotesAction)
+            firstMenuElements.append(sendAction)
             let duplicateAction = UIAction(title: "Duplicate", image: UIImage(systemName: "doc.on.doc")) { action in
                 _ = NeoLibrary.createDuplicate(note: note, url: url)
                 self.updateDisplayedNotes(false)
             }
-            menuElements.append(duplicateAction)
+            firstMenuElements.append(duplicateAction)
+            
+            let tagsAction = UIAction(title: "Manage Tags...", image: UIImage(systemName: "tag.fill")) { action in
+                self.editNoteTags(url: url, note: note, cell: self.noteCollectionView.cellForItem(at: cellIndexPath))
+            }
+            secondMenuElements.append(tagsAction)
+            let similarNotesAction = UIAction(title: "Related Notes...", image: UIImage(systemName: "link")) { action in
+                self.showRelatedNotesFor(url: url, note: note)
+                self.view.makeToast("Showing related notes.", title: note.getName())
+            }
+            secondMenuElements.append(similarNotesAction)
+            
             let copyNoteAction = UIAction(title: "Copy Note", image: UIImage(systemName: "doc.on.clipboard")) { action in
                 SKClipboard.copy(note: note)
                 self.updateClipboardButton()
                 self.view.makeToast("Copied note to SKClipboard.")
             }
-            menuElements.append(copyNoteAction)
+            thirdMenuElements.append(copyNoteAction)
             let copyTextAction = UIAction(title: "Copy Text", image: UIImage(systemName: "text.quote")) { action in
                 UIPasteboard.general.string = note.getText()
                 self.view.makeToast("Copied text to Clipboard.")
             }
-            menuElements.append(copyTextAction)
-            
-            let sendAction = UIAction(title: "Send...", image: UIImage(systemName: "paperplane")) { action in
-                self.sendNote(url: url, note: note)
-            }
-            menuElements.append(sendAction)
+            thirdMenuElements.append(copyTextAction)
         }
         let deleteAction = UIAction(title: "Delete", image: UIImage(systemName: "xmark.circle.fill"), attributes: .destructive) { action in
             self.deleteFile(url: url, file: file)
         }
-        menuElements.append(deleteAction)
+        fourthMenuElements.append(deleteAction)
+        
+        menuElements.append(UIMenu(title: "Basic", options: .displayInline, children: firstMenuElements))
+        menuElements.append(UIMenu(title: "Knowledge", options: .displayInline, children: secondMenuElements))
+        if thirdMenuElements.count > 0 {
+            menuElements.append(UIMenu(title: "Copy", options: .displayInline, children: thirdMenuElements))
+        }
+        menuElements.append(UIMenu(title: "Delete", options: .displayInline, children: fourthMenuElements))
         return UIMenu(title: file.getName(), children: menuElements)
     }
     
