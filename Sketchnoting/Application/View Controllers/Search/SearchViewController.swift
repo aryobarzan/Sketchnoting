@@ -10,6 +10,7 @@ import UIKit
 
 class SearchViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UITextFieldDelegate, DrawingSearchDelegate {
     
+    @IBOutlet weak var searchModeSegmentedControl: UISegmentedControl!
     @IBOutlet weak var searchTextField: UITextField!
     @IBOutlet weak var searchButton: UIButton!
     @IBOutlet weak var drawingSearchButton: UIButton!
@@ -28,6 +29,8 @@ class SearchViewController: UIViewController, UICollectionViewDelegate, UICollec
         self.tabBarController?.tabBar.isHidden = false
         
         searchTextField.delegate = self
+        
+        searchButton.layer.cornerRadius = 14
 
         filtersCollectionView.delegate = self
         filtersCollectionView.dataSource = self
@@ -41,8 +44,29 @@ class SearchViewController: UIViewController, UICollectionViewDelegate, UICollec
         notesCollectionView.reloadData()
     }
     
+    @IBAction func searchModeSegmentChanged(_ sender: UISegmentedControl) {
+        // Clear all search results first
+        searchFilters.removeAll()
+        filtersCollectionView.reloadData()
+        self.updateResults()
+        // Lexical Search
+        if sender.selectedSegmentIndex == 0 {
+            searchTypeSegmentedControl.isHidden = false
+            filtersCollectionView.isHidden = false
+        }
+        // Semantic Search
+        else {
+            searchTypeSegmentedControl.isHidden = true
+            filtersCollectionView.isHidden = true
+            
+        }
+    }
     @IBAction func searchTapped(_ sender: UIButton) {
-        performSearch()
+        // Lexical Search
+        if searchModeSegmentedControl.selectedSegmentIndex == 0 {
+            performLexicalSearch()
+        }
+        
         searchTextField.resignFirstResponder()
     }
     @IBAction func searchTypeSegmentChanged(_ sender: UISegmentedControl) {
@@ -71,7 +95,10 @@ class SearchViewController: UIViewController, UICollectionViewDelegate, UICollec
         // Hide the keyboard.
         if textField.tag == 101 {
             searchTextField.resignFirstResponder()
-            performSearch()
+            // Lexical Search
+            if searchModeSegmentedControl.selectedSegmentIndex == 0 {
+                performLexicalSearch()
+            }
         }
         return true
     }
@@ -123,7 +150,7 @@ class SearchViewController: UIViewController, UICollectionViewDelegate, UICollec
     }
     
     //
-    private func performSearch() {
+    private func performLexicalSearch() {
         if !searchTextField.text!.isEmpty {
             createSearchFilter(term: searchTextField.text!, type: self.currentSearchType)
             searchTextField.text = ""

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17156" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="c3X-aa-9QU">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="c3X-aa-9QU">
     <device id="ipad9_7" orientation="portrait" layout="fullscreen" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17126"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
         <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
@@ -2015,22 +2015,16 @@
                                     <action selector="searchTypeSegmentChanged:" destination="kPL-Mg-aaB" eventType="valueChanged" id="YyS-fB-eBs"/>
                                 </connections>
                             </segmentedControl>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Your Current Filters" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="eLY-SL-zqP">
-                                <rect key="frame" x="20" y="156" width="148" height="21"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <nil key="textColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                            <textField opaque="NO" tag="101" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Enter your search term(s)" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="OWB-7G-1Cd">
-                                <rect key="frame" x="20" y="69" width="670" height="34"/>
+                            <textField opaque="NO" tag="101" contentMode="scaleToFill" horizontalHuggingPriority="249" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Enter your search term(s)" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="OWB-7G-1Cd">
+                                <rect key="frame" x="20" y="69" width="571" height="34"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits"/>
                             </textField>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="San-i8-ecq">
-                                <rect key="frame" x="727" y="75" width="21" height="22"/>
+                                <rect key="frame" x="599" y="72" width="21" height="28"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="21" id="Wq9-r3-A36"/>
-                                    <constraint firstAttribute="height" constant="22" id="X47-oo-mcc"/>
+                                    <constraint firstAttribute="height" constant="28" id="X47-oo-mcc"/>
                                 </constraints>
                                 <state key="normal" image="scribble" catalog="system"/>
                                 <connections>
@@ -2038,12 +2032,12 @@
                                 </connections>
                             </button>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="TBN-T0-e7n">
-                                <rect key="frame" x="20" y="185" width="728" height="115"/>
+                                <rect key="frame" x="20" y="156" width="728" height="56"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="115" id="6vb-xr-dnd"/>
+                                    <constraint firstAttribute="height" constant="56" id="6vb-xr-dnd"/>
                                 </constraints>
-                                <collectionViewFlowLayout key="collectionViewLayout" automaticEstimatedItemSize="YES" minimumLineSpacing="10" minimumInteritemSpacing="10" id="Omv-M5-N1W">
+                                <collectionViewFlowLayout key="collectionViewLayout" scrollDirection="horizontal" automaticEstimatedItemSize="YES" minimumLineSpacing="10" minimumInteritemSpacing="10" id="Omv-M5-N1W">
                                     <size key="itemSize" width="160" height="35"/>
                                     <size key="headerReferenceSize" width="0.0" height="0.0"/>
                                     <size key="footerReferenceSize" width="0.0" height="0.0"/>
@@ -2051,7 +2045,7 @@
                                 </collectionViewFlowLayout>
                                 <cells>
                                     <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="SearchFilterCollectionViewCell" id="9C2-AH-kdO" customClass="SearchFilterCollectionViewCell" customModule="Sketchnoting" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="0.0" width="160" height="35"/>
+                                        <rect key="frame" x="0.0" y="10.5" width="160" height="35"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="S5i-kx-uZ1">
                                             <rect key="frame" x="0.0" y="0.0" width="160" height="35"/>
@@ -2090,13 +2084,13 @@
                                 </cells>
                             </collectionView>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Notes: 0 results" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="c0m-wh-T3d">
-                                <rect key="frame" x="20" y="308" width="121" height="21"/>
+                                <rect key="frame" x="20" y="220" width="121" height="21"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="tTU-cQ-M7Q">
-                                <rect key="frame" x="20" y="337" width="728" height="617"/>
+                                <rect key="frame" x="20" y="249" width="728" height="705"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <collectionViewFlowLayout key="collectionViewLayout" automaticEstimatedItemSize="YES" minimumLineSpacing="10" minimumInteritemSpacing="10" id="BHd-NG-Ehf">
                                     <size key="itemSize" width="50" height="50"/>
@@ -2116,16 +2110,30 @@
                                 </cells>
                             </collectionView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Rar-0k-hIs">
-                                <rect key="frame" x="698" y="75" width="21" height="22"/>
+                                <rect key="frame" x="628" y="72" width="120" height="28"/>
+                                <color key="backgroundColor" systemColor="linkColor"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="21" id="60O-57-mCh"/>
-                                    <constraint firstAttribute="height" constant="22" id="DCr-PV-dQL"/>
+                                    <constraint firstAttribute="height" constant="28" id="DCr-PV-dQL"/>
+                                    <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="120" id="uje-BH-SR9"/>
                                 </constraints>
-                                <state key="normal" image="magnifyingglass" catalog="system"/>
+                                <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <state key="normal" title=" Search" image="magnifyingglass" catalog="system">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                </state>
                                 <connections>
                                     <action selector="searchTapped:" destination="kPL-Mg-aaB" eventType="touchUpInside" id="muc-uy-kUT"/>
                                 </connections>
                             </button>
+                            <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="imP-cY-iHl">
+                                <rect key="frame" x="130" y="25" width="153" height="32"/>
+                                <segments>
+                                    <segment title="Lexical"/>
+                                    <segment title="Semantic"/>
+                                </segments>
+                                <connections>
+                                    <action selector="searchModeSegmentChanged:" destination="kPL-Mg-aaB" eventType="valueChanged" id="TpN-kv-3IJ"/>
+                                </connections>
+                            </segmentedControl>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="MqQ-2V-Ujw"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -2135,24 +2143,24 @@
                             <constraint firstItem="pyx-fB-u9y" firstAttribute="top" secondItem="OWB-7G-1Cd" secondAttribute="bottom" constant="14" id="Bxw-Up-KyO"/>
                             <constraint firstItem="MqQ-2V-Ujw" firstAttribute="trailing" relation="lessThanOrEqual" secondItem="c0m-wh-T3d" secondAttribute="trailing" constant="627" id="C62-jk-nMb"/>
                             <constraint firstItem="OWB-7G-1Cd" firstAttribute="leading" secondItem="MqQ-2V-Ujw" secondAttribute="leading" constant="20" id="DkE-Gm-awh"/>
-                            <constraint firstItem="San-i8-ecq" firstAttribute="leading" secondItem="Rar-0k-hIs" secondAttribute="trailing" constant="8" id="EuW-r4-IHq"/>
-                            <constraint firstItem="TBN-T0-e7n" firstAttribute="top" secondItem="eLY-SL-zqP" secondAttribute="bottom" constant="8" id="FEd-Yy-Uuj"/>
-                            <constraint firstItem="MqQ-2V-Ujw" firstAttribute="trailing" relation="lessThanOrEqual" secondItem="eLY-SL-zqP" secondAttribute="trailing" constant="600" id="HV5-6l-0Lk"/>
-                            <constraint firstItem="eLY-SL-zqP" firstAttribute="leading" secondItem="MqQ-2V-Ujw" secondAttribute="leading" constant="20" id="KMa-Vf-NX3"/>
+                            <constraint firstItem="Rar-0k-hIs" firstAttribute="leading" secondItem="San-i8-ecq" secondAttribute="trailing" constant="8" id="HHy-Q9-caZ"/>
                             <constraint firstItem="c0m-wh-T3d" firstAttribute="top" secondItem="TBN-T0-e7n" secondAttribute="bottom" constant="8" id="LPX-HZ-cbG"/>
                             <constraint firstItem="tTU-cQ-M7Q" firstAttribute="top" secondItem="c0m-wh-T3d" secondAttribute="bottom" constant="8" id="MN1-ur-Uuy"/>
+                            <constraint firstItem="TBN-T0-e7n" firstAttribute="top" secondItem="pyx-fB-u9y" secondAttribute="bottom" constant="8" id="PTL-p3-RBS"/>
+                            <constraint firstItem="imP-cY-iHl" firstAttribute="leading" secondItem="Axk-yc-h7I" secondAttribute="trailing" constant="8" id="PlE-BE-k9Q"/>
                             <constraint firstItem="OWB-7G-1Cd" firstAttribute="top" secondItem="Axk-yc-h7I" secondAttribute="bottom" constant="8" id="Raa-Gc-ZQb"/>
-                            <constraint firstItem="MqQ-2V-Ujw" firstAttribute="trailing" secondItem="San-i8-ecq" secondAttribute="trailing" constant="20" id="SvI-co-ykk"/>
+                            <constraint firstItem="imP-cY-iHl" firstAttribute="top" secondItem="MqQ-2V-Ujw" secondAttribute="top" constant="25" id="Tt6-B7-R52"/>
                             <constraint firstItem="Axk-yc-h7I" firstAttribute="top" secondItem="MqQ-2V-Ujw" secondAttribute="top" constant="20" id="U5y-RD-OyJ"/>
                             <constraint firstItem="tTU-cQ-M7Q" firstAttribute="leading" secondItem="MqQ-2V-Ujw" secondAttribute="leading" constant="20" id="URX-VU-7tf"/>
+                            <constraint firstItem="MqQ-2V-Ujw" firstAttribute="trailing" secondItem="Rar-0k-hIs" secondAttribute="trailing" constant="20" id="Wjj-Gf-AXm"/>
                             <constraint firstItem="c0m-wh-T3d" firstAttribute="leading" secondItem="MqQ-2V-Ujw" secondAttribute="leading" constant="20" id="Xmu-he-LDr"/>
-                            <constraint firstItem="San-i8-ecq" firstAttribute="top" secondItem="MqQ-2V-Ujw" secondAttribute="top" constant="75" id="aqW-9U-tpd"/>
+                            <constraint firstItem="San-i8-ecq" firstAttribute="leading" secondItem="OWB-7G-1Cd" secondAttribute="trailing" constant="8" id="ZFf-Es-2c3"/>
+                            <constraint firstItem="San-i8-ecq" firstAttribute="top" secondItem="MqQ-2V-Ujw" secondAttribute="top" constant="72" id="aqW-9U-tpd"/>
                             <constraint firstItem="MqQ-2V-Ujw" firstAttribute="bottom" secondItem="tTU-cQ-M7Q" secondAttribute="bottom" constant="20" id="bpH-Hc-o2P"/>
-                            <constraint firstItem="Rar-0k-hIs" firstAttribute="leading" secondItem="OWB-7G-1Cd" secondAttribute="trailing" constant="8" id="eYK-SF-VwO"/>
-                            <constraint firstItem="Rar-0k-hIs" firstAttribute="top" secondItem="MqQ-2V-Ujw" secondAttribute="top" constant="75" id="gJV-A6-btc"/>
-                            <constraint firstItem="eLY-SL-zqP" firstAttribute="top" secondItem="OWB-7G-1Cd" secondAttribute="bottom" constant="53" id="icp-Sp-zGe"/>
+                            <constraint firstItem="Rar-0k-hIs" firstAttribute="top" secondItem="MqQ-2V-Ujw" secondAttribute="top" constant="72" id="gJV-A6-btc"/>
                             <constraint firstItem="Axk-yc-h7I" firstAttribute="leading" secondItem="MqQ-2V-Ujw" secondAttribute="leading" constant="20" id="nTm-Tn-k5e"/>
                             <constraint firstItem="MqQ-2V-Ujw" firstAttribute="trailing" secondItem="TBN-T0-e7n" secondAttribute="trailing" constant="20" id="oZc-a6-QzU"/>
+                            <constraint firstItem="MqQ-2V-Ujw" firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="imP-cY-iHl" secondAttribute="trailing" symbolic="YES" id="q3E-qV-wcg"/>
                             <constraint firstItem="MqQ-2V-Ujw" firstAttribute="trailing" secondItem="tTU-cQ-M7Q" secondAttribute="trailing" constant="20" id="yAa-hO-NeM"/>
                             <constraint firstItem="TBN-T0-e7n" firstAttribute="leading" secondItem="MqQ-2V-Ujw" secondAttribute="leading" constant="20" id="yBz-gW-DUj"/>
                         </constraints>
@@ -2164,6 +2172,7 @@
                         <outlet property="notesCollectionView" destination="tTU-cQ-M7Q" id="jGW-6h-6JS"/>
                         <outlet property="resultsLabel" destination="c0m-wh-T3d" id="u2u-gS-nIX"/>
                         <outlet property="searchButton" destination="Rar-0k-hIs" id="KQF-bK-HJo"/>
+                        <outlet property="searchModeSegmentedControl" destination="imP-cY-iHl" id="BTR-bx-Clf"/>
                         <outlet property="searchTextField" destination="OWB-7G-1Cd" id="Zgw-Th-BBx"/>
                         <outlet property="searchTypeSegmentedControl" destination="pyx-fB-u9y" id="SNv-Yc-mFQ"/>
                     </connections>
@@ -3429,15 +3438,6 @@
         </systemColor>
         <systemColor name="systemRedColor">
             <color red="1" green="0.23137254901960785" blue="0.18823529411764706" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-        </systemColor>
-        <systemColor name="viewFlipsideBackgroundColor">
-            <color red="0.1215686274509804" green="0.12941176470588239" blue="0.14117647058823529" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-        </systemColor>
-        <systemColor name="viewFlipsideBackgroundColor">
-            <color red="0.1215686274509804" green="0.12941176470588239" blue="0.14117647058823529" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-        </systemColor>
-        <systemColor name="viewFlipsideBackgroundColor">
-            <color red="0.1215686274509804" green="0.12941176470588239" blue="0.14117647058823529" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="viewFlipsideBackgroundColor">
             <color red="0.1215686274509804" green="0.12941176470588239" blue="0.14117647058823529" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
