@@ -72,6 +72,7 @@
 		9F77DBCA23FFD619007C8B7D /* AnnotationUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F77DBC923FFD619007C8B7D /* AnnotationUtilities.swift */; };
 		9F8551B123A539D9006EB0B1 /* NotePageCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F8551B023A539D9006EB0B1 /* NotePageCollectionViewCell.swift */; };
 		9F87A47D2445441500F83B12 /* NoteTypedText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F87A47C2445441500F83B12 /* NoteTypedText.swift */; };
+		9F8E0D0F25DDC02C00A951B1 /* SemanticSearch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F8E0D0E25DDC02C00A951B1 /* SemanticSearch.swift */; };
 		9F92D10E231E95B400BC0E57 /* UICollectionViewExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F92D10D231E95B400BC0E57 /* UICollectionViewExtensions.swift */; };
 		9F92D110231E97DF00BC0E57 /* UserDefaultsExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F92D10F231E97DF00BC0E57 /* UserDefaultsExtensions.swift */; };
 		9F92D11523202B9900BC0E57 /* KnowledgeGraphHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F92D11423202B9900BC0E57 /* KnowledgeGraphHelper.swift */; };
@@ -221,6 +222,7 @@
 		9F77DBC923FFD619007C8B7D /* AnnotationUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnnotationUtilities.swift; sourceTree = "<group>"; };
 		9F8551B023A539D9006EB0B1 /* NotePageCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotePageCollectionViewCell.swift; sourceTree = "<group>"; };
 		9F87A47C2445441500F83B12 /* NoteTypedText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteTypedText.swift; sourceTree = "<group>"; };
+		9F8E0D0E25DDC02C00A951B1 /* SemanticSearch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SemanticSearch.swift; sourceTree = "<group>"; };
 		9F92D10D231E95B400BC0E57 /* UICollectionViewExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UICollectionViewExtensions.swift; sourceTree = "<group>"; };
 		9F92D10F231E97DF00BC0E57 /* UserDefaultsExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsExtensions.swift; sourceTree = "<group>"; };
 		9F92D11423202B9900BC0E57 /* KnowledgeGraphHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KnowledgeGraphHelper.swift; sourceTree = "<group>"; };
@@ -363,6 +365,7 @@
 				9F1A0C54249DA60B00E507BC /* SKClipboard.swift */,
 				9FFE9B3324B3C77200D92FBA /* NeoLibrary.swift */,
 				9FC5386A2520DB7700911DBF /* SKRecognizer.swift */,
+				9F8E0D0E25DDC02C00A951B1 /* SemanticSearch.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -943,6 +946,7 @@
 				9F0ABB282412E5D400CA5A4E /* SKCacheManager.swift in Sources */,
 				9FB87CF924B006B900A262D8 /* ALMAARHelper.swift in Sources */,
 				9FD29C58223C3CF700CC969A /* UIImageExtensions.swift in Sources */,
+				9F8E0D0F25DDC02C00A951B1 /* SemanticSearch.swift in Sources */,
 				9F00428923E9FB2600961636 /* BadgeHub.swift in Sources */,
 				9F65983B23EDD29300CDBE0C /* NoteTextBlock.swift in Sources */,
 				9FB87CF624B0061200A262D8 /* ARDocument.swift in Sources */,

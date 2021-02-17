@@ -62,11 +62,7 @@ class SearchViewController: UIViewController, UICollectionViewDelegate, UICollec
         }
     }
     @IBAction func searchTapped(_ sender: UIButton) {
-        // Lexical Search
-        if searchModeSegmentedControl.selectedSegmentIndex == 0 {
-            performLexicalSearch()
-        }
-        
+        performSearch()
         searchTextField.resignFirstResponder()
     }
     @IBAction func searchTypeSegmentChanged(_ sender: UISegmentedControl) {
@@ -95,10 +91,7 @@ class SearchViewController: UIViewController, UICollectionViewDelegate, UICollec
         // Hide the keyboard.
         if textField.tag == 101 {
             searchTextField.resignFirstResponder()
-            // Lexical Search
-            if searchModeSegmentedControl.selectedSegmentIndex == 0 {
-                performLexicalSearch()
-            }
+            performSearch()
         }
         return true
     }
@@ -150,11 +143,38 @@ class SearchViewController: UIViewController, UICollectionViewDelegate, UICollec
     }
     
     //
+    private func performSearch() {
+        if let searchTextFieldText = searchTextField.text {
+            if !searchTextFieldText.isEmpty {
+                if searchModeSegmentedControl.selectedSegmentIndex == 0 {
+                    self.performLexicalSearch()
+                }
+                else {
+                    self.performSemanticSearch()
+                }
+            }
+        }
+    }
     private func performLexicalSearch() {
-        if !searchTextField.text!.isEmpty {
-            createSearchFilter(term: searchTextField.text!, type: self.currentSearchType)
-            searchTextField.text = ""
-            self.updateResults()
+        createSearchFilter(term: searchTextField.text!, type: self.currentSearchType)
+        searchTextField.text = ""
+        self.updateResults()
+    }
+    
+    private func performSemanticSearch() {
+        // Missing - This is currently only for testing
+        let query = searchTextField.text!
+        let tokens = SemanticSearch.tokenize(text: query, unit: .word)
+        for token in tokens {
+            log.info(token)
+        }
+        let partsOfSpeechTags = SemanticSearch.tag(text: query)
+        for tag in partsOfSpeechTags {
+            log.info("\(tag.0) - \(tag.1)")
+        }
+        let entities = SemanticSearch.tag(text: query, scheme: .nameType)
+        for entity in entities {
+            log.info("\(entity.0) - \(entity.1)")
         }
     }
     

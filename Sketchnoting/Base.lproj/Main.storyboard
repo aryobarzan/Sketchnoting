@@ -2015,7 +2015,7 @@
                                     <action selector="searchTypeSegmentChanged:" destination="kPL-Mg-aaB" eventType="valueChanged" id="YyS-fB-eBs"/>
                                 </connections>
                             </segmentedControl>
-                            <textField opaque="NO" tag="101" contentMode="scaleToFill" horizontalHuggingPriority="249" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Enter your search term(s)" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="OWB-7G-1Cd">
+                            <textField opaque="NO" tag="101" contentMode="scaleToFill" horizontalHuggingPriority="249" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Enter your search query" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="OWB-7G-1Cd">
                                 <rect key="frame" x="20" y="69" width="571" height="34"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits"/>
@@ -2083,8 +2083,8 @@
                                     </collectionViewCell>
                                 </cells>
                             </collectionView>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Notes: 0 results" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="c0m-wh-T3d">
-                                <rect key="frame" x="20" y="220" width="121" height="21"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Notes: 0 result(s)" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="c0m-wh-T3d">
+                                <rect key="frame" x="20" y="220" width="132" height="21"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
@@ -2138,7 +2138,6 @@
                         <viewLayoutGuide key="safeArea" id="MqQ-2V-Ujw"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
-                            <constraint firstItem="MqQ-2V-Ujw" firstAttribute="trailing" relation="lessThanOrEqual" secondItem="Axk-yc-h7I" secondAttribute="trailing" constant="646" id="5NX-sm-lEK"/>
                             <constraint firstItem="pyx-fB-u9y" firstAttribute="centerX" secondItem="Cr6-Dc-kQ1" secondAttribute="centerX" id="7r7-WC-Mrf"/>
                             <constraint firstItem="pyx-fB-u9y" firstAttribute="top" secondItem="OWB-7G-1Cd" secondAttribute="bottom" constant="14" id="Bxw-Up-KyO"/>
                             <constraint firstItem="MqQ-2V-Ujw" firstAttribute="trailing" relation="lessThanOrEqual" secondItem="c0m-wh-T3d" secondAttribute="trailing" constant="627" id="C62-jk-nMb"/>
