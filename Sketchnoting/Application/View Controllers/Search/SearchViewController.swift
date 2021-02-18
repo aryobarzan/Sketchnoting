@@ -176,6 +176,8 @@ class SearchViewController: UIViewController, UICollectionViewDelegate, UICollec
         for entity in entities {
             log.info("\(entity.0) - \(entity.1)")
         }
+        SemanticSearch.search(query: query, notes: NeoLibrary.getNotes())
+        
     }
     
     private func createSearchFilter(term: String, type: SearchType) {

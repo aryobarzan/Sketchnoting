@@ -18,6 +18,7 @@ protocol NoteDelegate {
 }
 
 class Note: File, DocumentDelegate {
+    private var id: String
     var pages: [NotePage]
     private var documents: [Document]
     var tags: [Tag]
@@ -30,6 +31,7 @@ class Note: File, DocumentDelegate {
     var delegate: NoteDelegate?
     
     init(name: String, documents: [Document]?) {
+        self.id = UUID.init().uuidString
         self.documents = documents ?? [Document]()
         self.pages = [NotePage]()
         self.tags = [Tag]()
@@ -41,6 +43,7 @@ class Note: File, DocumentDelegate {
     
     //Codable
     enum NoteCodingKeys: String, CodingKey {
+        case id = "id"
         case documents = "documents"
         case tags = "tags"
         case activePageIndex
@@ -65,6 +68,7 @@ class Note: File, DocumentDelegate {
         } catch {
             log.error("Error while encoding documents of note.")
         }
+        try container.encode(id, forKey: .id)
         try container.encode(tags, forKey: .tags)
         try container.encode(activePageIndex, forKey: .activePageIndex)
         try container.encode(helpLinesType, forKey: .helpLinesType)
@@ -108,6 +112,7 @@ class Note: File, DocumentDelegate {
         }
         documents = docs
         
+        id = (try? container.decode(String.self, forKey: .id)) ?? UUID.init().uuidString
         tags = (try? container.decode([Tag].self, forKey: .tags)) ?? [Tag]()
         activePageIndex = try container.decode(Int.self, forKey: .activePageIndex)
         helpLinesType = (try? container.decode(HelpLinesType.self, forKey: .helpLinesType)) ?? .None
@@ -117,6 +122,10 @@ class Note: File, DocumentDelegate {
         for doc in documents {
             doc.delegate = self
         }
+    }
+    
+    public func getID() -> String {
+        return id
     }
     
     //MARK: updating data
