@@ -36,6 +36,9 @@ class SearchViewController: UIViewController, UICollectionViewDelegate, UICollec
         filtersCollectionView.dataSource = self
         notesCollectionView.delegate = self
         notesCollectionView.dataSource = self
+        
+        // In case not yet downloaded (one time), download model for entity extraction library
+        SemanticSearch.downloadEntityExtractorModel()
     }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
