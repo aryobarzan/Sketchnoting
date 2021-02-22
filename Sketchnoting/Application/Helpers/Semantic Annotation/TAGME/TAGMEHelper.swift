@@ -21,7 +21,7 @@ class TAGMEHelper {
             let headers: HTTPHeaders = [
                 "Accept": "application/json"
             ]
-
+            log.info("TAGME annotator request sent.")
             AF.request("http://tagme.d4science.org/tagme/tag", parameters: parameters, headers: headers).responseJSON { response in
                 self.tagmeQueue.async {
                     let responseResult = response.result
@@ -30,14 +30,22 @@ class TAGMEHelper {
                     case .success(let res):
                         json = JSON(res)
                     case .failure(let error):
+                        log.error("TAGME response failed to serialize as JSON object.")
+                        log.error(response.debugDescription)
                         log.error(error.localizedDescription)
                         return
                     }
                     log.info("TAGME: API call successful.")
                     var results = [String: String]()
-                    log.info(json)
+                    // log.info(json)
+                    var documentsCount = 0
                     if let annotations = json["annotations"].array {
+                        log.info("TAGME found \(annotations.count) annotations.")
                         for annotation in annotations {
+                            if documentsCount == 20 {
+                                log.info("TAGME: reached limit of 20 documents. Discarding the rest of the found annotations.")
+                                break
+                            }
                             if let spot = annotation["spot"].string, let id = annotation["id"].double, let abstract = annotation["abstract"].string, let title = annotation["title"].string, let rho = annotation["rho"].double {
                                 if !spot.isEmpty && !abstract.isEmpty && results[spot] == nil {
                                     results[spot] = spot
@@ -51,6 +59,7 @@ class TAGMEHelper {
                                     }
                                     if rho > 0.05 {
                                         if let document = TAGMEDocument(title: title, description: abstract, URL: "tagme.d4science.org/tagme", type: .TAGME, spot: spot, categories: categories, wikiPageID: id) {
+                                            documentsCount += 1
                                             if let parentConcept = parentConcept {
                                                 self.checkRelatedness(doc_one: parentConcept, doc_two: document, note: note)
                                             }
@@ -157,7 +166,6 @@ class TAGMEHelper {
                             switch responseResult {
                             case .success(let res):
                                 json = JSON(res)
-                                log.info(json)
                                 if let imageURL = json["query"]["pages"][String(format: "%.0f", document.wikiPageID!)]["thumbnail"]["source"].string {
                                     DispatchQueue.global(qos: .utility).async {
                                         if let url = URL(string: imageURL) {

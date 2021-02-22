@@ -24,8 +24,8 @@ class NeoDocumentCell: UICollectionViewCell {
                         }
                     }
                     else {
-                        log.error("Failed to load in preview image for document: \(document.title)")
-                        log.error(result)
+                        // log.error("Failed to load in preview image for document: \(document.title)")
+                        // log.error(result)
                     }
                 case .failure(let error):
                     log.error(error)

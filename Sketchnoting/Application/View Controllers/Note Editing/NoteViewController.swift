@@ -774,9 +774,11 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                 case .connected, .connectedViaWiFi, .connectedViaCellular:
                     log.info("Internet Connection detected.")
                     if SettingsManager.isAnnotationServiceAvailable() {
+                        log.info("Annotating...")
                         SettingsManager.updateAnnotationServiceAvailability()
                         DispatchQueue.global(qos: .background).async {
                             if SettingsManager.getAnnotatorStatus(annotator: .TAGME) {
+                                log.info("Calling TAGME annotator.")
                                 TAGMEHelper.shared.fetch(text: text, note: self.note)
                             }
                             if SettingsManager.getAnnotatorStatus(annotator: .WAT) {
@@ -981,7 +983,8 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     func noteHasNewDocument(note: Note, document: Document) {
         documentsVC.update(note: self.note)
         self.updateTopicsCount()
-        NeoLibrary.save(note: self.note.1, url: self.note.0)
+        startSaveTimer()
+        //NeoLibrary.save(note: self.note.1, url: self.note.0)
     }
     func noteHasRemovedDocument(note: Note, document: Document) {
         documentsVC.update(note: self.note)

@@ -13,7 +13,6 @@ import PDFKit
 class NotePage: Codable {
     var canvasDrawing: PKDrawing
     private var drawings: [NoteDrawing]
-    private var noteText: NoteText?
     private var recognizedText: SKRecognizedText
     var backdropPDFData: Data?
     var pdfScale: Float = 1.0
@@ -35,7 +34,6 @@ class NotePage: Codable {
         case canvasDrawing = "canvasDrawing"
         case drawings = "noteDrawings"
         case recognizedText = "recognizedText"
-        case noteText = "noteText"
         case backdropPDFData = "backdropPDFData"
         case pdfScale = "pdfScale"
         case layers = "layers"
@@ -50,7 +48,6 @@ class NotePage: Codable {
         try container.encode(canvasDrawing, forKey: .canvasDrawing)
         try container.encode(drawings, forKey: .drawings)
         try container.encode(recognizedText, forKey: .recognizedText)
-        try container.encode(noteText, forKey: .noteText)
         try container.encode(backdropPDFData, forKey: .backdropPDFData)
         try container.encode(pdfScale, forKey: .pdfScale)
     }
@@ -82,7 +79,6 @@ class NotePage: Codable {
         canvasDrawing = try container.decode(PKDrawing.self, forKey: .canvasDrawing)
         drawings = (try? container.decode([NoteDrawing].self, forKey: .drawings)) ?? [NoteDrawing]()
         recognizedText = (try? container.decode(SKRecognizedText.self, forKey: .recognizedText)) ?? SKRecognizedText()
-        noteText = try? container.decode(NoteText.self, forKey: .noteText)
         backdropPDFData = try? container.decode(Data.self, forKey: .backdropPDFData)
         pdfScale = try container.decode(Float.self, forKey: .pdfScale)
     }
@@ -180,14 +176,6 @@ class NotePage: Codable {
         }
     }
     
-    func setNoteText(noteText: NoteText) {
-        self.noteText = noteText
-    }
-    
-    func getNoteText() -> NoteText? {
-        return self.noteText
-    }
-    
     //MARK: recognized text
     
     public func addRecognizedLine(line: SKRecognizedLine, lineNumber: Int) {
@@ -207,28 +195,22 @@ class NotePage: Codable {
         return self.recognizedText
     }
     
-    func clearNoteText() {
-        self.noteText = nil
-    }
-    
-    public func getText(raw: Bool = false) -> String {
+    public func getText(raw: Bool = false, includePDFContent: Bool = true) -> String {
         var text: String = ""
-        if let noteText = self.noteText {
-            if !raw {
-                text = noteText.spellchecked
-            }
-            else {
-                text = noteText.text
+        if !getRecognizedText().getText().isEmpty {
+            text += getRecognizedText().getText()
+        }
+        if includePDFContent {
+            if let pdfDocument = getPDFDocument(), let page = pdfDocument.page(at: 0), let pdfText = page.attributedString {
+                text += pdfText.string
             }
         }
-        
         return text
     }
     
     public func clear() {
         self.drawings = [NoteDrawing]()
         self.canvasDrawing = PKDrawing()
-        self.noteText = nil
     }
     
     public func getAsImage(completion: @escaping (UIImage) -> Void) {

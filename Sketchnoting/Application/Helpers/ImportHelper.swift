@@ -24,6 +24,7 @@ class ImportHelper {
         for url in urls {
             do {
                 let data = try Data(contentsOf: url)
+                log.info("Importing item of type: \(url.typeIdentifier!)")
                 switch url.typeIdentifier {
                 case "public.image", "public.jpeg", "public.jpg", "public.png":
                     if let decodedImage = UIImage(data: data) {
@@ -68,7 +69,7 @@ class ImportHelper {
                     log.error("Unrecognized type for URL: \(url.typeIdentifier ?? "No type identifier")")
                 }
             } catch {
-                log.error("Imported URL could not be decoded.")
+                log.error("Imported URL could not be decoded: \(url.absoluteString)")
             }
         }
         return (notes, images, pdfs, texts)

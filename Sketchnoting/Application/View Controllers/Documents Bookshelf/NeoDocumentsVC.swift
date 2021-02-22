@@ -268,12 +268,12 @@ class NeoDocumentsVC: UIViewController, UICollectionViewDelegate, UISearchBarDel
     
     private func showTAGMEAccuracyAlert() {
         var title = "Favor Common Topics (More)"
-        if self.note.1.tagmeEpsilon == Float(0.0) {
+        if self.note.1.tagmeEpsilon == Float(0.1) {
             title = "✔︎ Favor Common Topics (More)"
         }
         let alert = UIAlertController(title: "TAGME Accuracy", message: "Choose how documents are fetched.", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: NSLocalizedString(title, comment: ""), style: .default, handler: { _ in
-            self.note.1.tagmeEpsilon = 0.0
+            self.note.1.tagmeEpsilon = 0.1
             NeoLibrary.save(note: self.note.1, url: self.note.0)
             self.delegate?.tagmeEpsilonUpdated(value: 0.0)
         }))

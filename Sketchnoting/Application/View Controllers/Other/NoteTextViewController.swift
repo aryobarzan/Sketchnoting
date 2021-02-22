@@ -16,7 +16,7 @@ class NoteTextViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.title = note.1.getName()
-        textView.text = note.1.getCurrentPage().getRecognizedText().getText()
+        textView.text = note.1.getCurrentPage().getText()
     }
    
     @IBAction func copyTapped(_ sender: UIBarButtonItem) {
