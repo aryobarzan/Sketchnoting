@@ -128,6 +128,14 @@ class Note: File, DocumentDelegate {
         return id
     }
     
+    public func getDrawingLabels() -> [String] {
+        var labels = [String]()
+        for page in pages {
+            labels += page.getDrawingLabels()
+        }
+        return Array(Set(labels))
+    }
+    
     //MARK: updating data
     func add(pages: [NotePage]) {
         var i = activePageIndex + 1

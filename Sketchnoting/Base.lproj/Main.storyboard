@@ -2003,8 +2003,8 @@
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="pyx-fB-u9y">
-                                <rect key="frame" x="204.5" y="117" width="359" height="32"/>
+                            <segmentedControl hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="pyx-fB-u9y">
+                                <rect key="frame" x="204.5" y="125" width="359" height="32"/>
                                 <segments>
                                     <segment title="Any"/>
                                     <segment title="Body"/>
@@ -2016,12 +2016,12 @@
                                 </connections>
                             </segmentedControl>
                             <textField opaque="NO" tag="101" contentMode="scaleToFill" horizontalHuggingPriority="249" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Enter your search query" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="OWB-7G-1Cd">
-                                <rect key="frame" x="20" y="69" width="571" height="34"/>
+                                <rect key="frame" x="20" y="77" width="571" height="34"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences" returnKeyType="search"/>
                             </textField>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="San-i8-ecq">
-                                <rect key="frame" x="599" y="72" width="21" height="28"/>
+                                <rect key="frame" x="599" y="80" width="21" height="28"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="21" id="Wq9-r3-A36"/>
                                     <constraint firstAttribute="height" constant="28" id="X47-oo-mcc"/>
@@ -2031,8 +2031,8 @@
                                     <action selector="drawingSearchTapped:" destination="kPL-Mg-aaB" eventType="touchUpInside" id="EQD-32-wni"/>
                                 </connections>
                             </button>
-                            <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="TBN-T0-e7n">
-                                <rect key="frame" x="20" y="156" width="728" height="56"/>
+                            <collectionView hidden="YES" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="TBN-T0-e7n">
+                                <rect key="frame" x="20" y="164" width="728" height="56"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="56" id="6vb-xr-dnd"/>
@@ -2084,13 +2084,13 @@
                                 </cells>
                             </collectionView>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Notes: 0 result(s)" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="c0m-wh-T3d">
-                                <rect key="frame" x="20" y="220" width="132" height="21"/>
+                                <rect key="frame" x="20" y="228" width="132" height="21"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="tTU-cQ-M7Q">
-                                <rect key="frame" x="20" y="249" width="728" height="705"/>
+                                <rect key="frame" x="20" y="257" width="728" height="697"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <collectionViewFlowLayout key="collectionViewLayout" automaticEstimatedItemSize="YES" minimumLineSpacing="10" minimumInteritemSpacing="10" id="BHd-NG-Ehf">
                                     <size key="itemSize" width="50" height="50"/>
@@ -2110,7 +2110,7 @@
                                 </cells>
                             </collectionView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Rar-0k-hIs">
-                                <rect key="frame" x="628" y="72" width="120" height="28"/>
+                                <rect key="frame" x="628" y="80" width="120" height="28"/>
                                 <color key="backgroundColor" systemColor="linkColor"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="28" id="DCr-PV-dQL"/>
@@ -2124,7 +2124,7 @@
                                     <action selector="searchTapped:" destination="kPL-Mg-aaB" eventType="touchUpInside" id="muc-uy-kUT"/>
                                 </connections>
                             </button>
-                            <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="imP-cY-iHl">
+                            <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="1" translatesAutoresizingMaskIntoConstraints="NO" id="imP-cY-iHl">
                                 <rect key="frame" x="130" y="25" width="153" height="32"/>
                                 <segments>
                                     <segment title="Lexical"/>
@@ -2147,16 +2147,16 @@
                             <constraint firstItem="tTU-cQ-M7Q" firstAttribute="top" secondItem="c0m-wh-T3d" secondAttribute="bottom" constant="8" id="MN1-ur-Uuy"/>
                             <constraint firstItem="TBN-T0-e7n" firstAttribute="top" secondItem="pyx-fB-u9y" secondAttribute="bottom" constant="8" id="PTL-p3-RBS"/>
                             <constraint firstItem="imP-cY-iHl" firstAttribute="leading" secondItem="Axk-yc-h7I" secondAttribute="trailing" constant="8" id="PlE-BE-k9Q"/>
-                            <constraint firstItem="OWB-7G-1Cd" firstAttribute="top" secondItem="Axk-yc-h7I" secondAttribute="bottom" constant="8" id="Raa-Gc-ZQb"/>
+                            <constraint firstItem="OWB-7G-1Cd" firstAttribute="top" secondItem="Axk-yc-h7I" secondAttribute="bottom" constant="16" id="Raa-Gc-ZQb"/>
                             <constraint firstItem="imP-cY-iHl" firstAttribute="top" secondItem="MqQ-2V-Ujw" secondAttribute="top" constant="25" id="Tt6-B7-R52"/>
                             <constraint firstItem="Axk-yc-h7I" firstAttribute="top" secondItem="MqQ-2V-Ujw" secondAttribute="top" constant="20" id="U5y-RD-OyJ"/>
                             <constraint firstItem="tTU-cQ-M7Q" firstAttribute="leading" secondItem="MqQ-2V-Ujw" secondAttribute="leading" constant="20" id="URX-VU-7tf"/>
                             <constraint firstItem="MqQ-2V-Ujw" firstAttribute="trailing" secondItem="Rar-0k-hIs" secondAttribute="trailing" constant="20" id="Wjj-Gf-AXm"/>
                             <constraint firstItem="c0m-wh-T3d" firstAttribute="leading" secondItem="MqQ-2V-Ujw" secondAttribute="leading" constant="20" id="Xmu-he-LDr"/>
                             <constraint firstItem="San-i8-ecq" firstAttribute="leading" secondItem="OWB-7G-1Cd" secondAttribute="trailing" constant="8" id="ZFf-Es-2c3"/>
-                            <constraint firstItem="San-i8-ecq" firstAttribute="top" secondItem="MqQ-2V-Ujw" secondAttribute="top" constant="72" id="aqW-9U-tpd"/>
+                            <constraint firstItem="San-i8-ecq" firstAttribute="top" secondItem="MqQ-2V-Ujw" secondAttribute="top" constant="80" id="aqW-9U-tpd"/>
                             <constraint firstItem="MqQ-2V-Ujw" firstAttribute="bottom" secondItem="tTU-cQ-M7Q" secondAttribute="bottom" constant="20" id="bpH-Hc-o2P"/>
-                            <constraint firstItem="Rar-0k-hIs" firstAttribute="top" secondItem="MqQ-2V-Ujw" secondAttribute="top" constant="72" id="gJV-A6-btc"/>
+                            <constraint firstItem="Rar-0k-hIs" firstAttribute="top" secondItem="MqQ-2V-Ujw" secondAttribute="top" constant="80" id="gJV-A6-btc"/>
                             <constraint firstItem="Axk-yc-h7I" firstAttribute="leading" secondItem="MqQ-2V-Ujw" secondAttribute="leading" constant="20" id="nTm-Tn-k5e"/>
                             <constraint firstItem="MqQ-2V-Ujw" firstAttribute="trailing" secondItem="TBN-T0-e7n" secondAttribute="trailing" constant="20" id="oZc-a6-QzU"/>
                             <constraint firstItem="MqQ-2V-Ujw" firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="imP-cY-iHl" secondAttribute="trailing" symbolic="YES" id="q3E-qV-wcg"/>

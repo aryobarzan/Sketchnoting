@@ -11,8 +11,9 @@ import NaturalLanguage
 import MLKitEntityExtraction
 
 class SemanticSearch {
-    static let SEARCH_THRESHOLD = 1.0
-    static let DRAWING_THRESHOLD = 0.5
+    static let SEARCH_THRESHOLD = 0.8
+    static let DRAWING_THRESHOLD = 0.7
+    static let KEYWORD_THRESHOLD = 0.6
     
     static let entityExtractor = EntityExtractor.entityExtractor(options: EntityExtractorOptions(modelIdentifier:
                                                                                                     EntityExtractionModelIdentifier.english))
@@ -52,6 +53,17 @@ class SemanticSearch {
             }
         }
         return tagsTuple
+    }
+    
+    static func lemmatize(text: String) -> String {
+        let tagger = NLTagger(tagSchemes: [.lemma])
+        tagger.string = text
+        let tags = tagger.tags(in: text.startIndex..<text.endIndex, unit: .word, scheme: .lemma, options: [.omitPunctuation, .omitWhitespace])
+        var textLemmatized = text
+        if tags.count > 0 && tags[0].0 != nil {
+            textLemmatized = tags[0].0!.rawValue
+        }
+        return textLemmatized
     }
     
     static func extractEntities(text: String, entityCompletion: (DateTimeEntity?) -> Void) {
@@ -158,26 +170,26 @@ class SemanticSearch {
                         log.info("Body similarity threshold achieved: \(averageSimilarity)")
                     }
                     // MARK: Drawings search
-                    averageSimilarity = 0.0
-                    for term in queryNouns {
-                        var minimumSimilarity = 999.0
-                        for page in note.1.pages {
-                            for drawing in page.getDrawingLabels() {
-                                let similarity = wordEmbedding.distance(between: term.0, and: drawing)
+                    if !isMatch {
+                        averageSimilarity = 0.0
+                        for term in queryNouns {
+                            var minimumSimilarity = 999.0
+                            for drawing in note.1.getDrawingLabels() {
+                                let similarity = wordEmbedding.distance(between: term.0, and: lemmatize(text: drawing))
                                 log.info("\(term.0) - \(drawing): \(similarity)")
                                 if similarity < minimumSimilarity {
                                     minimumSimilarity = similarity
                                 }
                             }
+                            averageSimilarity += minimumSimilarity
                         }
-                        averageSimilarity += minimumSimilarity
-                    }
-                    averageSimilarity /= Double(queryNouns.count)
-                    if averageSimilarity <= DRAWING_THRESHOLD {
-                        log.info("Drawing similarity threshold achieved.")
-                        if !isMatch {
-                            results.append(note)
-                            isMatch = true
+                        averageSimilarity /= Double(queryNouns.count)
+                        if averageSimilarity <= DRAWING_THRESHOLD {
+                            log.info("Drawing similarity threshold achieved.")
+                            if !isMatch {
+                                results.append(note)
+                                isMatch = true
+                            }
                         }
                     }
                     // MARK: Documents search
@@ -206,7 +218,7 @@ class SemanticSearch {
                         }
                         // MARK: Document Title
                         let similarity = sentenceEmbedding.distance(between: query, and: document.title, distanceType: .cosine)
-                        if similarity <= SEARCH_THRESHOLD {
+                        if similarity <= KEYWORD_THRESHOLD {
                             log.info("Found query in title of document: \(document.title) [\(document.documentType.rawValue)]")
                             if !documentResults.contains(document) {
                                 documentResults.append(document)
@@ -280,24 +292,23 @@ class SemanticSearch {
                     }
                     
                     // MARK: Drawings search
-                    for term in queryNouns {
-                        for page in note.1.pages {
-                            for drawing in page.getDrawingLabels() {
-                                let similarity = wordEmbedding.distance(between: term.0, and: drawing)
+                    if !isMatch {
+                        for term in queryNouns {
+                            for drawing in note.1.getDrawingLabels() {
+                                let similarity = wordEmbedding.distance(between: term.0, and: lemmatize(text: drawing))
                                 log.info("\(term.0) - \(drawing): \(similarity)")
                                 if similarity <= DRAWING_THRESHOLD {
+                                    log.info("Drawing similarity threshold achieved.")
                                     if !isMatch {
                                         results.append(note)
                                         isMatch = true
+                                        break
                                     }
                                 }
                             }
                             if isMatch {
                                 break
                             }
-                        }
-                        if isMatch {
-                            break
                         }
                     }
                     // MARK: Documents search
