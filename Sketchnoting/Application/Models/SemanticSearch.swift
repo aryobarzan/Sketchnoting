@@ -104,7 +104,7 @@ class SemanticSearch {
     static var dateTimeEntity: DateTimeEntity?
     
     static func search(query: String, notes: [(URL, Note)]) -> ([(URL, Note)], [Document], [Document], [Document])? {
-        // missing: note tags
+        // missing: note tags, note title
         let tagger = NLTagger(tagSchemes: [.lemma])
         if let sentenceEmbedding = NLEmbedding.sentenceEmbedding(for: .english), let wordEmbedding = NLEmbedding.wordEmbedding(for: .english) {
             let queryWords = tokenize(text: query, unit: .word)

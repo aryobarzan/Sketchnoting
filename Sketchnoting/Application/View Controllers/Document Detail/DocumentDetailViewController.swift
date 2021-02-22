@@ -74,9 +74,7 @@ class DocumentDetailViewController: UIViewController, DocumentVisitor {
         if let description = document.description {
             self.setDetailDescription(text: description)
         }
-        if let mapImage = document.mapImage {
-            bottomImageView.image = mapImage
-        }
+        loadMapImage(document: document)
     }
     
     func process(document: WATDocument) {
@@ -86,9 +84,7 @@ class DocumentDetailViewController: UIViewController, DocumentVisitor {
         if let description = document.description {
             self.setDetailDescription(text: description)
         }
-        if let mapImage = document.mapImage {
-            bottomImageView.image = mapImage
-        }
+        loadMapImage(document: document)
     }
     
     func process(document: BioPortalDocument) {
@@ -134,6 +130,22 @@ class DocumentDetailViewController: UIViewController, DocumentVisitor {
             //safariVC!.modalPresentationStyle = .pageSheet
             
         }
+    }
+    
+    private func loadMapImage(document: Document) {
+        document.retrieveImage(type: .Map, completion: { result in
+            switch result {
+            case .success(let value):
+                if let mapImage = value {
+                    log.info("Map image found for document \(document.title).")
+                    DispatchQueue.main.async {
+                        self.bottomImageView.image = mapImage
+                    }
+                }
+            case .failure(_): break
+                // log.error("No map image found for document \(document.title).")
+            }
+        })
     }
     
     private func setDetailDescription(text: String) {

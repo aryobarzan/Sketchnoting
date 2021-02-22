@@ -13,7 +13,6 @@ class TAGMEDocument: Document {
     var spot: String?
     var categories: [String]?
     var wikiPageID: Double?
-    var mapImage: UIImage?
     
     private enum CodingKeys: String, CodingKey {
         case spot
@@ -43,8 +42,6 @@ class TAGMEDocument: Document {
         spot = try? container.decode(String.self, forKey: .spot)
         categories = try? container.decode([String].self, forKey: .categories)
         wikiPageID = try? container.decode(Double.self, forKey: .wikiPageID)
-        
-        loadMapImage()
     }
     
     //MARK: Visitable
@@ -52,24 +49,7 @@ class TAGMEDocument: Document {
         visitor.process(document: self)
     }
     
-    private func loadMapImage() {
-        self.retrieveImage(type: .Map, completion: { result in
-            switch result {
-            case .success(let value):
-                if value != nil {
-                    log.info("Map image found for document \(self.title).")
-                    DispatchQueue.main.async {
-                        self.mapImage = value!
-                    }
-                }
-            case .failure(_):
-                log.error("No map image found for document \(self.title).")
-            }
-        })
-    }
-    
     override func reload() {
-        loadMapImage()
         delegate?.documentHasChanged(document: self)
     }
 }

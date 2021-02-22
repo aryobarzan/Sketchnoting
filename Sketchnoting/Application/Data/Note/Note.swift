@@ -10,6 +10,12 @@ import UIKit
 import PDFKit
 import PencilKit
 
+enum NoteTextViewOption: String {
+    case FullText
+    case HandwrittenText
+    case PDFText
+}
+
 protocol NoteDelegate {
     func noteHasNewDocument(note: Note, document: Document)
     func noteHasRemovedDocument(note: Note, document: Document)
@@ -218,10 +224,7 @@ class Note: File, DocumentDelegate {
     }
     func setDocumentMapImage(document: Document, image: UIImage) {
         if self.documents.contains(document) {
-            if document is TAGMEDocument {
-                (document as! TAGMEDocument).mapImage = image
-                self.delegate?.noteDocumentHasChanged(note: self, document: document)
-            }
+            self.delegate?.noteDocumentHasChanged(note: self, document: document)
         }
     }
     func setDocumentMoleculeImage(document: CHEBIDocument, image: UIImage) {
@@ -235,11 +238,10 @@ class Note: File, DocumentDelegate {
         self.delegate?.noteDocumentHasChanged(note: self, document: document)
     }
     
-    //MARK: recognized text
-    public func getText(raw: Bool = false) -> String {
+    public func getText(option: NoteTextViewOption = .FullText) -> String {
         var text: String = ""
         for page in pages {
-            text = text + page.getText()
+            text = text + page.getText(option: option)
             text += "\n"
         }
         return text

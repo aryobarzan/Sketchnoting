@@ -195,17 +195,29 @@ class NotePage: Codable {
         return self.recognizedText
     }
     
-    public func getText(raw: Bool = false, includePDFContent: Bool = true) -> String {
+    public func getText(option: NoteTextViewOption = .FullText) -> String {
         var text: String = ""
-        if !getRecognizedText().getText().isEmpty {
+        switch option {
+        
+        case .FullText:
             text += getRecognizedText().getText()
-        }
-        if includePDFContent {
-            if let pdfDocument = getPDFDocument(), let page = pdfDocument.page(at: 0), let pdfText = page.attributedString {
-                text += pdfText.string
+            if !text.isEmpty {
+                text += "\n"
             }
+            text += getPDFText()
+        case .HandwrittenText:
+            text += getRecognizedText().getText()
+        case .PDFText:
+            text += getPDFText()
         }
         return text
+    }
+    
+    private func getPDFText() -> String {
+        if let pdfDocument = getPDFDocument(), let page = pdfDocument.page(at: 0), let pdfText = page.attributedString {
+            return pdfText.string
+        }
+        return ""
     }
     
     public func clear() {

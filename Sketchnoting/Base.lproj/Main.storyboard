@@ -1618,21 +1618,59 @@
                         <rect key="frame" x="0.0" y="0.0" width="704" height="984"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" text="Recognized note handwriting." textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="AEB-jm-UlP">
-                                <rect key="frame" x="20" y="76" width="664" height="888"/>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" text="[Empty]" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="AEB-jm-UlP">
+                                <rect key="frame" x="20" y="162" width="664" height="802"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <color key="textColor" name="SketchnotingTextColor"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                             </textView>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="o8Y-jo-lvS">
+                                <rect key="frame" x="20" y="76" width="664" height="60"/>
+                                <subviews>
+                                    <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="nLV-yK-Wkf">
+                                        <rect key="frame" x="8" y="14.5" width="201" height="32"/>
+                                        <segments>
+                                            <segment title="Current Page"/>
+                                            <segment title="Note"/>
+                                        </segments>
+                                        <connections>
+                                            <action selector="pagesSegmentedControlChanged:" destination="Zff-JM-hmJ" eventType="valueChanged" id="qcI-Rk-QdW"/>
+                                        </connections>
+                                    </segmentedControl>
+                                    <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="t6K-BE-gMi">
+                                        <rect key="frame" x="217" y="14.5" width="377" height="32"/>
+                                        <segments>
+                                            <segment title="Full Text"/>
+                                            <segment title="Handwritten Text"/>
+                                            <segment title="PDF Text"/>
+                                        </segments>
+                                        <connections>
+                                            <action selector="textSegmentedControlChanged:" destination="Zff-JM-hmJ" eventType="valueChanged" id="4aQ-IZ-wsV"/>
+                                        </connections>
+                                    </segmentedControl>
+                                </subviews>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                <constraints>
+                                    <constraint firstItem="nLV-yK-Wkf" firstAttribute="centerY" secondItem="o8Y-jo-lvS" secondAttribute="centerY" id="7yJ-aQ-T8t"/>
+                                    <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="t6K-BE-gMi" secondAttribute="trailing" constant="20" symbolic="YES" id="BQb-WW-oXu"/>
+                                    <constraint firstItem="nLV-yK-Wkf" firstAttribute="leading" secondItem="o8Y-jo-lvS" secondAttribute="leading" constant="8" id="SXn-pq-b9G"/>
+                                    <constraint firstItem="t6K-BE-gMi" firstAttribute="leading" secondItem="nLV-yK-Wkf" secondAttribute="trailing" constant="8" id="aWG-UY-sY4"/>
+                                    <constraint firstItem="t6K-BE-gMi" firstAttribute="centerY" secondItem="o8Y-jo-lvS" secondAttribute="centerY" id="xeV-Q1-4Kl"/>
+                                    <constraint firstAttribute="height" constant="60" id="y17-eH-0Zq"/>
+                                </constraints>
+                            </view>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="Yma-1T-HRR"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstItem="AEB-jm-UlP" firstAttribute="leading" secondItem="Yma-1T-HRR" secondAttribute="leading" constant="20" id="8hM-L8-n40"/>
                             <constraint firstItem="Yma-1T-HRR" firstAttribute="bottom" secondItem="AEB-jm-UlP" secondAttribute="bottom" constant="20" id="QFK-DC-Zxc"/>
+                            <constraint firstItem="AEB-jm-UlP" firstAttribute="top" secondItem="o8Y-jo-lvS" secondAttribute="bottom" constant="26" id="cqe-wI-cbR"/>
                             <constraint firstItem="Yma-1T-HRR" firstAttribute="trailing" secondItem="AEB-jm-UlP" secondAttribute="trailing" constant="20" id="dVr-mi-w3F"/>
-                            <constraint firstItem="AEB-jm-UlP" firstAttribute="top" secondItem="Yma-1T-HRR" secondAttribute="top" constant="20" id="een-pB-csE"/>
+                            <constraint firstItem="Yma-1T-HRR" firstAttribute="trailing" secondItem="o8Y-jo-lvS" secondAttribute="trailing" constant="20" id="oVu-cb-wh6"/>
+                            <constraint firstItem="o8Y-jo-lvS" firstAttribute="top" secondItem="Yma-1T-HRR" secondAttribute="top" constant="20" id="tqa-bN-RfY"/>
+                            <constraint firstItem="o8Y-jo-lvS" firstAttribute="leading" secondItem="Yma-1T-HRR" secondAttribute="leading" constant="20" id="uOD-Xe-cLM"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" title="Note" id="loX-jj-3Tc">
@@ -1648,12 +1686,14 @@
                         </barButtonItem>
                     </navigationItem>
                     <connections>
+                        <outlet property="pagesSegmentedControl" destination="nLV-yK-Wkf" id="45o-3z-SBt"/>
+                        <outlet property="textSegmentedControl" destination="t6K-BE-gMi" id="pIs-S8-6J0"/>
                         <outlet property="textView" destination="AEB-jm-UlP" id="jZu-d4-xGq"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="aJk-De-WiL" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="5734" y="1753"/>
+            <point key="canvasLocation" x="5733.59375" y="1752.5390625"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="xdO-4n-2vR">

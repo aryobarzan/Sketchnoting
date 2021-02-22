@@ -755,7 +755,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
                         sizeForItemAt indexPath: IndexPath) -> CGSize {
         switch self.noteCollectionViewState {
         case .Grid:
-            return CGSize(width: CGFloat(175), height: CGFloat(275))
+            return CGSize(width: CGFloat(200), height: CGFloat(300))
         case .List:
             return CGSize(width: collectionView.bounds.size.width - CGFloat(10), height: CGFloat(100))
         }

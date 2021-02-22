@@ -86,6 +86,10 @@ class NeoLibrary {
                             if let decoded = self.decodeNoteFromData(data: data) {
                                 files.append((url, decoded))
                             }
+                            else {
+                                log.error("Detected invalid file - will attempt to delete...")
+                                delete(url: url)
+                            }
                         }
                     }
                 } catch {
@@ -110,7 +114,9 @@ class NeoLibrary {
                             if let note = self.decodeNoteFromData(data: data) {
                                 notes.append((fileURL, note))
                             }
-                        } catch {}
+                        } catch {
+                            log.error("Invalid file.")
+                        }
                         
                     }
                 } catch { log.error(error) }
@@ -191,6 +197,7 @@ class NeoLibrary {
             if let (_, uniqueURL) = self.constructUniqueName(rename: name, file: file, url: url, modificationType: .Rename) {
                 do {
                     try FileManager.default.moveItem(at: url, to: uniqueURL)
+                    log.info("File renamed.")
                     return uniqueURL
                 } catch {
                     log.error("Error while trying to rename file.")
