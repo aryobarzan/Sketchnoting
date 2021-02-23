@@ -8,10 +8,11 @@
 
 import UIKit
 import Alamofire
+import NaturalLanguage
 
 class MapHelper {
     private static let mapQuestAPIKey = "bAELaFV3A8vNwICyhbziI7tNeSfYdUvr"
-    static func fetchMap(location: String, document: Document) {
+    private static func fetchMap(location: String, document: Document) {
         let parameters: Parameters = ["q": location, "maxRows": 1, "username": "aryo"]
         let headers: HTTPHeaders = [
                 "Accept": "application/json"
@@ -50,6 +51,65 @@ class MapHelper {
             else {
                 log.error("No map image could be found for document \(document.title).")
             }
+        }
+    }
+    
+    private static func isPlace(document: Document) -> Bool {
+        for t in SemanticSearch.tag(text: document.title, scheme: .nameType) {
+            if t.1 == "PlaceName" {
+                return true
+            }
+        }
+        if let tagmeDocument = document as? TAGMEDocument {
+            if let categories = tagmeDocument.categories {
+                for category in categories {
+                    var trimmed = category
+                    if category.contains(":") {
+                        if let range = category.range(of: ":") {
+                            trimmed = String(category[range.upperBound...])
+                        }
+                    }
+                    for t in SemanticSearch.tag(text: trimmed, scheme: .nameType) {
+                        if t.1 == "PlaceName" {
+                            return true
+                        }
+                    }
+                    let tokens = SemanticSearch.tokenize(text: trimmed, unit: .word)
+                    var minimumSimilarity = 999.0
+                    for token in tokens {
+                        let lemma = SemanticSearch.lemmatize(text: token)
+                        let similarity = SemanticSearch.wordDistance(between: lemma, and: "place")
+                        if similarity < minimumSimilarity {
+                            minimumSimilarity = similarity
+                        }
+                    }
+                    if minimumSimilarity <= 1.0 {
+                        return true
+                    }
+                }
+            }
+        }
+        return false
+        // MARK: Old method
+        //let placeTerms = ["place", "city", "populated", "country", "capital", "location", "state", "village"]
+        //for term in placeTerms {
+        //    if document.description?.lowercased().contains(term) ?? false {
+        //        return true
+        //    }
+        //}
+        //return false
+    }
+    
+    static func downloadMap(document: Document) {
+        if isPlace(document: document) {
+            fetchMap(location: document.title, document: document)
+        }
+        else {
+            KnowledgeGraphHelper.isPlace(name: document.title, completionHandler: { isPlace in
+                if isPlace {
+                    fetchMap(location: document.title, document: document)
+                }
+            })
         }
     }
 }

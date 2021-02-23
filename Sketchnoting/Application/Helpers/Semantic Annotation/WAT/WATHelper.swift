@@ -20,7 +20,7 @@ class WATHelper {
         let headers: HTTPHeaders = [
             "Accept": "application/json"
         ]
-
+        var documentsCount = 0
         AF.request("https://wat.d4science.org/wat/tag/tag", parameters: parameters, headers: headers).responseJSON { response in
             self.watQueue.async {
                 let responseResult = response.result
@@ -36,11 +36,16 @@ class WATHelper {
                 var results = [String: String]()
                 if let annotations = json["annotations"].array {
                     for annotation in annotations {
+                        if documentsCount == 30 {
+                            log.info("WAT: reached limit of 30 documents. Discarding the rest of the found annotations.")
+                            break
+                        }
                         if let spot = annotation["spot"].string, let id = annotation["id"].double, let title = annotation["title"].string?.replacingOccurrences(of: "_", with: " "), let rho = annotation["rho"].double {
                             if !spot.isEmpty && results[spot] == nil {
                                 results[spot] = spot
                                 if rho > 0.1 {
                                     if let document = WATDocument(title: title, description: "Missing description.", URL: "https://sobigdata.d4science.org/web/tagme/wat-api", type: .WAT, spot: spot, wikiPageID: id) {
+                                        documentsCount += 1
                                         if let parentConcept = parentConcept {
                                             self.checkRelatedness(doc_one: parentConcept, doc_two: document, note: note)
                                         }
@@ -69,11 +74,7 @@ class WATHelper {
                             KnowledgeGraphHelper.fetchWikipediaImage(document: document)
                         }
                     })
-                    KnowledgeGraphHelper.isPlace(name: document.title, completionHandler: { isPlace in
-                        if isPlace {
-                            MapHelper.fetchMap(location: document.title, document: document)
-                        }
-                    })
+                    MapHelper.downloadMap(document: document)
                 }
             }
         }
@@ -131,7 +132,6 @@ class WATHelper {
                             switch responseResult {
                             case .success(let res):
                                 json = JSON(res)
-                                
                                 if let imageURL = json["query"]["pages"][String(format: "%.0f", document.wikiPageID!)]["thumbnail"]["source"].string {
                                     DispatchQueue.global(qos: .utility).async {
                                         if let url = URL(string: imageURL) {

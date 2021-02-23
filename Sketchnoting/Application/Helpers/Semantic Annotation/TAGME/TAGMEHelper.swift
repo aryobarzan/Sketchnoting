@@ -22,6 +22,7 @@ class TAGMEHelper {
                 "Accept": "application/json"
             ]
             log.info("TAGME annotator request sent.")
+            var documentsCount = 0
             AF.request("http://tagme.d4science.org/tagme/tag", parameters: parameters, headers: headers).responseJSON { response in
                 self.tagmeQueue.async {
                     let responseResult = response.result
@@ -38,12 +39,12 @@ class TAGMEHelper {
                     log.info("TAGME: API call successful.")
                     var results = [String: String]()
                     // log.info(json)
-                    var documentsCount = 0
+                    
                     if let annotations = json["annotations"].array {
                         log.info("TAGME found \(annotations.count) annotations.")
                         for annotation in annotations {
-                            if documentsCount == 20 {
-                                log.info("TAGME: reached limit of 20 documents. Discarding the rest of the found annotations.")
+                            if documentsCount == 30 {
+                                log.info("TAGME: reached limit of 30 documents. Discarding the rest of the found annotations.")
                                 break
                             }
                             if let spot = annotation["spot"].string, let id = annotation["id"].double, let abstract = annotation["abstract"].string, let title = annotation["title"].string, let rho = annotation["rho"].double {
@@ -94,21 +95,7 @@ class TAGMEHelper {
                                 document: document)
                         }
                     })
-                    KnowledgeGraphHelper.isPlace(name: document.title, completionHandler: { isPlace in
-                        if isPlace {
-                            MapHelper.fetchMap(location: document.title, document: document)
-                        }
-                        else {
-                            let placeTerms = ["place", "city", "populated", "country", "capital", "location", "state", "village"]
-                            for term in placeTerms {
-                                if document.description?.lowercased().contains(term) ?? false {
-                                    MapHelper.fetchMap(location: document.title, document: document)
-                                    break
-                                }
-                            }
-                            
-                        }
-                    })
+                    MapHelper.downloadMap(document: document)
                 }
             }
         }

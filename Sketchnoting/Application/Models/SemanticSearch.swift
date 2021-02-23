@@ -17,6 +17,9 @@ class SemanticSearch {
     
     static let entityExtractor = EntityExtractor.entityExtractor(options: EntityExtractorOptions(modelIdentifier:
                                                                                                     EntityExtractionModelIdentifier.english))
+    private static let wordEmbedding = NLEmbedding.wordEmbedding(for: .english)
+    private static let sentenceEmbedding = NLEmbedding.sentenceEmbedding(for: .english)
+    
     static func downloadEntityExtractorModel() {
         entityExtractor.downloadModelIfNeeded(completion: { error in
             if error == nil {
@@ -64,6 +67,27 @@ class SemanticSearch {
             textLemmatized = tags[0].0!.rawValue
         }
         return textLemmatized
+    }
+    
+    static func neighbors(word: String, maximumCount: Int = 5) -> [(String, Double)] {
+        if let wordEmbedding = wordEmbedding {
+            return wordEmbedding.neighbors(for: word, maximumCount: maximumCount)
+        }
+        return [(String, Double)]()
+    }
+    
+    static func wordDistance(between: String, and: String) -> Double {
+        if let wordEmbedding = wordEmbedding {
+            return wordEmbedding.distance(between: between, and: and, distanceType: .cosine)
+        }
+        return -1.0
+    }
+    
+    static func sentenceDistance(between: String, and: String) -> Double {
+        if let sentenceEmbedding = sentenceEmbedding {
+            return sentenceEmbedding.distance(between: between, and: and, distanceType: .cosine)
+        }
+        return -1.0
     }
     
     static func extractEntities(text: String, entityCompletion: (DateTimeEntity?) -> Void) {
