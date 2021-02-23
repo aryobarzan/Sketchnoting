@@ -72,6 +72,8 @@
 		9F77DBCA23FFD619007C8B7D /* AnnotationUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F77DBC923FFD619007C8B7D /* AnnotationUtilities.swift */; };
 		9F8551B123A539D9006EB0B1 /* NotePageCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F8551B023A539D9006EB0B1 /* NotePageCollectionViewCell.swift */; };
 		9F87A47D2445441500F83B12 /* NoteTypedText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F87A47C2445441500F83B12 /* NoteTypedText.swift */; };
+		9F8988D225E59D9B005CB90B /* SearchDocumentsCard.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9F8988D125E59D9B005CB90B /* SearchDocumentsCard.xib */; };
+		9F8988D425E59DAD005CB90B /* SearchDocumentsCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F8988D325E59DAD005CB90B /* SearchDocumentsCard.swift */; };
 		9F8E0D0F25DDC02C00A951B1 /* SemanticSearch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F8E0D0E25DDC02C00A951B1 /* SemanticSearch.swift */; };
 		9F92D10E231E95B400BC0E57 /* UICollectionViewExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F92D10D231E95B400BC0E57 /* UICollectionViewExtensions.swift */; };
 		9F92D110231E97DF00BC0E57 /* UserDefaultsExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F92D10F231E97DF00BC0E57 /* UserDefaultsExtensions.swift */; };
@@ -223,6 +225,8 @@
 		9F77DBC923FFD619007C8B7D /* AnnotationUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnnotationUtilities.swift; sourceTree = "<group>"; };
 		9F8551B023A539D9006EB0B1 /* NotePageCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotePageCollectionViewCell.swift; sourceTree = "<group>"; };
 		9F87A47C2445441500F83B12 /* NoteTypedText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteTypedText.swift; sourceTree = "<group>"; };
+		9F8988D125E59D9B005CB90B /* SearchDocumentsCard.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SearchDocumentsCard.xib; sourceTree = "<group>"; };
+		9F8988D325E59DAD005CB90B /* SearchDocumentsCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchDocumentsCard.swift; sourceTree = "<group>"; };
 		9F8E0D0E25DDC02C00A951B1 /* SemanticSearch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SemanticSearch.swift; sourceTree = "<group>"; };
 		9F92D10D231E95B400BC0E57 /* UICollectionViewExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UICollectionViewExtensions.swift; sourceTree = "<group>"; };
 		9F92D10F231E97DF00BC0E57 /* UserDefaultsExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsExtensions.swift; sourceTree = "<group>"; };
@@ -502,6 +506,8 @@
 				9F92D11923217CFA00BC0E57 /* SearchFilterView.xib */,
 				9F92D11B23217D0500BC0E57 /* SearchFilterView.swift */,
 				9F65984723F315FE00CDBE0C /* SearchFilterCollectionViewCell.swift */,
+				9F8988D125E59D9B005CB90B /* SearchDocumentsCard.xib */,
+				9F8988D325E59DAD005CB90B /* SearchDocumentsCard.swift */,
 			);
 			path = Search;
 			sourceTree = "<group>";
@@ -868,6 +874,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9F8988D225E59D9B005CB90B /* SearchDocumentsCard.xib in Resources */,
 				9FD29C442239525A00CC969A /* GoogleService-Info.plist in Resources */,
 				9FD29BB12220525000CC969A /* LaunchScreen.storyboard in Resources */,
 				9FD29BAE2220525000CC969A /* Assets.xcassets in Resources */,
@@ -1024,6 +1031,7 @@
 				9FBF6AB422E9F391001FD730 /* VisionTextWrapper.swift in Sources */,
 				9FAADE88255A1FE800A5E6A3 /* CGRectExtensions.swift in Sources */,
 				9FC02C1E23EDB6400051C576 /* Note.swift in Sources */,
+				9F8988D425E59DAD005CB90B /* SearchDocumentsCard.swift in Sources */,
 				9F318D39244A207300A1B4B5 /* UIFontExtensions.swift in Sources */,
 				9F2C0D75248F0E2600F58F5E /* ArrayExtensions.swift in Sources */,
 				9F8551B123A539D9006EB0B1 /* NotePageCollectionViewCell.swift in Sources */,

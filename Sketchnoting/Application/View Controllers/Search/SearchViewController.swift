@@ -16,12 +16,14 @@ class SearchViewController: UIViewController, UICollectionViewDelegate, UICollec
     @IBOutlet weak var drawingSearchButton: UIButton!
     @IBOutlet weak var searchTypeSegmentedControl: UISegmentedControl!
     @IBOutlet weak var filtersCollectionView: UICollectionView!
-    @IBOutlet weak var resultsLabel: UILabel!
     @IBOutlet weak var notesCollectionView: UICollectionView!
+    @IBOutlet weak var contentStackView: UIStackView!
     
     var searchFilters = [SearchFilter]()
     var notes = [(URL, Note)]()
     var currentSearchType = SearchType.All
+    
+    var searchDocumentsCards = [SearchDocumentsCard]()
     
     private var appSearch = AppSearch()
     override func viewDidLoad() {
@@ -176,14 +178,35 @@ class SearchViewController: UIViewController, UICollectionViewDelegate, UICollec
         for entity in entities {
             log.info("\(entity.0) - \(entity.1)")
         }
+        clearSearchDocumentsCards()
+        self.notes = [(URL, Note)]()
+        notesCollectionView.reloadData()
         SemanticSearch.shared.search(query: query, notes: NeoLibrary.getNotes(), searchHandler: {searchResult in
             if searchResult.note != nil {
                 log.info("Match: Note - \(searchResult.note!.1.getName())")
+                DispatchQueue.main.async {
+                    self.notes.append(searchResult.note!)
+                    self.notesCollectionView.reloadData()
+                }
             }
             log.info("Document matches: \(searchResult.documents.count)")
             log.info("Location document matches: \(searchResult.locationDocuments.count)")
             log.info("Person document matches: \(searchResult.personDocuments.count)")
+            if searchResult.documents.count > 0 {
+                DispatchQueue.main.async {
+                    let searchDocumentsCard = SearchDocumentsCard(documents: searchResult.documents, frame: CGRect(x: 0, y: 0, width: 100, height: 236))
+                    self.contentStackView.addArrangedSubview(searchDocumentsCard)
+                    self.searchDocumentsCards.append(searchDocumentsCard)
+                }
+            }
         })
+    }
+    
+    private func clearSearchDocumentsCards() {
+        for card in searchDocumentsCards {
+            card.removeFromSuperview()
+        }
+        searchDocumentsCards = [SearchDocumentsCard]()
     }
     
     private func createSearchFilter(term: String, type: SearchType) {
@@ -198,7 +221,6 @@ class SearchViewController: UIViewController, UICollectionViewDelegate, UICollec
     private func updateResults() {
         self.notes = appSearch.search(filters: self.searchFilters)
         notesCollectionView.reloadData()
-        resultsLabel.text = "Notes: \(self.notes.count) result(s)"
     }
     
     var noteToOpen: (URL, Note)?

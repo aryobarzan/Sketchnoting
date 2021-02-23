@@ -2055,22 +2055,6 @@
                                     <action selector="searchTypeSegmentChanged:" destination="kPL-Mg-aaB" eventType="valueChanged" id="YyS-fB-eBs"/>
                                 </connections>
                             </segmentedControl>
-                            <textField opaque="NO" tag="101" contentMode="scaleToFill" horizontalHuggingPriority="249" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Enter your search query" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="OWB-7G-1Cd">
-                                <rect key="frame" x="20" y="77" width="571" height="34"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences" returnKeyType="search"/>
-                            </textField>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="San-i8-ecq">
-                                <rect key="frame" x="599" y="80" width="21" height="28"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="21" id="Wq9-r3-A36"/>
-                                    <constraint firstAttribute="height" constant="28" id="X47-oo-mcc"/>
-                                </constraints>
-                                <state key="normal" image="scribble" catalog="system"/>
-                                <connections>
-                                    <action selector="drawingSearchTapped:" destination="kPL-Mg-aaB" eventType="touchUpInside" id="EQD-32-wni"/>
-                                </connections>
-                            </button>
                             <collectionView hidden="YES" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="TBN-T0-e7n">
                                 <rect key="frame" x="20" y="164" width="728" height="56"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -2123,32 +2107,64 @@
                                     </collectionViewCell>
                                 </cells>
                             </collectionView>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Notes: 0 result(s)" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="c0m-wh-T3d">
-                                <rect key="frame" x="20" y="228" width="132" height="21"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <nil key="textColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                            <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="tTU-cQ-M7Q">
-                                <rect key="frame" x="20" y="257" width="728" height="697"/>
-                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                                <collectionViewFlowLayout key="collectionViewLayout" automaticEstimatedItemSize="YES" minimumLineSpacing="10" minimumInteritemSpacing="10" id="BHd-NG-Ehf">
-                                    <size key="itemSize" width="50" height="50"/>
-                                    <size key="headerReferenceSize" width="0.0" height="0.0"/>
-                                    <size key="footerReferenceSize" width="0.0" height="0.0"/>
-                                    <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
-                                </collectionViewFlowLayout>
-                                <cells>
-                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="NoteCollectionViewCell" id="uCD-N0-VbP" customClass="NoteCollectionViewCell" customModule="Sketchnoting" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                        <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="TJT-g3-TGc">
-                                            <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
-                                            <autoresizingMask key="autoresizingMask"/>
-                                        </collectionViewCellContentView>
-                                    </collectionViewCell>
-                                </cells>
-                            </collectionView>
+                            <textField opaque="NO" tag="101" contentMode="scaleToFill" horizontalHuggingPriority="249" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Enter your search query" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="OWB-7G-1Cd">
+                                <rect key="frame" x="20" y="77" width="571" height="34"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences" returnKeyType="search"/>
+                            </textField>
+                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" showsHorizontalScrollIndicator="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Air-BM-9f6">
+                                <rect key="frame" x="20" y="253" width="728" height="701"/>
+                                <subviews>
+                                    <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="5" translatesAutoresizingMaskIntoConstraints="NO" id="9Uv-ur-khF">
+                                        <rect key="frame" x="0.0" y="0.0" width="728" height="340"/>
+                                        <subviews>
+                                            <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="tTU-cQ-M7Q">
+                                                <rect key="frame" x="0.0" y="0.0" width="728" height="340"/>
+                                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="height" constant="340" id="dt9-MJ-kXa"/>
+                                                </constraints>
+                                                <collectionViewFlowLayout key="collectionViewLayout" scrollDirection="horizontal" automaticEstimatedItemSize="YES" minimumLineSpacing="10" minimumInteritemSpacing="10" id="BHd-NG-Ehf">
+                                                    <size key="itemSize" width="50" height="50"/>
+                                                    <size key="headerReferenceSize" width="0.0" height="0.0"/>
+                                                    <size key="footerReferenceSize" width="0.0" height="0.0"/>
+                                                    <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
+                                                </collectionViewFlowLayout>
+                                                <cells>
+                                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="NoteCollectionViewCell" id="uCD-N0-VbP" customClass="NoteCollectionViewCell" customModule="Sketchnoting" customModuleProvider="target">
+                                                        <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                        <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="TJT-g3-TGc">
+                                                            <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                                            <autoresizingMask key="autoresizingMask"/>
+                                                        </collectionViewCellContentView>
+                                                    </collectionViewCell>
+                                                </cells>
+                                            </collectionView>
+                                        </subviews>
+                                    </stackView>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstAttribute="bottom" secondItem="9Uv-ur-khF" secondAttribute="bottom" id="JWM-S0-1n0"/>
+                                    <constraint firstItem="9Uv-ur-khF" firstAttribute="width" secondItem="Air-BM-9f6" secondAttribute="width" id="oBB-De-ME5"/>
+                                    <constraint firstItem="9Uv-ur-khF" firstAttribute="leading" secondItem="Air-BM-9f6" secondAttribute="leading" id="tAz-ac-id6"/>
+                                    <constraint firstItem="9Uv-ur-khF" firstAttribute="top" secondItem="Air-BM-9f6" secondAttribute="top" id="uVU-Ha-Z5s"/>
+                                    <constraint firstAttribute="trailing" secondItem="9Uv-ur-khF" secondAttribute="trailing" id="y5C-BV-bfQ"/>
+                                </constraints>
+                                <viewLayoutGuide key="contentLayoutGuide" id="Zb4-N8-68i"/>
+                                <viewLayoutGuide key="frameLayoutGuide" id="pbp-0n-5nu"/>
+                            </scrollView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="San-i8-ecq">
+                                <rect key="frame" x="599" y="80" width="21" height="28"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="21" id="Wq9-r3-A36"/>
+                                    <constraint firstAttribute="height" constant="28" id="X47-oo-mcc"/>
+                                </constraints>
+                                <state key="normal" image="scribble" catalog="system"/>
+                                <connections>
+                                    <action selector="drawingSearchTapped:" destination="kPL-Mg-aaB" eventType="touchUpInside" id="EQD-32-wni"/>
+                                </connections>
+                            </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Rar-0k-hIs">
                                 <rect key="frame" x="628" y="80" width="120" height="28"/>
                                 <color key="backgroundColor" systemColor="linkColor"/>
@@ -2178,38 +2194,35 @@
                         <viewLayoutGuide key="safeArea" id="MqQ-2V-Ujw"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
+                            <constraint firstItem="Air-BM-9f6" firstAttribute="top" secondItem="TBN-T0-e7n" secondAttribute="bottom" constant="33" id="1G4-BD-eD8"/>
                             <constraint firstItem="pyx-fB-u9y" firstAttribute="centerX" secondItem="Cr6-Dc-kQ1" secondAttribute="centerX" id="7r7-WC-Mrf"/>
                             <constraint firstItem="pyx-fB-u9y" firstAttribute="top" secondItem="OWB-7G-1Cd" secondAttribute="bottom" constant="14" id="Bxw-Up-KyO"/>
-                            <constraint firstItem="MqQ-2V-Ujw" firstAttribute="trailing" relation="lessThanOrEqual" secondItem="c0m-wh-T3d" secondAttribute="trailing" constant="627" id="C62-jk-nMb"/>
                             <constraint firstItem="OWB-7G-1Cd" firstAttribute="leading" secondItem="MqQ-2V-Ujw" secondAttribute="leading" constant="20" id="DkE-Gm-awh"/>
                             <constraint firstItem="Rar-0k-hIs" firstAttribute="leading" secondItem="San-i8-ecq" secondAttribute="trailing" constant="8" id="HHy-Q9-caZ"/>
-                            <constraint firstItem="c0m-wh-T3d" firstAttribute="top" secondItem="TBN-T0-e7n" secondAttribute="bottom" constant="8" id="LPX-HZ-cbG"/>
-                            <constraint firstItem="tTU-cQ-M7Q" firstAttribute="top" secondItem="c0m-wh-T3d" secondAttribute="bottom" constant="8" id="MN1-ur-Uuy"/>
+                            <constraint firstItem="MqQ-2V-Ujw" firstAttribute="trailing" secondItem="Air-BM-9f6" secondAttribute="trailing" constant="20" id="Kgl-6E-rMc"/>
+                            <constraint firstItem="MqQ-2V-Ujw" firstAttribute="bottom" secondItem="Air-BM-9f6" secondAttribute="bottom" constant="20" id="OuT-cD-HFo"/>
                             <constraint firstItem="TBN-T0-e7n" firstAttribute="top" secondItem="pyx-fB-u9y" secondAttribute="bottom" constant="8" id="PTL-p3-RBS"/>
                             <constraint firstItem="imP-cY-iHl" firstAttribute="leading" secondItem="Axk-yc-h7I" secondAttribute="trailing" constant="8" id="PlE-BE-k9Q"/>
                             <constraint firstItem="OWB-7G-1Cd" firstAttribute="top" secondItem="Axk-yc-h7I" secondAttribute="bottom" constant="16" id="Raa-Gc-ZQb"/>
                             <constraint firstItem="imP-cY-iHl" firstAttribute="top" secondItem="MqQ-2V-Ujw" secondAttribute="top" constant="25" id="Tt6-B7-R52"/>
                             <constraint firstItem="Axk-yc-h7I" firstAttribute="top" secondItem="MqQ-2V-Ujw" secondAttribute="top" constant="20" id="U5y-RD-OyJ"/>
-                            <constraint firstItem="tTU-cQ-M7Q" firstAttribute="leading" secondItem="MqQ-2V-Ujw" secondAttribute="leading" constant="20" id="URX-VU-7tf"/>
                             <constraint firstItem="MqQ-2V-Ujw" firstAttribute="trailing" secondItem="Rar-0k-hIs" secondAttribute="trailing" constant="20" id="Wjj-Gf-AXm"/>
-                            <constraint firstItem="c0m-wh-T3d" firstAttribute="leading" secondItem="MqQ-2V-Ujw" secondAttribute="leading" constant="20" id="Xmu-he-LDr"/>
                             <constraint firstItem="San-i8-ecq" firstAttribute="leading" secondItem="OWB-7G-1Cd" secondAttribute="trailing" constant="8" id="ZFf-Es-2c3"/>
                             <constraint firstItem="San-i8-ecq" firstAttribute="top" secondItem="MqQ-2V-Ujw" secondAttribute="top" constant="80" id="aqW-9U-tpd"/>
-                            <constraint firstItem="MqQ-2V-Ujw" firstAttribute="bottom" secondItem="tTU-cQ-M7Q" secondAttribute="bottom" constant="20" id="bpH-Hc-o2P"/>
                             <constraint firstItem="Rar-0k-hIs" firstAttribute="top" secondItem="MqQ-2V-Ujw" secondAttribute="top" constant="80" id="gJV-A6-btc"/>
+                            <constraint firstItem="Air-BM-9f6" firstAttribute="leading" secondItem="MqQ-2V-Ujw" secondAttribute="leading" constant="20" id="ioN-Nv-pR7"/>
                             <constraint firstItem="Axk-yc-h7I" firstAttribute="leading" secondItem="MqQ-2V-Ujw" secondAttribute="leading" constant="20" id="nTm-Tn-k5e"/>
                             <constraint firstItem="MqQ-2V-Ujw" firstAttribute="trailing" secondItem="TBN-T0-e7n" secondAttribute="trailing" constant="20" id="oZc-a6-QzU"/>
                             <constraint firstItem="MqQ-2V-Ujw" firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="imP-cY-iHl" secondAttribute="trailing" symbolic="YES" id="q3E-qV-wcg"/>
-                            <constraint firstItem="MqQ-2V-Ujw" firstAttribute="trailing" secondItem="tTU-cQ-M7Q" secondAttribute="trailing" constant="20" id="yAa-hO-NeM"/>
                             <constraint firstItem="TBN-T0-e7n" firstAttribute="leading" secondItem="MqQ-2V-Ujw" secondAttribute="leading" constant="20" id="yBz-gW-DUj"/>
                         </constraints>
                     </view>
                     <tabBarItem key="tabBarItem" systemItem="search" id="IiZ-xI-wB7"/>
                     <connections>
+                        <outlet property="contentStackView" destination="9Uv-ur-khF" id="HvY-iW-fiI"/>
                         <outlet property="drawingSearchButton" destination="San-i8-ecq" id="Pqb-uY-l95"/>
                         <outlet property="filtersCollectionView" destination="TBN-T0-e7n" id="Atf-yH-hkl"/>
                         <outlet property="notesCollectionView" destination="tTU-cQ-M7Q" id="jGW-6h-6JS"/>
-                        <outlet property="resultsLabel" destination="c0m-wh-T3d" id="u2u-gS-nIX"/>
                         <outlet property="searchButton" destination="Rar-0k-hIs" id="KQF-bK-HJo"/>
                         <outlet property="searchModeSegmentedControl" destination="imP-cY-iHl" id="BTR-bx-Clf"/>
                         <outlet property="searchTextField" destination="OWB-7G-1Cd" id="Zgw-Th-BBx"/>
