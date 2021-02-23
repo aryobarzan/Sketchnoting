@@ -36,9 +36,6 @@ class SearchViewController: UIViewController, UICollectionViewDelegate, UICollec
         filtersCollectionView.dataSource = self
         notesCollectionView.delegate = self
         notesCollectionView.dataSource = self
-        
-        // In case not yet downloaded (one time), download model for entity extraction library
-        SemanticSearch.downloadEntityExtractorModel()
     }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -167,20 +164,26 @@ class SearchViewController: UIViewController, UICollectionViewDelegate, UICollec
     private func performSemanticSearch() {
         // Missing - This is currently only for testing
         let query = searchTextField.text!
-        let tokens = SemanticSearch.tokenize(text: query, unit: .word)
+        let tokens = SemanticSearch.shared.tokenize(text: query, unit: .word)
         for token in tokens {
             log.info(token)
         }
-        let partsOfSpeechTags = SemanticSearch.tag(text: query)
+        let partsOfSpeechTags = SemanticSearch.shared.tag(text: query)
         for tag in partsOfSpeechTags {
             log.info("\(tag.0) - \(tag.1)")
         }
-        let entities = SemanticSearch.tag(text: query, scheme: .nameType)
+        let entities = SemanticSearch.shared.tag(text: query, scheme: .nameType)
         for entity in entities {
             log.info("\(entity.0) - \(entity.1)")
         }
-        SemanticSearch.search(query: query, notes: NeoLibrary.getNotes())
-        
+        SemanticSearch.shared.search(query: query, notes: NeoLibrary.getNotes(), searchHandler: {searchResult in
+            if searchResult.note != nil {
+                log.info("Match: Note - \(searchResult.note!.1.getName())")
+            }
+            log.info("Document matches: \(searchResult.documents.count)")
+            log.info("Location document matches: \(searchResult.locationDocuments.count)")
+            log.info("Person document matches: \(searchResult.personDocuments.count)")
+        })
     }
     
     private func createSearchFilter(term: String, type: SearchType) {

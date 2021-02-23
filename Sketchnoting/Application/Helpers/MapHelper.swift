@@ -8,7 +8,6 @@
 
 import UIKit
 import Alamofire
-import NaturalLanguage
 
 class MapHelper {
     private static let mapQuestAPIKey = "bAELaFV3A8vNwICyhbziI7tNeSfYdUvr"
@@ -55,7 +54,7 @@ class MapHelper {
     }
     
     private static func isPlace(document: Document) -> Bool {
-        for t in SemanticSearch.tag(text: document.title, scheme: .nameType) {
+        for t in SemanticSearch.shared.tag(text: document.title, scheme: .nameType) {
             if t.1 == "PlaceName" {
                 return true
             }
@@ -69,16 +68,16 @@ class MapHelper {
                             trimmed = String(category[range.upperBound...])
                         }
                     }
-                    for t in SemanticSearch.tag(text: trimmed, scheme: .nameType) {
+                    for t in SemanticSearch.shared.tag(text: trimmed, scheme: .nameType) {
                         if t.1 == "PlaceName" {
                             return true
                         }
                     }
-                    let tokens = SemanticSearch.tokenize(text: trimmed, unit: .word)
+                    let tokens = SemanticSearch.shared.tokenize(text: trimmed, unit: .word)
                     var minimumSimilarity = 999.0
                     for token in tokens {
-                        let lemma = SemanticSearch.lemmatize(text: token)
-                        let similarity = SemanticSearch.wordDistance(between: lemma, and: "place")
+                        let lemma = SemanticSearch.shared.lemmatize(text: token)
+                        let similarity = SemanticSearch.shared.wordDistance(between: lemma, and: "place")
                         if similarity < minimumSimilarity {
                             minimumSimilarity = similarity
                         }

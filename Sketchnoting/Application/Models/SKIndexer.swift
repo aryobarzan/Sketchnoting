@@ -12,7 +12,7 @@ import NaturalLanguage
 class SKIndexer {
     func index(note: Note) {
         let body = note.getText()
-        let sentences = SemanticSearch.tokenize(text: body, unit: .sentence)
+        let sentences = SemanticSearch.shared.tokenize(text: body, unit: .sentence)
         var sentenceEmbeddings = [[Double]]()
         if let sentenceEmbedding = NLEmbedding.sentenceEmbedding(for: .english) {
             for sentence in sentences {

@@ -11,16 +11,37 @@ import NaturalLanguage
 import MLKitEntityExtraction
 
 class SemanticSearch {
-    static let SEARCH_THRESHOLD = 0.8
-    static let DRAWING_THRESHOLD = 0.7
-    static let KEYWORD_THRESHOLD = 0.6
     
-    static let entityExtractor = EntityExtractor.entityExtractor(options: EntityExtractorOptions(modelIdentifier:
-                                                                                                    EntityExtractionModelIdentifier.english))
-    private static let wordEmbedding = NLEmbedding.wordEmbedding(for: .english)
-    private static let sentenceEmbedding = NLEmbedding.sentenceEmbedding(for: .english)
+    public static let shared = SemanticSearch()
+    private init() {
+        locationSynonyms = ["location"]
+        var synonyms = wordEmbedding!.neighbors(for: "location", maximumCount: 5)
+        for syn in synonyms {
+            locationSynonyms.append(syn.0.lowercased())
+        }
+        personSynonyms = ["person"]
+        synonyms = wordEmbedding!.neighbors(for: "person", maximumCount: 5)
+        for syn in synonyms {
+            personSynonyms.append(syn.0.lowercased())
+        }
+        queue.maxConcurrentOperationCount = 4
+        
+        downloadEntityExtractorModel()
+    }
     
-    static func downloadEntityExtractorModel() {
+    private let SEARCH_THRESHOLD = 0.8
+    private let DRAWING_THRESHOLD = 0.7
+    private let KEYWORD_THRESHOLD = 0.6
+    private var locationSynonyms: [String]
+    private var personSynonyms: [String]
+    
+    private let entityExtractor = EntityExtractor.entityExtractor(options: EntityExtractorOptions(modelIdentifier: EntityExtractionModelIdentifier.english))
+    private let wordEmbedding = NLEmbedding.wordEmbedding(for: .english)
+    private let sentenceEmbedding = NLEmbedding.sentenceEmbedding(for: .english)
+    
+    private let queue = OperationQueue()
+    
+    func downloadEntityExtractorModel() {
         entityExtractor.downloadModelIfNeeded(completion: { error in
             if error == nil {
                 log.info("Entity extraction model is ready.")
@@ -30,7 +51,8 @@ class SemanticSearch {
             }
         })
     }
-    static func tokenize(text: String, unit: NLTokenUnit = .sentence) -> [String] {
+    
+    func tokenize(text: String, unit: NLTokenUnit = .sentence) -> [String] {
         let tokenizer = NLTokenizer(unit: unit)
         tokenizer.string = text
         let tokens = tokenizer.tokens(for: text.startIndex..<text.endIndex)
@@ -42,10 +64,10 @@ class SemanticSearch {
         return tokensAsString
     }
     
-    static func tag(text: String, scheme: NLTagScheme = .lexicalClass) -> [(String, String)] {
+    func tag(text: String, scheme: NLTagScheme = .lexicalClass) -> [(String, String)] {
         let tagger = NLTagger(tagSchemes: [scheme])
         tagger.string = text
-        let tags = tagger.tags(in: text.startIndex..<text.endIndex, unit: .word, scheme: scheme, options: [.omitPunctuation, .omitWhitespace])
+        let tags = tagger.tags(in: text.startIndex..<text.endIndex, unit: .word, scheme: scheme, options: [.omitPunctuation, .omitWhitespace, .joinNames])
         var tagsTuple = [(String, String)]()
         for tag in tags {
             if let t = tag.0 {
@@ -58,7 +80,7 @@ class SemanticSearch {
         return tagsTuple
     }
     
-    static func lemmatize(text: String) -> String {
+    func lemmatize(text: String) -> String {
         let tagger = NLTagger(tagSchemes: [.lemma])
         tagger.string = text
         let tags = tagger.tags(in: text.startIndex..<text.endIndex, unit: .word, scheme: .lemma, options: [.omitPunctuation, .omitWhitespace])
@@ -69,28 +91,28 @@ class SemanticSearch {
         return textLemmatized
     }
     
-    static func neighbors(word: String, maximumCount: Int = 5) -> [(String, Double)] {
+    func neighbors(word: String, maximumCount: Int = 5) -> [(String, Double)] {
         if let wordEmbedding = wordEmbedding {
             return wordEmbedding.neighbors(for: word, maximumCount: maximumCount)
         }
         return [(String, Double)]()
     }
     
-    static func wordDistance(between: String, and: String) -> Double {
+    func wordDistance(between: String, and: String) -> Double {
         if let wordEmbedding = wordEmbedding {
             return wordEmbedding.distance(between: between, and: and, distanceType: .cosine)
         }
         return -1.0
     }
     
-    static func sentenceDistance(between: String, and: String) -> Double {
+    func sentenceDistance(between: String, and: String) -> Double {
         if let sentenceEmbedding = sentenceEmbedding {
             return sentenceEmbedding.distance(between: between, and: and, distanceType: .cosine)
         }
         return -1.0
     }
     
-    static func extractEntities(text: String, entityCompletion: (DateTimeEntity?) -> Void) {
+    func extractEntities(text: String, entityCompletion: (DateTimeEntity?) -> Void) {
         self.dateTimeEntity = nil
         let params = EntityExtractionParams()
         params.referenceTime = Date();
@@ -125,57 +147,52 @@ class SemanticSearch {
             }
         }
     }
-    static var dateTimeEntity: DateTimeEntity?
+    private var dateTimeEntity: DateTimeEntity?
     
-    static func search(query: String, notes: [(URL, Note)]) -> ([(URL, Note)], [Document], [Document], [Document])? {
+    func getDateTimeEntity() -> DateTimeEntity? {
+        return dateTimeEntity
+    }
+    
+    // temporary
+    func getCurrentTime() -> Int64 {
+        return Int64(Date().timeIntervalSince1970 * 1000)
+    }
+    
+    func search(query: String, notes: [(URL, Note)], searchHandler: ((SearchResult) -> Void)?) {
         // missing: note tags, note title
         let tagger = NLTagger(tagSchemes: [.lemma])
-        if let sentenceEmbedding = NLEmbedding.sentenceEmbedding(for: .english), let wordEmbedding = NLEmbedding.wordEmbedding(for: .english) {
-            let queryWords = tokenize(text: query, unit: .word)
-            let queryPartsOfSpeech = tag(text: query, scheme: .lexicalClass)
-            let queryEntities = tag(text: query, scheme: .nameType)
-            // Extract nouns from the query
-            var queryNouns = [(String, String)]()
-            for term in queryPartsOfSpeech {
-                if term.1 == "Noun" || term.1 == "Other" {
-                    tagger.string = term.0
-                    let tags = tagger.tags(in: term.0.startIndex..<term.0.endIndex, unit: .word, scheme: .lemma, options: [.omitPunctuation, .omitWhitespace])
-                    var termLemmatized = term.0
-                    if tags.count > 0 && tags[0].0 != nil {
-                        termLemmatized = tags[0].0!.rawValue
-                    }
-                    queryNouns.append((termLemmatized, term.1))
+        let queryWords = tokenize(text: query, unit: .word)
+        let queryPartsOfSpeech = tag(text: query, scheme: .lexicalClass)
+        let queryEntities = tag(text: query, scheme: .nameType)
+        // Extract nouns from the query
+        var queryNouns = [(String, String)]()
+        for term in queryPartsOfSpeech {
+            if term.1 == "Noun" || term.1 == "Other" {
+                tagger.string = term.0
+                let tags = tagger.tags(in: term.0.startIndex..<term.0.endIndex, unit: .word, scheme: .lemma, options: [.omitPunctuation, .omitWhitespace])
+                var termLemmatized = term.0
+                if tags.count > 0 && tags[0].0 != nil {
+                    termLemmatized = tags[0].0!.rawValue
                 }
+                queryNouns.append((termLemmatized, term.1))
             }
-            
-            //
-            var locationSynonyms = ["location"]
-            var synonyms = wordEmbedding.neighbors(for: "location", maximumCount: 5)
-            for syn in synonyms {
-                locationSynonyms.append(syn.0.lowercased())
-            }
-            var personSynonyms = ["person"]
-            synonyms = wordEmbedding.neighbors(for: "person", maximumCount: 5)
-            for syn in synonyms {
-                personSynonyms.append(syn.0.lowercased())
-            }
-            //
-            
-            var results = [(URL, Note)]()
-            var documentResults = [Document]()
-            var locationResults = [Document]()
-            var personResults = [Document]()
-            
-            let queryType = checkPhraseType(queryPartsOfSpeech: queryPartsOfSpeech)
-            log.info("Performing semantic search on query of type: \(queryType.rawValue)")
-            // MARK: Keyword or Clause
-            if queryType == .Keyword || queryType == .Clause {
-                for note in notes {
+        }
+        let queryType = checkPhraseType(queryPartsOfSpeech: queryPartsOfSpeech)
+        log.info("Performing semantic search on query of type: \(queryType.rawValue)")
+        
+        // MARK: Keyword or Clause
+        if queryType == .Keyword || queryType == .Clause {
+            for note in notes {
+                queue.addOperation {
+                    let sentenceEmbedding = NLEmbedding.sentenceEmbedding(for: .english)!
+                    let wordEmbedding = NLEmbedding.wordEmbedding(for: .english)!
+                    var searchResult = SearchResult()
+                    var time = self.getCurrentTime()
                     log.info("- Searching note: \(note.1.getName())")
                     var isMatch = false
                     // MARK: Body search
                     let body = note.1.getText()
-                    let noteWords = SemanticSearch.tokenize(text: body, unit: .word)
+                    let noteWords = self.tokenize(text: body, unit: .word)
                     var averageSimilarity = 0.0
                     for queryWord in queryWords {
                         var minimumSimilarity = 999.0
@@ -188,18 +205,20 @@ class SemanticSearch {
                         averageSimilarity += minimumSimilarity
                     }
                     averageSimilarity /= Double(queryWords.count)
-                    if averageSimilarity <= SEARCH_THRESHOLD {
-                        results.append(note)
+                    if averageSimilarity <= self.SEARCH_THRESHOLD {
+                        searchResult.note = note
                         isMatch = true
                         log.info("Body similarity threshold achieved: \(averageSimilarity)")
                     }
+                    log.info("Analysis of note body: \(self.getCurrentTime() - time)ms")
                     // MARK: Drawings search
+                    time = self.getCurrentTime()
                     if !isMatch {
                         averageSimilarity = 0.0
                         for term in queryNouns {
                             var minimumSimilarity = 999.0
                             for drawing in note.1.getDrawingLabels() {
-                                let similarity = wordEmbedding.distance(between: term.0, and: lemmatize(text: drawing))
+                                let similarity = wordEmbedding.distance(between: term.0, and: self.lemmatize(text: drawing))
                                 log.info("\(term.0) - \(drawing): \(similarity)")
                                 if similarity < minimumSimilarity {
                                     minimumSimilarity = similarity
@@ -208,20 +227,22 @@ class SemanticSearch {
                             averageSimilarity += minimumSimilarity
                         }
                         averageSimilarity /= Double(queryNouns.count)
-                        if averageSimilarity <= DRAWING_THRESHOLD {
+                        if averageSimilarity <= self.DRAWING_THRESHOLD {
                             log.info("Drawing similarity threshold achieved.")
                             if !isMatch {
-                                results.append(note)
+                                searchResult.note = note
                                 isMatch = true
                             }
                         }
                     }
+                    log.info("Analysis of note drawings: \(self.getCurrentTime() - time)ms")
                     // MARK: Documents search
+                    time = self.getCurrentTime()
                     var foundInDocuments = false
                     for document in note.1.getDocuments() {
                         // MARK: Document Description
                         if let description = document.description {
-                            let words = SemanticSearch.tokenize(text: description, unit: .word)
+                            let words = self.tokenize(text: description, unit: .word)
                             var averageSimilarity = 0.0
                             for queryWord in queryWords {
                                 var minimumSimilarity = 999.0
@@ -234,18 +255,18 @@ class SemanticSearch {
                                 averageSimilarity += minimumSimilarity
                             }
                             averageSimilarity /= Double(queryWords.count)
-                            if averageSimilarity <= SEARCH_THRESHOLD {
+                            if averageSimilarity <= self.SEARCH_THRESHOLD {
                                 log.info("Found in document: \(document.title)")
-                                documentResults.append(document)
+                                searchResult.documents.append(document)
                                 foundInDocuments = true
                             }
                         }
                         // MARK: Document Title
                         let similarity = sentenceEmbedding.distance(between: query, and: document.title, distanceType: .cosine)
-                        if similarity <= KEYWORD_THRESHOLD {
+                        if similarity <= self.KEYWORD_THRESHOLD {
                             log.info("Found query in title of document: \(document.title) [\(document.documentType.rawValue)]")
-                            if !documentResults.contains(document) {
-                                documentResults.append(document)
+                            if !searchResult.documents.contains(document) {
+                                searchResult.documents.append(document)
                                 foundInDocuments = true
                             }
                         }
@@ -255,12 +276,12 @@ class SemanticSearch {
                                 if entity.1 == NLTag.placeName.rawValue {
                                     var foundLocation = false
                                     for category in categories {
-                                        for locationSynonym in locationSynonyms {
+                                        for locationSynonym in self.locationSynonyms {
                                             let similarity = wordEmbedding.distance(between: category, and: locationSynonym, distanceType: .cosine)
                                             if similarity <= 1.0 {
                                                 log.info("Found location related document: \(category) - \(locationSynonym)")
                                                 foundLocation = true
-                                                locationResults.append(document)
+                                                searchResult.locationDocuments.append(document)
                                                 break
                                             }
                                         }
@@ -272,12 +293,12 @@ class SemanticSearch {
                                 else if entity.1 == NLTag.personalName.rawValue {
                                     var foundPerson = false
                                     for category in categories {
-                                        for personSynonym in personSynonyms {
+                                        for personSynonym in self.personSynonyms {
                                             let similarity = wordEmbedding.distance(between: category, and: personSynonym, distanceType: .cosine)
                                             if similarity <= 1.0 {
                                                 log.info("Found person related document: \(category) - \(personSynonym)")
                                                 foundPerson = true
-                                                personResults.append(document)
+                                                searchResult.personDocuments.append(document)
                                                 break
                                             }
                                         }
@@ -290,18 +311,28 @@ class SemanticSearch {
                         }
                     }
                     if foundInDocuments && !isMatch {
-                        results.append(note)
+                        searchResult.note = note
                     }
+                    log.info("Analysis of documents for note: \(self.getCurrentTime() - time)ms")
+                    if let searchHandler = searchHandler {
+                        searchHandler(searchResult)
+                    }
+                    //searchHandler(searchResult)
                 }
             }
-            // MARK: ExtendedClause or Sentence
-            else {
-                for note in notes {
-                    log.info("- Searching note: \(note.1.getName())")
+        }
+        // MARK: ExtendedClause or Sentence
+        else {
+            for note in notes {
+                log.info("- Searching note: \(note.1.getName())")
+                queue.addOperation {
+                    let sentenceEmbedding = NLEmbedding.sentenceEmbedding(for: .english)!
+                    let wordEmbedding = NLEmbedding.wordEmbedding(for: .english)!
+                    var searchResult = SearchResult()
                     var isMatch = false
                     // MARK: Body search
                     let body = note.1.getText()
-                    let sentences = SemanticSearch.tokenize(text: body, unit: .sentence)
+                    let sentences = self.tokenize(text: body, unit: .sentence)
                     var minimumSimilarity = 999.0
                     for sentence in sentences {
                         let similarity = sentenceEmbedding.distance(between: query, and: sentence, distanceType: .cosine)
@@ -309,8 +340,8 @@ class SemanticSearch {
                             minimumSimilarity = similarity
                         }
                     }
-                    if minimumSimilarity <= SEARCH_THRESHOLD {
-                        results.append(note)
+                    if minimumSimilarity <= self.SEARCH_THRESHOLD {
+                        searchResult.note = note
                         isMatch = true
                         log.info("Minimum body similarity achieved: \(minimumSimilarity)")
                     }
@@ -319,12 +350,12 @@ class SemanticSearch {
                     if !isMatch {
                         for term in queryNouns {
                             for drawing in note.1.getDrawingLabels() {
-                                let similarity = wordEmbedding.distance(between: term.0, and: lemmatize(text: drawing))
+                                let similarity = wordEmbedding.distance(between: term.0, and: self.lemmatize(text: drawing))
                                 log.info("\(term.0) - \(drawing): \(similarity)")
-                                if similarity <= DRAWING_THRESHOLD {
+                                if similarity <= self.DRAWING_THRESHOLD {
                                     log.info("Drawing similarity threshold achieved.")
                                     if !isMatch {
-                                        results.append(note)
+                                        searchResult.note = note
                                         isMatch = true
                                         break
                                     }
@@ -340,7 +371,7 @@ class SemanticSearch {
                     for document in note.1.getDocuments() {
                         // MARK: Document Description
                         if let description = document.description {
-                            let sentences = SemanticSearch.tokenize(text: description, unit: .sentence)
+                            let sentences = self.tokenize(text: description, unit: .sentence)
                             var minimumSimilarity = 999.0
                             for sentence in sentences {
                                 let similarity = sentenceEmbedding.distance(between: query, and: sentence, distanceType: .cosine)
@@ -348,33 +379,33 @@ class SemanticSearch {
                                     minimumSimilarity = similarity
                                 }
                             }
-                            if minimumSimilarity <= SEARCH_THRESHOLD {
+                            if minimumSimilarity <= self.SEARCH_THRESHOLD {
                                 log.info("Found in document description of: \(document.title)")
-                                documentResults.append(document)
+                                searchResult.documents.append(document)
                                 foundInDocuments = true
                             }
                         }
                         // MARK: Document Title
                         let titleSimilarity = sentenceEmbedding.distance(between: document.title, and: query, distanceType: .cosine)
-                        if titleSimilarity <= SEARCH_THRESHOLD {
+                        if titleSimilarity <= self.SEARCH_THRESHOLD {
                             log.info("Found match in title of document: \(document.title)")
-                            if !documentResults.contains(document) {
-                                documentResults.append(document)
+                            if !searchResult.documents.contains(document) {
+                                searchResult.documents.append(document)
                                 foundInDocuments = true
                             }
                         }
-    
+                        
                         if let tagmeDocument = document as? TAGMEDocument, let categories = tagmeDocument.categories {
                             for entity in queryEntities {
                                 if entity.1 == NLTag.placeName.rawValue {
                                     var foundLocation = false
                                     for category in categories {
-                                        for locationSynonym in locationSynonyms {
+                                        for locationSynonym in self.locationSynonyms {
                                             let similarity = wordEmbedding.distance(between: category, and: locationSynonym, distanceType: .cosine)
-                                            if similarity <= SEARCH_THRESHOLD {
+                                            if similarity <= self.SEARCH_THRESHOLD {
                                                 log.info("Found location related document: \(category) - \(locationSynonym)")
                                                 foundLocation = true
-                                                locationResults.append(document)
+                                                searchResult.locationDocuments.append(document)
                                                 break
                                             }
                                         }
@@ -386,12 +417,12 @@ class SemanticSearch {
                                 else if entity.1 == NLTag.personalName.rawValue {
                                     var foundPerson = false
                                     for category in categories {
-                                        for personSynonym in personSynonyms {
+                                        for personSynonym in self.personSynonyms {
                                             let similarity = wordEmbedding.distance(between: category, and: personSynonym, distanceType: .cosine)
-                                            if similarity <= SEARCH_THRESHOLD {
+                                            if similarity <= self.SEARCH_THRESHOLD {
                                                 log.info("Found person related document: \(category) - \(personSynonym)")
                                                 foundPerson = true
-                                                personResults.append(document)
+                                                searchResult.personDocuments.append(document)
                                                 break
                                             }
                                         }
@@ -404,13 +435,17 @@ class SemanticSearch {
                         }
                     }
                     if foundInDocuments && !isMatch {
-                        results.append(note)
+                        searchResult.note = note
+                    }
+                    if let searchHandler = searchHandler {
+                        searchHandler(searchResult)
                     }
                 }
             }
-            return (results, documentResults, personResults, locationResults)
         }
-        return nil
+        queue.addBarrierBlock {
+            log.info("Semantic search completed.")
+        }
     }
     
     private enum PhraseType: String {
@@ -420,7 +455,7 @@ class SemanticSearch {
         case Sentence = "Sentence"
     }
     
-    private static func checkPhraseType(queryPartsOfSpeech: [(String, String)]) -> PhraseType {
+    private func checkPhraseType(queryPartsOfSpeech: [(String, String)]) -> PhraseType {
         if queryPartsOfSpeech.count == 1 {
             return PhraseType.Keyword
         }
@@ -444,4 +479,11 @@ class SemanticSearch {
             return PhraseType.Clause
         }
     }
+}
+
+struct SearchResult {
+    var note: (URL, Note)?
+    var documents = [Document]()
+    var locationDocuments = [Document]()
+    var personDocuments = [Document]()
 }
