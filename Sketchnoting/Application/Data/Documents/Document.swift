@@ -112,6 +112,7 @@ class Document: Codable, Visitable, Equatable, Hashable {
     public func downloadImage(url: URL, type: DocumentImageType) {
         let cache = SKCacheManager.cache
         let key = type.rawValue + "-" + self.documentType.rawValue + "-" + self.title
+        log.info(key)
         let downloader = ImageDownloader.default
         if !url.absoluteString.lowercased().contains(".svg") {
             downloader.downloadImage(with: url, completionHandler:  { result in
@@ -120,6 +121,7 @@ class Document: Codable, Visitable, Equatable, Hashable {
                     if value.originalData.count < 10000000 {
                         log.info("Downloaded non-svg image for document: \(self.title)")
                         cache.store(value.image, original: value.originalData, forKey: key)
+                        
                         self.reload()
                     }
                     else {

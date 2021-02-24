@@ -14,6 +14,7 @@
                 <outlet property="bodyTextView" destination="ds9-EN-96T" id="JBU-dR-1Fk"/>
                 <outlet property="contentView" destination="iN0-l3-epB" id="jia-oV-kmV"/>
                 <outlet property="documentIndexLabel" destination="dGr-ye-JAe" id="Mc4-uA-SMg"/>
+                <outlet property="documentIndexViewsContainer" destination="Z7w-Sk-0pn" id="2pv-X5-pPl"/>
                 <outlet property="imagePageControl" destination="wmi-RJ-Fai" id="ZXc-e9-Kcc"/>
                 <outlet property="imageView" destination="PBP-XX-Kxe" id="cKi-LP-drO"/>
                 <outlet property="nextDocumentButton" destination="CmF-uR-SsU" id="Hh2-RE-hob"/>
@@ -36,6 +37,7 @@
                     <connections>
                         <outletCollection property="gestureRecognizers" destination="EI4-a2-Jap" appends="YES" id="p0G-My-mTg"/>
                         <outletCollection property="gestureRecognizers" destination="hBg-EK-QT3" appends="YES" id="dUL-rI-P6u"/>
+                        <outletCollection property="gestureRecognizers" destination="ExC-p4-XGp" appends="YES" id="bea-4b-xlR"/>
                     </connections>
                 </imageView>
                 <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="ds9-EN-96T">
@@ -142,7 +144,12 @@
         </tapGestureRecognizer>
         <swipeGestureRecognizer direction="right" id="hBg-EK-QT3">
             <connections>
-                <action selector="imageViewSwiped:" destination="-1" id="c5j-IB-brV"/>
+                <action selector="imageViewSwipedRight:" destination="-1" id="c5j-IB-brV"/>
+            </connections>
+        </swipeGestureRecognizer>
+        <swipeGestureRecognizer direction="left" id="ExC-p4-XGp">
+            <connections>
+                <action selector="imageViewSwipedLeft:" destination="-1" id="mMD-Pq-PYx"/>
             </connections>
         </swipeGestureRecognizer>
     </objects>

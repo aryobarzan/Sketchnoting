@@ -165,7 +165,7 @@ class SearchViewController: UIViewController, UICollectionViewDelegate, UICollec
     
     private func performSemanticSearch() {
         // Missing - This is currently only for testing
-        let query = searchTextField.text!
+        let query = searchTextField.text!.trimmingCharacters(in: .whitespacesAndNewlines)
         let tokens = SemanticSearch.shared.tokenize(text: query, unit: .word)
         for token in tokens {
             log.info(token)
