@@ -183,16 +183,13 @@ class SearchViewController: UIViewController, UICollectionViewDelegate, UICollec
         self.notes = [(URL, Note)]()
         notesCollectionView.reloadData()
         SemanticSearch.shared.search(query: query, notes: NeoLibrary.getNotes(), searchHandler: {searchResult in
+            log.info("Search Result - \(searchResult.note == nil ? "Note not a match" : searchResult.note!.1.getName()) / \(searchResult.documents.count) Documents / \(searchResult.personDocuments.count) Person-Documents / \(searchResult.locationDocuments.count) Location-Documents")
             if searchResult.note != nil {
-                log.info("Match: Note - \(searchResult.note!.1.getName())")
                 DispatchQueue.main.async {
                     self.notes.append(searchResult.note!)
                     self.notesCollectionView.reloadData()
                 }
             }
-            log.info("Document matches: \(searchResult.documents.count)")
-            log.info("Location document matches: \(searchResult.locationDocuments.count)")
-            log.info("Person document matches: \(searchResult.personDocuments.count)")
             if searchResult.documents.count > 0 {
                 DispatchQueue.main.async {
                     let searchDocumentsCard = SearchDocumentsCard(documents: searchResult.documents, frame: CGRect(x: 0, y: 0, width: 100, height: 340))

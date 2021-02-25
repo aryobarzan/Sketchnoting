@@ -12,6 +12,7 @@ class NoteTextViewController: UIViewController {
 
     @IBOutlet weak var pagesSegmentedControl: UISegmentedControl!
     @IBOutlet weak var textSegmentedControl: UISegmentedControl!
+    @IBOutlet weak var parsingSegmentedControl: UISegmentedControl!
     @IBOutlet var textView: UITextView!
     
     var note: (URL, Note)!
@@ -23,30 +24,35 @@ class NoteTextViewController: UIViewController {
     }
     
     private func getText() -> String {
+        var text = ""
         // Current page
         if pagesSegmentedControl.selectedSegmentIndex == 0 {
             if textSegmentedControl.selectedSegmentIndex == 0 { // Full text
-                return note.1.getCurrentPage().getText(option: .FullText)
+                text = note.1.getCurrentPage().getText(option: .FullText)
             }
             else if textSegmentedControl.selectedSegmentIndex == 1 { // Handwritten text
-                return note.1.getCurrentPage().getText(option: .HandwrittenText)
+                text = note.1.getCurrentPage().getText(option: .HandwrittenText)
             }
             else { // PDF text
-                return note.1.getCurrentPage().getText(option: .PDFText)
+                text = note.1.getCurrentPage().getText(option: .PDFText)
             }
         }
         // Full Note
         else {
             if textSegmentedControl.selectedSegmentIndex == 0 { // Full text
-                return note.1.getText(option: .FullText)
+                text = note.1.getText(option: .FullText)
             }
             else if textSegmentedControl.selectedSegmentIndex == 1 { // Handwritten tex
-                return note.1.getText(option: .HandwrittenText)
+                text = note.1.getText(option: .HandwrittenText)
             }
             else { // PDF text
-                return note.1.getText(option: .PDFText)
+                text = note.1.getText(option: .PDFText)
             }
         }
+        if parsingSegmentedControl.selectedSegmentIndex == 1 {
+            text = TextParser.shared.clean(text: text)
+        }
+        return text
     }
    
     @IBAction func copyTapped(_ sender: UIBarButtonItem) {
@@ -61,6 +67,9 @@ class NoteTextViewController: UIViewController {
         textView.text = getText()
     }
     @IBAction func textSegmentedControlChanged(_ sender: UISegmentedControl) {
+        textView.text = getText()
+    }
+    @IBAction func parsingSegmentedControlChanged(_ sender: UISegmentedControl) {
         textView.text = getText()
     }
 }

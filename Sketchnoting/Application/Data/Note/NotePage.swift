@@ -214,8 +214,8 @@ class NotePage: Codable {
     }
     
     private func getPDFText() -> String {
-        if let pdfDocument = getPDFDocument(), let page = pdfDocument.page(at: 0), let pdfText = page.attributedString {
-            return pdfText.string
+        if let pdfDocument = getPDFDocument(), let page = pdfDocument.page(at: 0), let pdfText = page.string {
+            return pdfText
         }
         return ""
     }

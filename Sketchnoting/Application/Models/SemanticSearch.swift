@@ -596,14 +596,14 @@ class SemanticSearch {
         return searchResult
     }
     
-    private enum PhraseType: String {
+    enum PhraseType: String {
         case Keyword = "Keyword"
         case Clause = "Clause"
         case ExtendedClause = "Extended Clause"
         case Sentence = "Sentence"
     }
     
-    private func checkPhraseType(queryPartsOfSpeech: [(String, String)]) -> PhraseType {
+    func checkPhraseType(queryPartsOfSpeech: [(String, String)]) -> PhraseType {
         if queryPartsOfSpeech.count == 1 {
             return PhraseType.Keyword
         }

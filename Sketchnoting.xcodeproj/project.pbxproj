@@ -74,6 +74,7 @@
 		9F87A47D2445441500F83B12 /* NoteTypedText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F87A47C2445441500F83B12 /* NoteTypedText.swift */; };
 		9F8988D225E59D9B005CB90B /* SearchDocumentsCard.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9F8988D125E59D9B005CB90B /* SearchDocumentsCard.xib */; };
 		9F8988D425E59DAD005CB90B /* SearchDocumentsCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F8988D325E59DAD005CB90B /* SearchDocumentsCard.swift */; };
+		9F8988D625E8239E005CB90B /* TextParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F8988D525E8239E005CB90B /* TextParser.swift */; };
 		9F8E0D0F25DDC02C00A951B1 /* SemanticSearch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F8E0D0E25DDC02C00A951B1 /* SemanticSearch.swift */; };
 		9F92D10E231E95B400BC0E57 /* UICollectionViewExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F92D10D231E95B400BC0E57 /* UICollectionViewExtensions.swift */; };
 		9F92D110231E97DF00BC0E57 /* UserDefaultsExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F92D10F231E97DF00BC0E57 /* UserDefaultsExtensions.swift */; };
@@ -227,6 +228,7 @@
 		9F87A47C2445441500F83B12 /* NoteTypedText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteTypedText.swift; sourceTree = "<group>"; };
 		9F8988D125E59D9B005CB90B /* SearchDocumentsCard.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SearchDocumentsCard.xib; sourceTree = "<group>"; };
 		9F8988D325E59DAD005CB90B /* SearchDocumentsCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchDocumentsCard.swift; sourceTree = "<group>"; };
+		9F8988D525E8239E005CB90B /* TextParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextParser.swift; sourceTree = "<group>"; };
 		9F8E0D0E25DDC02C00A951B1 /* SemanticSearch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SemanticSearch.swift; sourceTree = "<group>"; };
 		9F92D10D231E95B400BC0E57 /* UICollectionViewExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UICollectionViewExtensions.swift; sourceTree = "<group>"; };
 		9F92D10F231E97DF00BC0E57 /* UserDefaultsExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsExtensions.swift; sourceTree = "<group>"; };
@@ -373,6 +375,7 @@
 				9FC5386A2520DB7700911DBF /* SKRecognizer.swift */,
 				9F8E0D0E25DDC02C00A951B1 /* SemanticSearch.swift */,
 				9FCC9E2225DEAD4B0079EB29 /* SKIndexer.swift */,
+				9F8988D525E8239E005CB90B /* TextParser.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -952,6 +955,7 @@
 				9F65984823F315FE00CDBE0C /* SearchFilterCollectionViewCell.swift in Sources */,
 				9FFE9B3424B3C77200D92FBA /* NeoLibrary.swift in Sources */,
 				9FCC9E2325DEAD4B0079EB29 /* SKIndexer.swift in Sources */,
+				9F8988D625E8239E005CB90B /* TextParser.swift in Sources */,
 				9FA6238B22D37213007ED794 /* BioPortalHelper.swift in Sources */,
 				9F77DBCA23FFD619007C8B7D /* AnnotationUtilities.swift in Sources */,
 				9F0ABB282412E5D400CA5A4E /* SKCacheManager.swift in Sources */,
