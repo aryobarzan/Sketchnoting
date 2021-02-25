@@ -24,11 +24,11 @@
         </placeholder>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
         <view contentMode="scaleToFill" id="iN0-l3-epB">
-            <rect key="frame" x="0.0" y="0.0" width="735" height="236"/>
+            <rect key="frame" x="0.0" y="0.0" width="735" height="340"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="doc.circle.fill" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="PBP-XX-Kxe">
-                    <rect key="frame" x="587" y="54.5" width="128" height="127"/>
+                    <rect key="frame" x="587" y="106.5" width="128" height="127"/>
                     <gestureRecognizers/>
                     <constraints>
                         <constraint firstAttribute="width" constant="128" id="7kx-9y-ZgC"/>
@@ -41,10 +41,10 @@
                     </connections>
                 </imageView>
                 <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="ds9-EN-96T">
-                    <rect key="frame" x="20" y="54" width="563" height="134"/>
+                    <rect key="frame" x="20" y="58" width="563" height="234"/>
                     <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                     <constraints>
-                        <constraint firstAttribute="height" constant="134" id="zbJ-cx-z3h"/>
+                        <constraint firstAttribute="height" constant="234" id="zbJ-cx-z3h"/>
                     </constraints>
                     <string key="text">Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nam liber te conscient to factor tum poen legum odioque civiuda.</string>
                     <color key="textColor" systemColor="labelColor"/>
@@ -52,7 +52,7 @@
                     <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                 </textView>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Z7w-Sk-0pn">
-                    <rect key="frame" x="271.5" y="190" width="192" height="40"/>
+                    <rect key="frame" x="271.5" y="294" width="192" height="40"/>
                     <subviews>
                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="prS-h8-Ha5">
                             <rect key="frame" x="37" y="5" width="30" height="30"/>
@@ -104,19 +104,32 @@
                     </constraints>
                 </view>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Document" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="LMl-Iz-hCP">
-                    <rect key="frame" x="20" y="17" width="126" height="34"/>
+                    <rect key="frame" x="20" y="17" width="126" height="33"/>
                     <fontDescription key="fontDescription" style="UICTFontTextStyleTitle1"/>
                     <nil key="textColor"/>
                     <nil key="highlightedColor"/>
                 </label>
                 <pageControl hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" numberOfPages="2" translatesAutoresizingMaskIntoConstraints="NO" id="wmi-RJ-Fai">
-                    <rect key="frame" x="600" y="190" width="103.5" height="28"/>
+                    <rect key="frame" x="600" y="242" width="103.5" height="28"/>
                     <color key="pageIndicatorTintColor" systemColor="systemGrayColor"/>
                     <color key="currentPageIndicatorTintColor" systemColor="systemBlueColor"/>
                     <connections>
                         <action selector="imagePageControlChanged:" destination="-1" eventType="valueChanged" id="Ggz-R6-iYz"/>
                     </connections>
                 </pageControl>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="b6H-vG-rkj">
+                    <rect key="frame" x="693" y="17" width="22" height="22"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="22" id="aZX-9N-Obs"/>
+                        <constraint firstAttribute="height" constant="22" id="sxy-61-Jqv"/>
+                    </constraints>
+                    <state key="normal" image="xmark" catalog="system">
+                        <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="large" weight="bold"/>
+                    </state>
+                    <connections>
+                        <action selector="closeButtonTapped:" destination="-1" eventType="touchUpInside" id="9hg-gR-Mcq"/>
+                    </connections>
+                </button>
             </subviews>
             <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
             <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -125,14 +138,16 @@
                 <constraint firstItem="LMl-Iz-hCP" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="20" symbolic="YES" id="8Ce-1L-JnD"/>
                 <constraint firstItem="ds9-EN-96T" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" constant="20" id="A7a-HR-cKG"/>
                 <constraint firstItem="wmi-RJ-Fai" firstAttribute="top" secondItem="PBP-XX-Kxe" secondAttribute="bottom" constant="8" id="CNE-Nn-ZLb"/>
+                <constraint firstItem="ds9-EN-96T" firstAttribute="top" secondItem="LMl-Iz-hCP" secondAttribute="bottom" constant="8" id="Cyx-m7-MtB"/>
                 <constraint firstItem="Z7w-Sk-0pn" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="GGy-d5-qUY"/>
                 <constraint firstItem="PBP-XX-Kxe" firstAttribute="leading" secondItem="ds9-EN-96T" secondAttribute="trailing" constant="4" id="HMJ-1M-3Xa"/>
-                <constraint firstItem="ds9-EN-96T" firstAttribute="top" secondItem="LMl-Iz-hCP" secondAttribute="bottom" constant="3" id="K14-D5-ACQ"/>
                 <constraint firstAttribute="bottom" secondItem="Z7w-Sk-0pn" secondAttribute="bottom" constant="6" id="Sv5-v6-TZQ"/>
+                <constraint firstAttribute="trailing" secondItem="b6H-vG-rkj" secondAttribute="trailing" constant="20" id="Ude-Mx-oS0"/>
                 <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="PBP-XX-Kxe" secondAttribute="trailing" constant="20" id="dvj-hs-2oo"/>
                 <constraint firstItem="LMl-Iz-hCP" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="17" id="hDE-AL-9JL"/>
                 <constraint firstItem="Z7w-Sk-0pn" firstAttribute="top" secondItem="ds9-EN-96T" secondAttribute="bottom" constant="2" id="msS-9z-B4b"/>
                 <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="wmi-RJ-Fai" secondAttribute="trailing" constant="31.5" id="r3F-eg-g3q"/>
+                <constraint firstItem="b6H-vG-rkj" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="17" id="wYr-Ei-3ay"/>
             </constraints>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
             <point key="canvasLocation" x="-19.565217391304348" y="-139.28571428571428"/>
@@ -157,6 +172,7 @@
         <image name="arrow.left.square.fill" catalog="system" width="128" height="114"/>
         <image name="arrow.right.square.fill" catalog="system" width="128" height="114"/>
         <image name="doc.circle.fill" catalog="system" width="128" height="121"/>
+        <image name="xmark" catalog="system" width="128" height="113"/>
         <systemColor name="labelColor">
             <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>

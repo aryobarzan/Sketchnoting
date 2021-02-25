@@ -178,6 +178,7 @@ class SearchViewController: UIViewController, UICollectionViewDelegate, UICollec
         for entity in entities {
             log.info("\(entity.0) - \(entity.1)")
         }
+        // Search
         clearSearchDocumentsCards()
         self.notes = [(URL, Note)]()
         notesCollectionView.reloadData()
@@ -194,7 +195,7 @@ class SearchViewController: UIViewController, UICollectionViewDelegate, UICollec
             log.info("Person document matches: \(searchResult.personDocuments.count)")
             if searchResult.documents.count > 0 {
                 DispatchQueue.main.async {
-                    let searchDocumentsCard = SearchDocumentsCard(documents: searchResult.documents, frame: CGRect(x: 0, y: 0, width: 100, height: 236))
+                    let searchDocumentsCard = SearchDocumentsCard(documents: searchResult.documents, frame: CGRect(x: 0, y: 0, width: 100, height: 340))
                     self.contentStackView.addArrangedSubview(searchDocumentsCard)
                     self.searchDocumentsCards.append(searchDocumentsCard)
                 }

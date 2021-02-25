@@ -510,20 +510,14 @@ class SemanticSearch {
             // MARK: Drawings search
             if !isMatch {
                 for term in queryNouns {
-                    for drawing in note.1.getDrawingLabels() {
-                        let similarity = wordEmbedding.distance(between: term.0, and: self.lemmatize(text: drawing))
-                        log.info("\(term.0) - \(drawing): \(similarity)")
-                        if similarity <= self.DRAWING_THRESHOLD {
-                            log.info("Drawing similarity threshold achieved.")
-                            if !isMatch {
-                                searchResult.note = note
-                                isMatch = true
-                                break
-                            }
+                    let (minimumDrawingDistance, highestDrawingLevenshteinMatchPercentage) = performStringSimilarity(between: term.1.lowercased(), and: note.1.getDrawingLabels(), wordEmbedding: wordEmbedding)
+                    if minimumDrawingDistance <= self.DRAWING_THRESHOLD || highestDrawingLevenshteinMatchPercentage >= 0.75 {
+                        log.info("Drawing similarity threshold achieved.")
+                        if !isMatch {
+                            searchResult.note = note
+                            isMatch = true
+                            break
                         }
-                    }
-                    if isMatch {
-                        break
                     }
                 }
             }
@@ -547,7 +541,7 @@ class SemanticSearch {
                     }
                 }
                 // MARK: Document Title
-                let titleSimilarity = sentenceEmbedding.distance(between: document.title, and: query, distanceType: .cosine)
+                let titleSimilarity = sentenceEmbedding.distance(between: query, and: document.title, distanceType: .cosine)
                 if titleSimilarity <= self.SEARCH_THRESHOLD {
                     log.info("Found match in title of document: \(document.title)")
                     if !searchResult.documents.contains(document) {
@@ -555,7 +549,7 @@ class SemanticSearch {
                         foundInDocuments = true
                     }
                 }
-                
+                // MARK: Document entities - to adjust
                 if let tagmeDocument = document as? TAGMEDocument, let categories = tagmeDocument.categories {
                     for entity in queryEntities {
                         if entity.1 == NLTag.placeName.rawValue {

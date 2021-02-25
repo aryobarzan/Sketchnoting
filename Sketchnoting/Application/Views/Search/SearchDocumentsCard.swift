@@ -120,14 +120,12 @@ class SearchDocumentsCard: UIView {
     }
     
     private func updateImageView() {
+        DispatchQueue.main.async {
+            self.imageView.image = nil
+        }
         if !images.isEmpty {
             DispatchQueue.main.async {
                 self.imageView.image = self.images[self.currentImageIndex]
-            }
-        }
-        else {
-            DispatchQueue.main.async {
-                self.imageView.image = nil
             }
         }
         if images.count < 2 {
@@ -196,5 +194,8 @@ class SearchDocumentsCard: UIView {
             currentImageIndex = (currentImageIndex + 1) % images.count
             updateImageView()
         }
+    }
+    @IBAction func closeButtonTapped(_ sender: UIButton) {
+        self.removeFromSuperview()
     }
 }
