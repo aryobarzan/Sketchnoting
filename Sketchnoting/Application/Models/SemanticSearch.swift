@@ -161,7 +161,7 @@ class SemanticSearch {
     func search(query: String, notes: [(URL, Note)], searchHandler: ((SearchResult) -> Void)?) {
         // missing: note tags, note title
         let tagger = NLTagger(tagSchemes: [.lemma])
-        let queryWords = tokenize(text: query, unit: .word)
+        // let queryWords = tokenize(text: query, unit: .word)
         let queryPartsOfSpeech = tag(text: query, scheme: .lexicalClass)
         let queryEntities = tag(text: query, scheme: .nameType)
         // Extract nouns from the query
@@ -179,7 +179,6 @@ class SemanticSearch {
         }
         let queryType = checkPhraseType(queryPartsOfSpeech: queryPartsOfSpeech)
         log.info("Performing semantic search on query of type: \(queryType.rawValue)")
-        
         // MARK: Keyword
         if queryType == .Keyword {
             for note in notes {
@@ -215,6 +214,31 @@ class SemanticSearch {
             let distance = wordEmbedding.distance(between: query.lowercased(), and: word.lowercased())
             if distance == 2.0 { // Meaning: word is unknown to word embedder (has no vector representation)
                 let levenshteinDistance = query.lowercased().levenshtein(word.lowercased())
+                if levenshteinDistance == 0 {
+                    levenshteinMatchPercentage = 1.0
+                    break
+                }
+                else {
+                    let temp = 1.0 / Double(levenshteinDistance)
+                    if temp > levenshteinMatchPercentage {
+                        levenshteinMatchPercentage = temp
+                    }
+                }
+            }
+            if distance < minimumDistance {
+                minimumDistance = distance
+            }
+        }
+        return (minimumDistance, levenshteinMatchPercentage)
+    }
+    
+    private func performStringSimilarity(between query: String, and sentences: [String], sentenceEmbedding: NLEmbedding) -> (Double, Double) {
+        var minimumDistance = 999.0
+        var levenshteinMatchPercentage = 0.0
+        for sentence in sentences {
+            let distance = sentenceEmbedding.distance(between: query.lowercased(), and: sentence.lowercased())
+            if distance == 2.0 { // Meaning: sentence is unknown to sentence embedder (has no vector representation)
+                let levenshteinDistance = query.lowercased().levenshtein(sentence.lowercased())
                 if levenshteinDistance == 0 {
                     levenshteinMatchPercentage = 1.0
                     break
@@ -332,181 +356,19 @@ class SemanticSearch {
         return searchResult
     }
     
-    /*private func searchClause() {
-        let sentenceEmbedding = NLEmbedding.sentenceEmbedding(for: .english)!
-        let wordEmbedding = NLEmbedding.wordEmbedding(for: .english)!
-        var searchResult = SearchResult()
-        var time = self.getCurrentTime()
-        log.info("- Searching note: \(note.1.getName())")
-        var isMatch = false
-        // MARK: Body search
-        let body = note.1.getText(option: .FullText)
-        let noteWords = self.tokenize(text: body, unit: .word)
-        var averageSimilarity = 0.0
-        for queryWord in queryWords {
-            var minimumSimilarity = 999.0
-            for word in noteWords {
-                let similarity = wordEmbedding.distance(between: queryWord.lowercased(), and: word.lowercased(), distanceType: .cosine)
-                if similarity < minimumSimilarity {
-                    minimumSimilarity = similarity
-                }
-            }
-            averageSimilarity += minimumSimilarity
-        }
-        averageSimilarity /= Double(queryWords.count)
-        if averageSimilarity <= self.SEARCH_THRESHOLD {
-            searchResult.note = note
-            isMatch = true
-            log.info("Body similarity threshold achieved: \(averageSimilarity)")
-        }
-        log.info("Analysis of note body: \(self.getCurrentTime() - time)ms")
-        // MARK: Drawings search
-        time = self.getCurrentTime()
-        if !isMatch {
-            averageSimilarity = 0.0
-            for term in queryNouns {
-                var minimumSimilarity = 999.0
-                for drawing in note.1.getDrawingLabels() {
-                    let similarity = wordEmbedding.distance(between: term.0.lowercased(), and: self.lemmatize(text: drawing).lowercased())
-                    log.info("\(term.0) - \(drawing): \(similarity)")
-                    if similarity < minimumSimilarity {
-                        minimumSimilarity = similarity
-                    }
-                }
-                averageSimilarity += minimumSimilarity
-            }
-            averageSimilarity /= Double(queryNouns.count)
-            if averageSimilarity <= self.DRAWING_THRESHOLD {
-                log.info("Drawing similarity threshold achieved.")
-                if !isMatch {
-                    searchResult.note = note
-                    isMatch = true
-                }
-            }
-        }
-        log.info("Analysis of note drawings: \(self.getCurrentTime() - time)ms")
-        // MARK: Documents search
-        time = self.getCurrentTime()
-        var foundInDocuments = false
-        for document in note.1.getDocuments() {
-            // MARK: Document Description
-            if let description = document.description {
-                let words = self.tokenize(text: description, unit: .word)
-                var averageSimilarity = 0.0
-                for queryWord in queryWords {
-                    var minimumSimilarity = 999.0
-                    for word in words {
-                        let similarity = wordEmbedding.distance(between: queryWord.lowercased(), and: word.lowercased(), distanceType: .cosine)
-                        if similarity < minimumSimilarity {
-                            minimumSimilarity = similarity
-                        }
-                    }
-                    averageSimilarity += minimumSimilarity
-                }
-                averageSimilarity /= Double(queryWords.count)
-                if averageSimilarity <= self.SEARCH_THRESHOLD {
-                    log.info("Found in document: \(document.title)")
-                    searchResult.documents.append(document)
-                    foundInDocuments = true
-                }
-            }
-            // MARK: Document Title
-            let documentTitleWords = self.tokenize(text: document.title, unit: .word)
-            var minimumDistance = 999.0
-            var levenshteinMatchPercentage = 0.0
-            for word in documentTitleWords {
-                let distance = wordEmbedding.distance(between: query.lowercased(), and: word.lowercased())
-                if distance == 2.0 { // Meaning: word is unknown to word embedder (has no vector representation)
-                    let levenshteinDistance = query.lowercased().levenshtein(word.lowercased())
-                    if levenshteinDistance == 0 {
-                        levenshteinMatchPercentage = 1.0
-                        break
-                    }
-                    else {
-                        let temp = 1.0 / Double(levenshteinDistance)
-                        if temp > levenshteinMatchPercentage {
-                            levenshteinMatchPercentage = temp
-                        }
-                    }
-                }
-                if distance < minimumDistance {
-                    minimumDistance = distance
-                }
-            }
-            if minimumDistance <= self.KEYWORD_THRESHOLD || levenshteinMatchPercentage >= 0.75 {
-                log.info("\(document.title) - \(minimumDistance)")
-                log.info("Found query in title of document: \(document.title) [\(document.documentType.rawValue)]")
-                if !searchResult.documents.contains(document) {
-                    searchResult.documents.append(document)
-                    foundInDocuments = true
-                }
-            }
-            // MARK: Document entities - to adjust
-            if let tagmeDocument = document as? TAGMEDocument, let categories = tagmeDocument.categories {
-                for entity in queryEntities {
-                    if entity.1 == NLTag.placeName.rawValue {
-                        var foundLocation = false
-                        for category in categories {
-                            for locationSynonym in self.locationSynonyms {
-                                let similarity = wordEmbedding.distance(between: category, and: locationSynonym, distanceType: .cosine)
-                                if similarity <= 1.0 {
-                                    log.info("Found location related document: \(category) - \(locationSynonym)")
-                                    foundLocation = true
-                                    searchResult.locationDocuments.append(document)
-                                    break
-                                }
-                            }
-                            if foundLocation {
-                                break
-                            }
-                        }
-                    }
-                    else if entity.1 == NLTag.personalName.rawValue {
-                        var foundPerson = false
-                        for category in categories {
-                            for personSynonym in self.personSynonyms {
-                                let similarity = wordEmbedding.distance(between: category, and: personSynonym, distanceType: .cosine)
-                                if similarity <= 1.0 {
-                                    log.info("Found person related document: \(category) - \(personSynonym)")
-                                    foundPerson = true
-                                    searchResult.personDocuments.append(document)
-                                    break
-                                }
-                            }
-                            if foundPerson {
-                                break
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        if foundInDocuments && !isMatch {
-            searchResult.note = note
-        }
-        log.info("Analysis of documents for note: \(self.getCurrentTime() - time)ms")
-    }*/
-    
     private func searchSentence(query: String, note: (URL, Note), queryNouns: [(String, String)], queryEntities: [(String, String)]) -> SearchResult {
         var searchResult = SearchResult()
         if let sentenceEmbedding = NLEmbedding.sentenceEmbedding(for: .english), let wordEmbedding = NLEmbedding.wordEmbedding(for: .english) {
             var isMatch = false
             // MARK: Body search
             let body = note.1.getText()
-            let sentences = self.tokenize(text: body, unit: .sentence)
-            var minimumSimilarity = 999.0
-            for sentence in sentences {
-                let similarity = sentenceEmbedding.distance(between: query, and: sentence, distanceType: .cosine)
-                if similarity < minimumSimilarity {
-                    minimumSimilarity = similarity
-                }
-            }
-            if minimumSimilarity <= self.SEARCH_THRESHOLD {
+            let noteBodySentences = self.tokenize(text: body, unit: .sentence)
+            let (minimumBodyDistance, highestBodyLevenshteinMatchPercentage) = performStringSimilarity(between: query.lowercased(), and: noteBodySentences, sentenceEmbedding: sentenceEmbedding)
+            if minimumBodyDistance <= self.SEARCH_THRESHOLD || highestBodyLevenshteinMatchPercentage >= 0.75 {
                 searchResult.note = note
                 isMatch = true
-                log.info("Minimum body similarity achieved: \(minimumSimilarity)")
+                log.info("Body similarity threshold achieved: \(minimumBodyDistance) / \(highestBodyLevenshteinMatchPercentage)")
             }
-            
             // MARK: Drawings search
             if !isMatch {
                 for term in queryNouns {
@@ -526,23 +388,17 @@ class SemanticSearch {
             for document in note.1.getDocuments() {
                 // MARK: Document Description
                 if let description = document.description {
-                    let sentences = self.tokenize(text: description, unit: .sentence)
-                    var minimumSimilarity = 999.0
-                    for sentence in sentences {
-                        let similarity = sentenceEmbedding.distance(between: query, and: sentence, distanceType: .cosine)
-                        if similarity < minimumSimilarity {
-                            minimumSimilarity = similarity
-                        }
-                    }
-                    if minimumSimilarity <= self.SEARCH_THRESHOLD {
-                        log.info("Found in document description of: \(document.title)")
+                    let documentDescriptionSentences = self.tokenize(text: description, unit: .sentence)
+                    let (minimumBodyDistance, highestBodyLevenshteinMatchPercentage) = performStringSimilarity(between: query.lowercased(), and: documentDescriptionSentences, sentenceEmbedding: sentenceEmbedding)
+                    if minimumBodyDistance <= self.SEARCH_THRESHOLD || highestBodyLevenshteinMatchPercentage >= 0.75 {
                         searchResult.documents.append(document)
                         foundInDocuments = true
+                        log.info("Found in document description of: \(document.title)")
                     }
                 }
                 // MARK: Document Title
-                let titleSimilarity = sentenceEmbedding.distance(between: query, and: document.title, distanceType: .cosine)
-                if titleSimilarity <= self.SEARCH_THRESHOLD {
+                let (minimumBodyDistance, highestBodyLevenshteinMatchPercentage) = performStringSimilarity(between: query.lowercased(), and: [document.title], sentenceEmbedding: sentenceEmbedding)
+                if minimumBodyDistance <= self.SEARCH_THRESHOLD || highestBodyLevenshteinMatchPercentage >= 0.75 {
                     log.info("Found match in title of document: \(document.title)")
                     if !searchResult.documents.contains(document) {
                         searchResult.documents.append(document)
