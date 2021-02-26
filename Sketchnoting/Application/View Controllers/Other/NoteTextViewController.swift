@@ -13,6 +13,7 @@ class NoteTextViewController: UIViewController {
     @IBOutlet weak var pagesSegmentedControl: UISegmentedControl!
     @IBOutlet weak var textSegmentedControl: UISegmentedControl!
     @IBOutlet weak var parsingSegmentedControl: UISegmentedControl!
+    @IBOutlet weak var summarizeSwitch: UISwitch!
     @IBOutlet var textView: UITextView!
     
     var note: (URL, Note)!
@@ -51,6 +52,15 @@ class NoteTextViewController: UIViewController {
         }
         if parsingSegmentedControl.selectedSegmentIndex == 1 {
             text = TextParser.shared.clean(text: text)
+            
+        }
+        if summarizeSwitch.isOn {
+            Reductio.shared.summarize(text: text, compression: 0.5, completion: { phrases in
+                log.info("Summarized version has \(phrases.count) sentences.")
+                DispatchQueue.main.async {
+                    self.textView.text = phrases.joined(separator: " ")
+                }
+            })
         }
         return text
     }
@@ -70,6 +80,9 @@ class NoteTextViewController: UIViewController {
         textView.text = getText()
     }
     @IBAction func parsingSegmentedControlChanged(_ sender: UISegmentedControl) {
+        textView.text = getText()
+    }
+    @IBAction func summarizeSwitchChanged(_ sender: UISwitch) {
         textView.text = getText()
     }
 }

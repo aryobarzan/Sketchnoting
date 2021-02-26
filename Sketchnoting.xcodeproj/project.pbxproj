@@ -75,6 +75,15 @@
 		9F8988D225E59D9B005CB90B /* SearchDocumentsCard.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9F8988D125E59D9B005CB90B /* SearchDocumentsCard.xib */; };
 		9F8988D425E59DAD005CB90B /* SearchDocumentsCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F8988D325E59DAD005CB90B /* SearchDocumentsCard.swift */; };
 		9F8988D625E8239E005CB90B /* TextParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F8988D525E8239E005CB90B /* TextParser.swift */; };
+		9F8988D925E95873005CB90B /* Array+Combinations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F8988D825E95873005CB90B /* Array+Combinations.swift */; };
+		9F8988DB25E95892005CB90B /* Keyword.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F8988DA25E95892005CB90B /* Keyword.swift */; };
+		9F8988DD25E958A6005CB90B /* Reductio.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F8988DC25E958A6005CB90B /* Reductio.swift */; };
+		9F8988DF25E958C2005CB90B /* Search.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F8988DE25E958C2005CB90B /* Search.swift */; };
+		9F8988E125E958D7005CB90B /* Sentence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F8988E025E958D7005CB90B /* Sentence.swift */; };
+		9F8988E325E958EF005CB90B /* Stemmer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F8988E225E958EF005CB90B /* Stemmer.swift */; };
+		9F8988E525E9590C005CB90B /* Stopwords.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F8988E425E9590C005CB90B /* Stopwords.swift */; };
+		9F8988E725E95920005CB90B /* Summarizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F8988E625E95920005CB90B /* Summarizer.swift */; };
+		9F8988E925E95935005CB90B /* TextRank.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F8988E825E95935005CB90B /* TextRank.swift */; };
 		9F8E0D0F25DDC02C00A951B1 /* SemanticSearch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F8E0D0E25DDC02C00A951B1 /* SemanticSearch.swift */; };
 		9F92D10E231E95B400BC0E57 /* UICollectionViewExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F92D10D231E95B400BC0E57 /* UICollectionViewExtensions.swift */; };
 		9F92D110231E97DF00BC0E57 /* UserDefaultsExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F92D10F231E97DF00BC0E57 /* UserDefaultsExtensions.swift */; };
@@ -229,6 +238,15 @@
 		9F8988D125E59D9B005CB90B /* SearchDocumentsCard.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SearchDocumentsCard.xib; sourceTree = "<group>"; };
 		9F8988D325E59DAD005CB90B /* SearchDocumentsCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchDocumentsCard.swift; sourceTree = "<group>"; };
 		9F8988D525E8239E005CB90B /* TextParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextParser.swift; sourceTree = "<group>"; };
+		9F8988D825E95873005CB90B /* Array+Combinations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Array+Combinations.swift"; sourceTree = "<group>"; };
+		9F8988DA25E95892005CB90B /* Keyword.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Keyword.swift; sourceTree = "<group>"; };
+		9F8988DC25E958A6005CB90B /* Reductio.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Reductio.swift; sourceTree = "<group>"; };
+		9F8988DE25E958C2005CB90B /* Search.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Search.swift; sourceTree = "<group>"; };
+		9F8988E025E958D7005CB90B /* Sentence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sentence.swift; sourceTree = "<group>"; };
+		9F8988E225E958EF005CB90B /* Stemmer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Stemmer.swift; sourceTree = "<group>"; };
+		9F8988E425E9590C005CB90B /* Stopwords.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Stopwords.swift; sourceTree = "<group>"; };
+		9F8988E625E95920005CB90B /* Summarizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Summarizer.swift; sourceTree = "<group>"; };
+		9F8988E825E95935005CB90B /* TextRank.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextRank.swift; sourceTree = "<group>"; };
 		9F8E0D0E25DDC02C00A951B1 /* SemanticSearch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SemanticSearch.swift; sourceTree = "<group>"; };
 		9F92D10D231E95B400BC0E57 /* UICollectionViewExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UICollectionViewExtensions.swift; sourceTree = "<group>"; };
 		9F92D10F231E97DF00BC0E57 /* UserDefaultsExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsExtensions.swift; sourceTree = "<group>"; };
@@ -495,6 +513,22 @@
 			path = "Note Pages";
 			sourceTree = "<group>";
 		};
+		9F8988D725E9585B005CB90B /* Reductio */ = {
+			isa = PBXGroup;
+			children = (
+				9F8988D825E95873005CB90B /* Array+Combinations.swift */,
+				9F8988DA25E95892005CB90B /* Keyword.swift */,
+				9F8988DC25E958A6005CB90B /* Reductio.swift */,
+				9F8988DE25E958C2005CB90B /* Search.swift */,
+				9F8988E025E958D7005CB90B /* Sentence.swift */,
+				9F8988E225E958EF005CB90B /* Stemmer.swift */,
+				9F8988E425E9590C005CB90B /* Stopwords.swift */,
+				9F8988E625E95920005CB90B /* Summarizer.swift */,
+				9F8988E825E95935005CB90B /* TextRank.swift */,
+			);
+			path = Reductio;
+			sourceTree = "<group>";
+		};
 		9F92D11323202B8600BC0E57 /* Knowledge Graph */ = {
 			isa = PBXGroup;
 			children = (
@@ -682,6 +716,7 @@
 		9FD29C452239587D00CC969A /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				9F8988D725E9585B005CB90B /* Reductio */,
 				9FAB4B7B244BEF2700DEA46F /* FittableFontLabel.swift */,
 				9FAB4B7D244BEF2E00DEA46F /* UILabelExtension.swift */,
 				9FD29C462239588E00CC969A /* UIViewExtensions.swift */,
@@ -964,7 +999,9 @@
 				9F8E0D0F25DDC02C00A951B1 /* SemanticSearch.swift in Sources */,
 				9F00428923E9FB2600961636 /* BadgeHub.swift in Sources */,
 				9F65983B23EDD29300CDBE0C /* NoteTextBlock.swift in Sources */,
+				9F8988E925E95935005CB90B /* TextRank.swift in Sources */,
 				9FB87CF624B0061200A262D8 /* ARDocument.swift in Sources */,
+				9F8988D925E95873005CB90B /* Array+Combinations.swift in Sources */,
 				9F4B38C523EC76F400F87B61 /* DocumentPreviewViewController.swift in Sources */,
 				9F65984B23F3175E00CDBE0C /* SearchViewController.swift in Sources */,
 				9F65983723EDD15C00CDBE0C /* NoteTextElement.swift in Sources */,
@@ -1007,7 +1044,9 @@
 				9FD29C56223C3C3900CC969A /* StringExtensions.swift in Sources */,
 				9F65983F23EDD80B00CDBE0C /* HelpLinesType.swift in Sources */,
 				9FE38C6C24F8670B00421BAE /* NoteTypedTextView.swift in Sources */,
+				9F8988E125E958D7005CB90B /* Sentence.swift in Sources */,
 				9F96895724679D4000D02F81 /* NoteDoc.swift in Sources */,
+				9F8988DB25E95892005CB90B /* Keyword.swift in Sources */,
 				9F65983D23EDD2FA00CDBE0C /* NoteTextComplete.swift in Sources */,
 				9F92D11C23217D0500BC0E57 /* SearchFilterView.swift in Sources */,
 				9FDD6CA524AFB7C10093EDF4 /* NoteInfoViewController.swift in Sources */,
@@ -1020,6 +1059,7 @@
 				9FC5F90824A8DFEA00CDF2DF /* NoteOptionsViewController.swift in Sources */,
 				9FD29C4E223998BC00CC969A /* UIViewControllerExtensions.swift in Sources */,
 				9FD29C472239588E00CC969A /* UIViewExtensions.swift in Sources */,
+				9F8988E325E958EF005CB90B /* Stemmer.swift in Sources */,
 				9FB9984924868700003773F2 /* MoveFileViewCell.swift in Sources */,
 				9FA8C000239B18BA00BAA42B /* TagsViewController.swift in Sources */,
 				9FBF6AB822E9F428001FD730 /* VisionTextLineWrapper.swift in Sources */,
@@ -1041,13 +1081,16 @@
 				9F8551B123A539D9006EB0B1 /* NotePageCollectionViewCell.swift in Sources */,
 				9FBF6ABA22E9F439001FD730 /* VisionTextElementWrapper.swift in Sources */,
 				9F6A9F3E2550CE4900CF8CF1 /* CollectionExtensions.swift in Sources */,
+				9F8988DF25E958C2005CB90B /* Search.swift in Sources */,
 				9FD29BC72224B58600CC969A /* Document.swift in Sources */,
 				9F9898312470DC2700E62CD1 /* TextBoxViewController.swift in Sources */,
 				9F5F340623AC64E400EB2804 /* Knowledge.swift in Sources */,
 				9FBF6AB622E9F3FE001FD730 /* VisionTextBlockWrapper.swift in Sources */,
 				9FE38C6A24F8607800421BAE /* NoteImageView.swift in Sources */,
+				9F8988E525E9590C005CB90B /* Stopwords.swift in Sources */,
 				9F4B38BD23EA3D8500F87B61 /* ReceivedNoteCollectionViewCell.swift in Sources */,
 				9F0EC7DD2446A8AE000A28CB /* GestureExtensions.swift in Sources */,
+				9F8988DD25E958A6005CB90B /* Reductio.swift in Sources */,
 				9F65983323EDCEA300CDBE0C /* NotePage.swift in Sources */,
 				9FA6239E22E66D73007ED794 /* HandwritingRecognizer.swift in Sources */,
 				9F2FF43A249B083D00597AD6 /* NoteDrawing.swift in Sources */,
@@ -1057,6 +1100,7 @@
 				9FD5516E246A4364005D14D2 /* RelatedNotesViewController.swift in Sources */,
 				9F18E7A823FB4F1600543D78 /* FolderButton.swift in Sources */,
 				9FFE07E8232A622A00DBD0AC /* Tag.swift in Sources */,
+				9F8988E725E95920005CB90B /* Summarizer.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

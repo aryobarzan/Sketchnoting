@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import NaturalLanguage
 
 class TextParser {
     
@@ -19,6 +20,7 @@ class TextParser {
         let sentences = SemanticSearch.shared.tokenize(text: text, unit: .sentence)
         var validSentences = [String]()
         for sentence in sentences {
+            // 1
             let words = SemanticSearch.shared.tokenize(text: sentence, unit: .word)
             var incorrectCount = 0
             for word in words {
@@ -35,14 +37,15 @@ class TextParser {
                 log.error("Invalid sentence: \(sentence)")
                 continue
             }
-            
+            // 2
             let partsOfSpeech = SemanticSearch.shared.tag(text: sentence, scheme: .lexicalClass)
             let phraseType = SemanticSearch.shared.checkPhraseType(queryPartsOfSpeech: partsOfSpeech)
-            if phraseType == .Keyword || phraseType == .Clause {
+            if (phraseType == .Keyword && !partsOfSpeech.isEmpty && partsOfSpeech[0].1 != "Noun") || phraseType == .Clause {
                 validSentences.removeLast()
                 log.error("Invalid phrase type '\(phraseType.rawValue)' - \(sentence)")
                 continue
             }
+            // 3
             let invalidCharacters = ["()", "[]", "{", "}"] //";"
             for invalidCharacter in invalidCharacters {
                 if sentence.contains(invalidCharacter) {
@@ -54,21 +57,25 @@ class TextParser {
             if !validSentences.contains(sentence) {
                 continue
             }
+            // 4
             if sentence.range(of: ".*for\\s\\(.*\\).*", options: .regularExpression, range: nil) != nil {
                 validSentences.removeLast()
                 log.error("Invalid pattern 'for ()' - \(sentence)")
                 continue
             }
+            // 5
             if sentence.hasSuffix(";") {
                 validSentences.removeLast()
                 continue
             }
         }
         // Remove extra whitespaces
-        for i in 0..<validSentences.count {
+        var finalText = validSentences.joined(separator: " ")
+        finalText = finalText.replacingOccurrences(of: "[\\s\n]+", with: " ", options: .regularExpression, range: nil)
+        /*for i in 0..<validSentences.count {
             validSentences[i] = validSentences[i].replacingOccurrences(of: "[\\s\n]+", with: " ", options: .regularExpression, range: nil)
-        }
+        }*/
         log.info("Out of \(sentences.count) sentences, \(validSentences.count) are valid.")
-        return validSentences.joined(separator: "\n")
+        return finalText //validSentences.joined(separator: " ")
     }
 }

@@ -759,7 +759,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         if self.topicsShown {
             self.setupTopicAnnotations()
         }
-        self.annotateText(text: self.note.1.getText())
+        self.annotateText(text: self.note.1.getText(option: .FullText, parse: true))
     }
     
     var connectivity: Connectivity?
@@ -776,7 +776,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                     log.info("Internet Connection detected.")
                     if SettingsManager.isAnnotationServiceAvailable() {
                         log.info("Annotating...")
-                        let text = TextParser.shared.clean(text: text)
                         SettingsManager.updateAnnotationServiceAvailability()
                         DispatchQueue.global(qos: .background).async {
                             if SettingsManager.getAnnotatorStatus(annotator: .TAGME) {
@@ -1385,14 +1384,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         self.clearConceptHighlights()
         note.1.clearDocuments()
         NeoLibrary.save(note: note.1, url: note.0)
-        self.annotateText(text: note.1.getText())
-        /*if let doc = pdfView.document {
-            if let page = doc.page(at: 0) {
-                if page.string != nil && !page.string!.isEmpty {
-                    self.annotateText(text: page.string!)
-                }
-            }
-        }*/
+        self.annotateText(text: note.1.getText(option: .FullText, parse: true))
     }
     func tagmeEpsilonUpdated(value: Float) {
         note.1.tagmeEpsilon = value

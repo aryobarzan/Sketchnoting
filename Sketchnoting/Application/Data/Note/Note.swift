@@ -238,10 +238,10 @@ class Note: File, DocumentDelegate {
         self.delegate?.noteDocumentHasChanged(note: self, document: document)
     }
     
-    public func getText(option: NoteTextViewOption = .FullText) -> String {
+    public func getText(option: NoteTextViewOption = .FullText, parse: Bool = false) -> String {
         var text: String = ""
         for page in pages {
-            text = text + page.getText(option: option)
+            text = text + page.getText(option: option, parse: parse)
             text += "\n"
         }
         return text

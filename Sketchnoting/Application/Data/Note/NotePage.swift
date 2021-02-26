@@ -195,7 +195,7 @@ class NotePage: Codable {
         return self.recognizedText
     }
     
-    public func getText(option: NoteTextViewOption = .FullText) -> String {
+    public func getText(option: NoteTextViewOption = .FullText, parse: Bool = false) -> String {
         var text: String = ""
         switch option {
         
@@ -208,7 +208,12 @@ class NotePage: Codable {
         case .HandwrittenText:
             text += getRecognizedText().getText()
         case .PDFText:
-            text += getPDFText()
+            if parse {
+                text += TextParser.shared.clean(text: getPDFText())
+            }
+            else {
+                text += getPDFText()
+            }
         }
         return text
     }
