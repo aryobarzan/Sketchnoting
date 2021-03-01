@@ -1629,7 +1629,7 @@
                                 <rect key="frame" x="20" y="76" width="664" height="90"/>
                                 <subviews>
                                     <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="nLV-yK-Wkf">
-                                        <rect key="frame" x="8" y="8" width="201" height="35"/>
+                                        <rect key="frame" x="8" y="8" width="201" height="32"/>
                                         <segments>
                                             <segment title="Current Page"/>
                                             <segment title="Note"/>
@@ -1659,34 +1659,39 @@
                                             <action selector="textSegmentedControlChanged:" destination="Zff-JM-hmJ" eventType="valueChanged" id="4aQ-IZ-wsV"/>
                                         </connections>
                                     </segmentedControl>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Summarize:" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8St-rr-eMD">
-                                        <rect key="frame" x="199" y="60" width="81" height="18"/>
-                                        <fontDescription key="fontDescription" style="UICTFontTextStyleSubhead"/>
-                                        <nil key="textColor"/>
-                                        <nil key="highlightedColor"/>
-                                    </label>
                                     <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="Ouc-QU-QiI">
                                         <rect key="frame" x="288" y="52" width="51" height="31"/>
                                         <connections>
                                             <action selector="summarizeSwitchChanged:" destination="Zff-JM-hmJ" eventType="valueChanged" id="bKG-86-8Lg"/>
                                         </connections>
                                     </switch>
+                                    <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" animating="YES" style="medium" translatesAutoresizingMaskIntoConstraints="NO" id="Nih-0b-0n6">
+                                        <rect key="frame" x="351" y="57" width="20" height="20"/>
+                                    </activityIndicatorView>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Summarize:" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8St-rr-eMD">
+                                        <rect key="frame" x="199" y="58" width="81" height="18"/>
+                                        <fontDescription key="fontDescription" style="UICTFontTextStyleSubhead"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
                                 </subviews>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <constraints>
                                     <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="t6K-BE-gMi" secondAttribute="trailing" constant="20" symbolic="YES" id="BQb-WW-oXu"/>
+                                    <constraint firstItem="8St-rr-eMD" firstAttribute="top" secondItem="nLV-yK-Wkf" secondAttribute="bottom" constant="19" id="CBT-A2-QJv"/>
                                     <constraint firstItem="nLV-yK-Wkf" firstAttribute="leading" secondItem="o8Y-jo-lvS" secondAttribute="leading" constant="8" id="SXn-pq-b9G"/>
                                     <constraint firstItem="Ouc-QU-QiI" firstAttribute="top" secondItem="t6K-BE-gMi" secondAttribute="bottom" constant="13" id="Tc6-Li-cZp"/>
                                     <constraint firstItem="nLV-yK-Wkf" firstAttribute="top" secondItem="o8Y-jo-lvS" secondAttribute="top" constant="8" id="Ukw-wh-Adt"/>
+                                    <constraint firstItem="Nih-0b-0n6" firstAttribute="top" secondItem="t6K-BE-gMi" secondAttribute="bottom" constant="18" id="XHY-PQ-r2y"/>
                                     <constraint firstItem="8St-rr-eMD" firstAttribute="leading" secondItem="xQI-Yw-Qmx" secondAttribute="trailing" constant="8" id="Y2T-xV-GIa"/>
                                     <constraint firstItem="t6K-BE-gMi" firstAttribute="leading" secondItem="nLV-yK-Wkf" secondAttribute="trailing" constant="8" id="aWG-UY-sY4"/>
                                     <constraint firstItem="t6K-BE-gMi" firstAttribute="top" secondItem="o8Y-jo-lvS" secondAttribute="top" constant="8" id="h72-Hn-nhf"/>
                                     <constraint firstItem="Ouc-QU-QiI" firstAttribute="leading" secondItem="8St-rr-eMD" secondAttribute="trailing" constant="8" id="hwS-6Q-pTD"/>
                                     <constraint firstAttribute="bottom" secondItem="xQI-Yw-Qmx" secondAttribute="bottom" constant="7" id="jtS-1x-Sb9"/>
+                                    <constraint firstItem="Nih-0b-0n6" firstAttribute="leading" secondItem="Ouc-QU-QiI" secondAttribute="trailing" constant="14" id="k88-zF-6pE"/>
+                                    <constraint firstAttribute="bottom" secondItem="8St-rr-eMD" secondAttribute="bottom" constant="14" id="mI0-Ux-Xst"/>
                                     <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="xQI-Yw-Qmx" secondAttribute="trailing" constant="20" symbolic="YES" id="o1Y-wp-lIW"/>
-                                    <constraint firstAttribute="bottom" secondItem="8St-rr-eMD" secondAttribute="bottom" constant="12" id="sYO-qf-a70"/>
                                     <constraint firstItem="xQI-Yw-Qmx" firstAttribute="leading" secondItem="o8Y-jo-lvS" secondAttribute="leading" constant="8" id="sgZ-9z-W4R"/>
-                                    <constraint firstItem="8St-rr-eMD" firstAttribute="top" secondItem="nLV-yK-Wkf" secondAttribute="bottom" constant="18" id="wdn-cU-1RA"/>
                                     <constraint firstAttribute="bottom" secondItem="Ouc-QU-QiI" secondAttribute="bottom" constant="7" id="xDD-rX-rWT"/>
                                     <constraint firstAttribute="height" constant="90" id="y17-eH-0Zq"/>
                                 </constraints>
@@ -1717,6 +1722,7 @@
                         </barButtonItem>
                     </navigationItem>
                     <connections>
+                        <outlet property="activityIndicator" destination="Nih-0b-0n6" id="4HZ-ms-zEr"/>
                         <outlet property="pagesSegmentedControl" destination="nLV-yK-Wkf" id="45o-3z-SBt"/>
                         <outlet property="parsingSegmentedControl" destination="xQI-Yw-Qmx" id="JVg-Zm-kWQ"/>
                         <outlet property="summarizeSwitch" destination="Ouc-QU-QiI" id="vQK-hk-yuV"/>
@@ -2077,7 +2083,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <segmentedControl hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="pyx-fB-u9y">
-                                <rect key="frame" x="204.5" y="125" width="359" height="32"/>
+                                <rect key="frame" x="20" y="125" width="359" height="32"/>
                                 <segments>
                                     <segment title="Any"/>
                                     <segment title="Body"/>
@@ -2140,7 +2146,7 @@
                                     </collectionViewCell>
                                 </cells>
                             </collectionView>
-                            <textField opaque="NO" tag="101" contentMode="scaleToFill" horizontalHuggingPriority="249" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Enter your search query" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="OWB-7G-1Cd">
+                            <textField opaque="NO" tag="101" contentMode="scaleToFill" horizontalHuggingPriority="249" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Enter your search query" textAlignment="natural" minimumFontSize="17" clearButtonMode="unlessEditing" translatesAutoresizingMaskIntoConstraints="NO" id="OWB-7G-1Cd">
                                 <rect key="frame" x="20" y="77" width="571" height="34"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences" returnKeyType="search"/>
@@ -2223,14 +2229,26 @@
                                     <action selector="searchModeSegmentChanged:" destination="kPL-Mg-aaB" eventType="valueChanged" id="TpN-kv-3IJ"/>
                                 </connections>
                             </segmentedControl>
+                            <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="tH4-HJ-5MO">
+                                <rect key="frame" x="699" y="125" width="51" height="31"/>
+                                <connections>
+                                    <action selector="expandedSearchSwitchChanged:" destination="kPL-Mg-aaB" eventType="valueChanged" id="txF-Bi-RRh"/>
+                                </connections>
+                            </switch>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Expanded Search" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="D8l-la-vhm">
+                                <rect key="frame" x="564" y="130" width="127" height="19.5"/>
+                                <fontDescription key="fontDescription" style="UICTFontTextStyleCallout"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="MqQ-2V-Ujw"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstItem="Air-BM-9f6" firstAttribute="top" secondItem="TBN-T0-e7n" secondAttribute="bottom" constant="33" id="1G4-BD-eD8"/>
-                            <constraint firstItem="pyx-fB-u9y" firstAttribute="centerX" secondItem="Cr6-Dc-kQ1" secondAttribute="centerX" id="7r7-WC-Mrf"/>
                             <constraint firstItem="pyx-fB-u9y" firstAttribute="top" secondItem="OWB-7G-1Cd" secondAttribute="bottom" constant="14" id="Bxw-Up-KyO"/>
                             <constraint firstItem="OWB-7G-1Cd" firstAttribute="leading" secondItem="MqQ-2V-Ujw" secondAttribute="leading" constant="20" id="DkE-Gm-awh"/>
+                            <constraint firstItem="pyx-fB-u9y" firstAttribute="leading" secondItem="MqQ-2V-Ujw" secondAttribute="leading" constant="20" id="GV3-rc-4EH"/>
                             <constraint firstItem="Rar-0k-hIs" firstAttribute="leading" secondItem="San-i8-ecq" secondAttribute="trailing" constant="8" id="HHy-Q9-caZ"/>
                             <constraint firstItem="MqQ-2V-Ujw" firstAttribute="trailing" secondItem="Air-BM-9f6" secondAttribute="trailing" constant="20" id="Kgl-6E-rMc"/>
                             <constraint firstItem="MqQ-2V-Ujw" firstAttribute="bottom" secondItem="Air-BM-9f6" secondAttribute="bottom" constant="20" id="OuT-cD-HFo"/>
@@ -2242,11 +2260,16 @@
                             <constraint firstItem="MqQ-2V-Ujw" firstAttribute="trailing" secondItem="Rar-0k-hIs" secondAttribute="trailing" constant="20" id="Wjj-Gf-AXm"/>
                             <constraint firstItem="San-i8-ecq" firstAttribute="leading" secondItem="OWB-7G-1Cd" secondAttribute="trailing" constant="8" id="ZFf-Es-2c3"/>
                             <constraint firstItem="San-i8-ecq" firstAttribute="top" secondItem="MqQ-2V-Ujw" secondAttribute="top" constant="80" id="aqW-9U-tpd"/>
+                            <constraint firstItem="D8l-la-vhm" firstAttribute="top" secondItem="OWB-7G-1Cd" secondAttribute="bottom" constant="19" id="dTZ-7C-kL0"/>
                             <constraint firstItem="Rar-0k-hIs" firstAttribute="top" secondItem="MqQ-2V-Ujw" secondAttribute="top" constant="80" id="gJV-A6-btc"/>
                             <constraint firstItem="Air-BM-9f6" firstAttribute="leading" secondItem="MqQ-2V-Ujw" secondAttribute="leading" constant="20" id="ioN-Nv-pR7"/>
+                            <constraint firstItem="tH4-HJ-5MO" firstAttribute="top" secondItem="Rar-0k-hIs" secondAttribute="bottom" constant="17" id="nMA-qc-htu"/>
                             <constraint firstItem="Axk-yc-h7I" firstAttribute="leading" secondItem="MqQ-2V-Ujw" secondAttribute="leading" constant="20" id="nTm-Tn-k5e"/>
+                            <constraint firstItem="D8l-la-vhm" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="pyx-fB-u9y" secondAttribute="trailing" constant="8" symbolic="YES" id="nyY-b5-zPZ"/>
                             <constraint firstItem="MqQ-2V-Ujw" firstAttribute="trailing" secondItem="TBN-T0-e7n" secondAttribute="trailing" constant="20" id="oZc-a6-QzU"/>
+                            <constraint firstItem="MqQ-2V-Ujw" firstAttribute="trailing" secondItem="tH4-HJ-5MO" secondAttribute="trailing" constant="20" id="oce-4l-sWt"/>
                             <constraint firstItem="MqQ-2V-Ujw" firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="imP-cY-iHl" secondAttribute="trailing" symbolic="YES" id="q3E-qV-wcg"/>
+                            <constraint firstItem="tH4-HJ-5MO" firstAttribute="leading" secondItem="D8l-la-vhm" secondAttribute="trailing" constant="8" id="tGm-4e-3bC"/>
                             <constraint firstItem="TBN-T0-e7n" firstAttribute="leading" secondItem="MqQ-2V-Ujw" secondAttribute="leading" constant="20" id="yBz-gW-DUj"/>
                         </constraints>
                     </view>
@@ -2254,6 +2277,8 @@
                     <connections>
                         <outlet property="contentStackView" destination="9Uv-ur-khF" id="HvY-iW-fiI"/>
                         <outlet property="drawingSearchButton" destination="San-i8-ecq" id="Pqb-uY-l95"/>
+                        <outlet property="expandedSearchLabel" destination="D8l-la-vhm" id="7Bw-0D-EaI"/>
+                        <outlet property="expandedSearchSwitch" destination="tH4-HJ-5MO" id="810-q7-r7n"/>
                         <outlet property="filtersCollectionView" destination="TBN-T0-e7n" id="Atf-yH-hkl"/>
                         <outlet property="notesCollectionView" destination="tTU-cQ-M7Q" id="jGW-6h-6JS"/>
                         <outlet property="searchButton" destination="Rar-0k-hIs" id="KQF-bK-HJo"/>
@@ -3443,7 +3468,7 @@
         <segue reference="RAn-aJ-7TA"/>
         <segue reference="b6T-Lb-KBp"/>
         <segue reference="odf-CP-ags"/>
-        <segue reference="ct4-u7-KZY"/>
+        <segue reference="NP1-U9-fiV"/>
     </inferredMetricsTieBreakers>
     <resources>
         <image name="antenna.radiowaves.left.and.right" catalog="system" width="128" height="109"/>

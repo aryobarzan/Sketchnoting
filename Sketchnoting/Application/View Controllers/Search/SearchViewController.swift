@@ -15,6 +15,8 @@ class SearchViewController: UIViewController, UICollectionViewDelegate, UICollec
     @IBOutlet weak var searchButton: UIButton!
     @IBOutlet weak var drawingSearchButton: UIButton!
     @IBOutlet weak var searchTypeSegmentedControl: UISegmentedControl!
+    @IBOutlet weak var expandedSearchLabel: UILabel!
+    @IBOutlet weak var expandedSearchSwitch: UISwitch!
     @IBOutlet weak var filtersCollectionView: UICollectionView!
     @IBOutlet weak var notesCollectionView: UICollectionView!
     @IBOutlet weak var contentStackView: UIStackView!
@@ -50,17 +52,20 @@ class SearchViewController: UIViewController, UICollectionViewDelegate, UICollec
         // Clear all search results first
         searchFilters.removeAll()
         filtersCollectionView.reloadData()
-        self.updateResults()
+        clearResults()
         // Lexical Search
         if sender.selectedSegmentIndex == 0 {
             searchTypeSegmentedControl.isHidden = false
             filtersCollectionView.isHidden = false
+            expandedSearchLabel.isHidden = true
+            expandedSearchSwitch.isHidden = true
         }
         // Semantic Search
         else {
             searchTypeSegmentedControl.isHidden = true
             filtersCollectionView.isHidden = true
-            
+            expandedSearchLabel.isHidden = false
+            expandedSearchSwitch.isHidden = false
         }
     }
     @IBAction func searchTapped(_ sender: UIButton) {
@@ -95,6 +100,18 @@ class SearchViewController: UIViewController, UICollectionViewDelegate, UICollec
             searchTextField.resignFirstResponder()
             performSearch()
         }
+        return true
+    }
+    @IBAction func expandedSearchSwitchChanged(_ sender: UISwitch) {
+        if let text = searchTextField.text {
+            if !text.isEmpty {
+                performSearch()
+            }
+        }
+    }
+    
+    func textFieldShouldClear(_ textField: UITextField) -> Bool {
+        clearResults()
         return true
     }
     
@@ -145,6 +162,13 @@ class SearchViewController: UIViewController, UICollectionViewDelegate, UICollec
     }
     
     //
+    
+    private func clearResults() {
+        self.notes = [(URL, Note)]()
+        notesCollectionView.reloadData()
+        self.clearSearchDocumentsCards()
+    }
+    
     private func performSearch() {
         if let searchTextFieldText = searchTextField.text {
             if !searchTextFieldText.isEmpty {
@@ -159,7 +183,7 @@ class SearchViewController: UIViewController, UICollectionViewDelegate, UICollec
     }
     private func performLexicalSearch() {
         createSearchFilter(term: searchTextField.text!, type: self.currentSearchType)
-        searchTextField.text = ""
+        clearResults()
         self.updateResults()
     }
     
@@ -179,10 +203,8 @@ class SearchViewController: UIViewController, UICollectionViewDelegate, UICollec
             log.info("\(entity.0) - \(entity.1)")
         }
         // Search
-        clearSearchDocumentsCards()
-        self.notes = [(URL, Note)]()
-        notesCollectionView.reloadData()
-        SemanticSearch.shared.search(query: query, notes: NeoLibrary.getNotes(), searchHandler: {searchResult in
+        clearResults()
+        SemanticSearch.shared.search(query: query, notes: NeoLibrary.getNotes(), expandedSearch: expandedSearchSwitch.isOn, searchHandler: {searchResult in
             log.info("Search Result - \(searchResult.note == nil ? "Note not a match" : searchResult.note!.1.getName()) / \(searchResult.documents.count) Documents / \(searchResult.personDocuments.count) Person-Documents / \(searchResult.locationDocuments.count) Location-Documents")
             if searchResult.note != nil {
                 DispatchQueue.main.async {

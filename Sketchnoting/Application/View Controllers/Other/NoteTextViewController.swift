@@ -15,6 +15,7 @@ class NoteTextViewController: UIViewController {
     @IBOutlet weak var parsingSegmentedControl: UISegmentedControl!
     @IBOutlet weak var summarizeSwitch: UISwitch!
     @IBOutlet var textView: UITextView!
+    @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     
     var note: (URL, Note)!
     
@@ -26,6 +27,7 @@ class NoteTextViewController: UIViewController {
     
     private func getText() -> String {
         var text = ""
+        summarizeSwitch.setOn(false, animated: true)
         // Current page
         if pagesSegmentedControl.selectedSegmentIndex == 0 {
             if textSegmentedControl.selectedSegmentIndex == 0 { // Full text
@@ -43,7 +45,7 @@ class NoteTextViewController: UIViewController {
             if textSegmentedControl.selectedSegmentIndex == 0 { // Full text
                 text = note.1.getText(option: .FullText)
             }
-            else if textSegmentedControl.selectedSegmentIndex == 1 { // Handwritten tex
+            else if textSegmentedControl.selectedSegmentIndex == 1 { // Handwritten text
                 text = note.1.getText(option: .HandwrittenText)
             }
             else { // PDF text
@@ -53,14 +55,6 @@ class NoteTextViewController: UIViewController {
         if parsingSegmentedControl.selectedSegmentIndex == 1 {
             text = TextParser.shared.clean(text: text)
             
-        }
-        if summarizeSwitch.isOn {
-            Reductio.shared.summarize(text: text, compression: 0.5, completion: { phrases in
-                log.info("Summarized version has \(phrases.count) sentences.")
-                DispatchQueue.main.async {
-                    self.textView.text = phrases.joined(separator: " ")
-                }
-            })
         }
         return text
     }
@@ -83,6 +77,24 @@ class NoteTextViewController: UIViewController {
         textView.text = getText()
     }
     @IBAction func summarizeSwitchChanged(_ sender: UISwitch) {
-        textView.text = getText()
+        if sender.isOn {
+            textSegmentedControl.isEnabled = false
+            pagesSegmentedControl.isEnabled = false
+            parsingSegmentedControl.isEnabled = false
+            activityIndicator.isHidden = false
+            Reductio.shared.summarize(text: textView.text, compression: 0.8, completion: { phrases in
+                    log.info("Summarized version has \(phrases.count) sentences.")
+                    DispatchQueue.main.async {
+                        self.textSegmentedControl.isEnabled = true
+                        self.pagesSegmentedControl.isEnabled = true
+                        self.parsingSegmentedControl.isEnabled = true
+                        self.activityIndicator.isHidden = true
+                        self.textView.text = phrases.joined(separator: " ")
+                    }
+            })
+        }
+        else {
+            textView.text = getText()
+        }
     }
 }

@@ -1320,12 +1320,12 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                     if let pdfPage = pdf.page(at: i) {
                         if !setPDFForCurrentPage {
                             setPDFForCurrentPage = true
-                            note.1.getCurrentPage().backdropPDFData = pdfPage.dataRepresentation
+                            note.1.getCurrentPage().set(pdfDocument: pdfPage.dataRepresentation)
                             self.pdfView.document = PDFDocument(data: pdfPage.dataRepresentation!)
                         }
                         else {
                             let newPage = NotePage()
-                            newPage.backdropPDFData = pdfPage.dataRepresentation
+                            newPage.set(pdfDocument: pdfPage.dataRepresentation)
                             note.1.pages.insert(newPage, at: note.1.activePageIndex + 1)
                         }
                     }
@@ -1530,7 +1530,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         self.startSaveTimer()
     }
     func deletePDF() {
-        note.1.getCurrentPage().backdropPDFData = nil
+        note.1.getCurrentPage().set(pdfDocument: nil)
         pdfView.document = nil
         self.startSaveTimer()
     }

@@ -17,11 +17,11 @@ class TextParser {
     func clean(text: String) -> String {
         let spellchecker = UITextChecker()
 
-        let sentences = SemanticSearch.shared.tokenize(text: text, unit: .sentence)
+        let sentences = SemanticSearch.shared.tokenize(text: text.trimmingCharacters(in: .whitespaces), unit: .sentence)
         var validSentences = [String]()
         for sentence in sentences {
             // 1
-            let words = SemanticSearch.shared.tokenize(text: sentence, unit: .word)
+            let words = SemanticSearch.shared.tokenize(text: sentence.trimmingCharacters(in: .whitespaces), unit: .word)
             var incorrectCount = 0
             for word in words {
                 let range = NSRange(location: 0, length: word.utf16.count)
@@ -38,9 +38,9 @@ class TextParser {
                 continue
             }
             // 2
-            let partsOfSpeech = SemanticSearch.shared.tag(text: sentence, scheme: .lexicalClass)
+            let partsOfSpeech = SemanticSearch.shared.tag(text: sentence.trimmingCharacters(in: .whitespaces), scheme: .lexicalClass)
             let phraseType = SemanticSearch.shared.checkPhraseType(queryPartsOfSpeech: partsOfSpeech)
-            if (phraseType == .Keyword && !partsOfSpeech.isEmpty && partsOfSpeech[0].1 != "Noun") || phraseType == .Clause {
+            if (phraseType == .Keyword && !partsOfSpeech.isEmpty && partsOfSpeech[0].1 != "Noun") {
                 validSentences.removeLast()
                 log.error("Invalid phrase type '\(phraseType.rawValue)' - \(sentence)")
                 continue

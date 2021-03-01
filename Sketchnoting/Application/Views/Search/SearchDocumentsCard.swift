@@ -155,8 +155,8 @@ class SearchDocumentsCard: UIView {
             else if currentIndex >= documents.count - 1 {
                 nextDocumentButton.isEnabled = false
             }
-            documentIndexLabel.text = "\(currentIndex + 1) / \(documents.count)"
         }
+        documentIndexLabel.text = "\(currentIndex + 1) / \(Int(documents.count))"
     }
     
     @IBAction func previousDocumentButtonTapped(_ sender: UIButton) {

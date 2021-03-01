@@ -46,7 +46,11 @@ internal final class TextRank<T: Hashable> {
         var vertex = Node()
         for (node, links) in graph {
             let score: Float = links.reduce(0.0) { $0 + nodes[$1] / outlinks[$1] * weights[$1, node] }
-            vertex[node] = (1-damping/nodes.count) + damping * score
+            if score.isNaN {
+                vertex[node] = (1-damping/nodes.count) + damping * 0.0
+            } else {
+                vertex[node] = (1-damping/nodes.count) + damping * score
+            }
         }
         return vertex
     }

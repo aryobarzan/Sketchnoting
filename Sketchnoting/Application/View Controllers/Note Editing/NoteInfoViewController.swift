@@ -23,7 +23,7 @@ class NoteInfoViewController: UIViewController {
         titleTextField.text = note.1.getName()
         creationDateLabel.text = "\(NeoLibrary.getCreationDate(url: note.0).getFormattedDate())"
         updateDateLabel.text = "\(NeoLibrary.getModificationDate(url: note.0).getFormattedDate())"
-        pageIndexLabel.text = "\(note.1.activePageIndex+1)/\(note.1.pages.count)"
+        pageIndexLabel.text = "\(note.1.activePageIndex+1)/\(Int(note.1.pages.count))"
     }
     
     @IBAction func titleTextViewDone(_ sender: UITextField) {

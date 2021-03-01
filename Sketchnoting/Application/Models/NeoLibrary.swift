@@ -330,11 +330,11 @@ class NeoLibrary {
             if let pdfPage = pdf.page(at: i) {
                 if !setPDFForCurrentPage {
                     setPDFForCurrentPage = true
-                    note.getCurrentPage().backdropPDFData = pdfPage.dataRepresentation
+                    note.getCurrentPage().set(pdfDocument: pdfPage.dataRepresentation)
                 }
                 else {
                     let newPage = NotePage()
-                    newPage.backdropPDFData = pdfPage.dataRepresentation
+                    newPage.set(pdfDocument: pdfPage.dataRepresentation)
                     note.pages.append(newPage)
                 }
             }

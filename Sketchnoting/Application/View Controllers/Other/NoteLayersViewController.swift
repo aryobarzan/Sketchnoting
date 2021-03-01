@@ -133,7 +133,7 @@ class NoteLayersViewController: UITableViewController, NoteLayersViewCellDelegat
                 break
             case .PDF:
                 self.delegate?.deletePDF()
-                self.note.1.getCurrentPage().backdropPDFData = nil
+                self.note.1.getCurrentPage().set(pdfDocument: nil)
                 self.sections.remove(at: 2)
                 self.tableView.reloadData()
                 break

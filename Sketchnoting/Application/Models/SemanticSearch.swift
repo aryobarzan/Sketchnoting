@@ -211,29 +211,45 @@ class SemanticSearch {
         }
     }
     
-    private func performStringSimilarity(between query: String, and words: [String], wordEmbedding: NLEmbedding) -> (Double, Double) {
-        var minimumDistance = 999.0
-        var levenshteinMatchPercentage = 0.0
+    private enum SearchType: String {
+        case Lexical
+        case Semantic
+    }
+    
+    private func performStringSimilarity(between query: String, and words: [String], wordEmbedding: NLEmbedding) -> (Double, String, SearchType) {
+        var minimumDistance = 999.0 // lower is better
+        var levenshteinMatchPercentage = 0.0 // higher is better
+        var similarWord = ""
+        let query = query.lowercased()
         for word in words {
-            let distance = wordEmbedding.distance(between: query.lowercased(), and: word.lowercased())
+            let distance = wordEmbedding.distance(between: query, and: word.lowercased())
             if distance == 2.0 { // Meaning: word is unknown to word embedder (has no vector representation)
-                let levenshteinDistance = query.lowercased().levenshtein(word.lowercased())
+                let levenshteinDistance = query.levenshtein(word.lowercased())
+                log.info("(DEBUG) Levenshtein distance - \(word) - \(levenshteinDistance) ")
                 if levenshteinDistance == 0 {
                     levenshteinMatchPercentage = 1.0
+                    similarWord = word
                     break
                 }
                 else {
                     let temp = 1.0 / Double(levenshteinDistance)
                     if temp > levenshteinMatchPercentage {
                         levenshteinMatchPercentage = temp
+                        similarWord = word
                     }
                 }
             }
-            if distance < minimumDistance {
+            else if distance < minimumDistance {
                 minimumDistance = distance
+                similarWord = word
             }
         }
-        return (minimumDistance, levenshteinMatchPercentage)
+        if minimumDistance >= 2.0 {
+            return (levenshteinMatchPercentage, similarWord, SearchType.Lexical)
+        }
+        else {
+            return (minimumDistance, similarWord, SearchType.Semantic)
+        }
     }
     
     private func performStringSimilarity(between query: String, and sentences: [String], sentenceEmbedding: NLEmbedding) -> (Double, Double) {
@@ -270,27 +286,49 @@ class SemanticSearch {
             var isMatch = false
             // MARK: Body search
             let noteBodyWords = self.tokenize(text: note.1.getText(option: .FullText), unit: .word)
-            let (minimumBodyDistance, highestBodyLevenshteinMatchPercentage) = performStringSimilarity(between: query.lowercased(), and: noteBodyWords, wordEmbedding: wordEmbedding)
-            if minimumBodyDistance <= self.SEARCH_THRESHOLD || highestBodyLevenshteinMatchPercentage >= lexicalThreshold {
-                searchResult.note = note
-                isMatch = true
-                log.info("Body similarity threshold achieved: \(minimumBodyDistance) / \(highestBodyLevenshteinMatchPercentage)")
+            let (similarityResult, similarWord, searchType) = performStringSimilarity(between: query.lowercased(), and: noteBodyWords, wordEmbedding: wordEmbedding)
+            switch searchType {
+            case .Lexical:
+                searchResult.bodyScore = 1.0 * max(0.01, similarityResult)
+                if similarityResult >= lexicalThreshold {
+                    searchResult.note = note
+                    isMatch = true
+                    log.info("[Lexical] Body ('\(similarWord)') = \(similarityResult)")
+                    break
+                }
+            case .Semantic:
+                searchResult.bodyScore = 1.0 / max(0.01, similarityResult)
+                if similarityResult <= SEARCH_THRESHOLD {
+                    log.info("[Semantic] Body ('\(similarWord)') = \(similarityResult)")
+                    searchResult.note = note
+                    isMatch = true
+                    break
+                }
             }
-            searchResult.bodyScore = 1.0 / max(0.01, minimumBodyDistance)
             log.info("Analysis of note body: \(self.getCurrentTime() - time)ms")
             // MARK: Drawings search
             if !isMatch {
                 time = self.getCurrentTime()
-                let (minimumDrawingDistance, highestDrawingLevenshteinMatchPercentage) = performStringSimilarity(between: query.lowercased(), and: note.1.getDrawingLabels(), wordEmbedding: wordEmbedding)
-                if minimumDrawingDistance <= self.DRAWING_THRESHOLD || highestDrawingLevenshteinMatchPercentage >= lexicalThreshold {
-                    log.info("Drawing similarity threshold achieved.")
-                    if !isMatch {
+                let (similarityResult, similarWord, searchType) = performStringSimilarity(between: query.lowercased(), and: note.1.getDrawingLabels(), wordEmbedding: wordEmbedding)
+                switch searchType {
+                case .Lexical:
+                    searchResult.drawingScore = 1.0 * max(0.01, similarityResult)
+                    if similarityResult >= lexicalThreshold {
                         searchResult.note = note
                         isMatch = true
+                        log.info("[Lexical] Drawing ('\(similarWord)') = \(similarityResult)")
+                        break
+                    }
+                case .Semantic:
+                    searchResult.drawingScore = 1.0 / max(0.01, similarityResult)
+                    if similarityResult <= SEARCH_THRESHOLD {
+                        log.info("[Semantic] Drawing ('\(similarWord)') = \(similarityResult)")
+                        searchResult.note = note
+                        isMatch = true
+                        break
                     }
                 }
                 log.info("Analysis of note drawings: \(self.getCurrentTime() - time)ms")
-                searchResult.drawingScore = 1.0 / max(0.01, minimumDrawingDistance)
             }
             // MARK: Documents search
             time = self.getCurrentTime()
@@ -301,28 +339,50 @@ class SemanticSearch {
                 // MARK: Document Description
                 if let description = document.description {
                     let words = self.tokenize(text: description, unit: .word)
-                    let (minimumDocumentDescriptionDistance, highestDocumentDescriptionLevenshteinMatchPercentage) = performStringSimilarity(between: query.lowercased(), and: words, wordEmbedding: wordEmbedding)
-                    if minimumDocumentDescriptionDistance <= self.SEARCH_THRESHOLD || highestDocumentDescriptionLevenshteinMatchPercentage >= lexicalThreshold {
-                        log.info("Found in document: \(document.title)")
-                        searchResult.documents.append(document)
-                        foundInDocuments = true
+                    let (similarityResult, similarWord, searchType) = performStringSimilarity(between: query.lowercased(), and: words, wordEmbedding: wordEmbedding)
+                    switch searchType {
+                    case .Lexical:
+                        documentScore = 1.0 * max(0.01, similarityResult)
+                        if similarityResult >= lexicalThreshold {
+                            searchResult.documents.append(document)
+                            foundInDocuments = true
+                            log.info("[Lexical] Document '\(document.title)' Description ('\(similarWord)') = \(similarityResult)")
+                        }
+                        break
+                    case .Semantic:
+                        documentScore = 1.0 / max(0.01, similarityResult)
+                        if similarityResult <= SEARCH_THRESHOLD {
+                            log.info("[Semantic] Document '\(document.title)' Description ('\(similarWord)') = \(similarityResult)")
+                            searchResult.documents.append(document)
+                            foundInDocuments = true
+                        }
+                        break
                     }
-                    documentScore = 1.0 / max(0.01, minimumDocumentDescriptionDistance)
                 }
                 // MARK: Document Title
                 let documentTitleWords = self.tokenize(text: document.title, unit: .word)
-                let (minimumDocumentTitleDistance, highestDocumentTitleLevenshteinMatchPercentage) = performStringSimilarity(between: query.lowercased(), and: documentTitleWords, wordEmbedding: wordEmbedding)
-                if minimumDocumentTitleDistance <= self.KEYWORD_THRESHOLD || highestDocumentTitleLevenshteinMatchPercentage >= lexicalThreshold {
-                    log.info("Found query in title of document: \(document.title) [\(document.documentType.rawValue)]")
-                    if !searchResult.documents.contains(document) {
+                let (similarityResult, similarWord, searchType) = performStringSimilarity(between: query.lowercased(), and: documentTitleWords, wordEmbedding: wordEmbedding)
+                switch searchType {
+                case .Lexical:
+                    tempScore = 1.0 * max(0.01, similarityResult)
+                    if similarityResult >= lexicalThreshold {
+                        searchResult.documents.append(document)
+                        foundInDocuments = true
+                        log.info("[Lexical] Document '\(document.title)' Title ('\(similarWord)') = \(similarityResult)")
+                    }
+                    break
+                case .Semantic:
+                    tempScore = 1.0 / max(0.01, similarityResult)
+                    if similarityResult <= KEYWORD_THRESHOLD {
+                        log.info("[Semantic] Document '\(document.title)' Title ('\(similarWord)') = \(similarityResult)")
                         searchResult.documents.append(document)
                         foundInDocuments = true
                     }
+                    break
                 }
-                tempScore = 1.0 / max(0.01, minimumDocumentTitleDistance)
                 documentScore = tempScore > documentScore ? tempScore : documentScore
                 // MARK: Document entities - to adjust
-                if let tagmeDocument = document as? TAGMEDocument, let categories = tagmeDocument.categories {
+                /*if let tagmeDocument = document as? TAGMEDocument, let categories = tagmeDocument.categories {
                     if queryEntityType == NLTag.placeName.rawValue {
                         var foundLocation = false
                         for category in categories {
@@ -357,9 +417,10 @@ class SemanticSearch {
                             }
                         }
                     }
-                }
+                }*/
             }
             searchResult.documentScore = documentScore
+            searchResult.documents = Array(Set(searchResult.documents))
             if foundInDocuments && !isMatch {
                 searchResult.note = note
             }
@@ -384,14 +445,31 @@ class SemanticSearch {
             // MARK: Drawings search
             if !isMatch {
                 for term in queryNouns {
-                    let (minimumDrawingDistance, highestDrawingLevenshteinMatchPercentage) = performStringSimilarity(between: term.1.lowercased(), and: note.1.getDrawingLabels(), wordEmbedding: wordEmbedding)
-                    if minimumDrawingDistance <= self.DRAWING_THRESHOLD || highestDrawingLevenshteinMatchPercentage >= lexicalThreshold {
-                        log.info("Drawing similarity threshold achieved.")
-                        if !isMatch {
-                            searchResult.note = note
-                            isMatch = true
-                            break
+                    let (similarityResult, similarWord, searchType) = performStringSimilarity(between: term.1.lowercased(), and: note.1.getDrawingLabels(), wordEmbedding: wordEmbedding)
+                    switch searchType {
+                    case .Lexical:
+                        searchResult.drawingScore = 1.0 * max(0.01, similarityResult)
+                        if similarityResult >= lexicalThreshold {
+                            log.info("[Lexical] Drawing ('\(similarWord)') = \(similarityResult)")
+                            if !isMatch {
+                                searchResult.note = note
+                                isMatch = true
+                            }
                         }
+                        break
+                    case .Semantic:
+                        searchResult.drawingScore = 1.0 / max(0.01, similarityResult)
+                        if similarityResult <= DRAWING_THRESHOLD {
+                            log.info("[Semantic] Drawing ('\(similarWord)') = \(similarityResult)")
+                            if !isMatch {
+                                searchResult.note = note
+                                isMatch = true
+                            }
+                        }
+                        break
+                    }
+                    if isMatch {
+                        break
                     }
                 }
             }

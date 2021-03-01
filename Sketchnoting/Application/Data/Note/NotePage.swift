@@ -14,8 +14,9 @@ class NotePage: Codable {
     var canvasDrawing: PKDrawing
     private var drawings: [NoteDrawing]
     private var recognizedText: SKRecognizedText
-    var backdropPDFData: Data?
+    private var backdropPDFData: Data?
     var pdfScale: Float = 1.0
+    private var pdfParsedText: String?
     private var layers: [NoteLayer]
     
     private enum LayerTypeKey : String, CodingKey {
@@ -36,6 +37,7 @@ class NotePage: Codable {
         case recognizedText = "recognizedText"
         case backdropPDFData = "backdropPDFData"
         case pdfScale = "pdfScale"
+        case pdfParsedText = "pdfParsedText"
         case layers = "layers"
     }
     func encode(to encoder: Encoder) throws {
@@ -50,6 +52,7 @@ class NotePage: Codable {
         try container.encode(recognizedText, forKey: .recognizedText)
         try container.encode(backdropPDFData, forKey: .backdropPDFData)
         try container.encode(pdfScale, forKey: .pdfScale)
+        try? container.encode(pdfParsedText, forKey: .pdfParsedText)
     }
     required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -81,6 +84,7 @@ class NotePage: Codable {
         recognizedText = (try? container.decode(SKRecognizedText.self, forKey: .recognizedText)) ?? SKRecognizedText()
         backdropPDFData = try? container.decode(Data.self, forKey: .backdropPDFData)
         pdfScale = try container.decode(Float.self, forKey: .pdfScale)
+        pdfParsedText = try? container.decode(String.self, forKey: .pdfParsedText)
     }
     
     func clearCanvas() {
@@ -195,6 +199,8 @@ class NotePage: Codable {
         return self.recognizedText
     }
     
+    // MARK: Helper functions
+    
     public func getText(option: NoteTextViewOption = .FullText, parse: Bool = false) -> String {
         var text: String = ""
         switch option {
@@ -209,13 +215,23 @@ class NotePage: Codable {
             text += getRecognizedText().getText()
         case .PDFText:
             if parse {
-                text += TextParser.shared.clean(text: getPDFText())
+                if let pdfParsedText = pdfParsedText {
+                    text += pdfParsedText
+                }
+                else {
+                    updateParsedPDFText()
+                    text += pdfParsedText!
+                }
             }
             else {
                 text += getPDFText()
             }
         }
         return text
+    }
+    
+    private func updateParsedPDFText() {
+        pdfParsedText = TextParser.shared.clean(text: getPDFText())
     }
     
     private func getPDFText() -> String {
@@ -268,5 +284,14 @@ class NotePage: Codable {
             }
         }
         return nil
+    }
+    
+    func set(pdfDocument: Data?) {
+        self.backdropPDFData = pdfDocument
+        updateParsedPDFText()
+    }
+    
+    func getPDFData() -> Data? {
+        return backdropPDFData
     }
 }
