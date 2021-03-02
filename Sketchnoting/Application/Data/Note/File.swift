@@ -22,7 +22,7 @@ class File: Codable, Equatable, Hashable {
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(name, forKey: .name)
-        log.info("File " + self.name + " encoded.")
+        // log.info("File " + self.name + " encoded.")
     }
     required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -30,7 +30,7 @@ class File: Codable, Equatable, Hashable {
         if name.isEmpty {
             name = "Untitled"
         }
-        log.info("File " + self.name + " decoded.")
+        // log.info("File " + self.name + " decoded.")
     }
     
     //

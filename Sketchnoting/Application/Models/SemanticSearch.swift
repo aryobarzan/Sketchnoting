@@ -181,7 +181,7 @@ class SemanticSearch {
         log.info("Performing semantic search on query of type: \(queryType.rawValue)")
         var lexicalThreshold = 1.0
         if expandedSearch {
-            lexicalThreshold = 0.75
+            lexicalThreshold = 0.90
         }
         // MARK: Keyword
         if queryType == .Keyword {
@@ -218,25 +218,23 @@ class SemanticSearch {
     
     private func performStringSimilarity(between query: String, and words: [String], wordEmbedding: NLEmbedding) -> (Double, String, SearchType) {
         var minimumDistance = 999.0 // lower is better
-        var levenshteinMatchPercentage = 0.0 // higher is better
+        var levenshteinRatio = 0.0 // higher is better
         var similarWord = ""
         let query = query.lowercased()
         for word in words {
+            // Semantic
             let distance = wordEmbedding.distance(between: query, and: word.lowercased())
             if distance == 2.0 { // Meaning: word is unknown to word embedder (has no vector representation)
+                // Lexical
                 let levenshteinDistance = query.levenshtein(word.lowercased())
-                log.info("(DEBUG) Levenshtein distance - \(word) - \(levenshteinDistance) ")
-                if levenshteinDistance == 0 {
-                    levenshteinMatchPercentage = 1.0
+                let lengthsSum = Double(query.count + word.count)
+                let temp: Double = (lengthsSum - Double(levenshteinDistance))/lengthsSum
+                if temp > levenshteinRatio {
+                    levenshteinRatio = temp
                     similarWord = word
-                    break
                 }
-                else {
-                    let temp = 1.0 / Double(levenshteinDistance)
-                    if temp > levenshteinMatchPercentage {
-                        levenshteinMatchPercentage = temp
-                        similarWord = word
-                    }
+                if levenshteinRatio == 1.0 { // Exact match found
+                    break
                 }
             }
             else if distance < minimumDistance {
@@ -244,9 +242,11 @@ class SemanticSearch {
                 similarWord = word
             }
         }
+        // No semantic result, hence return lexical similarity
         if minimumDistance >= 2.0 {
-            return (levenshteinMatchPercentage, similarWord, SearchType.Lexical)
+            return (levenshteinRatio, similarWord, SearchType.Lexical)
         }
+        // Semantic result is returned
         else {
             return (minimumDistance, similarWord, SearchType.Semantic)
         }
@@ -254,27 +254,27 @@ class SemanticSearch {
     
     private func performStringSimilarity(between query: String, and sentences: [String], sentenceEmbedding: NLEmbedding) -> (Double, Double) {
         var minimumDistance = 999.0
-        var levenshteinMatchPercentage = 0.0
+        var levenshteinRatio = 0.0
+        var similarSentence = ""
         for sentence in sentences {
             let distance = sentenceEmbedding.distance(between: query.lowercased(), and: sentence.lowercased())
             if distance == 2.0 { // Meaning: sentence is unknown to sentence embedder (has no vector representation)
                 let levenshteinDistance = query.lowercased().levenshtein(sentence.lowercased())
-                if levenshteinDistance == 0 {
-                    levenshteinMatchPercentage = 1.0
-                    break
+                let lengthsSum = Double(query.count + sentence.count)
+                let temp: Double = (lengthsSum - Double(levenshteinDistance))/lengthsSum
+                if temp > levenshteinRatio {
+                    levenshteinRatio = temp
+                    similarSentence = sentence
                 }
-                else {
-                    let temp = 1.0 / Double(levenshteinDistance)
-                    if temp > levenshteinMatchPercentage {
-                        levenshteinMatchPercentage = temp
-                    }
+                if levenshteinRatio == 1.0 { // Exact match found
+                    break
                 }
             }
             if distance < minimumDistance {
                 minimumDistance = distance
             }
         }
-        return (minimumDistance, levenshteinMatchPercentage)
+        return (minimumDistance, levenshteinRatio)
     }
     
     private func searchKeyword(query: String, in note: (URL, Note), lexicalThreshold: Double = 1.0, queryEntityType: String) -> SearchResult {

@@ -113,8 +113,7 @@ class Note: File, DocumentDelegate {
                 }
             }
         } catch {
-            log.error("Decoding a note's documents failed.")
-            log.error(error)
+            log.error("Decoding a note's documents failed: \(error)")
         }
         documents = docs
         

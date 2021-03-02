@@ -608,8 +608,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         }
     }
     // ------
-    
-    
     private func conceptHighlightExists(new: CGRect) -> UIView? {
         for (view, _) in self.conceptHighlights {
             if view.frame == new {
@@ -766,7 +764,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     func annotateText(text: String) {
         self.clearConceptHighlights()
         
-        
         connectivity = Connectivity()
         connectivity!.framework = .network
         connectivity!.checkConnectivity { connectivity in
@@ -816,7 +813,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         }
     }
     
-    
     private func showBookshelf() {
         bookshelfButton.tintColor = .white
         bookshelfButton.backgroundColor = self.view.tintColor
@@ -845,15 +841,21 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     }
     
     var pageChanged = false
+    var noteIsLoaded = false
     func canvasViewDrawingDidChange(_ canvasView: PKCanvasView) {
-        self.resetHandwritingRecognition = true
-        startRecognitionTimer()
-        if pageChanged {
-            pageChanged = false
+        if noteIsLoaded {
+            self.resetHandwritingRecognition = true
+            startRecognitionTimer()
+            if pageChanged {
+                pageChanged = false
+            }
+            else {
+                note.1.getCurrentPage().canvasDrawing = self.canvasView.drawing
+                self.startSaveTimer()
+            }
         }
         else {
-            note.1.getCurrentPage().canvasDrawing = self.canvasView.drawing
-            self.startSaveTimer()
+            noteIsLoaded = true
         }
     }
     
