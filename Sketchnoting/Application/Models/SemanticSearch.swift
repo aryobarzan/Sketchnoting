@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 import NaturalLanguage
 import MLKitEntityExtraction
 
@@ -112,22 +113,25 @@ class SemanticSearch {
         return -1.0
     }
     
-    func extractEntities(text: String, entityCompletion: (DateTimeEntity?) -> Void) {
+    func extractEntities(text: String, allowed: [EntityType] = [EntityType.dateTime], entityCompletion: (([Entity]?) -> Void)?) {
         self.dateTimeEntity = nil
         let params = EntityExtractionParams()
         params.referenceTime = Date();
         params.referenceTimeZone = TimeZone(identifier: "GMT");
         params.preferredLocale = Locale(identifier: "en-US");
-        params.typesFilter = Set([EntityType.address, EntityType.dateTime])
-        
+        params.typesFilter = Set(allowed)
         entityExtractor.annotateText(
             text,
             params: params) { result, error in
             if error == nil {
+                var allEntities = [Entity]()
                 if let annotations = result {
                     for annotation in annotations {
                         let entities = annotation.entities
                         for entity in entities {
+                            if allowed.contains(entity.entityType) {
+                                allEntities.append(entity)
+                            }
                             switch entity.entityType {
                             case EntityType.dateTime:
                                 guard let dateTimeEntity = entity.dateTimeEntity else {
@@ -139,11 +143,18 @@ class SemanticSearch {
                                 log.info("DateTime: \(dateTimeEntity.dateTime)")
                                 self.dateTimeEntity = dateTimeEntity
                             default:
-                                log.info("Entity: \(entity)");
+                                log.info("Entity: \(entity)")
+                                break
                             }
                         }
                     }
                 }
+                if let entityCompletion = entityCompletion {
+                    entityCompletion(allEntities)
+                }
+            }
+            else {
+                log.error("Entity extraction failed: \(error.debugDescription)")
             }
         }
     }
@@ -158,21 +169,55 @@ class SemanticSearch {
         return Int64(Date().timeIntervalSince1970 * 1000)
     }
     
+    private func process(query: String) -> String {
+        let queryWords = tokenize(text: query, unit: .word)
+        // Spellcheck & lowercase {
+        /*let spellchecker = UITextChecker()
+        for i in 0..<queryWords.count {
+            let range = NSRange(location: 0, length: queryWords[i].utf16.count)
+            let guesses = spellchecker.guesses(forWordRange: range, in: queryWords[i], language: "en")
+            if let guesses = guesses {
+                if !guesses.isEmpty {
+                    queryWords[i] = guesses[0]
+                }
+            }
+        }*/
+        if queryWords.count > 1 { // Longer query
+            var processedQuery = ""
+            let allowed = [NLTag.noun.rawValue, NLTag.number.rawValue, NLTag.adjective.rawValue, NLTag.otherWord.rawValue]
+            let partsOfSpeech = tag(text: queryWords.joined(separator: " "), scheme: .lexicalClass)
+            for i in 0..<partsOfSpeech.count {
+                if allowed.contains(partsOfSpeech[i].1) {
+                    processedQuery.append("\(partsOfSpeech[i].0.lowercased()) ")
+                }
+            }
+            processedQuery = processedQuery.trimmingCharacters(in: .whitespaces)
+            return processedQuery
+        }
+        else if queryWords.count == 1 { // Keyword query
+            return lemmatize(text: queryWords[0].lowercased())
+        }
+        return queryWords.joined(separator: " ")
+    }
+    
     public func search(query: String, notes: [(URL, Note)], expandedSearch: Bool = true, searchHandler: ((SearchResult) -> Void)?) {
         // let queryWords = tokenize(text: query, unit: .word)
-        let queryPartsOfSpeech = tag(text: query, scheme: .lexicalClass)
+        // let queryPartsOfSpeech = tag(text: query, scheme: .lexicalClass)
         // let queryEntities = tag(text: query, scheme: .nameType) // PlaceName, PersonName, OrganizationName
         // Extract nouns from the query and retain their lemmatized form:
-        var queryNouns = [String]()
+        /* var queryNouns = [String]()
         for term in queryPartsOfSpeech {
             if term.1 == "Noun" { // || term.1 == "Other"
                 queryNouns.append(lemmatize(text: term.0))
             }
-        }
+        }*/
         // Keyword, Clause, Extended Clause or Sentence
-        let queryType = checkPhraseType(queryPartsOfSpeech: queryPartsOfSpeech)
-        log.info("Performing search on query of type: \(queryType.rawValue)")
+        //let queryType = checkPhraseType(queryPartsOfSpeech: queryPartsOfSpeech)
+        // log.info("Performing search on query of type: \(queryType.rawValue)")
         // Expanded Search means a lower threshold for the lexical search, i.e. more tolerant to minor typos
+        log.info("Original query: \(query)")
+        let query = process(query: query)
+        log.info("Processed query: \(query)")
         let lexicalThreshold = expandedSearch ? 0.9 : 1.0
         
         // Start search process, going through each note

@@ -14,6 +14,9 @@ class TextParser {
     static let shared = TextParser()
     private init(){}
     
+    let dispatchQueueEntityExtraction = DispatchQueue(label: "Entity Extractor")
+    let dispatchGroup = DispatchGroup()
+    
     func clean(text: String) -> String {
         let spellchecker = UITextChecker()
 
@@ -68,6 +71,21 @@ class TextParser {
                 validSentences.removeLast()
                 continue
             }
+            
+            /*self.dispatchGroup.enter()
+            log.info(sentence)
+            SemanticSearch.shared.extractEntities(text: sentence, allowed: [.address], entityCompletion: { entities in
+                if entities != nil && !entities!.isEmpty {
+                    log.info("Invalid entity type found - \(sentence)")
+                    validSentences.removeLast()
+                }
+                else {
+                    log.info("VALID")
+                }
+                self.dispatchGroup.leave()
+            })
+            _ = self.dispatchGroup.wait(timeout: .distantFuture)*/
+            
         }
         // Remove extra whitespaces
         var finalText = validSentences.joined(separator: " ")
