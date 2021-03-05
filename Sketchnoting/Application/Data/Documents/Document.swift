@@ -185,5 +185,4 @@ class Document: Codable, Visitable, Equatable, Hashable {
         hasher.combine(title)
         hasher.combine(documentType)
     }
-    
 }

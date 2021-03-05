@@ -8,14 +8,12 @@
 
 import UIKit
 import NaturalLanguage
+import SwiftCoroutine
 
 class TextParser {
     
     static let shared = TextParser()
     private init(){}
-    
-    let dispatchQueueEntityExtraction = DispatchQueue(label: "Entity Extractor")
-    let dispatchGroup = DispatchGroup()
     
     func clean(text: String) -> String {
         let spellchecker = UITextChecker()
@@ -49,15 +47,17 @@ class TextParser {
                 continue
             }
             // 3
+            var invalid = false
             let invalidCharacters = ["()", "[]", "{", "}"] //";"
             for invalidCharacter in invalidCharacters {
                 if sentence.contains(invalidCharacter) {
+                    invalid = true
                     validSentences.removeLast()
                     log.error("Invalid character '\(invalidCharacter)' - \(sentence)")
                     break
                 }
             }
-            if !validSentences.contains(sentence) {
+            if invalid {
                 continue
             }
             // 4
@@ -71,29 +71,10 @@ class TextParser {
                 validSentences.removeLast()
                 continue
             }
-            
-            /*self.dispatchGroup.enter()
-            log.info(sentence)
-            SemanticSearch.shared.extractEntities(text: sentence, allowed: [.address], entityCompletion: { entities in
-                if entities != nil && !entities!.isEmpty {
-                    log.info("Invalid entity type found - \(sentence)")
-                    validSentences.removeLast()
-                }
-                else {
-                    log.info("VALID")
-                }
-                self.dispatchGroup.leave()
-            })
-            _ = self.dispatchGroup.wait(timeout: .distantFuture)*/
-            
         }
         // Remove extra whitespaces
-        var finalText = validSentences.joined(separator: " ")
-        finalText = finalText.replacingOccurrences(of: "[\\s\n]+", with: " ", options: .regularExpression, range: nil)
-        /*for i in 0..<validSentences.count {
-            validSentences[i] = validSentences[i].replacingOccurrences(of: "[\\s\n]+", with: " ", options: .regularExpression, range: nil)
-        }*/
-        log.info("Out of \(sentences.count) sentences, \(validSentences.count) are valid.")
-        return finalText //validSentences.joined(separator: " ")
+        let finalText = validSentences.joined(separator: " ").replacingOccurrences(of: "[\\s\n]+", with: " ", options: .regularExpression, range: nil)
+        log.info("Out of \(Int(sentences.count)) sentences, \(Int(validSentences.count)) are valid.")
+        return finalText
     }
 }

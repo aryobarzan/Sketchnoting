@@ -54,7 +54,6 @@ class NoteTextViewController: UIViewController {
         }
         if parsingSegmentedControl.selectedSegmentIndex == 1 {
             text = TextParser.shared.clean(text: text)
-            
         }
         return text
     }

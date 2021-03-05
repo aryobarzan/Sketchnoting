@@ -7,17 +7,16 @@
 //
 
 import UIKit
+import NVActivityIndicatorView
 
 class SearchViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UITextFieldDelegate, DrawingSearchDelegate {
     
-    @IBOutlet weak var searchModeSegmentedControl: UISegmentedControl!
+    @IBOutlet weak var activityIndicator: NVActivityIndicatorView!
     @IBOutlet weak var searchTextField: UITextField!
     @IBOutlet weak var searchButton: UIButton!
     @IBOutlet weak var drawingSearchButton: UIButton!
-    @IBOutlet weak var searchTypeSegmentedControl: UISegmentedControl!
     @IBOutlet weak var expandedSearchLabel: UILabel!
     @IBOutlet weak var expandedSearchSwitch: UISwitch!
-    @IBOutlet weak var filtersCollectionView: UICollectionView!
     @IBOutlet weak var notesCollectionView: UICollectionView!
     @IBOutlet weak var contentStackView: UIStackView!
     
@@ -36,51 +35,20 @@ class SearchViewController: UIViewController, UICollectionViewDelegate, UICollec
         
         searchButton.layer.cornerRadius = 14
 
-        filtersCollectionView.delegate = self
-        filtersCollectionView.dataSource = self
         notesCollectionView.delegate = self
         notesCollectionView.dataSource = self
     }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         notesCollectionView.register(UINib(nibName: "NoteCollectionViewCell", bundle: nil), forCellWithReuseIdentifier: "NoteCollectionViewCell")
-        filtersCollectionView.reloadData()
         notesCollectionView.reloadData()
     }
     
-    @IBAction func searchModeSegmentChanged(_ sender: UISegmentedControl) {
-        // Clear all search results first
-        searchFilters.removeAll()
-        filtersCollectionView.reloadData()
-        clearResults()
-        // Lexical Search
-        if sender.selectedSegmentIndex == 0 {
-            searchTypeSegmentedControl.isHidden = false
-            filtersCollectionView.isHidden = false
-            expandedSearchLabel.isHidden = true
-            expandedSearchSwitch.isHidden = true
-        }
-        // Semantic Search
-        else {
-            searchTypeSegmentedControl.isHidden = true
-            filtersCollectionView.isHidden = true
-            expandedSearchLabel.isHidden = false
-            expandedSearchSwitch.isHidden = false
-        }
-    }
     @IBAction func searchTapped(_ sender: UIButton) {
         performSearch()
         searchTextField.resignFirstResponder()
     }
-    @IBAction func searchTypeSegmentChanged(_ sender: UISegmentedControl) {
-        switch sender.selectedSegmentIndex {
-            case 0: self.currentSearchType = .All
-            case 1: self.currentSearchType = .Text
-            case 2: self.currentSearchType = .Document
-            case 3: self.currentSearchType = .Drawing
-            default: self.currentSearchType = .All
-        }
-    }
+  
     @IBAction func drawingSearchTapped(_ sender: UIButton) {
         let drawingSearchVC = UIStoryboard(name: "Main", bundle: Bundle.main).instantiateViewController(withIdentifier: "DrawingSearchViewController") as? DrawingSearchViewController
         if let drawingSearchVC = drawingSearchVC {
@@ -91,7 +59,7 @@ class SearchViewController: UIViewController, UICollectionViewDelegate, UICollec
         }
     }
     func drawingSearchRecognized(label: String) {
-        createSearchFilter(term: label, type: .Drawing)
+        // TODO
         self.updateResults()
     }
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
@@ -116,49 +84,25 @@ class SearchViewController: UIViewController, UICollectionViewDelegate, UICollec
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        if collectionView == filtersCollectionView {
-            return searchFilters.count
-        }
-        else {
-            return notes.count
-        }
+        return notes.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        if collectionView == filtersCollectionView {
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "SearchFilterCollectionViewCell", for: indexPath as IndexPath) as! SearchFilterCollectionViewCell
-            cell.setFilter(filter: searchFilters[indexPath.item])
-            return cell
-        }
-        else {
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "NoteCollectionViewCell", for: indexPath as IndexPath) as! NoteCollectionViewCell
-            cell.setFile(url: notes[indexPath.item].0 ,file: notes[indexPath.item].1)
-            return cell
-        }
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "NoteCollectionViewCell", for: indexPath as IndexPath) as! NoteCollectionViewCell
+        cell.setFile(url: notes[indexPath.item].0 ,file: notes[indexPath.item].1)
+        return cell
     }
     
     // MARK: UICollectionViewDelegate
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        if collectionView == filtersCollectionView {
-            searchFilters.remove(at: indexPath.item)
-            filtersCollectionView.reloadData()
-            self.updateResults()
-        }
-        else {
-            self.openNote(url: self.notes[indexPath.item].0, note: self.notes[indexPath.item].1)
-            log.info("Note tapped.")
-        }
+        self.openNote(url: self.notes[indexPath.item].0, note: self.notes[indexPath.item].1)
+        log.info("Note tapped.")
     }
     
     func collectionView(_ collectionView: UICollectionView,
                         layout collectionViewLayout: UICollectionViewLayout,
                         sizeForItemAt indexPath: IndexPath) -> CGSize {
-        if collectionView == filtersCollectionView {
-            return CGSize(width: CGFloat(117), height: CGFloat(21))
-        }
-        else {
-            return CGSize(width: CGFloat(200), height: CGFloat(300))
-        }
+        return CGSize(width: CGFloat(200), height: CGFloat(300))
     }
     
     //
@@ -172,38 +116,17 @@ class SearchViewController: UIViewController, UICollectionViewDelegate, UICollec
     private func performSearch() {
         if let searchTextFieldText = searchTextField.text {
             if !searchTextFieldText.isEmpty {
-                if searchModeSegmentedControl.selectedSegmentIndex == 0 {
-                    self.performLexicalSearch()
-                }
-                else {
-                    self.performSemanticSearch()
-                }
+                self.performSemanticSearch()
             }
         }
     }
-    private func performLexicalSearch() {
-        createSearchFilter(term: searchTextField.text!, type: self.currentSearchType)
-        clearResults()
-        self.updateResults()
-    }
     
     private func performSemanticSearch() {
-        // Missing - This is currently only for testing
         let query = searchTextField.text!.trimmingCharacters(in: .whitespacesAndNewlines)
-        let tokens = SemanticSearch.shared.tokenize(text: query, unit: .word)
-        for token in tokens {
-            log.info(token)
-        }
-        let partsOfSpeechTags = SemanticSearch.shared.tag(text: query)
-        for tag in partsOfSpeechTags {
-            log.info("\(tag.0) - \(tag.1)")
-        }
-        let entities = SemanticSearch.shared.tag(text: query, scheme: .nameType)
-        for entity in entities {
-            log.info("\(entity.0) - \(entity.1)")
-        }
         // Search
         clearResults()
+        activityIndicator.isHidden = false
+        activityIndicator.startAnimating()
         SemanticSearch.shared.search(query: query, notes: NeoLibrary.getNotes(), expandedSearch: expandedSearchSwitch.isOn, searchHandler: {searchResult in
             log.info("Search Result - \(searchResult.note == nil ? "Note not a match" : searchResult.note!.1.getName()) / \(searchResult.documents.count) Documents / \(searchResult.personDocuments.count) Person-Documents / \(searchResult.locationDocuments.count) Location-Documents")
             if searchResult.note != nil {
@@ -219,6 +142,10 @@ class SearchViewController: UIViewController, UICollectionViewDelegate, UICollec
                     self.searchDocumentsCards.append(searchDocumentsCard)
                 }
             }
+        }, searchFinishHandler: {
+            DispatchQueue.main.async {
+                self.activityIndicator.isHidden = true
+            }
         })
     }
     
@@ -227,15 +154,6 @@ class SearchViewController: UIViewController, UICollectionViewDelegate, UICollec
             card.removeFromSuperview()
         }
         searchDocumentsCards = [SearchDocumentsCard]()
-    }
-    
-    private func createSearchFilter(term: String, type: SearchType) {
-        let termTrimmed = term.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-        let filter = SearchFilter(term: termTrimmed, type: type)
-        if !searchFilters.contains(filter) {
-            searchFilters.append(filter)
-            filtersCollectionView.reloadData()
-        }
     }
     
     private func updateResults() {

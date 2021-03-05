@@ -1171,24 +1171,24 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     
     func previousPage() {
         if note.1.hasPreviousPage() {
-            self.view.makeToast("Page \(note.1.activePageIndex)/\(note.1.pages.count)", duration: 1.0, position: .center)
+            self.view.makeToast("Page \(note.1.activePageIndex)/\(Int(note.1.pages.count))", duration: 1.0, position: .center)
             self.pageChanged = true
+            note.1.previousPage()
+            self.load(page: note.1.getCurrentPage())
             if self.saveTimer != nil {
                 self.saveCurrentPage()
             }
-            note.1.previousPage()
-            self.load(page: note.1.getCurrentPage())
         }
     }
     func nextPage() {
         if note.1.hasNextPage() {
-            self.view.makeToast("Page \(note.1.activePageIndex+2)/\(note.1.pages.count)", duration: 1.0, position: .center)
+            self.view.makeToast("Page \(note.1.activePageIndex+2)/\(Int(note.1.pages.count))", duration: 1.0, position: .center)
             self.pageChanged = true
+            note.1.nextPage()
+            self.load(page: note.1.getCurrentPage())
             if self.saveTimer != nil {
                 self.saveCurrentPage()
             }
-            note.1.nextPage()
-            self.load(page: note.1.getCurrentPage())
         }
     }
     

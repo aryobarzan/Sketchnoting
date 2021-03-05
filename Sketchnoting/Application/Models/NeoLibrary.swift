@@ -650,4 +650,90 @@ class NeoLibrary {
         }
         return Date()
     }
+    
+    // MARK: Document storage
+    private static var documentsIndex: [String : [String]] = [String : [String]]()
+    private static func getDocumentsURL(for type: DocumentType) -> URL {
+        let documentsPath = self.getDocumentsURL()
+        let documentsURL = documentsPath.appendingPathComponent("Documents")
+        let documentTypeFolderURL = documentsURL.appendingPathComponent(type.rawValue)
+        do
+        {
+            if !FileManager.default.fileExists(atPath: documentsURL.path) {
+                try FileManager.default.createDirectory(atPath: documentsURL.path, withIntermediateDirectories: true, attributes: nil)
+            }
+            if !FileManager.default.fileExists(atPath: documentTypeFolderURL.path) {
+                try FileManager.default.createDirectory(atPath: documentTypeFolderURL.path, withIntermediateDirectories: true, attributes: nil)
+            }
+        }
+        catch let error as NSError
+        {
+            log.error("Documents folder could not be created: \(error.debugDescription)")
+        }
+        return documentTypeFolderURL
+    }
+    public static func store(document: Document, for note: Note?) {
+        let documentURL = getDocumentsURL(for: document.documentType).appendingPathComponent(document.title)
+        neoLibraryQueue.async {
+            let encoder = JSONEncoder()
+            if let encoded = try? encoder.encode(document) {
+                do
+                {
+                    try encoded.write(to: documentURL)
+                    log.info("[\(document.documentType.rawValue)] Document \(document.title) stored.")
+                    if let note = note {
+                        if documentsIndex[note.getID()] == nil {
+                            documentsIndex[note.getID()] = [String]()
+                        }
+                        documentsIndex[note.getID()]!.append(documentURL.path)
+                    }
+                }
+                catch let error as NSError
+                {
+                    log.error("[\(document.documentType.rawValue)] Document \(document.title) could not be stored: \(error)")
+                }
+            }
+        }
+    }
+    private static func loadDocument(url: URL) -> Document? {
+        if FileManager.default.fileExists(atPath: url.path) {
+            do {
+                let decoder = JSONDecoder()
+                let data = try Data(contentsOf: url)
+                if let type = DocumentType(rawValue: url.deletingLastPathComponent().lastPathComponent) {
+                    switch type {
+                    case .TAGME:
+                        return try decoder.decode(TAGMEDocument.self, from: data)
+                    case .WAT:
+                        return try decoder.decode(WATDocument.self, from: data)
+                    case .BioPortal:
+                        return try decoder.decode(BioPortalDocument.self, from: data)
+                    case .Chemistry:
+                        return try decoder.decode(CHEBIDocument.self, from: data)
+                    case .ALMAAR:
+                        return try decoder.decode(ARDocument.self, from: data)
+                    case .Other:
+                        return try decoder.decode(Document.self, from: data)
+                    }
+                }
+            } catch {
+                log.error("Document failed to load from disk: \(url.path)")
+            }
+        }
+        return nil
+    }
+    public static func getDocuments(for note: Note?) -> [Document] {
+        var documents = [Document]()
+        if let note = note {
+            if let documentPaths = documentsIndex[note.getID()] {
+                for documentPath in documentPaths {
+                    if let document = loadDocument(url: URL(fileURLWithPath: documentPath)) {
+                        documents.append(document)
+                    }
+                }
+            }
+        }
+        // Missing - load all documents
+        return documents
+    }
 }

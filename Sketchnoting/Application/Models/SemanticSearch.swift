@@ -10,6 +10,7 @@ import Foundation
 import UIKit
 import NaturalLanguage
 import MLKitEntityExtraction
+import SwiftCoroutine
 
 class SemanticSearch {
     
@@ -119,7 +120,7 @@ class SemanticSearch {
         params.referenceTime = Date();
         params.referenceTimeZone = TimeZone(identifier: "GMT");
         params.preferredLocale = Locale(identifier: "en-US");
-        params.typesFilter = Set(allowed)
+        //params.typesFilter = Set(allowed)
         entityExtractor.annotateText(
             text,
             params: params) { result, error in
@@ -155,6 +156,9 @@ class SemanticSearch {
             }
             else {
                 log.error("Entity extraction failed: \(error.debugDescription)")
+                if let entityCompletion = entityCompletion {
+                    entityCompletion(nil)
+                }
             }
         }
     }
@@ -184,8 +188,23 @@ class SemanticSearch {
         }*/
         if queryWords.count > 1 { // Longer query
             var processedQuery = ""
-            let allowed = [NLTag.noun.rawValue, NLTag.number.rawValue, NLTag.adjective.rawValue, NLTag.otherWord.rawValue]
+            var allowed = [NLTag.noun.rawValue, NLTag.number.rawValue, NLTag.adjective.rawValue, NLTag.otherWord.rawValue]
             let partsOfSpeech = tag(text: queryWords.joined(separator: " "), scheme: .lexicalClass)
+            var wordsDebug = ""
+            var tagsDebug = ""
+            for p in partsOfSpeech {
+                wordsDebug.append(p.0 + " ")
+                tagsDebug.append(p.1 + " ")
+            }
+            log.info(wordsDebug)
+            log.info(tagsDebug)
+            let phraseType = checkPhraseType(queryPartsOfSpeech: partsOfSpeech)
+            if phraseType == .Sentence {
+                let isQuestion = isSentenceQuestion(text: query)
+                if !isQuestion {
+                    allowed.append(NLTag.verb.rawValue)
+                }
+            }
             for i in 0..<partsOfSpeech.count {
                 if allowed.contains(partsOfSpeech[i].1) {
                     processedQuery.append("\(partsOfSpeech[i].0.lowercased()) ")
@@ -200,7 +219,7 @@ class SemanticSearch {
         return queryWords.joined(separator: " ")
     }
     
-    public func search(query: String, notes: [(URL, Note)], expandedSearch: Bool = true, searchHandler: ((SearchResult) -> Void)?) {
+    public func search(query: String, notes: [(URL, Note)], expandedSearch: Bool = true, searchHandler: ((SearchResult) -> Void)?, searchFinishHandler: (() -> Void)?) {
         // let queryWords = tokenize(text: query, unit: .word)
         // let queryPartsOfSpeech = tag(text: query, scheme: .lexicalClass)
         // let queryEntities = tag(text: query, scheme: .nameType) // PlaceName, PersonName, OrganizationName
@@ -333,6 +352,9 @@ class SemanticSearch {
         }
         queue.addBarrierBlock {
             log.info("Search complete.")
+            if let searchFinishHandler = searchFinishHandler {
+                searchFinishHandler()
+            }
         }
     }
     
@@ -454,6 +476,21 @@ class SemanticSearch {
         else {
             return PhraseType.Clause
         }
+    }
+    
+    func isSentenceQuestion(text: String) -> Bool {
+        let questionKeywords = ["who", "what", "where", "which", "when", "whose"]
+        let words = tokenize(text: text, unit: .word)
+        for word in words {
+            let word = lemmatize(text: word).lowercased()
+            if questionKeywords.contains(word) {
+                return true
+            }
+        }
+        if text.hasSuffix("?") {
+            return true
+        }
+        return false
     }
     
     // Maximal Consecutive Longest Common Subsequence starting at character 1
