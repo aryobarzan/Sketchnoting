@@ -25,9 +25,7 @@ class SemanticSearch {
         synonyms = wordEmbedding!.neighbors(for: "person", maximumCount: 5)
         for syn in synonyms {
             personSynonyms.append(syn.0.lowercased())
-        }
-        queue.maxConcurrentOperationCount = 4
-        
+        }        
         downloadEntityExtractorModel()
     }
     
