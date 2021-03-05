@@ -93,7 +93,7 @@ class RelatedNotesViewController: UIViewController, UICollectionViewDataSource, 
             self.delegate?.openRelatedNote(url: related.0, note: related.1)
         }))
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in
-                log.info("Not opening note.")
+                logger.info("Not opening note.")
         }))
         self.present(alert, animated: true, completion: nil)
     }

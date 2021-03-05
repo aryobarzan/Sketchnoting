@@ -23,7 +23,7 @@ class SKRecognizer {
     public static func recognize(canvasView: PKCanvasView, recognitionType: RecognitionType = .Text, handleFinish:@escaping ((_ success: Bool, _ param: String?)->())) {
         if !isInitialized() {
             initializeRecognizers()
-            log.error("Cannot recognize ink yet: recognizers are not initialized.")
+            logger.error("Cannot recognize ink yet: recognizers are not initialized.")
         }
         else {
             switch recognitionType {
@@ -69,10 +69,10 @@ class SKRecognizer {
                         completion: {
                             (result: DigitalInkRecognitionResult?, error: Error?) in
                             if let result = result, let candidate = result.candidates.first {
-                                log.info("Recognized: \(candidate.text)")
+                                logger.info("Recognized: \(candidate.text)")
                                 handleFinish(true, candidate.text)
                             } else {
-                                log.error(error.debugDescription)
+                                logger.error(error.debugDescription)
                                 handleFinish(false, nil)
                             }
                         })
@@ -98,10 +98,10 @@ class SKRecognizer {
                         completion: {
                             (result: DigitalInkRecognitionResult?, error: Error?) in
                             if let result = result, let candidate = result.candidates.first {
-                                log.info("Recognized Drawing: \(candidate.text)")
+                                logger.info("Recognized Drawing: \(candidate.text)")
                                 handleFinish(true, candidate.text)
                             } else {
-                                log.error(error.debugDescription)
+                                logger.error(error.debugDescription)
                                 handleFinish(false, nil)
                             }
                         })
@@ -114,7 +114,7 @@ class SKRecognizer {
     public static func recognizeText(pkStrokes: [PKStroke], handleFinish:@escaping ((_ success: Bool, _ param: SKRecognizedLine?, _ lineNumber: Int)->())) {
         if !isInitialized() {
             initializeRecognizers()
-            log.error("Cannot recognize ink yet: recognizers are not initialized.")
+            logger.error("Cannot recognize ink yet: recognizers are not initialized.")
             return
         }
         var strokesByLine = [[PKStroke]]()
@@ -155,7 +155,7 @@ class SKRecognizer {
                 strokesByLine[groupIndex!] = updatedGroup
             }
         }
-        log.info("Detected \(strokesByLine.count) line(s).")
+        logger.info("Detected \(strokesByLine.count) line(s).")
         var inks = [([PKStroke], Ink)]()
         for line in strokesByLine {
             if let ink = self.createInkFrom(pkStrokes: line) {
@@ -212,7 +212,7 @@ class SKRecognizer {
                                 if !currentWordStrokes.isEmpty {
                                     strokesByWord.append(currentWordStrokes)
                                 }
-                                log.info("(Iteration \(iterations)) Number of words segmented: \(strokesByWord.count)")
+                                logger.info("(Iteration \(iterations)) Number of words segmented: \(strokesByWord.count)")
                                 iterations += 1
                                 if bestStrokesByWordCount == -1 {
                                     bestStrokesByWord = strokesByWord
@@ -262,11 +262,11 @@ class SKRecognizer {
                             if inks[i].0.first != nil && inks[i].0.last != nil {
                                 let lineRenderBounds = CGRect(x: inks[i].0.first!.renderBounds.minX, y: inks[i].0.first!.renderBounds.minY, width: inks[i].0.last!.renderBounds.maxX - inks[i].0.first!.renderBounds.minX, height: lineHeight)
                                 let recognizedLine = SKRecognizedLine(text: result.candidates.first!.text, words: recognizedWords, renderBounds: lineRenderBounds)
-                                log.info("Recognized: \(candidate.text)")
+                                logger.info("Recognized: \(candidate.text)")
                                 handleFinish(true, recognizedLine, i)
                             }
                             else {
-                                log.error("Unknown error (1) when recognizing line of text.")
+                                logger.error("Unknown error (1) when recognizing line of text.")
                                 handleFinish(false, nil, -1)
                             }
                         }
@@ -274,7 +274,7 @@ class SKRecognizer {
                             handleFinish(false, nil, -1)
                         }
                     } else {
-                        log.error(error.debugDescription)
+                        logger.error(error.debugDescription)
                         handleFinish(false, nil, -1)
                     }
                 })
@@ -344,7 +344,7 @@ class SKRecognizer {
             })
             
         }
-        var ordered = segmentedStrokes.values.sorted(by: {word_1, word_2 in
+        let ordered = segmentedStrokes.values.sorted(by: {word_1, word_2 in
             return word_1[0].renderBounds.minX < word_2[0].renderBounds.minX
         })
         return ordered
@@ -364,7 +364,7 @@ class SKRecognizer {
     public static func recognizeNoteDrawing(noteDrawing: NoteDrawing, pkStrokes: [PKStroke], handleFinish:@escaping ((_ success: Bool, _ param: NoteDrawing?)->())) {
         if !isInitialized() {
             initializeRecognizers()
-            log.error("Cannot recognize ink yet: recognizers are not initialized.")
+            logger.error("Cannot recognize ink yet: recognizers are not initialized.")
             return
         }
         var strokes: [Stroke] = [Stroke]()
@@ -386,11 +386,11 @@ class SKRecognizer {
                 completion: {
                     (result: DigitalInkRecognitionResult?, error: Error?) in
                     if let result = result, let candidate = result.candidates.first {
-                        log.info("Recognized Drawing: \(candidate.text)")
+                        logger.info("Recognized Drawing: \(candidate.text)")
                         let updatedNoteDrawing = NoteDrawing(label: candidate.text, region: noteDrawing.getRegion())
                         handleFinish(true, updatedNoteDrawing)
                     } else {
-                        log.error(error.debugDescription)
+                        logger.error(error.debugDescription)
                         handleFinish(false, nil)
                     }
                 })
@@ -418,7 +418,7 @@ class SKRecognizer {
             let model = DigitalInkRecognitionModel.init(modelIdentifier: identifier)
             let modelManager = MLKitCommon.ModelManager.modelManager()
             if !modelManager.isModelDownloaded(model) {
-                log.info("Downloading Model: \(identifier.languageTag)")
+                logger.info("Downloading Model: \(identifier.languageTag)")
                 modelManager.download(
                   model,
                   conditions: ModelDownloadConditions.init(
@@ -430,14 +430,14 @@ class SKRecognizer {
     
     public static func initializeRecognizers() {
         if !notificationInitialized {
-            log.info("Initialized notification for model downloads.")
+            logger.info("Initialized notification for model downloads.")
             NotificationCenter.default.addObserver(
               forName: NSNotification.Name.mlkitModelDownloadDidSucceed,
               object: nil,
               queue: OperationQueue.main,
               using: {
                 (notification) in
-                log.info("Model download succeeded")
+                logger.info("Model download succeeded.")
                 initializeRecognizers()
               })
             notificationInitialized = true
@@ -449,7 +449,7 @@ class SKRecognizer {
             if modelManager.isModelDownloaded(model) {
                 let options: DigitalInkRecognizerOptions = DigitalInkRecognizerOptions.init(model: model)
                 textRecognizer = DigitalInkRecognizer.digitalInkRecognizer(options: options)
-                log.info("Text Recognizer: initialized")
+                logger.info("Text Recognizer: initialized.")
             }
             else {
                 downloadModels()
@@ -463,7 +463,7 @@ class SKRecognizer {
             if modelManager.isModelDownloaded(model) {
                 let options: DigitalInkRecognizerOptions = DigitalInkRecognizerOptions.init(model: model)
                 drawingRecognizer = DigitalInkRecognizer.digitalInkRecognizer(options: options)
-                log.info("Drawing Recognizer: initialized")
+                logger.info("Drawing Recognizer: initialized")
             }
             else {
                 downloadModels()

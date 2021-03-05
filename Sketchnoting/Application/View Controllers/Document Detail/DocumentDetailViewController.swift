@@ -55,7 +55,7 @@ class DocumentDetailViewController: UIViewController, DocumentVisitor {
                     }
                 }
             case .failure(_):
-                log.error("No preview image found for document \(document.title).")
+                logger.error("No preview image found for document \(document.title).")
             }
         })
         document.accept(visitor: self)
@@ -110,25 +110,10 @@ class DocumentDetailViewController: UIViewController, DocumentVisitor {
         typeLabel.text = "AR"
         contentTextView.dataDetectorTypes = UIDataDetectorTypes.link
         self.setDetailDescription(text: document.URL)
-//        if let safariVC = safariVC {
-//            safariVC.willMove(toParent: nil)
-//            safariVC.view.removeFromSuperview()
-//            safariVC.removeFromParent()
-//        }
         if document.URL.contains(".reality") {
             let safariVC = SFSafariViewController(url: URL(string: document.URL)!)
             safariVC.modalPresentationStyle = .pageSheet
             present(safariVC, animated: true)
-//            addChild(safariVC!)
-//            self.view.addSubview(safariVC!.view)
-//            safariVC!.view.translatesAutoresizingMaskIntoConstraints = false
-//            safariVC!.view.topAnchor.constraint(equalTo: contentTextView.topAnchor, constant: 10).isActive = true
-//            safariVC!.view.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
-//            safariVC!.view.leadingAnchor.constraint(equalTo: contentTextView.leadingAnchor).isActive = true
-//            safariVC!.view.trailingAnchor.constraint(equalTo: contentTextView.trailingAnchor).isActive = true
-//            safariVC!.didMove(toParent: self)
-            //safariVC!.modalPresentationStyle = .pageSheet
-            
         }
     }
     
@@ -137,7 +122,7 @@ class DocumentDetailViewController: UIViewController, DocumentVisitor {
             switch result {
             case .success(let value):
                 if let mapImage = value {
-                    log.info("Map image found for document \(document.title).")
+                    logger.info("Map image found for document \(document.title).")
                     DispatchQueue.main.async {
                         self.bottomImageView.image = mapImage
                     }

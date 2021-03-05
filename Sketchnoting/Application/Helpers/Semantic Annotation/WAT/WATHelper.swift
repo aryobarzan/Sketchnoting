@@ -29,15 +29,15 @@ class WATHelper {
                 case .success(let res):
                     json = JSON(res)
                 case .failure(let error):
-                    log.error(error.localizedDescription)
+                    logger.error(error.localizedDescription)
                     return
                 }
-                log.info("WAT: API call successful.")
+                logger.info("WAT: API call successful.")
                 var results = [String: String]()
                 if let annotations = json["annotations"].array {
                     for annotation in annotations {
                         if documentsCount == 30 {
-                            log.info("WAT: reached limit of 30 documents. Discarding the rest of the found annotations.")
+                            logger.info("WAT: reached limit of 30 documents. Discarding the rest of the found annotations.")
                             break
                         }
                         if let spot = annotation["spot"].string, let id = annotation["id"].double, let title = annotation["title"].string?.replacingOccurrences(of: "_", with: " "), let rho = annotation["rho"].double {
@@ -65,7 +65,7 @@ class WATHelper {
     private func performAdditionalSteps(document: WATDocument, note: (URL, Note)) {
         DispatchQueue.main.async {
             if !note.1.getDocuments().contains(document) {
-                log.info("WAT: new document added - \(document.title)")
+                logger.info("WAT: new document added - \(document.title)")
                 note.1.addDocument(document: document)
                 self.watQueue.async {
                     self.fetchWikipediaIntroText(document: document)
@@ -95,13 +95,13 @@ class WATHelper {
                     if let wikiExtract = json["query"]["pages"][String(format: "%.0f", document.wikiPageID!)]["extract"].string {
                         DispatchQueue.main.async {
                             document.description = wikiExtract
-                            log.info("Retrieved wikipedia intro extract for document \(document.title).")
+                            logger.info("Retrieved wikipedia intro extract for document \(document.title).")
                         }
                     }
                     break
                 case .failure(let error):
-                    log.error("Failed to retrieve wikipedia intro extract for document \(document.title).")
-                    log.error(error.localizedDescription)
+                    logger.error("Failed to retrieve wikipedia intro extract for document \(document.title).")
+                    logger.error(error.localizedDescription)
                     return
                 }
             }
@@ -135,7 +135,7 @@ class WATHelper {
                                 if let imageURL = json["query"]["pages"][String(format: "%.0f", document.wikiPageID!)]["thumbnail"]["source"].string {
                                     DispatchQueue.global(qos: .utility).async {
                                         if let url = URL(string: imageURL) {
-                                            log.info("Found Wikipedia preview image for: \(document.title)")
+                                            logger.info("Found Wikipedia preview image for: \(document.title)")
                                             document.downloadImage(url: url, type: .Standard)
                                             completion(true)
                                         }
@@ -148,7 +148,7 @@ class WATHelper {
                                     completion(false)
                                 }
                             case .failure(let error):
-                                log.error(error.localizedDescription)
+                                logger.error(error.localizedDescription)
                                 completion(false)
                                 return
                             }
@@ -156,7 +156,7 @@ class WATHelper {
                     }
                     break
                 case .failure(let error):
-                    log.error(error.localizedDescription)
+                    logger.error(error.localizedDescription)
                     completion(false)
                     return
                 }
@@ -181,7 +181,7 @@ class WATHelper {
             if words.count > 1 {
                 for word in words {
                     self.fetch(text: word, note: note, parentConcept: document)
-                    log.info("Fetching WAT document for subconcept: \(word)")
+                    logger.info("Fetching WAT document for subconcept: \(word)")
                 }
             }
         }
@@ -202,17 +202,17 @@ class WATHelper {
                         case .success(let res):
                             json = JSON(res)
                         case .failure(let error):
-                            log.error(error.localizedDescription)
+                            logger.error(error.localizedDescription)
                             return
                         }
-                        log.info("WAT: API call successful.")
-                        log.info(json)
+                        logger.info("WAT: API call successful.")
+                        logger.info(json)
                         if let result = json["result"].array {
                             for res in result {
                                 if let rel = res["rel"].double {
                                     if rel > 0.3 {
-                                        log.info(rel)
-                                        log.info(doc_two.title)
+                                        logger.info(rel)
+                                        logger.info(doc_two.title)
                                         self.performAdditionalSteps(document: doc_two, note: note)
                                     }
                                 }

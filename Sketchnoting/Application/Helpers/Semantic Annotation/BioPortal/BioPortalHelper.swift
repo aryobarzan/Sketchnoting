@@ -82,13 +82,13 @@ class BioPortalHelper {
                     }
                     DispatchQueue.main.async {
                         for doc in documents {
-                            log.info("BioPortal/CHEBI: new document added - \(doc.title)")
+                            logger.info("BioPortal/CHEBI: new document added - \(doc.title)")
                             note.1.addDocument(document: doc)
                         }
                     }
                 }
             case .failure(let error):
-                log.error(error.localizedDescription)
+                logger.error(error.localizedDescription)
                 return
             }
         }
@@ -103,10 +103,10 @@ class BioPortalHelper {
                 DispatchQueue.global().async {
                     if let url = URL(string: "https://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=" + value + "&dimensions=900") {
                         document.downloadImage(url: url, type: .Molecule)
-                        log.info("CHEBI: molecule image added - \(document.title)")
+                        logger.info("CHEBI: molecule image added - \(document.title)")
                     }
                     else {
-                        log.error("URL CHEBI image not found.")
+                        logger.error("URL CHEBI image not found.")
                     }
                 }
             }

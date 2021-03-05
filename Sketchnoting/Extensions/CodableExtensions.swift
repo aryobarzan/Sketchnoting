@@ -36,7 +36,7 @@ extension KeyedDecodingContainer {
         if let image = UIImage(data: imageData) {
             return image
         } else {
-            log.info("Failed to decode note image.")
+            logger.info("Failed to decode note image.")
             return UIImage()
         }
     }

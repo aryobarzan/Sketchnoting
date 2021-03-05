@@ -19,12 +19,12 @@ class ReceivedNotesController: NSObject, MCSessionDelegate {
             decodedNote.sharedByDevice = peerID.displayName
             DispatchQueue.main.async {
                 self.receivedNotes.append(decodedNote)
-                log.info("Decoded shared note.")
+                logger.info("Decoded shared note.")
                 Notifications.announce(receivedNote: decodedNote)
             }
         }
         else {
-            log.error("Failed to decode note shared with you.")
+            logger.error("Failed to decode note shared with you.")
         }
     }
     
@@ -53,7 +53,7 @@ class ReceivedNotesController: NSObject, MCSessionDelegate {
     func startHosting() {
         mcAdvertiserAssistant = MCAdvertiserAssistant(serviceType: "hws-kb", discoveryInfo: nil, session: mcSession)
         mcAdvertiserAssistant!.start()
-        log.info("Started hosting session.")
+        logger.info("Started hosting session.")
     }
     
     func stopHosting() {
@@ -61,6 +61,6 @@ class ReceivedNotesController: NSObject, MCSessionDelegate {
             mcAdvertiserAssistant!.stop()
             mcAdvertiserAssistant = nil
         }
-        log.info("Stopped hosting session.")
+        logger.info("Stopped hosting session.")
     }
 }

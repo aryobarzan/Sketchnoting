@@ -25,7 +25,7 @@ class MapHelper {
             case .failure( _):
                 return
             }
-            log.info("GeoNames Coordinates: API call successful.")
+            logger.info("GeoNames Coordinates: API call successful.")
                 
             let result = json
             let resources = result["geonames"] as? [[String: Any]]
@@ -37,7 +37,7 @@ class MapHelper {
                 }
             }
             else {
-                log.error("GeoNames Coordinates: API call failed.")
+                logger.error("GeoNames Coordinates: API call failed.")
             }
         }
     }
@@ -45,10 +45,10 @@ class MapHelper {
         DispatchQueue.global(qos: .utility).async {
             if let url = URL(string: "https://www.mapquestapi.com/staticmap/v5/map?key=" + mapQuestAPIKey + "&center=" + latitude + "," + longitude + "&size=800,600") {
                 document.downloadImage(url: url, type: .Map)
-                log.info("Map image could be found for document \(document.title).")
+                logger.info("Map image could be found for document \(document.title).")
             }
             else {
-                log.error("No map image could be found for document \(document.title).")
+                logger.error("No map image could be found for document \(document.title).")
             }
         }
     }

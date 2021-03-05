@@ -72,7 +72,7 @@ class Note: File, DocumentDelegate {
         do {
             try container.encode(documents, forKey: .documents)
         } catch {
-            log.error("Error while encoding documents of note.")
+            logger.error("Error while encoding documents of note.")
         }
         try container.encode(id, forKey: .id)
         try container.encode(tags, forKey: .tags)
@@ -113,7 +113,7 @@ class Note: File, DocumentDelegate {
                 }
             }
         } catch {
-            log.error("Decoding a note's documents failed: \(error)")
+            logger.error("Decoding a note's documents failed: \(error)")
         }
         documents = docs
         

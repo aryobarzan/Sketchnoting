@@ -82,7 +82,7 @@ class NoteTextViewController: UIViewController {
             parsingSegmentedControl.isEnabled = false
             activityIndicator.isHidden = false
             Reductio.shared.summarize(text: textView.text, compression: 0.8, completion: { phrases in
-                    log.info("Summarized version has \(phrases.count) sentences.")
+                    logger.info("Summarized version has \(phrases.count) sentences.")
                     DispatchQueue.main.async {
                         self.textSegmentedControl.isEnabled = true
                         self.pagesSegmentedControl.isEnabled = true

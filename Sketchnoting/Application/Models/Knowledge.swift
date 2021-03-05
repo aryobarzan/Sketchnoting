@@ -96,16 +96,11 @@ class Knowledge {
             }
             tf_idfs![note.0] = (note.1, noteIDFs)
         }
-        log.info("Setup of similarity matrix complete.")
+        logger.info("Setup of similarity matrix complete.")
     }
     
     public static func similarityMatrixIsSetup() -> Bool {
-        if tf_idfs == nil {
-            return false
-        }
-        else {
-            return true
-        }
+        return tf_idfs != nil
     }
     
     static func similarNotesFor(url: URL, note: Note) -> [(URL, Note, Float)] {

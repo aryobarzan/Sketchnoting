@@ -109,20 +109,20 @@ class SettingsViewController: UITableViewController {
                                 activityController.completionWithItemsHandler = {(activityType, completed, returnedItems, error) in
                                     if (completed) {
                                         NeoLibrary.delete(url: backupFileURL)
-                                        log.info("Deleted temporary backup zip file.")
+                                        logger.info("Deleted temporary backup zip file.")
                                     }
                                 }
                             })
                         }
                         else {
                             NeoLibrary.delete(url: backupFileURL)
-                            log.info("Deleted temporary backup zip file.")
+                            logger.info("Deleted temporary backup zip file.")
                         }
                     }
                 }
                 else {
                     alertView.dismiss(animated: true) {
-                        log.error("Backup failed.")
+                        logger.error("Backup failed.")
                     }
                 }
             }

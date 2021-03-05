@@ -38,7 +38,7 @@ struct SVGProcessor: ImageProcessor {
             return nil
             
         case .data(let data):
-            log.info("Processing image data. (SVGProcessor)")
+            logger.info("Processing image data. (SVGProcessor)")
             if (data.count < 10000000) {
                 if let imageSVG : SVGKImage = SVGKImage(data: data) {
                     return imageSVG.uiImage
@@ -46,7 +46,7 @@ struct SVGProcessor: ImageProcessor {
                 return nil
             }
             else {
-                log.error("Cannot process image, bigger than 10MB.")
+                logger.error("Cannot process image, bigger than 10MB.")
             }
             
             return nil

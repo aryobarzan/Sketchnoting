@@ -34,10 +34,10 @@ class TagsManager {
             self.tags.append(tag)
             if let encoded = try? encoder.encode(tag) {
                 UserDefaults.tags.set(encoded, forKey: tag.title)
-                log.info("Tag \(String(describing: tag.title)) added.")
+                logger.info("Tag \(String(describing: tag.title)) added.")
             }
             else {
-                log.error("Failed adding new tag \(String(describing: tag.title)).")
+                logger.error("Failed adding new tag \(String(describing: tag.title)).")
             }
         }
     }

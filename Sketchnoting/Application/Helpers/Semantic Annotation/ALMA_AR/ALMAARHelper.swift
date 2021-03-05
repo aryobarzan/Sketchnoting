@@ -27,10 +27,10 @@ class ALMAARHelper {
                 case .success(let res):
                     json = JSON(res)
                 case .failure(let error):
-                    log.error(error.localizedDescription)
+                    logger.error(error.localizedDescription)
                     return
                 }
-                log.info("ALMA AR (ID): API call successful.")
+                logger.info("ALMA AR (ID): API call successful.")
                 if let matches = json.array {
                     for match in matches {
                         if let id = match["id"].int, let _ = match["type"].string, let _ = match["url"].string {
@@ -55,17 +55,17 @@ class ALMAARHelper {
                 case .success(let res):
                     json = JSON(res)
                 case .failure(let error):
-                    log.error(error.localizedDescription)
+                    logger.error(error.localizedDescription)
                     return
                 }
-                log.info("ALMA AR (Resource): API call successful.")
+                logger.info("ALMA AR (Resource): API call successful.")
                 if let _ = json["id"].int, let title = json["title"].string, let previewURL = json["previewURL"].string, let url = json["url"].string {
                     if let document = ARDocument(title: title, description: nil, URL: url, type: .ALMAAR, spot: spot, categories: [String](), wikiPageID: nil)  { // Wiki page ID same as id?
                         DispatchQueue.main.async {
                             note.1.addDocument(document: document)
                             DispatchQueue.global(qos: .utility).async {
                                 if let url = URL(string: previewURL) {
-                                    log.info("Found ALMA AR document preview image for: \(document.title)")
+                                    logger.info("Found ALMA AR document preview image for: \(document.title)")
                                     document.downloadImage(url: url, type: .Standard)
                                 }
                             }

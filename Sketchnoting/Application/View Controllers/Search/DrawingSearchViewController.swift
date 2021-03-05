@@ -50,7 +50,7 @@ class DrawingSearchViewController: UIViewController, PKCanvasViewDelegate {
                     self.searchButton.setTitle(" " + result!, for: .normal)
                     self.searchButton.isEnabled = true
                     self.searchLabel = result!
-                    log.info("Best prediction: \(result!)")
+                    logger.info("Best prediction: \(result!)")
                 }
                 else {
                     self.searchButton.setTitle(" Not recognized", for: .normal)

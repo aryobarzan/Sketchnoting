@@ -33,7 +33,7 @@ class KnowledgeGraphHelper {
                         for type in typeArray {
                             if let value = type.string {
                                 if value.lowercased().contains("place") {
-                                    log.info("Knowledge Graph Helper: Is a place - \(name)")
+                                    logger.info("Knowledge Graph Helper: Is a place - \(name)")
                                     completionHandler(true)
                                     return
                                 }
@@ -67,10 +67,10 @@ class KnowledgeGraphHelper {
                     DispatchQueue.global(qos: .utility).async {
                         if let url = URL(string: imageString) {
                             document.downloadImage(url: url, type: .Standard)
-                            log.info("Knowledge Graph: Preview image added - \(document.title)")
+                            logger.info("Knowledge Graph: Preview image added - \(document.title)")
                         }
                         else {
-                            log.error("URL Wikipedia image not found via Knowledge Graph for TAGME document.")
+                            logger.error("URL Wikipedia image not found via Knowledge Graph for TAGME document.")
                         }
                     }
                 }

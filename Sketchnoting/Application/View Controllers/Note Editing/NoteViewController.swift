@@ -172,7 +172,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         super.prepare(for: segue, sender: sender)
         switch(segue.identifier ?? "") {
         case "Placeholder":
-            log.info("Placeholder")
+            logger.info("Placeholder")
             break
         case "CloseNote":
             if !isDeletingNote {
@@ -183,10 +183,10 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                 //self.processDrawingRecognition()
                 note.1.getCurrentPage().canvasDrawing = self.canvasView.drawing
                 NeoLibrary.save(note: note.1, url: note.0)
-                log.info("Closing & saving note.")
+                logger.info("Closing & saving note.")
             }
             else {
-                log.info("Deleting note.")
+                logger.info("Deleting note.")
             }
             break
         case "ShowNotePages":
@@ -268,7 +268,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             }
             break
         default:
-            log.error("Default segue case triggered.")
+            logger.error("Default segue case triggered.")
         }
     }
     
@@ -653,7 +653,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             for (view, doc) in conceptHighlights {
                 if view.frame.contains(sender.location(in: canvasView)) {
                     isRecognizingDrawing = false
-                    log.info("Highlighting concept")
+                    logger.info("Highlighting concept")
                     let documentPreviewVC = UIStoryboard(name: "Main", bundle: Bundle.main).instantiateViewController(withIdentifier: "DocumentPreviewViewController") as? DocumentPreviewViewController
                     if let documentPreviewVC = documentPreviewVC {
                         documentPreviewVC.modalPresentationStyle = .popover
@@ -668,7 +668,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                                     }
                                 }
                             case .failure(_):
-                                log.error("No preview image found for document.")
+                                logger.error("No preview image found for document.")
                             }
                         })
                         documentPreviewVC.titleLabel.text = doc[0].title
@@ -767,16 +767,16 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         connectivity = Connectivity()
         connectivity!.framework = .network
         connectivity!.checkConnectivity { connectivity in
-            log.info("Checking Internet connection for annotation services.")
+            logger.info("Checking Internet connection for annotation services.")
             switch connectivity.status {
                 case .connected, .connectedViaWiFi, .connectedViaCellular:
-                    log.info("Internet Connection detected.")
+                    logger.info("Internet Connection detected.")
                     if SettingsManager.isAnnotationServiceAvailable() {
-                        log.info("Annotating...")
+                        logger.info("Annotating...")
                         SettingsManager.updateAnnotationServiceAvailability()
                         DispatchQueue.global(qos: .background).async {
                             if SettingsManager.getAnnotatorStatus(annotator: .TAGME) {
-                                log.info("Calling TAGME annotator.")
+                                logger.info("Calling TAGME annotator.")
                                 TAGMEHelper.shared.fetch(text: text, note: self.note)
                             }
                             if SettingsManager.getAnnotatorStatus(annotator: .WAT) {
@@ -795,7 +795,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                     }
                     break
                 default:
-                    log.error("Internet Connection not detected: Annotation not possible.")
+                    logger.error("Internet Connection not detected: Annotation not possible.")
                     break
             }
         }
@@ -865,7 +865,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             textRecognitionTimer = nil
         }
         textRecognitionTimer = Timer.scheduledTimer(timeInterval: 5.0, target: self, selector: #selector(onRecognitionTimerFires), userInfo: nil, repeats: false)
-        log.info("Recognition timer started/reset.")
+        logger.info("Recognition timer started/reset.")
     }
     @objc func onRecognitionTimerFires()
     {
@@ -886,7 +886,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     {
         saveTimer?.invalidate()
         saveTimer = nil
-        log.info("Auto-saving note.")
+        logger.info("Auto-saving note.")
         NeoLibrary.save(note: note.1, url: note.0)
     }
     
@@ -1104,7 +1104,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                     SKRecognizer.recognizeNoteDrawing(noteDrawing: NoteDrawing(label: "", region: currentDrawingRegion.bounds), pkStrokes: getStrokesIn(region: currentDrawingRegion.frame)) { success, noteDrawing in
                         if success && noteDrawing != nil {
                             DispatchQueue.main.async {
-                                log.info("Recognized drawing: \(noteDrawing!.getLabel())")
+                                logger.info("Recognized drawing: \(noteDrawing!.getLabel())")
                                 self.view.makeToast("Recognized drawing: \(noteDrawing!.getLabel())")
                                 self.note.1.getCurrentPage().addDrawing(drawing: NoteDrawing(label: noteDrawing!.getLabel(), region: currentDrawingRegion.frame))
                                 self.drawingViews.append(currentDrawingRegion)
@@ -1166,7 +1166,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         }
         note.1.getCurrentPage().canvasDrawing = self.canvasView.drawing
         NeoLibrary.save(note: note.1, url: note.0)
-        log.info("Saved note for current page.")
+        logger.info("Saved note for current page.")
     }
     
     func previousPage() {
@@ -1284,7 +1284,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         controller.dismiss(animated: true, completion: nil)
     }
     func documentCameraViewController(_ controller: VNDocumentCameraViewController, didFailWithError error: Error) {
-        log.error(error)
+        logger.error(error)
         controller.dismiss(animated: true, completion: nil)
     }
     
@@ -1310,7 +1310,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             self.view.makeToast("Imported the selected documents.")
             let (notes, images, pdfs, texts) = ImportHelper.importItems(urls: urls)
             for n in notes {
-                log.info("Added pages of imported note to currently open note.")
+                logger.info("Added pages of imported note to currently open note.")
                 note.1.pages += n.1.pages
             }
             for img in images {
@@ -1490,7 +1490,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                     if view.frame.contains(sender.location(in: canvasView)) {
                         self.highlightedDraggableView = view
                         view.setHighlight(isHighlighted: true)
-                        log.info("Tapped note layer on canvas.")
+                        logger.info("Tapped note layer on canvas.")
                         canvasView.bringSubviewToFront(view)
                         break
                     }
@@ -1606,7 +1606,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                         }))
                     }
                     alert.addAction(UIAlertAction(title: NSLocalizedString("Cancel", comment: ""), style: .default, handler: { _ in
-                        log.info("Cancelled: changing code language of text box.")
+                        logger.info("Cancelled: changing code language of text box.")
                     }))
                     self.present(alert, animated: true, completion: nil)
                 }
@@ -1646,7 +1646,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             SKRecognizer.recognizeText(pkStrokes: isolatedStrokes.1) { success, line, lineNumber in
                 if success && line != nil {
                     self.note.1.getCurrentPage().addRecognizedLine(line: line!, lineNumber: lineNumber)
-                    log.info("Line \(lineNumber): \(line!.text)")
+                    logger.info("Line \(lineNumber): \(line!.text)")
                 }
                 self.startSaveTimer()
             }

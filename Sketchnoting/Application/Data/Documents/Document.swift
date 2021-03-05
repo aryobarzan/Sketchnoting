@@ -78,19 +78,19 @@ class Document: Codable, Visitable, Equatable, Hashable {
         do {
             title = try container.decode(String.self, forKey: CodingKeys.title)
         } catch {
-            log.error(error)
+            logger.error(error)
             title = ""
         }
         do {
             description = try container.decode(String.self, forKey: .description)
         } catch {
-            log.error(error)
+            logger.error(error)
             description = ""
         }
         do {
             isHidden = try container.decode(Bool.self, forKey: .isHidden)
         } catch {
-            log.error(error)
+            logger.error(error)
             isHidden = false
         }
         URL = try container.decode(String.self, forKey: .URL)
@@ -112,51 +112,51 @@ class Document: Codable, Visitable, Equatable, Hashable {
     public func downloadImage(url: URL, type: DocumentImageType) {
         let cache = SKCacheManager.cache
         let key = type.rawValue + "-" + self.documentType.rawValue + "-" + self.title
-        log.info(key)
+        logger.info(key)
         let downloader = ImageDownloader.default
         if !url.absoluteString.lowercased().contains(".svg") {
             downloader.downloadImage(with: url, completionHandler:  { result in
                 switch result {
                 case .success(let value):
                     if value.originalData.count < 10000000 {
-                        log.info("Downloaded non-svg image for document: \(self.title)")
+                        logger.info("Downloaded non-svg image for document: \(self.title)")
                         cache.store(value.image, original: value.originalData, forKey: key)
                         
                         self.reload()
                     }
                     else {
-                        log.error("Failed to download non-svg image for document due to large file size: \(self.title)")
+                        logger.error("Failed to download non-svg image for document due to large file size: \(self.title)")
                     }
                 case .failure(let error):
-                    log.error("Failed to download non-svg image for document due to unknown reason: \(self.title)")
-                    log.error(error)
+                    logger.error("Failed to download non-svg image for document due to unknown reason: \(self.title)")
+                    logger.error(error)
                 }
             })
         }
         else {
-            log.info("SVG preview image detected.")
+            logger.info("SVG preview image detected.")
             if let svgImage = SVGKImage(contentsOf: url)?.uiImage {
                 if let jpegData = svgImage.jpegData(compressionQuality: 0.8) {
                     if jpegData.count < 10000000 {
                         if let jpegImage = UIImage(data: jpegData) {
-                            log.info("Preview image from SVG image to jpeg image created.")
+                            logger.info("Preview image from SVG image to jpeg image created.")
                             cache.store(jpegImage, forKey: key)
                             self.reload()
                         }
                         else {
-                            log.error("Could not create UIImage from jpeg data.")
+                            logger.error("Could not create UIImage from jpeg data.")
                         }
                     }
                     else {
-                        log.error("Image bigger than 10MB, not stored.")
+                        logger.error("Image bigger than 10MB, not stored.")
                     }
                 }
                 else {
-                    log.error("Could not get JPEG data from SVG image.")
+                    logger.error("Could not get JPEG data from SVG image.")
                 }
             }
             else {
-                log.error("Could not retrieve SVG image from URL content.")
+                logger.error("Could not retrieve SVG image from URL content.")
             }
         }
     }

@@ -28,8 +28,8 @@ class NeoDocumentCell: UICollectionViewCell {
                         // log.error(result)
                     }
                 case .failure(let error):
-                    log.error(error)
-                    log.error("No preview image found for document: \(document.title).")
+                    logger.error(error)
+                    logger.error("No preview image found for document: \(document.title).")
                 }
             })
         }

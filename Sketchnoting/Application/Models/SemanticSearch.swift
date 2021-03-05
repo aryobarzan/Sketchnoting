@@ -44,10 +44,10 @@ class SemanticSearch {
     func downloadEntityExtractorModel() {
         entityExtractor.downloadModelIfNeeded(completion: { error in
             if error == nil {
-                log.info("Entity extraction model is ready.")
+                logger.info("Entity extraction model is ready.")
             }
             else {
-                log.error("Entity extraction model not available: \(error!)")
+                logger.error("Entity extraction model not available: \(error!)")
             }
         })
     }
@@ -112,6 +112,10 @@ class SemanticSearch {
         return -1.0
     }
     
+    func getWordEmbedding() -> NLEmbedding? {
+        return wordEmbedding
+    }
+    
     func extractEntities(text: String, allowed: [EntityType] = [EntityType.dateTime], entityCompletion: (([Entity]?) -> Void)?) {
         self.dateTimeEntity = nil
         let params = EntityExtractionParams()
@@ -134,15 +138,15 @@ class SemanticSearch {
                             switch entity.entityType {
                             case EntityType.dateTime:
                                 guard let dateTimeEntity = entity.dateTimeEntity else {
-                                    log.error("No date/time entity detected.")
+                                    logger.error("No date/time entity detected.")
                                     return
                                 }
-                                log.info("Date/time entity detected.")
-                                log.info("Granularity: \(dateTimeEntity.dateTimeGranularity)")
-                                log.info("DateTime: \(dateTimeEntity.dateTime)")
+                                logger.info("Date/time entity detected.")
+                                logger.info("Granularity: \(dateTimeEntity.dateTimeGranularity)")
+                                logger.info("DateTime: \(dateTimeEntity.dateTime)")
                                 self.dateTimeEntity = dateTimeEntity
                             default:
-                                log.info("Entity: \(entity)")
+                                logger.info("Entity: \(entity)")
                                 break
                             }
                         }
@@ -153,7 +157,7 @@ class SemanticSearch {
                 }
             }
             else {
-                log.error("Entity extraction failed: \(error.debugDescription)")
+                logger.error("Entity extraction failed: \(error.debugDescription)")
                 if let entityCompletion = entityCompletion {
                     entityCompletion(nil)
                 }
@@ -171,9 +175,26 @@ class SemanticSearch {
         return Int64(Date().timeIntervalSince1970 * 1000)
     }
     
+    private func getTermRelevancy(terms: [String]) -> Bool {
+        var terms = terms
+        if let wordEmbedding = wordEmbedding {
+            for i in 0..<terms.count {
+                let lemmatized = SemanticSearch.shared.lemmatize(text: terms[i])
+                if wordEmbedding.contains(lemmatized) {
+                    terms[i] = lemmatized.lowercased()
+                }
+                else {
+                    terms[i] = terms[i].lowercased()
+                }
+            }
+        }
+        // TODO: Calculate semantic distance (cosine) / TF-IDF score
+        return true
+    }
+    
     private func process(query: String) -> String {
         let queryWords = tokenize(text: query, unit: .word)
-        // Spellcheck & lowercase {
+        // Spellcheck & lowercase - currently disabled as it wrongly does not know many domain specific terms, e.g. "generics" in programming
         /*let spellchecker = UITextChecker()
         for i in 0..<queryWords.count {
             let range = NSRange(location: 0, length: queryWords[i].utf16.count)
@@ -194,8 +215,8 @@ class SemanticSearch {
                 wordsDebug.append(p.0 + " ")
                 tagsDebug.append(p.1 + " ")
             }
-            log.info(wordsDebug)
-            log.info(tagsDebug)
+            logger.info(wordsDebug)
+            logger.info(tagsDebug)
             let phraseType = checkPhraseType(queryPartsOfSpeech: partsOfSpeech)
             if phraseType == .Sentence {
                 let isQuestion = isSentenceQuestion(text: query)
@@ -203,11 +224,15 @@ class SemanticSearch {
                     allowed.append(NLTag.verb.rawValue)
                 }
             }
+            var retainedQueryTerms = [String]()
             for i in 0..<partsOfSpeech.count {
                 if allowed.contains(partsOfSpeech[i].1) {
                     processedQuery.append("\(partsOfSpeech[i].0.lowercased()) ")
+                    retainedQueryTerms.append(partsOfSpeech[i].0)
                 }
             }
+            var areTermsRelated = getTermRelevancy(terms: retainedQueryTerms)
+            
             processedQuery = processedQuery.trimmingCharacters(in: .whitespaces)
             return processedQuery
         }
@@ -232,9 +257,9 @@ class SemanticSearch {
         //let queryType = checkPhraseType(queryPartsOfSpeech: queryPartsOfSpeech)
         // log.info("Performing search on query of type: \(queryType.rawValue)")
         // Expanded Search means a lower threshold for the lexical search, i.e. more tolerant to minor typos
-        log.info("Original query: \(query)")
+        logger.info("Original query: \(query)")
         let query = process(query: query)
-        log.info("Processed query: \(query)")
+        logger.info("Processed query: \(query)")
         let lexicalThreshold = expandedSearch ? 0.9 : 1.0
         
         // Start search process, going through each note
@@ -249,13 +274,13 @@ class SemanticSearch {
                     case .Lexical:
                         if score >= lexicalThreshold { // Higher is better
                             searchResult.note = note
-                            log.info("[Lexical] Note title ('\(closestTarget)') = \(score)")
+                            logger.info("[Lexical] Note title ('\(closestTarget)') = \(score)")
                             break
                         }
                     case .Semantic:
                         if score <= self.SEARCH_THRESHOLD { // Lower is better
                             searchResult.note = note
-                            log.info("[Semantic] Note title ('\(closestTarget)') = \(score)")
+                            logger.info("[Semantic] Note title ('\(closestTarget)') = \(score)")
                             break
                         }
                     }
@@ -265,13 +290,13 @@ class SemanticSearch {
                     case .Lexical:
                         if score >= lexicalThreshold { // Higher is better
                             searchResult.note = note
-                            log.info("[Lexical] Note body ('\(closestTarget)') = \(score)")
+                            logger.info("[Lexical] Note body ('\(closestTarget)') = \(score)")
                             break
                         }
                     case .Semantic:
                         if score <= self.SEARCH_THRESHOLD { // Lower is better
                             searchResult.note = note
-                            log.info("[Semantic] Note body ('\(closestTarget)') = \(score)")
+                            logger.info("[Semantic] Note body ('\(closestTarget)') = \(score)")
                             break
                         }
                     }
@@ -281,13 +306,13 @@ class SemanticSearch {
                     case .Lexical:
                         if score >= lexicalThreshold { // Higher is better
                             searchResult.note = note
-                            log.info("[Lexical] Note drawing ('\(closestTarget)') = \(score)")
+                            logger.info("[Lexical] Note drawing ('\(closestTarget)') = \(score)")
                             break
                         }
                     case .Semantic:
                         if score <= self.DRAWING_THRESHOLD { // Lower is better
                             searchResult.note = note
-                            log.info("[Semantic] Note drawing ('\(closestTarget)') = \(score)")
+                            logger.info("[Semantic] Note drawing ('\(closestTarget)') = \(score)")
                             break
                         }
                     }
@@ -301,14 +326,14 @@ class SemanticSearch {
                             if score >= lexicalThreshold { // Higher is better
                                 searchResult.note = note
                                 isDocumentMatching = true
-                                log.info("[Lexical] Document ('\(document.title)') title ('\(closestTarget)') = \(score)")
+                                logger.info("[Lexical] Document ('\(document.title)') title ('\(closestTarget)') = \(score)")
                                 break
                             }
                         case .Semantic:
                             if score <= self.SEARCH_THRESHOLD { // Lower is better
                                 searchResult.note = note
                                 isDocumentMatching = true
-                                log.info("[Semantic] Document ('\(document.title)') title ('\(closestTarget)') = \(score)")
+                                logger.info("[Semantic] Document ('\(document.title)') title ('\(closestTarget)') = \(score)")
                                 break
                             }
                         }
@@ -324,14 +349,14 @@ class SemanticSearch {
                                 if score >= lexicalThreshold { // Higher is better
                                     searchResult.note = note
                                     isDocumentMatching = true
-                                    log.info("[Lexical] Document ('\(document.title)') description ('\(closestTarget)') = \(score)")
+                                    logger.info("[Lexical] Document ('\(document.title)') description ('\(closestTarget)') = \(score)")
                                     break
                                 }
                             case .Semantic:
                                 if score <= self.SEARCH_THRESHOLD { // Lower is better
                                     searchResult.note = note
                                     isDocumentMatching = true
-                                    log.info("[Semantic] Document ('\(document.title)') description ('\(closestTarget)') = \(score)")
+                                    logger.info("[Semantic] Document ('\(document.title)') description ('\(closestTarget)') = \(score)")
                                     break
                                 }
                             }
@@ -349,7 +374,7 @@ class SemanticSearch {
             }
         }
         queue.addBarrierBlock {
-            log.info("Search complete.")
+            logger.info("Search complete.")
             if let searchFinishHandler = searchFinishHandler {
                 searchFinishHandler()
             }

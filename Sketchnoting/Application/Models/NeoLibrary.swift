@@ -36,7 +36,7 @@ class NeoLibrary {
         }
         catch let error as NSError
         {
-            log.error("Home folder could not be created: \(error.debugDescription)")
+            logger.error("Home folder could not be created: \(error.debugDescription)")
         }
         return homeURL
     }
@@ -53,7 +53,7 @@ class NeoLibrary {
         }
         catch let error as NSError
         {
-            log.error("ExportTemporary folder could not be created: \(error.debugDescription)")
+            logger.error("ExportTemporary folder could not be created: \(error.debugDescription)")
         }
         return exportTemporaryURL
     }
@@ -87,17 +87,17 @@ class NeoLibrary {
                                 files.append((url, decoded))
                             }
                             else {
-                                log.error("Detected invalid file - will attempt to delete...")
+                                logger.error("Detected invalid file - will attempt to delete...")
                                 delete(url: url)
                             }
                         }
                     }
                 } catch {
-                    log.error(error)
+                    logger.error(error)
                 }
             }
         } catch {
-            log.error("Failed to load current files: \(error.localizedDescription)")
+            logger.error("Failed to load current files: \(error.localizedDescription)")
         }
         return files
     }
@@ -115,11 +115,11 @@ class NeoLibrary {
                                 notes.append((fileURL, note))
                             }
                         } catch {
-                            log.error("Invalid file.")
+                            logger.error("Invalid file.")
                         }
                         
                     }
-                } catch { log.error(error) }
+                } catch { logger.error(error) }
             }
         }
         return notes
@@ -129,7 +129,7 @@ class NeoLibrary {
         neoLibraryQueue.async {
             if let encoded = note.encodeFileAsData() {
                 try? encoded.write(to: url)
-                log.info("Note \(note.getName()) saved.")
+                logger.info("Note \(note.getName()) saved.")
             }
         }
     }
@@ -137,7 +137,7 @@ class NeoLibrary {
     private static func saveSynchronously(note: Note, url: URL) {
         if let encoded = note.encodeFileAsData() {
             try? encoded.write(to: url)
-            log.info("Note \(note.getName()) saved synchronously.")
+            logger.info("Note \(note.getName()) saved synchronously.")
         }
     }
     
@@ -145,13 +145,13 @@ class NeoLibrary {
         do {
             if FileManager.default.fileExists(atPath: url.path) {
                 try FileManager.default.removeItem(atPath: url.path)
-                log.info("Deleted file \(url.lastPathComponent).")
+                logger.info("Deleted file \(url.lastPathComponent).")
             }
             else {
-                log.error("File to delete \(url.lastPathComponent) could not be found on disk.")
+                logger.error("File to delete \(url.lastPathComponent) could not be found on disk.")
             }
         } catch {
-            log.error("Failed to delete file \(url.lastPathComponent).")
+            logger.error("Failed to delete file \(url.lastPathComponent).")
         }
     }
     
@@ -180,13 +180,13 @@ class NeoLibrary {
             {
                 if let (_, uniqueURL) = self.constructUniqueName(file: file, url: destination, modificationType: .Move) {
                     try FileManager.default.moveItem(at: source, to: uniqueURL)
-                    log.info("Moved file \(file.getName()) to \(uniqueURL.absoluteString).")
+                    logger.info("Moved file \(file.getName()) to \(uniqueURL.absoluteString).")
                     return uniqueURL
                 }
             }
             catch _ as NSError
             {
-                log.error("Unable to move file \(file.getName()) to \(destination.path).")
+                logger.error("Unable to move file \(file.getName()) to \(destination.path).")
             }
         }
         return nil
@@ -197,11 +197,11 @@ class NeoLibrary {
             if let (_, uniqueURL) = self.constructUniqueName(rename: name, file: file, url: url, modificationType: .Rename) {
                 do {
                     try FileManager.default.moveItem(at: url, to: uniqueURL)
-                    log.info("File renamed.")
+                    logger.info("File renamed.")
                     return uniqueURL
                 } catch {
-                    log.error("Error while trying to rename file.")
-                    log.error(error)
+                    logger.error("Error while trying to rename file.")
+                    logger.error(error)
                 }
             }
         }
@@ -219,10 +219,10 @@ class NeoLibrary {
                 let url = self.currentLocation.appendingPathComponent(n + ".sketchnote")
                 let note = Note(name: n, documents: nil)
                 self.saveSynchronously(note: note, url: url)
-                log.info("Note imported.")
+                logger.info("Note imported.")
             }
         } catch {
-            log.error("Failed to import note.")
+            logger.error("Failed to import note.")
         }
     }
     
@@ -234,7 +234,7 @@ class NeoLibrary {
         let url = self.currentLocation.appendingPathComponent(n + ".sketchnote")
         note.setName(name: n)
         self.saveSynchronously(note: note, url: url)
-        log.info("Note added.")
+        logger.info("Note added.")
     }
     
     
@@ -265,7 +265,7 @@ class NeoLibrary {
         }
         catch _ as NSError
         {
-            log.error("Unable to create folder.")
+            logger.error("Unable to create folder.")
         }
         return nil
     }
@@ -372,11 +372,11 @@ class NeoLibrary {
             do {
                 let progress = Progress()
                 var _: NSKeyValueObservation = progress.observe(\.fractionCompleted) { [] object, change in
-                    log.info("Backup ZIP creation progress: \(object.fractionCompleted)")
+                    logger.info("Backup ZIP creation progress: \(object.fractionCompleted)")
                 }
                 try fileManager.zipItem(at: sourceURL, to: destinationURL, shouldKeepParent: false, compressionMethod: .deflate, progress: progress)
             } catch {
-                log.error("Failed to create backup of library: \(error)")
+                logger.error("Failed to create backup of library: \(error)")
                 completion(nil)
             }
             completion(destinationURL)
@@ -393,14 +393,14 @@ class NeoLibrary {
             let enumerator = FileManager.default.enumerator(at: getTemporaryExportURL(),
                                     includingPropertiesForKeys: nil,
                                                        options: [.skipsHiddenFiles], errorHandler: { (url, error) -> Bool in
-                                                        log.error(error)
+                                                        logger.error(error)
                                                                 return true
             })!
             for case let fileURL as URL in enumerator {
                 try fileManager.removeItem(at: fileURL)
             }
         } catch {
-            log.error("Could not clear temporary export folder: \(error)")
+            logger.error("Could not clear temporary export folder: \(error)")
         }
     }
     
@@ -424,8 +424,7 @@ class NeoLibrary {
                                 try pdf.write(to: destinationURL)
                             }
                         } catch {
-                            log.error("PDF generation for note failed.")
-                            log.error(error)
+                            logger.error("PDF generation for note failed: \(error)")
                         }
                     }
                 }
@@ -440,8 +439,7 @@ class NeoLibrary {
                                     try jpg.write(to: destinationURL)
                                 }
                             } catch {
-                                log.error("Image generation for note failed.")
-                                log.error(error)
+                                logger.error("Image generation for note failed: \(error)")
                             }
                         }
                     }
@@ -456,7 +454,7 @@ class NeoLibrary {
                     }
                     catch let error as NSError
                     {
-                        log.error("Unable to create directory \(error.debugDescription)")
+                        logger.error("Unable to create directory \(error.debugDescription)")
                     }
                     for i in 0..<note.pages.count {
                         
@@ -469,8 +467,7 @@ class NeoLibrary {
                                         try jpg.write(to: pageURL)
                                     }
                                 } catch {
-                                    log.error("Image generation for note failed.")
-                                    log.error(error)
+                                    logger.error("Image generation for note failed: \(error)")
                                 }
                             }
                         }
@@ -481,8 +478,7 @@ class NeoLibrary {
             }
         }
         catch {
-            log.error("Creating file for export of note \(note.getName()) failed.")
-            log.error(error)
+            logger.error("Creating file for export of note \(note.getName()) failed: \(error)")
             return nil
         }
         queue.waitUntilAllOperationsAreFinished()
@@ -510,7 +506,7 @@ class NeoLibrary {
                 let enumerator = FileManager.default.enumerator(at: tempDestinationURL,
                                         includingPropertiesForKeys: resourceKeys,
                                                            options: [.skipsHiddenFiles], errorHandler: { (url, error) -> Bool in
-                                                            log.error(error)
+                                                            logger.error(error)
                                                                     return true
                 })!
                 let queue = OperationQueue()
@@ -529,13 +525,13 @@ class NeoLibrary {
                                                     try fileManager.removeItem(at: fileURL)
                                                 }
                                                 catch {
-                                                    log.error(error)
+                                                    logger.error(error)
                                                 }
                                             }
                                         }
                                         break
                                     default:
-                                        log.error("Non-implemented export type for folder.")
+                                        logger.error("Non-implemented export type for folder.")
                                         break
                                     }
                                 }
@@ -548,28 +544,28 @@ class NeoLibrary {
                         try fileManager.zipItem(at: tempDestinationURL, to: destinationURL, shouldKeepParent: false, compressionMethod: .deflate)
                         try fileManager.removeItem(at: tempDestinationURL)
                     } catch {
-                        log.error(error)
+                        logger.error(error)
                     }
                 }
                 break
             }
         } catch {
-            log.error("Failed to create zip of folder: \(error)")
+            logger.error("Failed to create zip of folder: \(error)")
         }
         return destinationURL
     }
     
     public static func createZIPOfExportFolder() -> URL? {
         let destinationURL = getDocumentsURL().appendingPathComponent("Sketchnoting-Export.zip")
-        log.info(destinationURL.absoluteString)
+        logger.info(destinationURL.absoluteString)
         do {
-            log.info(1)
+            logger.info(1)
             try FileManager.default.zipItem(at: getTemporaryExportURL(), to: destinationURL, shouldKeepParent: false, compressionMethod: .none)
-            log.info(2)
+            logger.info(2)
         }
         catch {
-            log.error("Created a ZIP of the export folder failed.")
-            log.error(error)
+            logger.error("Created a ZIP of the export folder failed.")
+            logger.error(error)
             return nil
         }
         if FileManager.default.fileExists(atPath: destinationURL.path) {
@@ -601,13 +597,13 @@ class NeoLibrary {
         archive.forEach { entry in
             if (!entry.path.hasSuffix("/")) {
                 if (entry.path.lowercased().hasSuffix(".sketchnote")) {
-                    log.info("Inspecting file \(entry.path)")
+                    logger.info("Inspecting file \(entry.path)")
                     _ = try? archive.extract(entry) { data in
                         if self.decodeNoteFromData(data: data) != nil {
                             // Valid .sketchnote file
                         }
                         else {
-                            log.error("Invalid file being imported! ZIP file import cancelled.")
+                            logger.error("Invalid file being imported! ZIP file import cancelled.")
                             valid = false
                         }
                     }
@@ -626,7 +622,7 @@ class NeoLibrary {
             try fileManager.createDirectory(at: destinationURL, withIntermediateDirectories: true, attributes: nil)
             try fileManager.unzipItem(at: sourceURL, to: destinationURL)
         } catch {
-            log.error("Failed to extract ZIP file for import: \(error)")
+            logger.error("Failed to extract ZIP file for import: \(error)")
             return ImportZIPResult.Failure
         }
         
@@ -668,7 +664,7 @@ class NeoLibrary {
         }
         catch let error as NSError
         {
-            log.error("Documents folder could not be created: \(error.debugDescription)")
+            logger.error("Documents folder could not be created: \(error.debugDescription)")
         }
         return documentTypeFolderURL
     }
@@ -680,7 +676,7 @@ class NeoLibrary {
                 do
                 {
                     try encoded.write(to: documentURL)
-                    log.info("[\(document.documentType.rawValue)] Document \(document.title) stored.")
+                    logger.info("[\(document.documentType.rawValue)] Document \(document.title) stored.")
                     if let note = note {
                         if documentsIndex[note.getID()] == nil {
                             documentsIndex[note.getID()] = [String]()
@@ -690,7 +686,7 @@ class NeoLibrary {
                 }
                 catch let error as NSError
                 {
-                    log.error("[\(document.documentType.rawValue)] Document \(document.title) could not be stored: \(error)")
+                    logger.error("[\(document.documentType.rawValue)] Document \(document.title) could not be stored: \(error)")
                 }
             }
         }
@@ -717,7 +713,7 @@ class NeoLibrary {
                     }
                 }
             } catch {
-                log.error("Document failed to load from disk: \(url.path)")
+                logger.error("Document failed to load from disk: \(url.path)")
             }
         }
         return nil

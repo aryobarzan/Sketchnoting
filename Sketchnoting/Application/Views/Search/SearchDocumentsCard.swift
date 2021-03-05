@@ -83,6 +83,7 @@ class SearchDocumentsCard: UIView {
     private func fetchDocumentImages() {
         if !documents.isEmpty {
             images = [UIImage]()
+            self.imageView.image = nil
             let currentDocument = documents[currentIndex]
             currentDocument.retrieveImage(type: .Standard, completion: { result in
                 switch result {

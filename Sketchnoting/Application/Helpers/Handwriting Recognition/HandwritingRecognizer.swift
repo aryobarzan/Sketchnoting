@@ -38,7 +38,7 @@ class HandwritingRecognizer {
             self.textRecognizerCloud = vision.cloudTextRecognizer()
             textRecognizerCloud.process(visionImageCloud) { result, error in
                 guard error == nil, let result = result else {
-                    log.error(error.debugDescription)
+                    logger.error(error.debugDescription)
                     handleFinish(false, nil)
                     return
                 }
@@ -48,7 +48,7 @@ class HandwritingRecognizer {
             break
         case .CloudDense:
             FirebaseUsage.shared.getAPIUsage(completion: {remaining in
-                log.info("Remaining usages for Firebase Dense: \(remaining)")
+                logger.info("Remaining usages for Firebase Dense: \(remaining)")
                 if remaining > 0 {
                     FirebaseUsage.shared.sendAPIUsage()
                     let options = VisionCloudTextRecognizerOptions()
@@ -56,7 +56,7 @@ class HandwritingRecognizer {
                     self.textRecognizerCloud = self.vision.cloudTextRecognizer(options: options)
                     self.textRecognizerCloud.process(visionImageCloud) { result, error in
                         guard error == nil, let result = result else {
-                            log.error(error.debugDescription)
+                            logger.error(error.debugDescription)
                             handleFinish(false, nil)
                             return
                         }
@@ -96,7 +96,7 @@ class FirebaseUsage {
             case .success(let res):
                 json = JSON(res)
             case .failure(let error):
-                log.error(error.localizedDescription)
+                logger.error(error.localizedDescription)
                 completion(0)
                 return
             }
@@ -121,9 +121,9 @@ class FirebaseUsage {
             switch responseResult {
             case .success(let res):
                 json = JSON(res)
-                log.info(json)
+                logger.info(json)
             case .failure(let error):
-                log.error(error.localizedDescription)
+                logger.error(error.localizedDescription)
                 return
             }
         }

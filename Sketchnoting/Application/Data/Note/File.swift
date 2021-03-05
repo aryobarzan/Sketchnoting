@@ -59,10 +59,10 @@ class File: Codable, Equatable, Hashable {
         let metaDataEncoder = JSONEncoder()
         if let encodedMetaData = try? metaDataEncoder.encode(self) {
             data.append(encodedMetaData)
-            log.info("File \(self.getName()) encoded.")
+            logger.info("File \(self.getName()) encoded.")
         }
         else {
-            log.error("Encoding failed for file " + self.getName() + ".")
+            logger.error("Encoding failed for file " + self.getName() + ".")
         }
         let dataEncoded = try? NSKeyedArchiver.archivedData(withRootObject: data, requiringSecureCoding: false)
         return dataEncoded

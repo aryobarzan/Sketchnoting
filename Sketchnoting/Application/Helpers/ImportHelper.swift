@@ -24,7 +24,7 @@ class ImportHelper {
         for url in urls {
             do {
                 let data = try Data(contentsOf: url)
-                log.info("Importing item of type: \(url.typeIdentifier!)")
+                logger.info("Importing item of type: \(url.typeIdentifier!)")
                 switch url.typeIdentifier {
                 case "public.image", "public.jpeg", "public.jpg", "public.png":
                     if let decodedImage = UIImage(data: data) {
@@ -53,23 +53,23 @@ class ImportHelper {
                     let result = NeoLibrary.importZIP(url: url)
                     switch result {
                     case .Success:
-                        log.info("Success: ZIP file imported.")
+                        logger.info("Success: ZIP file imported.")
                         break
                     case .InvalidFile:
-                        log.error("Failure: ZIP file contains invalid file.")
+                        logger.error("Failure: ZIP file contains invalid file.")
                         break
                     case .InvalidZIP:
-                        log.error("Failure: ZIP file is invalid.")
+                        logger.error("Failure: ZIP file is invalid.")
                         break
                     case .Failure:
-                        log.error("Failure: ZIP import failed for unknown reason.")
+                        logger.error("Failure: ZIP import failed for unknown reason.")
                         break
                     }
                 default:
-                    log.error("Unrecognized type for URL: \(url.typeIdentifier ?? "No type identifier")")
+                    logger.error("Unrecognized type for URL: \(url.typeIdentifier ?? "No type identifier")")
                 }
             } catch {
-                log.error("Imported URL could not be decoded: \(url.absoluteString)")
+                logger.error("Imported URL could not be decoded: \(url.absoluteString)")
             }
         }
         return (notes, images, pdfs, texts)
@@ -83,7 +83,7 @@ class ImportHelper {
         else if let fileExtension = fileExtension {
             noteTypedText.codeLanguage = fileExtension.lowercased()
         }
-        log.info("Text file language: \(noteTypedText.codeLanguage)")
+        logger.info("Text file language: \(noteTypedText.codeLanguage)")
         return noteTypedText
     }
 }

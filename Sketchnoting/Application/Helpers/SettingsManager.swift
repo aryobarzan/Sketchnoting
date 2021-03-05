@@ -70,9 +70,9 @@ class SettingsManager {
         let p = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("NoteOptionsOrdering.json")
         do {
             try JSONEncoder().encode(orderingList).write(to: p)
-            log.info("Saved Note Options ordering.")
+            logger.info("Saved Note Options ordering.")
         } catch {
-            log.error("Failed to save Note Options ordering.")
+            logger.error("Failed to save Note Options ordering.")
         }
     }
     public static func getNoteOptionsOrdering() -> [NoteOption : Int]? {
@@ -82,8 +82,7 @@ class SettingsManager {
             let ordering = try JSONDecoder().decode([NoteOption : Int].self, from: data)
             return ordering
         } catch {
-            print(error)
-            log.info("Failed to fetch Note Options ordering.")
+            logger.info("Failed to fetch Note Options ordering: \(error)")
             return nil
         }
     }
@@ -91,7 +90,7 @@ class SettingsManager {
     public static func isAnnotationServiceAvailable() -> Bool {
         if let lastDate = UserDefaults.standard.object(forKey: "LastAnnotationDate") as? Date {
             let delta = Date().timeIntervalSince(lastDate)
-            log.info(delta)
+            logger.info(delta)
             if delta >= 10 {
                 return true
             }

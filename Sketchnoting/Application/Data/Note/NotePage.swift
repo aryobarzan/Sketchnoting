@@ -45,7 +45,7 @@ class NotePage: Codable {
         do {
             try container.encode(layers, forKey: .layers)
         } catch {
-            log.error("Error while encoding layers of note page.")
+            logger.error("Error while encoding layers of note page.")
         }
         try container.encode(canvasDrawing, forKey: .canvasDrawing)
         try container.encode(drawings, forKey: .drawings)
@@ -74,8 +74,8 @@ class NotePage: Codable {
                 }
             }
         } catch {
-            log.error("Decoding a note page's layers failed.")
-            log.error(error)
+            logger.error("Decoding a note page's layers failed.")
+            logger.error(error)
         }
         self.layers = layers
 

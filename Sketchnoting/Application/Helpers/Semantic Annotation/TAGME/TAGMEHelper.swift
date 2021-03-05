@@ -21,7 +21,7 @@ class TAGMEHelper {
             let headers: HTTPHeaders = [
                 "Accept": "application/json"
             ]
-            log.info("TAGME annotator request sent.")
+            logger.info("TAGME annotator request sent.")
             var documentsCount = 0
             AF.request("http://tagme.d4science.org/tagme/tag", parameters: parameters, headers: headers).responseJSON { response in
                 self.tagmeQueue.async {
@@ -31,20 +31,20 @@ class TAGMEHelper {
                     case .success(let res):
                         json = JSON(res)
                     case .failure(let error):
-                        log.error("TAGME response failed to serialize as JSON object.")
-                        log.error(response.debugDescription)
-                        log.error(error.localizedDescription)
+                        logger.error("TAGME response failed to serialize as JSON object.")
+                        logger.error(response.debugDescription)
+                        logger.error(error.localizedDescription)
                         return
                     }
-                    log.info("TAGME: API call successful.")
+                    logger.info("TAGME: API call successful.")
                     var results = [String: String]()
-                    // log.info(json)
+                    logger.info(json)
                     
                     if let annotations = json["annotations"].array {
-                        log.info("TAGME found \(annotations.count) annotations.")
+                        logger.info("TAGME found \(annotations.count) annotations.")
                         for annotation in annotations {
                             if documentsCount == 30 {
-                                log.info("TAGME: reached limit of 30 documents. Discarding the rest of the found annotations.")
+                                logger.info("TAGME: reached limit of 30 documents. Discarding the rest of the found annotations.")
                                 break
                             }
                             if let spot = annotation["spot"].string, let id = annotation["id"].double, let abstract = annotation["abstract"].string, let title = annotation["title"].string, let rho = annotation["rho"].double {
@@ -81,10 +81,10 @@ class TAGMEHelper {
     private func performAdditionalSteps(document: TAGMEDocument, note: (URL, Note)) {
         DispatchQueue.main.async {
             if !note.1.getDocuments().contains(document) {
-                log.info("TAGME: new document added - \(document.title)")
+                logger.info("TAGME: new document added - \(document.title)")
                 note.1.addDocument(document: document)
                 if let spot = document.spot {
-                    log.info("TAGME has triggered ALMA AR api calls.")
+                    logger.info("TAGME has triggered ALMA AR api calls.")
                     ALMAARHelper.shared.fetch(concept: document.title, spot: spot, note: note)
                 }
                 self.tagmeQueue.async {
@@ -116,13 +116,13 @@ class TAGMEHelper {
                     if let wikiExtract = json["query"]["pages"][String(format: "%.0f", document.wikiPageID!)]["extract"].string {
                         DispatchQueue.main.async {
                             document.description = wikiExtract
-                            log.info("Retrieved wikipedia intro extract for document \(document.title).")
+                            logger.info("Retrieved wikipedia intro extract for document \(document.title).")
                         }
                     }
                     break
                 case .failure(let error):
-                    log.error("Failed to retrieve wikipedia intro extract for document \(document.title).")
-                    log.error(error.localizedDescription)
+                    logger.error("Failed to retrieve wikipedia intro extract for document \(document.title).")
+                    logger.error(error.localizedDescription)
                     return
                 }
             }
@@ -156,7 +156,7 @@ class TAGMEHelper {
                                 if let imageURL = json["query"]["pages"][String(format: "%.0f", document.wikiPageID!)]["thumbnail"]["source"].string {
                                     DispatchQueue.global(qos: .utility).async {
                                         if let url = URL(string: imageURL) {
-                                            log.info("Found Wikipedia preview image for: \(document.title)")
+                                            logger.info("Found Wikipedia preview image for: \(document.title)")
                                             document.downloadImage(url: url, type: .Standard)
                                             completion(true)
                                         }
@@ -169,7 +169,7 @@ class TAGMEHelper {
                                     completion(false)
                                 }
                             case .failure(let error):
-                                log.error(error.localizedDescription)
+                                logger.error(error.localizedDescription)
                                 completion(false)
                                 return
                             }
@@ -177,7 +177,7 @@ class TAGMEHelper {
                     }
                     break
                 case .failure(let error):
-                    log.error(error.localizedDescription)
+                    logger.error(error.localizedDescription)
                     completion(false)
                     return
                 }
@@ -202,7 +202,7 @@ class TAGMEHelper {
             if words.count > 1 {
                 for word in words {
                     self.fetch(text: word, note: note, parentConcept: document)
-                    log.info("Fetching TAGME document for subconcept: \(word)")
+                    logger.info("Fetching TAGME document for subconcept: \(word)")
                 }
             }
         }
@@ -223,21 +223,21 @@ class TAGMEHelper {
                         case .success(let res):
                             json = JSON(res)
                         case .failure(let error):
-                            log.error(error.localizedDescription)
+                            logger.error(error.localizedDescription)
                             return
                         }
-                        log.info("TAGME (Relatedness): API call successful.")
-                        log.info(json)
+                        logger.info("TAGME (Relatedness): API call successful.")
+                        logger.info(json)
                         if let result = json["result"].array {
                             for res in result {
                                 if let rel = res["rel"].double {
                                     if rel > 0.3 {
-                                        log.info(rel)
-                                        log.info(doc_two.title)
+                                        logger.info(rel)
+                                        logger.info(doc_two.title)
                                         self.performAdditionalSteps(document: doc_two, note: note)
                                     }
                                     else {
-                                        log.info("Related document not saved, as it does not have a high enough related score: \(doc_two.title)")
+                                        logger.info("Related document not saved, as it does not have a high enough related score: \(doc_two.title)")
                                     }
                                 }
                             }

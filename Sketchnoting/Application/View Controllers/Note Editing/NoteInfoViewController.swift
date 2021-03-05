@@ -28,7 +28,7 @@ class NoteInfoViewController: UIViewController {
     
     @IBAction func titleTextViewDone(_ sender: UITextField) {
         if let text = sender.text {
-            log.info("Note title updated.")
+            logger.info("Note title updated.")
             let newURL = NeoLibrary.rename(url: note.0, file: note.1, name: text)
             if let newURL = newURL {
                 delegate?.noteRenamed(newName: text, newURL: newURL)

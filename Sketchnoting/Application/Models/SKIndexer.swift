@@ -20,10 +20,10 @@ class SKIndexer {
                     sentenceEmbeddings.append(vector)
                     //log.info(vector)
                     let results = sentenceEmbedding.neighbors(for: vector, maximumCount: 1, distanceType: .cosine)
-                    log.info(results[0].0)
+                    logger.info(results[0].0)
                 }
                 else {
-                    log.error("No vector representation possible for: \(sentence)")
+                    logger.error("No vector representation possible for: \(sentence)")
                 }
             }
         }

@@ -9,9 +9,10 @@
 import UIKit
 import Firebase
 import Alamofire
-import SwiftyBeaver
-let log = SwiftyBeaver.self
 import MultipeerConnectivity
+import SwiftyBeaver
+
+let logger = SwiftyBeaver.self
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -26,13 +27,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         console.format = "$DHH:mm:ss$d $L $M"
         console.levelString.info = "\u{1F49C} (INFO)"
         console.levelString.error = "\u{2764} (ERROR)"
-        log.addDestination(console)
-        log.addDestination(file)
+        logger.addDestination(console)
+        logger.addDestination(file)
+
         
         SKCacheManager.cache.diskStorage.config.expiration = .never
         SKCacheManager.cache.diskStorage.config.sizeLimit = 1000 * 1024 * 1024 // 1GB
         SKCacheManager.cache.memoryStorage.config.countLimit = 150
-        
+
         FirebaseApp.configure()
         
         if SettingsManager.firstAppStartup() {
@@ -75,7 +77,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var importURL: URL?
     func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any]) -> Bool {
-        log.info("Attempting to import file from outside.")
+        logger.info("Attempting to import file from outside.")
         importURL = url
         return true
     }

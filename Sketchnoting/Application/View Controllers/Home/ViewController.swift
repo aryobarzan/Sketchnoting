@@ -96,14 +96,14 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         noteCollectionView.dragDelegate = self
         noteCollectionView.dropDelegate = self
         noteCollectionView.dragInteractionEnabled = true
-        
+
         self.noteLoadingIndicator.isHidden = false
         self.noteLoadingIndicator.startAnimating()
         self.newNoteButton.isEnabled = false
         DispatchQueue.main.asyncAfter(deadline: .now()) {
             self.updateDisplayedNotes(true)
             self.updateFoldersHierarchy()
-            log.info("Files loaded.")
+            logger.info("Files loaded.")
             self.noteLoadingIndicator.stopAnimating()
             self.noteLoadingIndicator.isHidden = true
             self.newNoteButton.isEnabled = true
@@ -145,7 +145,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     // Respond to NotificationCenter events
     @objc func notifiedFileImport(_ noti : Notification)  {
         let importURL = (noti.userInfo as? [String : URL])!["importURL"]!
-        log.info(importURL)
+        logger.info(importURL)
         self.manageFileImport(urls: [importURL])
     }
     @objc func notifiedReceiveSketchnote(_ noti : Notification)  {
@@ -173,10 +173,10 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         super.prepare(for: segue, sender: sender)
         switch(segue.identifier ?? "") {
         case "NewSketchnote":
-            log.info("New note.")
+            logger.info("New note.")
             break
         case "EditSketchnote":
-            log.info("Editing note.")
+            logger.info("Editing note.")
             if let destination = segue.destination as? NoteViewController {
                 destination.note = noteToEdit
             }
@@ -231,7 +231,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         case "Settings":
             break
         default:
-            log.info("Unaccounted-for segue.")
+            logger.info("Unaccounted-for segue.")
         }
     }
     
@@ -265,20 +265,20 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             let (importedNotes, importedImages, importedPDFs, importedTexts) = ImportHelper.importItems(urls: urls)
             for note in importedNotes {
                 NeoLibrary.add(note: note.1)
-                log.info("Imported note \(note.1.getName()).")
+                logger.info("Imported note \(note.1.getName()).")
             }
             if importedImages.count > 0 {
                 _ = NeoLibrary.createNoteFrom(images: importedImages)
-                log.info("New note from imported images.")
+                logger.info("New note from imported images.")
             }
             if importedTexts.count > 0 {
                 _ = NeoLibrary.createNoteFrom(typedTexts: importedTexts)
-                log.info("New note from imported text files.")
+                logger.info("New note from imported text files.")
             }
             for pdf in importedPDFs {
                 if pdf.pageCount > 0 {
                     _ = NeoLibrary.createNoteFrom(pdf: pdf)
-                    log.info("New note from imported pdf.")
+                    logger.info("New note from imported pdf.")
                 }
             }
             self.view.makeToast("Imported your selected documents.")
@@ -302,7 +302,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         ImagePickerHelper.displayImagePickerWithImageOutput(vc: self, completion: { images in
             if images.count > 0 {
                 _ = NeoLibrary.createNoteFrom(images: images)
-                log.info("New note from imported images (camera roll).")
+                logger.info("New note from imported images (camera roll).")
                 self.updateDisplayedNotes(true)
             }
         })
@@ -341,14 +341,14 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             images.append(image)
         }
         _ = NeoLibrary.createNoteFrom(images: images)
-        log.info("New note from scanned images.")
+        logger.info("New note from scanned images.")
         self.updateDisplayedNotes(true)
     }
     func documentCameraViewControllerDidCancel(_ controller: VNDocumentCameraViewController) {
         controller.dismiss(animated: true, completion: nil)
     }
     func documentCameraViewController(_ controller: VNDocumentCameraViewController, didFailWithError error: Error) {
-        log.error(error)
+        logger.error(error)
         controller.dismiss(animated: true, completion: nil)
     }
     
@@ -410,7 +410,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     }
     
     private func updateFoldersHierarchy() {
-        log.info("Updating folder navigation hierarchy.")
+        logger.info("Updating folder navigation hierarchy.")
         for button in folderButtons {
             button.removeFromSuperview()
         }
@@ -418,7 +418,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         var component = NeoLibrary.currentLocation
         var limit = 0
         while !NeoLibrary.isHomeDirectory(url: component) && component != NeoLibrary.getHomeDirectoryURL() {
-            log.info(component)
+            logger.info(component)
             let folderButton = FolderButton()
             folderButton.frame = CGRect(x: 0, y: 0, width: 100, height: 35)
             folderButton.set(directoryURL: component)
@@ -724,7 +724,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         let mcBrowser = MCBrowserViewController(serviceType: "hws-kb", session: mcSession)
         mcBrowser.delegate = self
         self.present(mcBrowser, animated: true)
-        log.info("Joining sessions...")
+        logger.info("Joining sessions...")
     }
     
     private var noteCollectionViewState = SettingsManager.getFileDisplayLayout()
@@ -803,14 +803,14 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     public func open(url: URL, note: Note) {
         self.noteToEdit = (url, note)
         self.performSegue(withIdentifier: "EditSketchnote", sender: self)
-        log.info("Opening note.")
+        logger.info("Opening note.")
     }
     
     private func open(url: URL, folder: File) {
         NeoLibrary.currentLocation = url
         self.updateDisplayedNotes(false)
         self.updateFoldersHierarchy()
-        log.info("Opening folder.")
+        logger.info("Opening folder.")
     }
     
     private func renameFile(url: URL, file: File, indexPath: IndexPath) {
@@ -915,7 +915,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             self.noteCollectionView.reloadData()
         }))
         alert.addAction(UIAlertAction(title: "Cancel", style: .default, handler: { action in
-              log.info("Not deleting file.")
+              logger.info("Not deleting file.")
         }))
         self.present(alert, animated: true, completion: nil)
     }
@@ -944,7 +944,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             let sourceFile = self.items[sourceIndexPath.item]
             let destinationItem = self.items[destinationIndexPath.item]
             if !(destinationItem.1 is Note) { // Folder
-                log.info("Moving file to folder.")
+                logger.info("Moving file to folder.")
                 _ = NeoLibrary.move(file: sourceFile.1, from: sourceFile.0, to: destinationItem.0)
                 self.updateDisplayedNotes(false)
             }
@@ -1027,7 +1027,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
                 }
             }))
             alert.addAction(UIAlertAction(title: "Cancel", style: .default, handler: { action in
-                  log.info("Not deleting selected files.")
+                  logger.info("Not deleting selected files.")
             }))
             self.present(alert, animated: true, completion: nil)
         }
@@ -1044,7 +1044,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     
     // MARK: SKClipboardDelegate (to update)
     func pasteNoteTapped() {
-        log.info("Pasting note: \(SKClipboard.getNote()?.getName() ?? "Note name could not be retrieved.")")
+        logger.info("Pasting note: \(SKClipboard.getNote()?.getName() ?? "Note name could not be retrieved.")")
         if let n = SKClipboard.getNote() {
             NeoLibrary.add(note: n)
             self.updateDisplayedNotes(true)
@@ -1052,7 +1052,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         }
     }
     func pastePageTapped() {
-        log.info("Pasting note page.")
+        logger.info("Pasting note page.")
         if let p = SKClipboard.getPage() {
             let newNote = Note(name: "Note Page Copy", documents: nil)
             newNote.pages = [p]
@@ -1063,7 +1063,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         
     }
     func pasteNoteLayerTapped() {
-        log.info("Pasting note layer.")
+        logger.info("Pasting note layer.")
         if let layer = SKClipboard.getNoteLayer() {
             if let noteImage = layer as? NoteImage {
                 _ = NeoLibrary.createNoteFrom(images: [noteImage.image])

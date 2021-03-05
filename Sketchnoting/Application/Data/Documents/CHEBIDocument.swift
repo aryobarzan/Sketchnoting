@@ -37,13 +37,13 @@ class CHEBIDocument: BioPortalDocument {
             switch result {
             case .success(let value):
                 if value != nil {
-                    log.info("Molecule image found for document \(self.title).")
+                    logger.info("Molecule image found for document \(self.title).")
                     DispatchQueue.main.async {
                         self.moleculeImage = value!
                     }
                 }
             case .failure(let error):
-                log.error("No molecule image found for document \(self.title).")
+                logger.error("No molecule image found for document \(self.title).")
                 print(error)
             }
         })

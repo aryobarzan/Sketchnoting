@@ -66,7 +66,7 @@ class ReceivedNotesViewController: UIViewController, UICollectionViewDelegate, U
     }
     
     func acceptReceivedNote(note: Note) {
-        log.info("Accepted shared note")
+        logger.info("Accepted shared note")
         NeoLibrary.receivedNotesController.receivedNotes.removeAll(where: { $0 == note } )
         NeoLibrary.add(note: note)
         self.collectionView.reloadData()
@@ -74,7 +74,7 @@ class ReceivedNotesViewController: UIViewController, UICollectionViewDelegate, U
     }
        
     func rejectReceivedNote(note: Note) {
-        log.info("Rejected shared note")
+        logger.info("Rejected shared note")
         NeoLibrary.receivedNotesController.receivedNotes.removeAll(where: { $0 == note } )
         self.collectionView.reloadData()
         Notifications.announceDeviceVisibility()

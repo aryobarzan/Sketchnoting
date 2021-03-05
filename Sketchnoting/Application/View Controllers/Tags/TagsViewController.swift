@@ -53,7 +53,7 @@ class TagsViewController: UIViewController, UITableViewDataSource, UITableViewDe
             // Delete the row from the data source
             let tag = TagsManager.tags[indexPath.row]
             TagsManager.delete(tag: tag)
-            log.info("Tag deleted.")
+            logger.info("Tag deleted.")
             tableView.deleteRows(at: [indexPath], with: .fade)
             tagsTableView.reloadData()
             self.updateTagSelections()

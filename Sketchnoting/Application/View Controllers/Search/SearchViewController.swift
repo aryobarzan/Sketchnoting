@@ -96,7 +96,7 @@ class SearchViewController: UIViewController, UICollectionViewDelegate, UICollec
     // MARK: UICollectionViewDelegate
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         self.openNote(url: self.notes[indexPath.item].0, note: self.notes[indexPath.item].1)
-        log.info("Note tapped.")
+        logger.info("Note tapped.")
     }
     
     func collectionView(_ collectionView: UICollectionView,
@@ -128,7 +128,7 @@ class SearchViewController: UIViewController, UICollectionViewDelegate, UICollec
         activityIndicator.isHidden = false
         activityIndicator.startAnimating()
         SemanticSearch.shared.search(query: query, notes: NeoLibrary.getNotes(), expandedSearch: expandedSearchSwitch.isOn, searchHandler: {searchResult in
-            log.info("Search Result - \(searchResult.note == nil ? "Note not a match" : searchResult.note!.1.getName()) / \(searchResult.documents.count) Documents / \(searchResult.personDocuments.count) Person-Documents / \(searchResult.locationDocuments.count) Location-Documents")
+            logger.info("Search Result - \(searchResult.note == nil ? "Note not a match" : searchResult.note!.1.getName()) / \(searchResult.documents.count) Documents / \(searchResult.personDocuments.count) Person-Documents / \(searchResult.locationDocuments.count) Location-Documents")
             if searchResult.note != nil {
                 DispatchQueue.main.async {
                     self.notes.append(searchResult.note!)
