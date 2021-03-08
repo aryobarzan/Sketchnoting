@@ -175,21 +175,50 @@ class SemanticSearch {
         return Int64(Date().timeIntervalSince1970 * 1000)
     }
     
-    private func getTermRelevancy(terms: [String]) -> Bool {
+    private func getTermRelevancy(terms: [String], wordEmbedding: NLEmbedding) -> Bool {
         var terms = terms
-        if let wordEmbedding = wordEmbedding {
-            for i in 0..<terms.count {
-                let lemmatized = SemanticSearch.shared.lemmatize(text: terms[i])
-                if wordEmbedding.contains(lemmatized) {
-                    terms[i] = lemmatized.lowercased()
-                }
-                else {
-                    terms[i] = terms[i].lowercased()
-                }
+        for i in 0..<terms.count {
+            let lemmatized = SemanticSearch.shared.lemmatize(text: terms[i])
+            if wordEmbedding.contains(lemmatized) {
+                terms[i] = lemmatized.lowercased()
+            }
+            else {
+                terms[i] = terms[i].lowercased()
             }
         }
         // TODO: Calculate semantic distance (cosine) / TF-IDF score
-        return true
+        var unrelatedTerms = [String]()
+        var relatedTerms = terms
+        for term in terms {
+            var otherTerms = terms
+            otherTerms.remove(object: term)
+            var minimumDistance = 999.0
+            var highestCommonNotes = 0
+            let containingNotes = TF_IDF.shared.documentsForTerm(term: term, positiveOnly: true).compactMap({$0.noteID})
+            for otherTerm in otherTerms {
+                let distance = wordEmbedding.distance(between: term, and: otherTerm, distanceType: .cosine)
+                if distance < minimumDistance {
+                    minimumDistance = distance
+                }
+                if distance >= 2.0 && !containingNotes.isEmpty {
+                    let commonNotes = TF_IDF.shared.documentsForTerm(term: otherTerm, positiveOnly: true, documents: containingNotes)
+                    let count = Int(commonNotes.count)
+                    if count > highestCommonNotes {
+                        highestCommonNotes = count
+                    }
+                }
+            }
+            logger.info(minimumDistance)
+            logger.info(highestCommonNotes)
+            if minimumDistance > 1.0 {
+                if highestCommonNotes == 0 {
+                    logger.info("Distance - \(term) - \(minimumDistance)")
+                    unrelatedTerms.append(term)
+                    relatedTerms.remove(object: term)
+                }
+            }
+        }
+        return unrelatedTerms.isEmpty
     }
     
     private func process(query: String) -> String {
@@ -227,11 +256,16 @@ class SemanticSearch {
             var retainedQueryTerms = [String]()
             for i in 0..<partsOfSpeech.count {
                 if allowed.contains(partsOfSpeech[i].1) {
+                    if partsOfSpeech[i].1 == NLTag.otherWord.rawValue {
+                        if stopwords.contains(partsOfSpeech[i].0) {
+                            continue
+                        }
+                    }
                     processedQuery.append("\(partsOfSpeech[i].0.lowercased()) ")
                     retainedQueryTerms.append(partsOfSpeech[i].0)
                 }
             }
-            var areTermsRelated = getTermRelevancy(terms: retainedQueryTerms)
+            let areTermsRelated = getTermRelevancy(terms: retainedQueryTerms, wordEmbedding: wordEmbedding!)
             
             processedQuery = processedQuery.trimmingCharacters(in: .whitespaces)
             return processedQuery
@@ -243,6 +277,9 @@ class SemanticSearch {
     }
     
     public func search(query: String, notes: [(URL, Note)], expandedSearch: Bool = true, searchHandler: ((SearchResult) -> Void)?, searchFinishHandler: (() -> Void)?) {
+        for n in notes {
+            TF_IDF.shared.addNote(note: n.1)
+        }
         // let queryWords = tokenize(text: query, unit: .word)
         // let queryPartsOfSpeech = tag(text: query, scheme: .lexicalClass)
         // let queryEntities = tag(text: query, scheme: .nameType) // PlaceName, PersonName, OrganizationName

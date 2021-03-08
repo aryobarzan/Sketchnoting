@@ -28,7 +28,9 @@ final class TF_IDF {
     var documentsTF: Dictionary<String, TermCount>
     var corpusTermCount: TermCount
     
-    init() {
+    static let shared = TF_IDF()
+    
+    private init() {
         self.documentsTF = [:]
         corpusTermCount = [:]
     }
@@ -89,7 +91,7 @@ final class TF_IDF {
     ///
     /// - Returns: Array of tuple (docID, score) where _docID_ is the doc identifier and _score_
     ///     is the doc's score for the given _term_
-    func documentsForTerm(term: String) -> [(noteID: String, score: Double)] {
+    func documentsForTerm(term: String, positiveOnly: Bool = false, documents: [String] = [String]()) -> [(noteID: String, score: Double)] {
         guard let documentsTermCount = corpusTermCount[term] else {
             return []
         }
@@ -99,7 +101,20 @@ final class TF_IDF {
         for (document, documentTermCount) in documentsTF {
             if let tf = documentTermCount[term] {
                 let score = Double(tf) * idf
-                results.append((document, score))
+                var isIncluded = true
+                if positiveOnly {
+                    if score == 0.0 {
+                        isIncluded = false
+                    }
+                }
+                if !documents.isEmpty {
+                    if !documents.contains(document) {
+                        isIncluded = false
+                    }
+                }
+                if isIncluded {
+                    results.append((document, score))
+                }
             }
         }
         return results
