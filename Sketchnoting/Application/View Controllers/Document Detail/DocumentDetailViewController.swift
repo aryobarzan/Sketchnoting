@@ -62,7 +62,7 @@ class DocumentDetailViewController: UIViewController, DocumentVisitor {
     }
     
     func process(document: Document) {
-        if let description = document.description {
+        if let description = document.getDescription() {
             self.setDetailDescription(text: description)
         }
     }
@@ -71,7 +71,7 @@ class DocumentDetailViewController: UIViewController, DocumentVisitor {
         typeBackView.backgroundColor = #colorLiteral(red: 0.1764705926, green: 0.4980392158, blue: 0.7568627596, alpha: 1)
         typeLabel.text = "TAGME"
         titleLabel.text = document.title
-        if let description = document.description {
+        if let description = document.getDescription() {
             self.setDetailDescription(text: description)
         }
         loadMapImage(document: document)
@@ -81,7 +81,7 @@ class DocumentDetailViewController: UIViewController, DocumentVisitor {
         typeBackView.backgroundColor = #colorLiteral(red: 0.8549019694, green: 0.250980407, blue: 0.4784313738, alpha: 1)
         typeLabel.text = "WAT"
         titleLabel.text = document.title
-        if let description = document.description {
+        if let description = document.getDescription() {
             self.setDetailDescription(text: description)
         }
         loadMapImage(document: document)

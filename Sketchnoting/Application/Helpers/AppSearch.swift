@@ -142,7 +142,7 @@ class AppSearch: DocumentVisitor {
             documentFilterMatches = true
             return true
         }
-        else if let description = document.description {
+        else if let description = document.getDescription() {
             if description.lowercased().contains(documentFilterTerm) {
                 documentFilterMatches = true
                 return true

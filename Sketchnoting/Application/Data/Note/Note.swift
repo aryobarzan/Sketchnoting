@@ -197,8 +197,10 @@ class Note: File, DocumentDelegate {
         if let doc = document as? BioPortalDocument {
             let blacklistedBioPortalTerms = ["place", "city", "populated", "country", "capital", "location", "state", "town"]
             for term in blacklistedBioPortalTerms {
-                if doc.description?.lowercased().contains(term) ?? false {
-                    return false
+                if let description = doc.getDescription() {
+                    if description.lowercased().contains(term) {
+                        return false
+                    }
                 }
             }
         }

@@ -77,6 +77,12 @@ class SearchViewController: UIViewController, UICollectionViewDelegate, UICollec
             }
         }
     }
+    @IBAction func updateButtonTapped(_ sender: UIButton) {
+        TF_IDF.shared.clear()
+        for note in NeoLibrary.getNotes() {
+            TF_IDF.shared.addNote(note: note.1)
+        }
+    }
     
     func textFieldShouldClear(_ textField: UITextField) -> Bool {
         clearResults()

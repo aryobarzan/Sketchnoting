@@ -175,7 +175,7 @@ class SemanticSearch {
         return Int64(Date().timeIntervalSince1970 * 1000)
     }
     
-    private func getTermRelevancy(terms: [String], wordEmbedding: NLEmbedding) -> Bool {
+    private func getTermRelevancy(terms: [String], wordEmbedding: NLEmbedding) -> (String, String) {
         var terms = terms
         for i in 0..<terms.count {
             let lemmatized = SemanticSearch.shared.lemmatize(text: terms[i])
@@ -186,7 +186,7 @@ class SemanticSearch {
                 terms[i] = terms[i].lowercased()
             }
         }
-        // TODO: Calculate semantic distance (cosine) / TF-IDF score
+        // Calculate semantic distance (cosine) / TF-IDF score
         var unrelatedTerms = [String]()
         var relatedTerms = terms
         for term in terms {
@@ -208,20 +208,23 @@ class SemanticSearch {
                     }
                 }
             }
-            logger.info(minimumDistance)
-            logger.info(highestCommonNotes)
             if minimumDistance > 1.0 {
                 if highestCommonNotes == 0 {
-                    logger.info("Distance - \(term) - \(minimumDistance)")
+                    logger.info("Unrelated '\(term)': - \(minimumDistance) / \(highestCommonNotes)")
                     unrelatedTerms.append(term)
                     relatedTerms.remove(object: term)
                 }
             }
         }
-        return unrelatedTerms.isEmpty
+        logger.info("Query relevancy check...")
+        logger.info("Relevant query: \(relatedTerms.joined(separator: " "))")
+        if !unrelatedTerms.isEmpty {
+            logger.info("Unrelated query: \(unrelatedTerms.joined(separator: " "))")
+        }
+        return (relatedTerms.joined(separator: " "), unrelatedTerms.joined(separator: " "))
     }
     
-    private func process(query: String) -> String {
+    private func process(query: String) -> (String, String?) {
         let queryWords = tokenize(text: query, unit: .word)
         // Spellcheck & lowercase - currently disabled as it wrongly does not know many domain specific terms, e.g. "generics" in programming
         /*let spellchecker = UITextChecker()
@@ -265,21 +268,18 @@ class SemanticSearch {
                     retainedQueryTerms.append(partsOfSpeech[i].0)
                 }
             }
-            let areTermsRelated = getTermRelevancy(terms: retainedQueryTerms, wordEmbedding: wordEmbedding!)
-            
-            processedQuery = processedQuery.trimmingCharacters(in: .whitespaces)
-            return processedQuery
+            let (relatedQuery, unrelatedQuery) = getTermRelevancy(terms: retainedQueryTerms, wordEmbedding: wordEmbedding!)
+            processedQuery = relatedQuery.lowercased().trimmingCharacters(in: .whitespaces)
+            let processedUnrelatedQuery = unrelatedQuery.lowercased().trimmingCharacters(in: .whitespaces)
+            return (processedQuery, processedUnrelatedQuery == "" ? nil : processedUnrelatedQuery)
         }
         else if queryWords.count == 1 { // Keyword query
-            return lemmatize(text: queryWords[0].lowercased())
+            return (lemmatize(text: queryWords[0]).lowercased(), nil)
         }
-        return queryWords.joined(separator: " ")
+        return (queryWords.joined(separator: " "), nil)
     }
     
-    public func search(query: String, notes: [(URL, Note)], expandedSearch: Bool = true, searchHandler: ((SearchResult) -> Void)?, searchFinishHandler: (() -> Void)?) {
-        for n in notes {
-            TF_IDF.shared.addNote(note: n.1)
-        }
+    public func search(query: String, notes: [(URL, Note)], isSecondarySearch: Bool = false, expandedSearch: Bool = true, searchHandler: ((SearchResult) -> Void)?, searchFinishHandler: (() -> Void)?) {
         // let queryWords = tokenize(text: query, unit: .word)
         // let queryPartsOfSpeech = tag(text: query, scheme: .lexicalClass)
         // let queryEntities = tag(text: query, scheme: .nameType) // PlaceName, PersonName, OrganizationName
@@ -294,126 +294,139 @@ class SemanticSearch {
         //let queryType = checkPhraseType(queryPartsOfSpeech: queryPartsOfSpeech)
         // log.info("Performing search on query of type: \(queryType.rawValue)")
         // Expanded Search means a lower threshold for the lexical search, i.e. more tolerant to minor typos
+        let (primaryQuery, secondaryQuery) = process(query: query)
+        logger.info("----")
         logger.info("Original query: \(query)")
-        let query = process(query: query)
-        logger.info("Processed query: \(query)")
+        logger.info("Processed query: \(primaryQuery)")
         let lexicalThreshold = expandedSearch ? 0.9 : 1.0
         
+        var queries = [primaryQuery]
+        if secondaryQuery != nil {
+            queries.append(secondaryQuery!)
+        }
         // Start search process, going through each note
         // Note that this is parallelized, with up to 4 notes being processed at the same time
-        for note in notes {
-            queue.addOperation {
-                var searchResult = SearchResult()
-                if let wordEmbedding = NLEmbedding.wordEmbedding(for: .english), let sentenceEmbedding = NLEmbedding.sentenceEmbedding(for: .english) {
-                    // MARK: Note title
-                    var (searchType, closestTarget, score) = self.getStringSimilarity(betweenQuery: query, and: note.1.getName(), wordEmbedding: wordEmbedding, sentenceEmbedding: sentenceEmbedding)
-                    switch searchType {
-                    case .Lexical:
-                        if score >= lexicalThreshold { // Higher is better
-                            searchResult.note = note
-                            logger.info("[Lexical] Note title ('\(closestTarget)') = \(score)")
-                            break
-                        }
-                    case .Semantic:
-                        if score <= self.SEARCH_THRESHOLD { // Lower is better
-                            searchResult.note = note
-                            logger.info("[Semantic] Note title ('\(closestTarget)') = \(score)")
-                            break
-                        }
-                    }
-                    // MARK: Note body (handwritten + PDF text)
-                    (searchType, closestTarget, score) = self.getStringSimilarity(betweenQuery: query, and: note.1.getText(option: .FullText, parse: false), wordEmbedding: wordEmbedding, sentenceEmbedding: sentenceEmbedding)
-                    switch searchType {
-                    case .Lexical:
-                        if score >= lexicalThreshold { // Higher is better
-                            searchResult.note = note
-                            logger.info("[Lexical] Note body ('\(closestTarget)') = \(score)")
-                            break
-                        }
-                    case .Semantic:
-                        if score <= self.SEARCH_THRESHOLD { // Lower is better
-                            searchResult.note = note
-                            logger.info("[Semantic] Note body ('\(closestTarget)') = \(score)")
-                            break
-                        }
-                    }
-                    // MARK: Note recognized drawings
-                    (searchType, closestTarget, score) = self.getStringSimilarity(betweenQuery: query, and: note.1.getDrawingLabels(), wordEmbedding: wordEmbedding, sentenceEmbedding: sentenceEmbedding)
-                    switch searchType {
-                    case .Lexical:
-                        if score >= lexicalThreshold { // Higher is better
-                            searchResult.note = note
-                            logger.info("[Lexical] Note drawing ('\(closestTarget)') = \(score)")
-                            break
-                        }
-                    case .Semantic:
-                        if score <= self.DRAWING_THRESHOLD { // Lower is better
-                            searchResult.note = note
-                            logger.info("[Semantic] Note drawing ('\(closestTarget)') = \(score)")
-                            break
-                        }
-                    }
-                    // MARK: Documents
-                    for document in note.1.getDocuments(includeHidden: false) {
-                        var isDocumentMatching = false
-                        // Document title
-                        (searchType, closestTarget, score) = self.getStringSimilarity(betweenQuery: query, and: document.title, wordEmbedding: wordEmbedding, sentenceEmbedding: sentenceEmbedding)
+        for query in queries {
+            for note in notes {
+                queue.addOperation {
+                    var searchResult = SearchResult()
+                    if let wordEmbedding = NLEmbedding.wordEmbedding(for: .english), let sentenceEmbedding = NLEmbedding.sentenceEmbedding(for: .english) {
+                        // MARK: Note title
+                        var (searchType, closestTarget, score) = self.getStringSimilarity(betweenQuery: query, and: note.1.getName(), wordEmbedding: wordEmbedding, sentenceEmbedding: sentenceEmbedding)
                         switch searchType {
                         case .Lexical:
                             if score >= lexicalThreshold { // Higher is better
                                 searchResult.note = note
-                                isDocumentMatching = true
-                                logger.info("[Lexical] Document ('\(document.title)') title ('\(closestTarget)') = \(score)")
+                                logger.info("[Lexical] Note title ('\(closestTarget)') = \(score)")
                                 break
                             }
                         case .Semantic:
                             if score <= self.SEARCH_THRESHOLD { // Lower is better
                                 searchResult.note = note
-                                isDocumentMatching = true
-                                logger.info("[Semantic] Document ('\(document.title)') title ('\(closestTarget)') = \(score)")
+                                logger.info("[Semantic] Note title ('\(closestTarget)') = \(score)")
                                 break
                             }
                         }
-                        if isDocumentMatching {
-                            searchResult.documents.append(document)
-                            continue
+                        // MARK: Note body (handwritten + PDF text)
+                        let noteText = note.1.getText(option: .FullText, parse: false).trimmingCharacters(in: .whitespacesAndNewlines)
+                        if !noteText.isEmpty {
+                            (searchType, closestTarget, score) = self.getStringSimilarity(betweenQuery: query, and: noteText, wordEmbedding: wordEmbedding, sentenceEmbedding: sentenceEmbedding)
+                            switch searchType {
+                            case .Lexical:
+                                if score >= lexicalThreshold { // Higher is better
+                                    searchResult.note = note
+                                    logger.info("[Lexical] Note body ('\(closestTarget)') = \(score)")
+                                    break
+                                }
+                            case .Semantic:
+                                if score <= self.SEARCH_THRESHOLD { // Lower is better
+                                    searchResult.note = note
+                                    logger.info("[Semantic] Note body ('\(closestTarget)') = \(score)")
+                                    break
+                                }
+                            }
                         }
-                        // Document description (abstract)
-                        if let description = document.description {
-                            (searchType, closestTarget, score) = self.getStringSimilarity(betweenQuery: query, and: description, wordEmbedding: wordEmbedding, sentenceEmbedding: sentenceEmbedding)
+                        // MARK: Note recognized drawings
+                        let noteDrawingLabels = note.1.getDrawingLabels()
+                        if !noteDrawingLabels.isEmpty {
+                            (searchType, closestTarget, score) = self.getStringSimilarity(betweenQuery: query, and: note.1.getDrawingLabels(), wordEmbedding: wordEmbedding, sentenceEmbedding: sentenceEmbedding)
+                            switch searchType {
+                            case .Lexical:
+                                if score >= lexicalThreshold { // Higher is better
+                                    searchResult.note = note
+                                    logger.info("[Lexical] Note drawing ('\(closestTarget)') = \(score)")
+                                    break
+                                }
+                            case .Semantic:
+                                if score <= self.DRAWING_THRESHOLD { // Lower is better
+                                    searchResult.note = note
+                                    logger.info("[Semantic] Note drawing ('\(closestTarget)') = \(score)")
+                                    break
+                                }
+                            }
+                        }
+                        // MARK: Documents
+                        for document in note.1.getDocuments(includeHidden: false) {
+                            var isDocumentMatching = false
+                            // Document title
+                            (searchType, closestTarget, score) = self.getStringSimilarity(betweenQuery: query, and: document.title, wordEmbedding: wordEmbedding, sentenceEmbedding: sentenceEmbedding)
                             switch searchType {
                             case .Lexical:
                                 if score >= lexicalThreshold { // Higher is better
                                     searchResult.note = note
                                     isDocumentMatching = true
-                                    logger.info("[Lexical] Document ('\(document.title)') description ('\(closestTarget)') = \(score)")
+                                    logger.info("[Lexical] Document ('\(document.title)') title ('\(closestTarget)') = \(score)")
                                     break
                                 }
                             case .Semantic:
                                 if score <= self.SEARCH_THRESHOLD { // Lower is better
                                     searchResult.note = note
                                     isDocumentMatching = true
-                                    logger.info("[Semantic] Document ('\(document.title)') description ('\(closestTarget)') = \(score)")
+                                    logger.info("[Semantic] Document ('\(document.title)') title ('\(closestTarget)') = \(score)")
                                     break
                                 }
                             }
+                            if isDocumentMatching {
+                                searchResult.documents.append(document)
+                                continue
+                            }
+                            // Document description (abstract)
+                            if let description = document.getDescription() {
+                                (searchType, closestTarget, score) = self.getStringSimilarity(betweenQuery: query, and: description, wordEmbedding: wordEmbedding, sentenceEmbedding: sentenceEmbedding)
+                                switch searchType {
+                                case .Lexical:
+                                    if score >= lexicalThreshold { // Higher is better
+                                        searchResult.note = note
+                                        isDocumentMatching = true
+                                        logger.info("[Lexical] Document ('\(document.title)') description ('\(closestTarget)') = \(score)")
+                                        break
+                                    }
+                                case .Semantic:
+                                    if score <= self.SEARCH_THRESHOLD { // Lower is better
+                                        searchResult.note = note
+                                        isDocumentMatching = true
+                                        logger.info("[Semantic] Document ('\(document.title)') description ('\(closestTarget)') = \(score)")
+                                        break
+                                    }
+                                }
+                            }
+                            if isDocumentMatching {
+                                searchResult.documents.append(document)
+                                continue
+                            }
+                            // Document types [TODO]
                         }
-                        if isDocumentMatching {
-                            searchResult.documents.append(document)
-                            continue
-                        }
-                        // Document types [TODO]
+                    }
+                    if let searchHandler = searchHandler {
+                        searchHandler(searchResult)
                     }
                 }
-                if let searchHandler = searchHandler {
-                    searchHandler(searchResult)
-                }
             }
-        }
-        queue.addBarrierBlock {
-            logger.info("Search complete.")
-            if let searchFinishHandler = searchFinishHandler {
-                searchFinishHandler()
+            queue.addBarrierBlock {
+                logger.info("Search for query '\(query)' completed.")
+                if let searchFinishHandler = searchFinishHandler {
+                    searchFinishHandler()
+                }
             }
         }
     }

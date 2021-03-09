@@ -672,7 +672,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                             }
                         })
                         documentPreviewVC.titleLabel.text = doc[0].title
-                        documentPreviewVC.bodyTextView.text = doc[0].description
+                        documentPreviewVC.bodyTextView.text = doc[0].getDescription()
                     }
                 }
             }

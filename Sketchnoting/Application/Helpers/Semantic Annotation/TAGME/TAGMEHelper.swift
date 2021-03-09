@@ -115,7 +115,7 @@ class TAGMEHelper {
                     json = JSON(res)
                     if let wikiExtract = json["query"]["pages"][String(format: "%.0f", document.wikiPageID!)]["extract"].string {
                         DispatchQueue.main.async {
-                            document.description = wikiExtract
+                            document.set(description: wikiExtract)
                             logger.info("Retrieved wikipedia intro extract for document \(document.title).")
                         }
                     }

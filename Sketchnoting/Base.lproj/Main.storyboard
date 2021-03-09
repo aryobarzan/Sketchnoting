@@ -2181,10 +2181,18 @@
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                             </view>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="M2p-g3-U7u">
+                                <rect key="frame" x="697" y="25" width="51" height="30"/>
+                                <state key="normal" title="Update"/>
+                                <connections>
+                                    <action selector="updateButtonTapped:" destination="kPL-Mg-aaB" eventType="touchUpInside" id="nuv-w7-9iA"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="MqQ-2V-Ujw"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
+                            <constraint firstItem="MqQ-2V-Ujw" firstAttribute="trailing" secondItem="M2p-g3-U7u" secondAttribute="trailing" constant="20" id="AKg-Q5-Ex6"/>
                             <constraint firstItem="OWB-7G-1Cd" firstAttribute="leading" secondItem="MqQ-2V-Ujw" secondAttribute="leading" constant="20" id="DkE-Gm-awh"/>
                             <constraint firstItem="Rar-0k-hIs" firstAttribute="leading" secondItem="San-i8-ecq" secondAttribute="trailing" constant="8" id="HHy-Q9-caZ"/>
                             <constraint firstItem="MqQ-2V-Ujw" firstAttribute="trailing" secondItem="Air-BM-9f6" secondAttribute="trailing" constant="20" id="Kgl-6E-rMc"/>
@@ -2195,6 +2203,7 @@
                             <constraint firstItem="DtE-Wh-w1z" firstAttribute="leading" secondItem="Axk-yc-h7I" secondAttribute="trailing" constant="8" id="UBO-RX-SRO"/>
                             <constraint firstItem="MqQ-2V-Ujw" firstAttribute="trailing" secondItem="Rar-0k-hIs" secondAttribute="trailing" constant="20" id="Wjj-Gf-AXm"/>
                             <constraint firstItem="San-i8-ecq" firstAttribute="leading" secondItem="OWB-7G-1Cd" secondAttribute="trailing" constant="8" id="ZFf-Es-2c3"/>
+                            <constraint firstItem="M2p-g3-U7u" firstAttribute="top" secondItem="MqQ-2V-Ujw" secondAttribute="top" constant="25" id="aHI-DI-hep"/>
                             <constraint firstItem="San-i8-ecq" firstAttribute="top" secondItem="MqQ-2V-Ujw" secondAttribute="top" constant="80" id="aqW-9U-tpd"/>
                             <constraint firstItem="D8l-la-vhm" firstAttribute="top" secondItem="OWB-7G-1Cd" secondAttribute="bottom" constant="19" id="dTZ-7C-kL0"/>
                             <constraint firstItem="Rar-0k-hIs" firstAttribute="top" secondItem="MqQ-2V-Ujw" secondAttribute="top" constant="80" id="gJV-A6-btc"/>
@@ -2205,6 +2214,7 @@
                             <constraint firstItem="Air-BM-9f6" firstAttribute="top" secondItem="tH4-HJ-5MO" secondAttribute="bottom" constant="20" id="tGT-3W-O0s"/>
                             <constraint firstItem="tH4-HJ-5MO" firstAttribute="leading" secondItem="D8l-la-vhm" secondAttribute="trailing" constant="8" id="tGm-4e-3bC"/>
                             <constraint firstItem="DtE-Wh-w1z" firstAttribute="top" secondItem="MqQ-2V-Ujw" secondAttribute="top" constant="20" id="xbZ-O6-RRZ"/>
+                            <constraint firstItem="M2p-g3-U7u" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="DtE-Wh-w1z" secondAttribute="trailing" constant="8" symbolic="YES" id="yAj-X1-jaJ"/>
                         </constraints>
                     </view>
                     <tabBarItem key="tabBarItem" systemItem="search" id="IiZ-xI-wB7"/>

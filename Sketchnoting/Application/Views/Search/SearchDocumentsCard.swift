@@ -74,7 +74,7 @@ class SearchDocumentsCard: UIView {
         if !documents.isEmpty {
             let document = documents[currentIndex]
             titleLabel.text = document.title
-            bodyTextView.text = document.description
+            bodyTextView.text = document.getDescription()
         }
         fetchDocumentImages()
         updateDocumentIndex()

@@ -44,6 +44,10 @@ class ARDocument: Document {
         wikiPageID = try? container.decode(Double.self, forKey: .wikiPageID)
     }
     
+    override func getDescription() -> String? {
+        return self.URL
+    }
+    
     //MARK: Visitable
     override func accept(visitor: DocumentVisitor) {
         visitor.process(document: self)

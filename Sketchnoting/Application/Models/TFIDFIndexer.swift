@@ -35,6 +35,11 @@ final class TF_IDF {
         corpusTermCount = [:]
     }
     
+    func clear() {
+        self.documentsTF = [:]
+        corpusTermCount = [:]
+    }
+    
     /// Adds note info to the corpus
     /// Stores note ID, its term frequencies and updates the corpus terms frequencies
     ///

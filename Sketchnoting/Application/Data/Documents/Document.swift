@@ -38,7 +38,7 @@ enum DocumentType: String, Codable, CaseIterable {
 class Document: Codable, Visitable, Equatable, Hashable {
     
     var title: String
-    var description: String?
+    private var description: String?
     var URL: String
     var documentType: DocumentType
     var isHidden: Bool
@@ -95,6 +95,14 @@ class Document: Codable, Visitable, Equatable, Hashable {
         }
         URL = try container.decode(String.self, forKey: .URL)
         documentType = DocumentType(rawValue: try container.decode(String.self, forKey: .documentType)) ?? .Other
+    }
+    
+    func getDescription() -> String? {
+        return description
+    }
+    
+    func set(description: String?) {
+        self.description = description
     }
     
     //MARK: Visitable
