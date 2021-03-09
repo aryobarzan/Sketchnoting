@@ -175,7 +175,7 @@ class SemanticSearch {
         return Int64(Date().timeIntervalSince1970 * 1000)
     }
     
-    private func getTermRelevancy(terms: [String], wordEmbedding: NLEmbedding) -> (String, String) {
+    private func getTermRelevancy(terms: [String], wordEmbedding: NLEmbedding) -> [[String]] {
         var terms = terms
         for i in 0..<terms.count {
             let lemmatized = SemanticSearch.shared.lemmatize(text: terms[i])
@@ -186,45 +186,54 @@ class SemanticSearch {
                 terms[i] = terms[i].lowercased()
             }
         }
-        // Calculate semantic distance (cosine) / TF-IDF score
-        var unrelatedTerms = [String]()
-        var relatedTerms = terms
-        for term in terms {
+        var clusters = [[String]]()
+        clusters.append([terms[0]])
+        for term in terms[1..<terms.count] {
             var otherTerms = terms
             otherTerms.remove(object: term)
             var minimumDistance = 999.0
             var highestCommonNotes = 0
             let containingNotes = TF_IDF.shared.documentsForTerm(term: term, positiveOnly: true).compactMap({$0.noteID})
+            var closestTerm = ""
             for otherTerm in otherTerms {
                 let distance = wordEmbedding.distance(between: term, and: otherTerm, distanceType: .cosine)
                 if distance < minimumDistance {
                     minimumDistance = distance
+                    closestTerm = otherTerm
                 }
                 if distance >= 2.0 && !containingNotes.isEmpty {
                     let commonNotes = TF_IDF.shared.documentsForTerm(term: otherTerm, positiveOnly: true, documents: containingNotes)
                     let count = Int(commonNotes.count)
                     if count > highestCommonNotes {
                         highestCommonNotes = count
+                        closestTerm = otherTerm
+                    }
+                }
+                if closestTerm.isEmpty {
+                    closestTerm = otherTerm
+                }
+            }
+            var isAdded = false
+            if minimumDistance < 2.0 || highestCommonNotes > 0 {
+                for i in 0..<clusters.count {
+                    if clusters[i].contains(closestTerm) {
+                        clusters[i] = clusters[i] + [term]
+                        isAdded = true
+                        break
                     }
                 }
             }
-            if minimumDistance > 1.0 {
-                if highestCommonNotes == 0 {
-                    logger.info("Unrelated '\(term)': - \(minimumDistance) / \(highestCommonNotes)")
-                    unrelatedTerms.append(term)
-                    relatedTerms.remove(object: term)
-                }
+            if !isAdded {
+                clusters.append([term])
             }
         }
-        logger.info("Query relevancy check...")
-        logger.info("Relevant query: \(relatedTerms.joined(separator: " "))")
-        if !unrelatedTerms.isEmpty {
-            logger.info("Unrelated query: \(unrelatedTerms.joined(separator: " "))")
+        for cluster in clusters {
+            logger.info("Cluster: \(cluster.joined(separator: " "))")
         }
-        return (relatedTerms.joined(separator: " "), unrelatedTerms.joined(separator: " "))
+        return clusters
     }
     
-    private func process(query: String) -> (String, String?) {
+    private func process(query: String) -> [String] {
         let queryWords = tokenize(text: query, unit: .word)
         // Spellcheck & lowercase - currently disabled as it wrongly does not know many domain specific terms, e.g. "generics" in programming
         /*let spellchecker = UITextChecker()
@@ -268,15 +277,17 @@ class SemanticSearch {
                     retainedQueryTerms.append(partsOfSpeech[i].0)
                 }
             }
-            let (relatedQuery, unrelatedQuery) = getTermRelevancy(terms: retainedQueryTerms, wordEmbedding: wordEmbedding!)
-            processedQuery = relatedQuery.lowercased().trimmingCharacters(in: .whitespaces)
-            let processedUnrelatedQuery = unrelatedQuery.lowercased().trimmingCharacters(in: .whitespaces)
-            return (processedQuery, processedUnrelatedQuery == "" ? nil : processedUnrelatedQuery)
+            let queryClusters = getTermRelevancy(terms: retainedQueryTerms, wordEmbedding: wordEmbedding!)
+            var processedQueryClusters = [String]()
+            for queryCluster in queryClusters {
+                processedQueryClusters.append(queryCluster.joined(separator: " ").lowercased().trimmingCharacters(in: .whitespaces))
+            }
+            return processedQueryClusters
         }
         else if queryWords.count == 1 { // Keyword query
-            return (lemmatize(text: queryWords[0]).lowercased(), nil)
+            return [lemmatize(text: queryWords[0]).lowercased()]
         }
-        return (queryWords.joined(separator: " "), nil)
+        return [queryWords.joined(separator: " ")]
     }
     
     public func search(query: String, notes: [(URL, Note)], isSecondarySearch: Bool = false, expandedSearch: Bool = true, searchHandler: ((SearchResult) -> Void)?, searchFinishHandler: (() -> Void)?) {
@@ -294,16 +305,12 @@ class SemanticSearch {
         //let queryType = checkPhraseType(queryPartsOfSpeech: queryPartsOfSpeech)
         // log.info("Performing search on query of type: \(queryType.rawValue)")
         // Expanded Search means a lower threshold for the lexical search, i.e. more tolerant to minor typos
-        let (primaryQuery, secondaryQuery) = process(query: query)
+        let queries = process(query: query)
         logger.info("----")
         logger.info("Original query: \(query)")
-        logger.info("Processed query: \(primaryQuery)")
+        logger.info("Query has been divided into \(Int(queries.count)) semantically different queries.")
         let lexicalThreshold = expandedSearch ? 0.9 : 1.0
         
-        var queries = [primaryQuery]
-        if secondaryQuery != nil {
-            queries.append(secondaryQuery!)
-        }
         // Start search process, going through each note
         // Note that this is parallelized, with up to 4 notes being processed at the same time
         for query in queries {
