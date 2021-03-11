@@ -127,7 +127,6 @@
 		9FC5F90824A8DFEA00CDF2DF /* NoteOptionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FC5F90724A8DFEA00CDF2DF /* NoteOptionsViewController.swift */; };
 		9FC5F90A24A8E20000CDF2DF /* NoteOptionsCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FC5F90924A8E20000CDF2DF /* NoteOptionsCollectionViewCell.swift */; };
 		9FC5F90D24AFB07D00CDF2DF /* NVActivityIndicatorView in Frameworks */ = {isa = PBXBuildFile; productRef = 9FC5F90C24AFB07D00CDF2DF /* NVActivityIndicatorView */; };
-		9FCC9E2325DEAD4B0079EB29 /* SKIndexer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FCC9E2225DEAD4B0079EB29 /* SKIndexer.swift */; };
 		9FCE9EC32502AA0A00166AE2 /* ExportViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FCE9EC22502AA0A00166AE2 /* ExportViewController.swift */; };
 		9FCE9ECA2502E3EB00166AE2 /* ExportItemViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FCE9EC92502E3EB00166AE2 /* ExportItemViewCell.swift */; };
 		9FD1ADF123A52C090013C68E /* NoteViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29C182236DCFC00CC969A /* NoteViewController.swift */; };
@@ -154,6 +153,12 @@
 		9FE5B7A024BDF3AF00D94255 /* ZIPFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = 9FE5B79F24BDF3AF00D94255 /* ZIPFoundation */; };
 		9FF0AC9424412F4C00A82BE8 /* NoteImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FF0AC9324412F4C00A82BE8 /* NoteImage.swift */; };
 		9FF0AC962441308B00A82BE8 /* CodableExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FF0AC952441308B00A82BE8 /* CodableExtensions.swift */; };
+		9FF4757B25FAA9DF003CA74A /* NoteSimilarity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FF4757A25FAA9DF003CA74A /* NoteSimilarity.swift */; };
+		9FF4758325FAB4CF003CA74A /* DMatrix.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FF4757F25FAB4CE003CA74A /* DMatrix.swift */; };
+		9FF4758425FAB4CF003CA74A /* Matrix_Algebra.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FF4758025FAB4CF003CA74A /* Matrix_Algebra.swift */; };
+		9FF4758525FAB4CF003CA74A /* Matrix.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FF4758125FAB4CF003CA74A /* Matrix.swift */; };
+		9FF4758625FAB4CF003CA74A /* Algebra.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FF4758225FAB4CF003CA74A /* Algebra.swift */; };
+		9FF4758825FAC5D0003CA74A /* FastTextWordEmbedding.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 9FF4758725FAC5D0003CA74A /* FastTextWordEmbedding.mlmodel */; };
 		9FFE07E6232A5FE500DBD0AC /* TagTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FFE07E5232A5FE500DBD0AC /* TagTableViewCell.swift */; };
 		9FFE07E8232A622A00DBD0AC /* Tag.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FFE07E7232A622A00DBD0AC /* Tag.swift */; };
 		9FFE07EA232A63BA00DBD0AC /* TagsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FFE07E9232A63BA00DBD0AC /* TagsManager.swift */; };
@@ -289,7 +294,6 @@
 		9FC5386A2520DB7700911DBF /* SKRecognizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SKRecognizer.swift; sourceTree = "<group>"; };
 		9FC5F90724A8DFEA00CDF2DF /* NoteOptionsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteOptionsViewController.swift; sourceTree = "<group>"; };
 		9FC5F90924A8E20000CDF2DF /* NoteOptionsCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteOptionsCollectionViewCell.swift; sourceTree = "<group>"; };
-		9FCC9E2225DEAD4B0079EB29 /* SKIndexer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SKIndexer.swift; sourceTree = "<group>"; };
 		9FCD3D5C23EA0A59005CB98D /* CocoaLumberjack.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = CocoaLumberjack.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		9FCE9EC22502AA0A00166AE2 /* ExportViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportViewController.swift; sourceTree = "<group>"; };
 		9FCE9EC92502E3EB00166AE2 /* ExportItemViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportItemViewCell.swift; sourceTree = "<group>"; };
@@ -318,6 +322,12 @@
 		9FE38C6B24F8670B00421BAE /* NoteTypedTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteTypedTextView.swift; sourceTree = "<group>"; };
 		9FF0AC9324412F4C00A82BE8 /* NoteImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteImage.swift; sourceTree = "<group>"; };
 		9FF0AC952441308B00A82BE8 /* CodableExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodableExtensions.swift; sourceTree = "<group>"; };
+		9FF4757A25FAA9DF003CA74A /* NoteSimilarity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteSimilarity.swift; sourceTree = "<group>"; };
+		9FF4757F25FAB4CE003CA74A /* DMatrix.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DMatrix.swift; sourceTree = "<group>"; };
+		9FF4758025FAB4CF003CA74A /* Matrix_Algebra.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Matrix_Algebra.swift; sourceTree = "<group>"; };
+		9FF4758125FAB4CF003CA74A /* Matrix.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Matrix.swift; sourceTree = "<group>"; };
+		9FF4758225FAB4CF003CA74A /* Algebra.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Algebra.swift; sourceTree = "<group>"; };
+		9FF4758725FAC5D0003CA74A /* FastTextWordEmbedding.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = FastTextWordEmbedding.mlmodel; sourceTree = "<group>"; };
 		9FFE07E5232A5FE500DBD0AC /* TagTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagTableViewCell.swift; sourceTree = "<group>"; };
 		9FFE07E7232A622A00DBD0AC /* Tag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tag.swift; sourceTree = "<group>"; };
 		9FFE07E9232A63BA00DBD0AC /* TagsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagsManager.swift; sourceTree = "<group>"; };
@@ -398,9 +408,9 @@
 				9FFE9B3324B3C77200D92FBA /* NeoLibrary.swift */,
 				9FC5386A2520DB7700911DBF /* SKRecognizer.swift */,
 				9F8E0D0E25DDC02C00A951B1 /* SemanticSearch.swift */,
-				9FCC9E2225DEAD4B0079EB29 /* SKIndexer.swift */,
 				9F8988D525E8239E005CB90B /* TextParser.swift */,
 				9F72B76825F2C434009E31AA /* TFIDFIndexer.swift */,
+				9FF4757A25FAA9DF003CA74A /* NoteSimilarity.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -687,6 +697,7 @@
 		9FD29B9A2220524D00CC969A = {
 			isa = PBXGroup;
 			children = (
+				9FF4758725FAC5D0003CA74A /* FastTextWordEmbedding.mlmodel */,
 				9FD29BA52220524D00CC969A /* Sketchnoting */,
 				9FD29BA42220524D00CC969A /* Products */,
 				124769D1803E7C4AE8A1F382 /* Frameworks */,
@@ -723,6 +734,7 @@
 		9FD29C452239587D00CC969A /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				9FF4757E25FAB4B6003CA74A /* Matrix */,
 				9F8988D725E9585B005CB90B /* Reductio */,
 				9FAB4B7B244BEF2700DEA46F /* FittableFontLabel.swift */,
 				9FAB4B7D244BEF2E00DEA46F /* UILabelExtension.swift */,
@@ -821,6 +833,17 @@
 				9FE38C6B24F8670B00421BAE /* NoteTypedTextView.swift */,
 			);
 			path = "Draggable Views";
+			sourceTree = "<group>";
+		};
+		9FF4757E25FAB4B6003CA74A /* Matrix */ = {
+			isa = PBXGroup;
+			children = (
+				9FF4758225FAB4CF003CA74A /* Algebra.swift */,
+				9FF4757F25FAB4CE003CA74A /* DMatrix.swift */,
+				9FF4758025FAB4CF003CA74A /* Matrix_Algebra.swift */,
+				9FF4758125FAB4CF003CA74A /* Matrix.swift */,
+			);
+			path = Matrix;
 			sourceTree = "<group>";
 		};
 		9FFE07DC232A595D00DBD0AC /* Tags */ = {
@@ -989,6 +1012,8 @@
 				9FC5386B2520DB7700911DBF /* SKRecognizer.swift in Sources */,
 				9FAD28F623A52AC700F2203E /* NoteTextViewController.swift in Sources */,
 				9FA8C002239B21D500BAA42B /* TagsCreationViewController.swift in Sources */,
+				9FF4758325FAB4CF003CA74A /* DMatrix.swift in Sources */,
+				9FF4758825FAC5D0003CA74A /* FastTextWordEmbedding.mlmodel in Sources */,
 				9F0F4E0A2451260700B1F2EA /* UIUtilities.swift in Sources */,
 				9F942506238A341E006B0E81 /* UIStoryboardSegueWithCompletion.swift in Sources */,
 				9F87A47D2445441500F83B12 /* NoteTypedText.swift in Sources */,
@@ -996,10 +1021,10 @@
 				9F4B38C323EB1E6D00F87B61 /* Notifications.swift in Sources */,
 				9F75E451230D8AE100488BBD /* SettingsManager.swift in Sources */,
 				9F75E482231410A100488BBD /* TAGMEHelper.swift in Sources */,
+				9FF4758525FAB4CF003CA74A /* Matrix.swift in Sources */,
 				9FCE9EC32502AA0A00166AE2 /* ExportViewController.swift in Sources */,
 				9F65984823F315FE00CDBE0C /* SearchFilterCollectionViewCell.swift in Sources */,
 				9FFE9B3424B3C77200D92FBA /* NeoLibrary.swift in Sources */,
-				9FCC9E2325DEAD4B0079EB29 /* SKIndexer.swift in Sources */,
 				9F8988D625E8239E005CB90B /* TextParser.swift in Sources */,
 				9FA6238B22D37213007ED794 /* BioPortalHelper.swift in Sources */,
 				9F77DBCA23FFD619007C8B7D /* AnnotationUtilities.swift in Sources */,
@@ -1008,6 +1033,7 @@
 				9FD29C58223C3CF700CC969A /* UIImageExtensions.swift in Sources */,
 				9F8E0D0F25DDC02C00A951B1 /* SemanticSearch.swift in Sources */,
 				9F00428923E9FB2600961636 /* BadgeHub.swift in Sources */,
+				9FF4757B25FAA9DF003CA74A /* NoteSimilarity.swift in Sources */,
 				9F65983B23EDD29300CDBE0C /* NoteTextBlock.swift in Sources */,
 				9F8988E925E95935005CB90B /* TextRank.swift in Sources */,
 				9FB87CF624B0061200A262D8 /* ARDocument.swift in Sources */,
@@ -1047,6 +1073,7 @@
 				9FAB4B7C244BEF2700DEA46F /* FittableFontLabel.swift in Sources */,
 				9FB9984724868561003773F2 /* MoveFileViewController.swift in Sources */,
 				9F00B9F824C5D56E000153A8 /* NeoDocumentsVC.swift in Sources */,
+				9FF4758425FAB4CF003CA74A /* Matrix_Algebra.swift in Sources */,
 				9F92D10E231E95B400BC0E57 /* UICollectionViewExtensions.swift in Sources */,
 				9F9460DF23F5B0460073D709 /* GridView.swift in Sources */,
 				9F00B9FE24C5DBA2000153A8 /* NeoDocumentsSectionHeader.swift in Sources */,
@@ -1080,6 +1107,7 @@
 				9FA5A482244AB14E006D9FB2 /* UILabelExtensions.swift in Sources */,
 				9F318D3B244A20A000A1B4B5 /* UITextViewExtensions.swift in Sources */,
 				9F75E44F230D848200488BBD /* SettingsViewController.swift in Sources */,
+				9FF4758625FAB4CF003CA74A /* Algebra.swift in Sources */,
 				9F75E484231419FA00488BBD /* TAGMEDocument.swift in Sources */,
 				9F92D11523202B9900BC0E57 /* KnowledgeGraphHelper.swift in Sources */,
 				9F75E44C230C583200488BBD /* NoteCollectionViewCell.swift in Sources */,

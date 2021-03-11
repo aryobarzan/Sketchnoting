@@ -120,10 +120,23 @@ extension String {
     }
 }
 
+public enum StringMetric {
+    case Levenshtein
+    case DamerauLevenshtein
+}
+
 extension String {
-    public func levenshtein(_ other: String) -> Int {
+    public func distance (between target: String, metric: StringMetric = .Levenshtein) -> Int {
+        switch metric {
+        case .Levenshtein:
+            return distanceLevenshtein(between: target)
+        case .DamerauLevenshtein:
+            return distanceDamerauLevenshtein(between: target)
+        }
+    }
+    private func distanceLevenshtein(between target: String) -> Int {
         let sCount = self.count
-        let oCount = other.count
+        let oCount = target.count
 
         guard sCount != 0 else {
             return oCount
@@ -146,7 +159,7 @@ extension String {
 
         for j in 1...oCount {
             for i in 1...sCount {
-                if self[i - 1] == other[j - 1] {
+                if self[i - 1] == target[j - 1] {
                     mat[i][j] = mat[i - 1][j - 1]       // no operation
                 }
                 else {
@@ -159,6 +172,71 @@ extension String {
         }
 
         return mat[sCount][oCount]
+    }
+    
+    /// Get Damerau-Levenshtein distance.
+        /// Author: https://github.com/autozimu/StringMetric.swift/blob/master/Sources/StringMetric.swift
+        /// Reference <https://en.wikipedia.org/wiki/Damerau%E2%80%93Levenshtein_distance#endnote_itman#Distance_with_adjacent_transpositions>
+        /// - Parameter target: The target `String`.
+        /// - Returns: The Damerau-Levenshtein distance between the receiver and `target`.
+    private func distanceDamerauLevenshtein(between target: String) -> Int {
+        let selfCount = self.count
+        let targetCount = target.count
+        
+        if self == target {
+            return 0
+        }
+        if selfCount == 0 {
+            return targetCount
+        }
+        if targetCount == 0 {
+            return selfCount
+        }
+        
+        var da: [Character: Int] = [:]
+        
+        var d = Array(repeating: Array(repeating: 0, count: targetCount + 2), count: selfCount + 2)
+        
+        let maxdist = selfCount + targetCount
+        d[0][0] = maxdist
+        for i in 1...selfCount + 1 {
+            d[i][0] = maxdist
+            d[i][1] = i - 1
+        }
+        for j in 1...targetCount + 1 {
+            d[0][j] = maxdist
+            d[1][j] = j - 1
+        }
+        
+        for i in 2...selfCount + 1 {
+            var db = 1
+            
+            for j in 2...targetCount + 1 {
+                let k = da[target[j - 2]] ?? 1
+                let l = db
+                
+                var cost = 1
+                if self[i - 2] == target[j - 2] {
+                    cost = 0
+                    db = j
+                }
+                let substition = d[i - 1][j - 1] + cost
+                let injection = d[i][j - 1] + 1
+                let deletion = d[i - 1][j] + 1
+                let selfIdx = i - k - 1
+                let targetIdx = j - l - 1
+                let transposition = d[k - 1][l - 1] + selfIdx + 1 + targetIdx
+                
+                d[i][j] = Swift.min(
+                    substition,
+                    injection,
+                    deletion,
+                    transposition
+                )
+            }
+            da[self[i - 2]] = i
+        }
+        return d[selfCount + 1][targetCount + 1]
     }
 
     func capitalizingFirstLetter() -> String {

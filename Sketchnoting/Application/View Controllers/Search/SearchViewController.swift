@@ -8,7 +8,7 @@
 
 import UIKit
 import NVActivityIndicatorView
-
+import NaturalLanguage
 class SearchViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UITextFieldDelegate, DrawingSearchDelegate {
     
     @IBOutlet weak var activityIndicator: NVActivityIndicatorView!
@@ -37,6 +37,8 @@ class SearchViewController: UIViewController, UICollectionViewDelegate, UICollec
 
         notesCollectionView.delegate = self
         notesCollectionView.dataSource = self
+        
+        
     }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)

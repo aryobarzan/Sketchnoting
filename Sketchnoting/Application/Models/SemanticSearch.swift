@@ -487,7 +487,7 @@ class SemanticSearch {
                 }
                 if semanticDistance >= 2.0 { // Meaning: sentence is unknown to sentence embedder (has no vector representation)
                     // Lexical
-                    let levenshteinDistance = query.lowercased().levenshtein(sentence.lowercased())
+                    let levenshteinDistance = query.lowercased().distance(between: sentence.lowercased(), metric: .DamerauLevenshtein)
                     let lengthsSum = Double(query.count + sentence.count)
                     let temp: Double = (lengthsSum - Double(levenshteinDistance))/lengthsSum
                     if temp > highestLevenshteinRatio {
@@ -505,7 +505,7 @@ class SemanticSearch {
                         closestTarget = sentence
                     }
                     if semanticDistance >= 2.0 {
-                        let levenshteinDistance = query.lowercased().levenshtein(word.lowercased())
+                        let levenshteinDistance = query.lowercased().distance(between: word.lowercased(), metric: .DamerauLevenshtein)
                         let lengthsSum = Double(query.count + word.count)
                         let temp: Double = (lengthsSum - Double(levenshteinDistance))/lengthsSum
                         if temp > highestLevenshteinRatio {
