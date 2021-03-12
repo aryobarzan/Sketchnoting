@@ -117,12 +117,46 @@ class NeoLibrary {
                         } catch {
                             logger.error("Invalid file.")
                         }
-                        
                     }
                 } catch { logger.error(error) }
             }
         }
         return notes
+    }
+    
+    public static func getNoteIterator() -> NoteIterator {
+        var urls = [URL]()
+        if let enumerator = FileManager.default.enumerator(at: self.getHomeDirectoryURL(), includingPropertiesForKeys: [.isRegularFileKey], options: [.skipsHiddenFiles, .skipsPackageDescendants]) {
+            for case let fileURL as URL in enumerator {
+                do {
+                    let fileAttributes = try fileURL.resourceValues(forKeys:[.isRegularFileKey])
+                    if fileAttributes.isRegularFile! {
+                        do {
+                            let data = try Data(contentsOf: fileURL)
+                            if self.decodeNoteFromData(data: data) != nil {
+                                urls.append(fileURL)
+                            }
+                        } catch {
+                            logger.error("Invalid file.")
+                        }
+                    }
+                } catch { logger.error(error) }
+            }
+        }
+        return NoteIterator(urls)
+    }
+    
+    public static func getNote(from url: URL) -> Note? {
+        do {
+            let data = try Data(contentsOf: url)
+            if let note = self.decodeNoteFromData(data: data) {
+                return note
+            }
+        } catch {
+            logger.error("Invalid note URL.")
+            return nil
+        }
+        return nil
     }
     
     public static func save(note: Note, url: URL) {
@@ -731,5 +765,40 @@ class NeoLibrary {
         }
         // Missing - load all documents
         return documents
+    }
+}
+
+struct NoteIterator {
+    let noteURLs: [URL]
+    var index = 0
+    
+    init(_ noteURLs: [URL]) {
+        self.noteURLs = noteURLs
+    }
+    
+    mutating func next() -> (URL, Note)? {
+        if index < noteURLs.count {
+            var url = noteURLs[index]
+            var note = NeoLibrary.getNote(from: noteURLs[index])
+            self.index += 1
+            while note == nil && index < noteURLs.count {
+                url = noteURLs[index]
+                note = NeoLibrary.getNote(from: noteURLs[index])
+                self.index += 1
+            }
+            if note == nil {
+                return nil
+            }
+            else {
+                return (url, note!)
+            }
+        }
+        else {
+            return nil
+        }
+    }
+    
+    mutating func reset() {
+        self.index = 0
     }
 }

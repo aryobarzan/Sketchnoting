@@ -295,7 +295,7 @@ class SemanticSearch {
     }
     
     
-    public func search(query: String, notes: [(URL, Note)], isSecondarySearch: Bool = false, expandedSearch: Bool = true, searchHandler: ((SearchResult) -> Void)?, searchFinishHandler: (() -> Void)?) {
+    public func search(query: String, isSecondarySearch: Bool = false, expandedSearch: Bool = true, searchHandler: ((SearchResult) -> Void)?, searchFinishHandler: (() -> Void)?) {
         // let queryWords = tokenize(text: query, unit: .word)
         // let queryPartsOfSpeech = tag(text: query, scheme: .lexicalClass)
         // let queryEntities = tag(text: query, scheme: .nameType) // PlaceName, PersonName, OrganizationName
@@ -317,8 +317,10 @@ class SemanticSearch {
         let lexicalThreshold = expandedSearch ? 0.9 : 1.0
         
         // Start search process, going through each note
+        var noteIterator = NeoLibrary.getNoteIterator()
         for query in queries {
-            for note in notes {
+            noteIterator.reset()
+            while let note = noteIterator.next() {
                 // queue.addOperation
                 var searchResult = SearchResult()
                 // MARK: Note title

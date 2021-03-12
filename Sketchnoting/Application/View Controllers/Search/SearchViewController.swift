@@ -37,15 +37,6 @@ class SearchViewController: UIViewController, UICollectionViewDelegate, UICollec
 
         notesCollectionView.delegate = self
         notesCollectionView.dataSource = self
-        
-        /*if let test = try? NLEmbedding.init(contentsOf: Bundle.main.url(forResource: "FastTextWordEmbedding", withExtension: "mlmodelc")!) {
-            if let wordEmbedding = NLEmbedding.wordEmbedding(for: .english) {
-                logger.info(test.contains("programming"))
-                logger.info(wordEmbedding.contains("programming"))
-                logger.info(wordEmbedding.vocabularySize)
-                logger.info(test.vocabularySize)
-            }
-        }*/
     }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -142,7 +133,7 @@ class SearchViewController: UIViewController, UICollectionViewDelegate, UICollec
         clearResults()
         activityIndicator.isHidden = false
         activityIndicator.startAnimating()
-        SemanticSearch.shared.search(query: query, notes: NeoLibrary.getNotes(), expandedSearch: expandedSearchSwitch.isOn, searchHandler: {searchResult in
+        SemanticSearch.shared.search(query: query, expandedSearch: expandedSearchSwitch.isOn, searchHandler: {searchResult in
             logger.info("Search Result - \(searchResult.note == nil ? "Note not a match" : searchResult.note!.1.getName()) / \(searchResult.documents.count) Documents / \(searchResult.personDocuments.count) Person-Documents / \(searchResult.locationDocuments.count) Location-Documents")
             if searchResult.note != nil {
                 DispatchQueue.main.async {
