@@ -26,19 +26,17 @@ class NoteSimilarity {
         var uniqueTerms = Array(Set(titleTerms + bodyTerms))
         var toRemove = [Int]()
         // Lemmatize & lowercase
-        if let wordEmbedding = SemanticSearch.shared.getWordEmbedding() {
-            for i in 0..<uniqueTerms.count {
-                let lemmatized = SemanticSearch.shared.lemmatize(text: uniqueTerms[i])
-                if wordEmbedding.contains(lemmatized) {
-                    uniqueTerms[i] = lemmatized.lowercased()
-                }
-                else {
-                    uniqueTerms[i] = uniqueTerms[i].lowercased()
-                }
-                
-                if stopwords.contains(uniqueTerms[i]) {
-                    toRemove.append(i)
-                }
+        for i in 0..<uniqueTerms.count {
+            let lemmatized = SemanticSearch.shared.lemmatize(text: uniqueTerms[i]).lowercased()
+            if SemanticSearch.shared.getWordEmbedding().contains(lemmatized) {
+                uniqueTerms[i] = lemmatized
+            }
+            else {
+                uniqueTerms[i] = uniqueTerms[i].lowercased()
+            }
+            
+            if stopwords.contains(uniqueTerms[i]) {
+                toRemove.append(i)
             }
         }
         // Remove stop words

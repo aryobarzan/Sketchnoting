@@ -38,7 +38,14 @@ class SearchViewController: UIViewController, UICollectionViewDelegate, UICollec
         notesCollectionView.delegate = self
         notesCollectionView.dataSource = self
         
-        
+        /*if let test = try? NLEmbedding.init(contentsOf: Bundle.main.url(forResource: "FastTextWordEmbedding", withExtension: "mlmodelc")!) {
+            if let wordEmbedding = NLEmbedding.wordEmbedding(for: .english) {
+                logger.info(test.contains("programming"))
+                logger.info(wordEmbedding.contains("programming"))
+                logger.info(wordEmbedding.vocabularySize)
+                logger.info(test.vocabularySize)
+            }
+        }*/
     }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)

@@ -2,7 +2,7 @@
 //  Matrix.swift
 //
 //  Created by strictlyswift on 9/8/17.
-//
+//  Source: https://github.com/jrsonline/strictlyswift
 
 import Foundation
 
