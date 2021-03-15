@@ -19,18 +19,17 @@ protocol RelatedNotesVCDelegate {
 
 class RelatedNotesViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate {
     
-    private enum SimilarityLevel: Float {
-        case Low = 0.1
-        case Medium = 0.5
-        case High = 0.9
+    private enum SimilarityMethod {
+        case TF_IDF
+        case Semantic
     }
     
     var note: (URL, Note)!
-    var context: RelatedNotesContext! = .HomePage
+    var context: RelatedNotesContext = .HomePage
     
     var relatedNotes = [(URL, Note)]()
+    private var similarityMethod: SimilarityMethod = .TF_IDF
     var similarityThreshold: Float = 0.5
-    private var similarityLevel: SimilarityLevel = .Low
     
     var openNote: (URL, Note)?
     var delegate: RelatedNotesVCDelegate?
@@ -55,21 +54,15 @@ class RelatedNotesViewController: UIViewController, UICollectionViewDataSource, 
     }
     
     @IBAction func similaritySegmentedControlChanged(_ sender: UISegmentedControl) {
-        var newLevel = self.similarityLevel
-        switch sender.titleForSegment(at: sender.selectedSegmentIndex) {
-        case "Low":
-            newLevel = .Low
-            break
-        case "Medium":
-            newLevel = .Medium
-            break
-        case "High":
-            newLevel = .High
-            break
-        default:
-            break
+        var newSimilarityMethod: SimilarityMethod
+        if sender.selectedSegmentIndex == 0 {
+            newSimilarityMethod = .TF_IDF
         }
-        if newLevel != self.similarityLevel {
+        else {
+            newSimilarityMethod = .Semantic
+        }
+        if newSimilarityMethod != self.similarityMethod {
+            self.similarityMethod = newSimilarityMethod
             self.refreshRelatedNotes()
         }
     }
@@ -99,15 +92,21 @@ class RelatedNotesViewController: UIViewController, UICollectionViewDataSource, 
     }
     
     private func refreshRelatedNotes() {
-        if !Knowledge.similarityMatrixIsSetup() {
-            Knowledge.setupSimilarityMatrix()
-        }
-        let foundNotes = Knowledge.similarNotesFor(url: note.0, note: note.1)
-        self.relatedNotes = [(URL, Note)]()
-        for (url, note, score) in foundNotes {
-            if score > self.similarityLevel.rawValue {
-                self.relatedNotes.append((url, note))
+        if similarityMethod == .TF_IDF {
+            if !Knowledge.similarityMatrixIsSetup() {
+                Knowledge.setupSimilarityMatrix()
             }
+            let foundNotes = Knowledge.similarNotesFor(url: note.0, note: note.1)
+            self.relatedNotes = [(URL, Note)]()
+            for (url, note, score) in foundNotes {
+                if score > 0.1 {
+                    self.relatedNotes.append((url, note))
+                }
+            }
+        }
+        else {
+            let foundNotes = NoteSimilarity.shared.similarNotes(for: note.1, noteIterator: NeoLibrary.getNoteIterator(), maxResults: 5)
+            self.relatedNotes = foundNotes
         }
         collectionView.reloadData()
         countLabel.text = "Related Notes: (\(relatedNotes.count))"

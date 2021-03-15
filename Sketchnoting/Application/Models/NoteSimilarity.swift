@@ -17,13 +17,17 @@ class NoteSimilarity {
     }
     var noteMatrices: [String : [[Double]]]
     
+    func clear() {
+        self.noteMatrices.removeAll()
+    }
+    
     func add(note: Note) {
         var matrix = [[Double]]()
         
         let titleTerms = SemanticSearch.shared.tokenize(text: note.getName(), unit: .word)
         let bodyTerms = SemanticSearch.shared.tokenize(text: note.getText(), unit: .word)
         // Convert to set to only retain unique terms
-        var uniqueTerms = Array(Set(titleTerms + bodyTerms))
+        var uniqueTerms = titleTerms + bodyTerms // Array(Set(titleTerms + bodyTerms))
         var toRemove = [Int]()
         // Lemmatize & lowercase
         for i in 0..<uniqueTerms.count {
@@ -43,16 +47,14 @@ class NoteSimilarity {
         uniqueTerms = uniqueTerms.enumerated().filter { !toRemove.contains($0.offset) }.map { $0.element }
         
         // Insert vector for each term to matrix
-        if let wordEmbedding = NLEmbedding.wordEmbedding(for: .english) {
-            for term in uniqueTerms {
-                let vector = wordEmbedding.vector(for: term)
-                if vector != nil {
-                    matrix.append(vector!)
-                }
-                else {
-                    logger.info("No vector for '\(term)'.")
-                }
+        for term in uniqueTerms {
+            let vector = SemanticSearch.shared.getWordEmbedding().vector(for: term)
+            if vector != nil {
+                matrix.append(vector!)
             }
+            /*else {
+                logger.info("No vector for '\(term)'.")
+            }*/
         }
         
         noteMatrices[note.getID()] = matrix
@@ -67,6 +69,36 @@ class NoteSimilarity {
         let numerator = frobeniusNorm(matrix: replaceNegative(matrix: (matrix1_transposed ● matrix2).fast()))
         let denominator = sqrt(frobeniusNorm(matrix: replaceNegative(matrix: (matrix1_transposed ● matrix1).fast())) * frobeniusNorm(matrix: replaceNegative(matrix: (matrix2_transposed ● matrix2).fast())))
         return numerator / denominator
+    }
+    
+    func similarNotes(for source: Note, noteIterator: NoteIterator, maxResults: Int = 5) -> [(URL, Note)] {
+        var similarNotes = [((URL, Note), Double)]()
+        var noteIterator = noteIterator
+        while let note = noteIterator.next() {
+            if note.1 == source {
+                continue
+            }
+            let similarity = self.similarity(between: source, and: note.1)
+            logger.info("Similarity '\(source.getName())' / '\(note.1.getName())': \(similarity)")
+            if similarNotes.isEmpty {
+                similarNotes.append((note, similarity))
+            }
+            else {
+                var isInserted = false
+                for i in 0..<similarNotes.count {
+                    if similarity > similarNotes[i].1 {
+                        similarNotes.insert((note, similarity), at: i)
+                        isInserted = true
+                        break
+                    }
+                }
+                if !isInserted {
+                    similarNotes.append((note, similarity))
+                }
+            }
+        }
+        let maxResults = max(1, maxResults)
+        return Array(similarNotes.prefix(maxResults)).compactMap { $0.0 }
     }
     
     /*func transposed(matrix: [[Double]]) -> [[Double]] {

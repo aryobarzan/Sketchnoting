@@ -79,9 +79,13 @@ class SearchViewController: UIViewController, UICollectionViewDelegate, UICollec
     }
     @IBAction func updateButtonTapped(_ sender: UIButton) {
         TF_IDF.shared.clear()
-        for note in NeoLibrary.getNotes() {
+        NoteSimilarity.shared.clear()
+        var noteIterator = NeoLibrary.getNoteIterator()
+        while let note = noteIterator.next() {
             TF_IDF.shared.addNote(note: note.1)
+            NoteSimilarity.shared.add(note: note.1)
         }
+        logger.info("Reset TF-IDF and semantic matrices for notes library.")
     }
     
     func textFieldShouldClear(_ textField: UITextField) -> Bool {

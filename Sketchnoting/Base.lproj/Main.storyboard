@@ -2427,21 +2427,20 @@
                                 </collectionViewFlowLayout>
                                 <cells/>
                             </collectionView>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="(Similarity)" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="axe-yr-gGq">
-                                <rect key="frame" x="315" y="99" width="74" height="18"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="(Similarity Method)" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="axe-yr-gGq">
+                                <rect key="frame" x="286.5" y="99" width="131" height="18"/>
                                 <fontDescription key="fontDescription" type="italicSystem" pointSize="15"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="VwB-NW-cp9">
-                                <rect key="frame" x="249" y="60" width="206" height="32"/>
+                                <rect key="frame" x="275.5" y="60" width="153" height="32"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="31" id="ArB-Tz-KWv"/>
                                 </constraints>
                                 <segments>
-                                    <segment title="Low"/>
-                                    <segment title="Medium"/>
-                                    <segment title="High"/>
+                                    <segment title="TF-IDF"/>
+                                    <segment title="Semantic"/>
                                 </segments>
                                 <connections>
                                     <action selector="similaritySegmentedControlChanged:" destination="KcP-EM-pcP" eventType="valueChanged" id="lf6-Q6-jNb"/>

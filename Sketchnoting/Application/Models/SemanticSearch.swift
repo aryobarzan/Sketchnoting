@@ -16,7 +16,7 @@ class SemanticSearch {
     
     public static let shared = SemanticSearch()
     private init() {
-        queue.maxConcurrentOperationCount = 1
+        //queue.maxConcurrentOperationCount = 1
         do {
             wordEmbedding = try NLEmbedding.init(contentsOf: Bundle.main.url(forResource: "FastTextWordEmbedding", withExtension: "mlmodelc")!)
         } catch {
@@ -38,11 +38,24 @@ class SemanticSearch {
     private var personSynonyms: [String]
     
     private let entityExtractor = EntityExtractor.entityExtractor(options: EntityExtractorOptions(modelIdentifier: EntityExtractionModelIdentifier.english))
-    private var wordEmbedding: NLEmbedding
+    private var wordEmbedding: NLEmbedding = NLEmbedding.wordEmbedding(for: .english)!
+    /*var wordEmbedding: NLEmbedding {
+        get {
+            return internalQueue.sync {
+                    _wordEmbedding
+            }
+        }
+        set (newValue) {
+            internalQueue.async(flags: .barrier) {
+                self._wordEmbedding = newValue
+            }
+        }
+    }*/
+    
     private let sentenceEmbedding: NLEmbedding
     
-    private let queue = OperationQueue()
-    fileprivate let concurrentQueue = DispatchQueue(label: "com.some.concurrentQueue", qos: .default, attributes: .concurrent)
+    //private let queue = OperationQueue()
+    //private let internalQueue = DispatchQueue(label: "com.some.concurrentQueue", qos: .default, attributes: .concurrent)
     
     func downloadEntityExtractorModel() {
         entityExtractor.downloadModelIfNeeded(completion: { error in
@@ -295,25 +308,14 @@ class SemanticSearch {
     }
     
     
-    public func search(query: String, isSecondarySearch: Bool = false, expandedSearch: Bool = true, searchHandler: ((SearchResult) -> Void)?, searchFinishHandler: (() -> Void)?) {
-        // let queryWords = tokenize(text: query, unit: .word)
-        // let queryPartsOfSpeech = tag(text: query, scheme: .lexicalClass)
-        // let queryEntities = tag(text: query, scheme: .nameType) // PlaceName, PersonName, OrganizationName
-        // Extract nouns from the query and retain their lemmatized form:
-        /* var queryNouns = [String]()
-         for term in queryPartsOfSpeech {
-         if term.1 == "Noun" { // || term.1 == "Other"
-         queryNouns.append(lemmatize(text: term.0))
-         }
-         }*/
+    public func search(query: String, expandedSearch: Bool = true, searchHandler: ((SearchResult) -> Void)?, searchFinishHandler: (() -> Void)?) {
         // Keyword, Clause, Extended Clause or Sentence
         //let queryType = checkPhraseType(queryPartsOfSpeech: queryPartsOfSpeech)
-        // log.info("Performing search on query of type: \(queryType.rawValue)")
-        // Expanded Search means a lower threshold for the lexical search, i.e. more tolerant to minor typos
         let queries = process(query: query)
         logger.info("----")
         logger.info("Original query: \(query)")
         logger.info("Query has been divided into \(Int(queries.count)) semantically different queries.")
+        // Expanded Search means a lower threshold for the lexical search, i.e. more tolerant to minor typos
         let lexicalThreshold = expandedSearch ? 0.9 : 1.0
         
         // Start search process, going through each note
