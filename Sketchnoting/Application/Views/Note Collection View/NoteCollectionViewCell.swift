@@ -13,6 +13,7 @@ class NoteCollectionViewCell: UICollectionViewCell {
     @IBOutlet weak var titleBackgroundView: UIView!
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var selectedImage: UIImageView!
+    @IBOutlet weak var progressView: UIProgressView!
     
     var file: File!
     var url: URL!
@@ -25,7 +26,7 @@ class NoteCollectionViewCell: UICollectionViewCell {
         super.init(coder: aDecoder)
     }
     
-    func setFile(url: URL, file: File, isInSelectionMode: Bool = false, isFileSelected: Bool = false) {
+    func setFile(url: URL, file: File, isInSelectionMode: Bool = false, isFileSelected: Bool = false, progress: Double? = nil) {
         self.file = file
         self.url = url
         
@@ -51,7 +52,14 @@ class NoteCollectionViewCell: UICollectionViewCell {
         }
         self.toggleSelectionModeIndicator(status: isInSelectionMode)
         self.toggleSelected(isFileSelected: isFileSelected)
-            
+        
+        if let progress = progress {
+            progressView.progress = Float(progress)
+            progressView.isHidden = false
+        }
+        else {
+            progressView.isHidden = true
+        }
     }
     
     func toggleSelected(isFileSelected: Bool) {

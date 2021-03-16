@@ -17,7 +17,7 @@ protocol RelatedNotesVCDelegate {
     func openRelatedNote(url: URL, note: Note)
 }
 
-class RelatedNotesViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate {
+class RelatedNotesViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
     
     private enum SimilarityMethod {
         case TF_IDF
@@ -27,7 +27,7 @@ class RelatedNotesViewController: UIViewController, UICollectionViewDataSource, 
     var note: (URL, Note)!
     var context: RelatedNotesContext = .HomePage
     
-    var relatedNotes = [(URL, Note)]()
+    var relatedNotes = [((URL, Note), Double)]()
     private var similarityMethod: SimilarityMethod = .TF_IDF
     var similarityThreshold: Float = 0.5
     
@@ -74,16 +74,22 @@ class RelatedNotesViewController: UIViewController, UICollectionViewDataSource, 
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "NoteCollectionViewCell", for: indexPath as IndexPath) as! NoteCollectionViewCell
-        cell.setFile(url: self.relatedNotes[indexPath.item].0, file: self.relatedNotes[indexPath.item].1)
+        cell.setFile(url: self.relatedNotes[indexPath.item].0.0, file: self.relatedNotes[indexPath.item].0.1, progress: self.relatedNotes[indexPath.item].1)
         return cell
+    }
+    
+    func collectionView(_ collectionView: UICollectionView,
+                        layout collectionViewLayout: UICollectionViewLayout,
+                        sizeForItemAt indexPath: IndexPath) -> CGSize {
+        return CGSize(width: CGFloat(200), height: CGFloat(300))
     }
         
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let related = self.relatedNotes[indexPath.item]
-        let alert = UIAlertController(title: "Open Note", message: "Close this note and open the note " + related.1.getName() + "?", preferredStyle: .alert)
+        let alert = UIAlertController(title: "Open Note", message: "Close this note and open the note " + related.0.1.getName() + "?", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Open", style: .default, handler: { action in
             self.dismiss(animated: true, completion: nil)
-            self.delegate?.openRelatedNote(url: related.0, note: related.1)
+            self.delegate?.openRelatedNote(url: related.0.0, note: related.0.1)
         }))
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in
                 logger.info("Not opening note.")
@@ -97,10 +103,10 @@ class RelatedNotesViewController: UIViewController, UICollectionViewDataSource, 
                 Knowledge.setupSimilarityMatrix()
             }
             let foundNotes = Knowledge.similarNotesFor(url: note.0, note: note.1)
-            self.relatedNotes = [(URL, Note)]()
+            self.relatedNotes.removeAll()
             for (url, note, score) in foundNotes {
                 if score > 0.1 {
-                    self.relatedNotes.append((url, note))
+                    self.relatedNotes.append(((url, note), Double(score)))
                 }
             }
         }
@@ -109,10 +115,22 @@ class RelatedNotesViewController: UIViewController, UICollectionViewDataSource, 
             self.relatedNotes = foundNotes
         }
         collectionView.reloadData()
-        countLabel.text = "Related Notes: (\(Int(relatedNotes.count))"
+        countLabel.text = "Related Notes: (\(Int(relatedNotes.count)))"
     }
     @IBAction func refreshButtonTapped(_ sender: UIBarButtonItem) {
-        Knowledge.setupSimilarityMatrix()
+        if similarityMethod == .TF_IDF {
+            Knowledge.setupSimilarityMatrix()
+            logger.info("Refreshed note similarity TF-IDF.")
+        }
+        else {
+            NoteSimilarity.shared.clear()
+            var noteIterator = NeoLibrary.getNoteIterator()
+            while let note = noteIterator.next() {
+                TF_IDF.shared.addNote(note: note.1)
+                NoteSimilarity.shared.add(note: note.1)
+            }
+            logger.info("Refreshed note similarity matrices (semantic).")
+        }
         self.refreshRelatedNotes()
     }
 }
