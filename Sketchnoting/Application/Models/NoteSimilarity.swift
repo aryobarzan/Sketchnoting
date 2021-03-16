@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import NaturalLanguage
 import Accelerate
 
 class NoteSimilarity {
@@ -52,23 +51,42 @@ class NoteSimilarity {
             if vector != nil {
                 matrix.append(vector!)
             }
-            /*else {
-                logger.info("No vector for '\(term)'.")
-            }*/
         }
         
-        noteMatrices[note.getID()] = matrix
+        noteMatrices[note.getID()] = transpose(matrix: matrix)
     }
     
-    func similarity(between note1: Note, and note2: Note) -> Double {
-        let matrix1 = DMatrix(noteMatrices[note1.getID()]!)
-        let matrix1_transposed = matrix1.transpose()
-        let matrix2 = DMatrix(noteMatrices[note2.getID()]!)
-        let matrix2_transposed = matrix2.transpose()
+    private func similarity(between note1: Note, and note2: Note) -> Double {
+        let numerator = computeNorm(matrix_1: noteMatrices[note1.getID()]!, matrix_2: noteMatrices[note2.getID()]!)
+        let denominator_1 = computeNorm(matrix_1: noteMatrices[note1.getID()]!, matrix_2: noteMatrices[note1.getID()]!)
+        let denominator_2 = computeNorm(matrix_1: noteMatrices[note2.getID()]!, matrix_2: noteMatrices[note2.getID()]!)
+        return numerator / (sqrt(denominator_1 * denominator_2))
+    }
+    
+    private func computeNorm(matrix_1: [[Double]], matrix_2: [[Double]]) -> Double {
         
-        let numerator = frobeniusNorm(matrix: replaceNegative(matrix: (matrix1_transposed ● matrix2).fast()))
-        let denominator = sqrt(frobeniusNorm(matrix: replaceNegative(matrix: (matrix1_transposed ● matrix1).fast())) * frobeniusNorm(matrix: replaceNegative(matrix: (matrix2_transposed ● matrix2).fast())))
-        return numerator / denominator
+        let matrixA = transpose(matrix: matrix_1)
+        let matrixB = matrix_2
+       
+        // Define matrix row and column sizes
+        let M = Int32(matrixA.count)
+        let N = Int32(matrixB[0].count)
+        let K = Int32(matrixA[0].count)
+        
+        var result: [Double] = [[Double]](repeating: [Double](repeating: 0, count: Int(N)), count: Int(M)).flatMap { $0 }
+        
+        var matrixA_flat = matrixA.flatMap { $0 }
+        var matrixB_flat = matrixB.flatMap { $0 }
+        
+        vDSP_mmulD(
+            &matrixA_flat, vDSP_Stride(1),
+            &matrixB_flat, vDSP_Stride(1),
+            &result, vDSP_Stride(1),
+            vDSP_Length(M),
+            vDSP_Length(N),
+            vDSP_Length(K)
+        )
+        return frobeniusNorm(replaceNegative(result))
     }
     
     func similarNotes(for source: Note, noteIterator: NoteIterator, maxResults: Int = 5) -> [(URL, Note)] {
@@ -101,32 +119,28 @@ class NoteSimilarity {
         return Array(similarNotes.prefix(maxResults)).compactMap { $0.0 }
     }
     
-    /*func transposed(matrix: [[Double]]) -> [[Double]] {
+    private func transpose(matrix: [[Double]]) -> [[Double]] {
         guard let firstRow = matrix.first else { return [] }
         return firstRow.indices.map { index in
             matrix.map{ $0[index] }
         }
-    }*/
+    }
     
-    func frobeniusNorm(matrix: DMatrix) -> Double {
+    private func frobeniusNorm(_ matrix: [Double]) -> Double {
         var norm = 0.0
-        for row in 0..<matrix.rows {
-            for col in 0..<matrix.cols {
-                let v = matrix[row, col]
-                norm += pow(v, 2)
-            }
+        for i in 0..<matrix.count {
+            let v = matrix[i]
+            norm += pow(v, 2)
         }
         return sqrt(norm)
     }
     
-    func replaceNegative(matrix: DMatrix) -> DMatrix {
+    private func replaceNegative(_ matrix: [Double]) -> [Double] {
         var matrix = matrix
-        for row in 0..<matrix.rows {
-            for col in 0..<matrix.cols {
-                let v = matrix[row, col]
-                if v < 0 {
-                    matrix[row, col] = max(0.0, v)
-                }
+        for i in 0..<matrix.count {
+            let v = matrix[i]
+            if v < 0 {
+                matrix[i] = max(0.0, v)
             }
         }
         return matrix

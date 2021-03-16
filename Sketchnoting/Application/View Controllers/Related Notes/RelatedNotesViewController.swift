@@ -109,7 +109,7 @@ class RelatedNotesViewController: UIViewController, UICollectionViewDataSource, 
             self.relatedNotes = foundNotes
         }
         collectionView.reloadData()
-        countLabel.text = "Related Notes: (\(relatedNotes.count))"
+        countLabel.text = "Related Notes: (\(Int(relatedNotes.count))"
     }
     @IBAction func refreshButtonTapped(_ sender: UIBarButtonItem) {
         Knowledge.setupSimilarityMatrix()
