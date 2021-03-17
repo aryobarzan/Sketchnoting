@@ -20,52 +20,78 @@ class NoteSimilarity {
         self.noteMatrices.removeAll()
     }
     
-    func add(note: Note) {
+    func add(note: Note, useSentenceEmbedding: Bool = false, normalizeVector: Bool = false) {
         var matrix = [[Double]]()
         
-        let titleTerms = SemanticSearch.shared.tokenize(text: note.getName(), unit: .word)
-        let bodyTerms = SemanticSearch.shared.tokenize(text: note.getText(), unit: .word)
-        // Convert to set to only retain unique terms
-        var uniqueTerms = Array(Set(titleTerms + bodyTerms)) // titleTerms + bodyTerms
-        var toRemove = [Int]()
-        // Lemmatize & lowercase
-        for i in 0..<uniqueTerms.count {
-            let lemmatized = SemanticSearch.shared.lemmatize(text: uniqueTerms[i]).lowercased()
-            if SemanticSearch.shared.getWordEmbedding().contains(lemmatized) {
-                uniqueTerms[i] = lemmatized
-            }
-            else {
+        if useSentenceEmbedding {
+            let titleTerms = SemanticSearch.shared.tokenize(text: note.getName(), unit: .sentence)
+            let bodyTerms = SemanticSearch.shared.tokenize(text: note.getText(), unit: .sentence)
+            // Convert to set to only retain unique terms
+            var uniqueTerms = Array(Set(titleTerms + bodyTerms)) // titleTerms + bodyTerms
+            // Lemmatize & lowercase
+            for i in 0..<uniqueTerms.count {
                 uniqueTerms[i] = uniqueTerms[i].lowercased()
             }
+            // Insert vector for each term to matrix
+            for term in uniqueTerms {
+                let vector = SemanticSearch.shared.getSentenceEmbedding().vector(for: term)
+                if vector != nil {
+                    matrix.append(normalizeVector ? normalize(vector!) : vector!)
+                }
+            }
+        }
+        else {
+            let titleTerms = SemanticSearch.shared.tokenize(text: note.getName(), unit: .word)
+            let bodyTerms = SemanticSearch.shared.tokenize(text: note.getText(), unit: .word)
+            // Convert to set to only retain unique terms
+            var uniqueTerms = Array(Set(titleTerms + bodyTerms)) // titleTerms + bodyTerms
+            var toRemove = [Int]()
+            // Lemmatize & lowercase
+            for i in 0..<uniqueTerms.count {
+                let lemmatized = SemanticSearch.shared.lemmatize(text: uniqueTerms[i]).lowercased()
+                if SemanticSearch.shared.getWordEmbedding().contains(lemmatized) {
+                    uniqueTerms[i] = lemmatized
+                }
+                else {
+                    uniqueTerms[i] = uniqueTerms[i].lowercased()
+                }
+                
+                if stopwords.contains(uniqueTerms[i]) {
+                    toRemove.append(i)
+                }
+            }
+            // Remove stop words
+            uniqueTerms = uniqueTerms.enumerated().filter { !toRemove.contains($0.offset) }.map { $0.element }
             
-            if stopwords.contains(uniqueTerms[i]) {
-                toRemove.append(i)
+            // Insert vector for each term to matrix
+            for term in uniqueTerms {
+                let vector = SemanticSearch.shared.getWordEmbedding().vector(for: term)
+                if vector != nil {
+                    matrix.append(normalizeVector ? normalize(vector!) : vector!)
+                }
             }
         }
-        // Remove stop words
-        uniqueTerms = uniqueTerms.enumerated().filter { !toRemove.contains($0.offset) }.map { $0.element }
-        
-        // Insert vector for each term to matrix
-        for term in uniqueTerms {
-            let vector = SemanticSearch.shared.getWordEmbedding().vector(for: term)
-            if vector != nil {
-                matrix.append(vector!)
-            }
-        }
-        
         noteMatrices[note.getID()] = transpose(matrix: matrix)
     }
     
-    private func similarity(between note1: Note, and note2: Note) -> Double {
-        let numerator = compute(norm: .InfinityNorm, for: replaceNegative(multiply(noteMatrices[note1.getID()]!, noteMatrices[note2.getID()]!)))
-        let denominator_1 = compute(norm: .InfinityNorm, for: replaceNegative(multiply(noteMatrices[note1.getID()]!, noteMatrices[note1.getID()]!)))
-        let denominator_2 = compute(norm: .InfinityNorm, for: replaceNegative(multiply(noteMatrices[note2.getID()]!, noteMatrices[note2.getID()]!)))
+    private func normalize(_ vector: [Double]) -> [Double] {
+        var norm = 0.0
+        for value in vector {
+            norm += pow(value, 2)
+        }
+        norm = sqrt(norm)
+        return vector.map { $0 / norm }
+    }
+    
+    private func similarity(between note1: Note, and note2: Note, norm: MatrixNorm = .Frobenius) -> Double {
+        let numerator = compute(norm: norm, for: replaceNegative(multiply(noteMatrices[note1.getID()]!, noteMatrices[note2.getID()]!)))
+        let denominator_1 = compute(norm: norm, for: replaceNegative(multiply(noteMatrices[note1.getID()]!, noteMatrices[note1.getID()]!)))
+        let denominator_2 = compute(norm: norm, for: replaceNegative(multiply(noteMatrices[note2.getID()]!, noteMatrices[note2.getID()]!)))
         return numerator / (sqrt(denominator_1 * denominator_2))
         // Note: similarity value is only normalized to [0,1] range for Frobenius & L1,1 norms
     }
     
     private func multiply(_ matrix1: [[Double]], _ matrix2: [[Double]]) -> [Double] {
-        
         let matrixA = transpose(matrix: matrix1)
         let matrixB = matrix2
        

@@ -123,6 +123,10 @@ class SemanticSearch {
         return wordEmbedding
     }
     
+    func getSentenceEmbedding() -> NLEmbedding {
+        return sentenceEmbedding
+    }
+    
     public func synchronizedAccess(to object: AnyObject, _ block: () -> Void)
     {
         objc_sync_enter(object)

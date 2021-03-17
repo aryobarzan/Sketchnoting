@@ -22,25 +22,10 @@ class Knowledge {
         
         for note in allNotes {
             var bag = [String]()
-            bag = note.1.getText().components(separatedBy: " ")
-            for t in note.1.getName().components(separatedBy: " ") {
+            bag = SemanticSearch.shared.tokenize(text: note.1.getText(), unit: .word)
+            for t in SemanticSearch.shared.tokenize(text: note.1.getName(), unit: .word) {
                 if !bag.contains(t) {
                     bag.append(t)
-                }
-            }
-            for d in note.1.getDocuments() {
-                for t in d.title.components(separatedBy: " ") {
-                    if !bag.contains(t) {
-                        bag.append(t)
-                    }
-                }
-            }
-            for page in note.1.pages {
-                for layer in page.getLayers() {
-                    let hashcodeString = String(layer.hashValue)
-                    if !bag.contains(hashcodeString) {
-                        bag.append(hashcodeString)
-                    }
                 }
             }
             bag = bag.map {$0.lowercased()}
@@ -96,7 +81,7 @@ class Knowledge {
             }
             tf_idfs![note.0] = (note.1, noteIDFs)
         }
-        logger.info("Setup of similarity matrix complete.")
+        logger.info("Setup of TF-IDF matrix for notes complete.")
     }
     
     public static func similarityMatrixIsSetup() -> Bool {
