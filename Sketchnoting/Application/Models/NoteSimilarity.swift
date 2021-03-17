@@ -20,7 +20,7 @@ class NoteSimilarity {
         self.noteMatrices.removeAll()
     }
     
-    func add(note: Note, useSentenceEmbedding: Bool = false, normalizeVector: Bool = false, parse: Bool = false, useKeywords: Bool = false) {
+    func add(note: Note, useSentenceEmbedding: Bool = false, normalizeVector: Bool = false, parse: Bool = false, useKeywords: Bool = false, useDocuments: Bool = false) {
         var matrix = [[Double]]()
         
         if useSentenceEmbedding {
@@ -41,10 +41,13 @@ class NoteSimilarity {
         else {
             let titleTerms = SemanticSearch.shared.tokenize(text: note.getName(), unit: .word)
             let noteText = note.getText(parse: parse)
-            var bodyTerms = SemanticSearch.shared.tokenize(text: note.getText(parse: parse), unit: .word)
+            var bodyTerms = SemanticSearch.shared.tokenize(text: noteText, unit: .word)
             if bodyTerms.count > 10 && useKeywords {
-                bodyTerms = Reductio.shared.keywords(from: note.getText(parse: parse), count: 10)
+                bodyTerms = Reductio.shared.keywords(from: noteText, count: 10)
                 logger.info(bodyTerms.joined(separator: ", "))
+            }
+            else if useDocuments {
+                bodyTerms = note.getDocuments().map { $0.title }
             }
             // Convert to set to only retain unique terms
             var allTerms = (titleTerms + bodyTerms).map { $0.lowercased() }
