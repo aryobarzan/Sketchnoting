@@ -18,8 +18,33 @@ class Reductio {
     static let shared = Reductio()
     private init() {}
     
+    // The following methods are identical to the original methods but are instead synchronous and do not rely on completion blocks.
+    public func keywords(from text: String) -> [String] {
+        return text.keywords
+    }
+    
+    public func keywords(from text: String, count: Int) -> [String] {
+        return text.keywords.slice(length: count)
+    }
+    
+    public func keywords(from text: String, compression: Float) -> [String] {
+        return text.keywords.slice(percent: compression)
+    }
+    
     public func keywords(from text: String, completion: (([String]) -> Void)) {
         completion(text.keywords)
+    }
+    
+    public func summarize(text: String) -> [String] {
+        return text.summarize
+    }
+    
+    public func summarize(text: String, count: Int) -> [String] {
+        return text.summarize.slice(length: count)
+    }
+    
+    public func summarize(text: String, compression: Float) -> [String] {
+        return text.summarize.slice(percent: compression)
     }
     
     /**

@@ -126,8 +126,7 @@ class RelatedNotesViewController: UIViewController, UICollectionViewDataSource, 
             NoteSimilarity.shared.clear()
             var noteIterator = NeoLibrary.getNoteIterator()
             while let note = noteIterator.next() {
-                TF_IDF.shared.addNote(note: note.1)
-                NoteSimilarity.shared.add(note: note.1)
+                NoteSimilarity.shared.add(note: note.1, useSentenceEmbedding: false, normalizeVector: false, parse: false)
             }
             logger.info("Refreshed note similarity matrices (semantic).")
         }

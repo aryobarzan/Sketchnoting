@@ -9,7 +9,6 @@
 import Foundation
 import UIKit
 import NaturalLanguage
-import MLKitEntityExtraction
 import SwiftCoroutine
 
 class SemanticSearch {
@@ -27,8 +26,6 @@ class SemanticSearch {
         
         locationSynonyms = ["location", "city", "place", "capital", "country", "county", "village"]
         personSynonyms = ["person"]
-
-        downloadEntityExtractorModel()
     }
     
     private let SEARCH_THRESHOLD = 0.8
@@ -37,7 +34,6 @@ class SemanticSearch {
     private var locationSynonyms: [String]
     private var personSynonyms: [String]
     
-    private let entityExtractor = EntityExtractor.entityExtractor(options: EntityExtractorOptions(modelIdentifier: EntityExtractionModelIdentifier.english))
     private var wordEmbedding: NLEmbedding = NLEmbedding.wordEmbedding(for: .english)!
     /*var wordEmbedding: NLEmbedding {
         get {
@@ -56,17 +52,6 @@ class SemanticSearch {
     
     //private let queue = OperationQueue()
     //private let internalQueue = DispatchQueue(label: "com.some.concurrentQueue", qos: .default, attributes: .concurrent)
-    
-    func downloadEntityExtractorModel() {
-        entityExtractor.downloadModelIfNeeded(completion: { error in
-            if error == nil {
-                logger.info("Entity extraction model is ready.")
-            }
-            else {
-                logger.error("Entity extraction model not available: \(error!)")
-            }
-        })
-    }
     
     func tokenize(text: String, unit: NLTokenUnit = .sentence) -> [String] {
         let tokenizer = NLTokenizer(unit: unit)
@@ -132,60 +117,6 @@ class SemanticSearch {
         objc_sync_enter(object)
         block()
         objc_sync_exit(object)
-    }
-    
-    func extractEntities(text: String, allowed: [EntityType] = [EntityType.dateTime], entityCompletion: (([Entity]?) -> Void)?) {
-        self.dateTimeEntity = nil
-        let params = EntityExtractionParams()
-        params.referenceTime = Date();
-        params.referenceTimeZone = TimeZone(identifier: "GMT");
-        params.preferredLocale = Locale(identifier: "en-US");
-        //params.typesFilter = Set(allowed)
-        entityExtractor.annotateText(
-            text,
-            params: params) { result, error in
-            if error == nil {
-                var allEntities = [Entity]()
-                if let annotations = result {
-                    for annotation in annotations {
-                        let entities = annotation.entities
-                        for entity in entities {
-                            if allowed.contains(entity.entityType) {
-                                allEntities.append(entity)
-                            }
-                            switch entity.entityType {
-                            case EntityType.dateTime:
-                                guard let dateTimeEntity = entity.dateTimeEntity else {
-                                    logger.error("No date/time entity detected.")
-                                    return
-                                }
-                                logger.info("Date/time entity detected.")
-                                logger.info("Granularity: \(dateTimeEntity.dateTimeGranularity)")
-                                logger.info("DateTime: \(dateTimeEntity.dateTime)")
-                                self.dateTimeEntity = dateTimeEntity
-                            default:
-                                logger.info("Entity: \(entity)")
-                                break
-                            }
-                        }
-                    }
-                }
-                if let entityCompletion = entityCompletion {
-                    entityCompletion(allEntities)
-                }
-            }
-            else {
-                logger.error("Entity extraction failed: \(error.debugDescription)")
-                if let entityCompletion = entityCompletion {
-                    entityCompletion(nil)
-                }
-            }
-        }
-    }
-    private var dateTimeEntity: DateTimeEntity?
-    
-    func getDateTimeEntity() -> DateTimeEntity? {
-        return dateTimeEntity
     }
     
     // Only used for measuring search time (ms)

@@ -21,7 +21,6 @@ internal extension Array {
     }
 
     func combinations(length: Int) -> [[Element]] {
-
         return [Int](1...length)
             .reduce([([Element](), self)]) { (accum, _) in
                 accum.flatMap(addCombo)

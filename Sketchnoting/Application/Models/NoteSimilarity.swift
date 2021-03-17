@@ -20,21 +20,19 @@ class NoteSimilarity {
         self.noteMatrices.removeAll()
     }
     
-    func add(note: Note, useSentenceEmbedding: Bool = false, normalizeVector: Bool = false) {
+    func add(note: Note, useSentenceEmbedding: Bool = false, normalizeVector: Bool = false, parse: Bool = false, useKeywords: Bool = false) {
         var matrix = [[Double]]()
         
         if useSentenceEmbedding {
             let titleTerms = SemanticSearch.shared.tokenize(text: note.getName(), unit: .sentence)
-            let bodyTerms = SemanticSearch.shared.tokenize(text: note.getText(), unit: .sentence)
+            let bodyTerms = SemanticSearch.shared.tokenize(text: note.getText(parse: parse), unit: .sentence)
             // Convert to set to only retain unique terms
-            var uniqueTerms = Array(Set(titleTerms + bodyTerms)) // titleTerms + bodyTerms
-            // Lemmatize & lowercase
-            for i in 0..<uniqueTerms.count {
-                uniqueTerms[i] = uniqueTerms[i].lowercased()
-            }
-            // Insert vector for each term to matrix
-            for term in uniqueTerms {
-                let vector = SemanticSearch.shared.getSentenceEmbedding().vector(for: term)
+            var allSentences = (titleTerms + bodyTerms).map { $0.lowercased() }
+            allSentences = Array(Set(allSentences))
+
+            // Insert vector for each sentence to matrix
+            for sentence in allSentences {
+                let vector = SemanticSearch.shared.getSentenceEmbedding().vector(for: sentence)
                 if vector != nil {
                     matrix.append(normalizeVector ? normalize(vector!) : vector!)
                 }
@@ -42,29 +40,31 @@ class NoteSimilarity {
         }
         else {
             let titleTerms = SemanticSearch.shared.tokenize(text: note.getName(), unit: .word)
-            let bodyTerms = SemanticSearch.shared.tokenize(text: note.getText(), unit: .word)
+            let noteText = note.getText(parse: parse)
+            var bodyTerms = SemanticSearch.shared.tokenize(text: note.getText(parse: parse), unit: .word)
+            if bodyTerms.count > 10 && useKeywords {
+                bodyTerms = Reductio.shared.keywords(from: note.getText(parse: parse), count: 10)
+                logger.info(bodyTerms.joined(separator: ", "))
+            }
             // Convert to set to only retain unique terms
-            var uniqueTerms = Array(Set(titleTerms + bodyTerms)) // titleTerms + bodyTerms
+            var allTerms = (titleTerms + bodyTerms).map { $0.lowercased() }
+            allTerms = Array(Set(allTerms))
+            
             var toRemove = [Int]()
-            // Lemmatize & lowercase
-            for i in 0..<uniqueTerms.count {
-                let lemmatized = SemanticSearch.shared.lemmatize(text: uniqueTerms[i]).lowercased()
+            // Lemmatize
+            for i in 0..<allTerms.count {
+                let lemmatized = SemanticSearch.shared.lemmatize(text: allTerms[i])
                 if SemanticSearch.shared.getWordEmbedding().contains(lemmatized) {
-                    uniqueTerms[i] = lemmatized
+                    allTerms[i] = lemmatized
                 }
-                else {
-                    uniqueTerms[i] = uniqueTerms[i].lowercased()
-                }
-                
-                if stopwords.contains(uniqueTerms[i]) {
+                if stopwords.contains(allTerms[i]) {
                     toRemove.append(i)
                 }
             }
             // Remove stop words
-            uniqueTerms = uniqueTerms.enumerated().filter { !toRemove.contains($0.offset) }.map { $0.element }
-            
+            allTerms = allTerms.enumerated().filter { !toRemove.contains($0.offset) }.map { $0.element }
             // Insert vector for each term to matrix
-            for term in uniqueTerms {
+            for term in allTerms {
                 let vector = SemanticSearch.shared.getWordEmbedding().vector(for: term)
                 if vector != nil {
                     matrix.append(normalizeVector ? normalize(vector!) : vector!)
