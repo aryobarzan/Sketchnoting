@@ -8,6 +8,7 @@
 
 import Foundation
 import Accelerate
+import NaturalLanguage
 
 class NoteSimilarity {
     static var shared = NoteSimilarity()
@@ -20,16 +21,20 @@ class NoteSimilarity {
         self.noteMatrices.removeAll()
     }
     
-    func add(note: Note, useSentenceEmbedding: Bool = false, normalizeVector: Bool = false, parse: Bool = false, useKeywords: Bool = false, useDocuments: Bool = false) {
+    func add(note: Note, uniqueOnly: Bool = false, useSentenceEmbedding: Bool = false, normalizeVector: Bool = false, parse: Bool = false, useKeywords: Bool = false, useDocuments: Bool = false, useNounsOnly: Bool = false, filterSentences: Bool = false) {
         var matrix = [[Double]]()
         
         if useSentenceEmbedding {
             let titleTerms = SemanticSearch.shared.tokenize(text: note.getName(), unit: .sentence)
-            let bodyTerms = SemanticSearch.shared.tokenize(text: note.getText(parse: parse), unit: .sentence)
+            var bodySentences = SemanticSearch.shared.tokenize(text: note.getText(parse: parse), unit: .sentence)
+            if filterSentences {
+                bodySentences = bodySentences.filter {SemanticSearch.shared.checkPhraseType(queryPartsOfSpeech: SemanticSearch.shared.tag(text: $0, scheme: .lexicalClass)) == .Sentence}
+            }
             // Convert to set to only retain unique terms
-            var allSentences = (titleTerms + bodyTerms).map { $0.lowercased() }
-            allSentences = Array(Set(allSentences))
-
+            var allSentences = (titleTerms + bodySentences).map { $0.lowercased() }
+            if uniqueOnly {
+                allSentences = Array(Set(allSentences))
+            }
             // Insert vector for each sentence to matrix
             for sentence in allSentences {
                 let vector = SemanticSearch.shared.getSentenceEmbedding().vector(for: sentence)
@@ -49,9 +54,15 @@ class NoteSimilarity {
             else if useDocuments {
                 bodyTerms = note.getDocuments().map { $0.title }
             }
+            else if useNounsOnly {
+                let taggedTerms = SemanticSearch.shared.tag(text: noteText, scheme: .lexicalClass)
+                bodyTerms = taggedTerms.filter {$0.1 == NLTag.noun.rawValue }.map { $0.0 }
+            }
             // Convert to set to only retain unique terms
             var allTerms = (titleTerms + bodyTerms).map { $0.lowercased() }
-            allTerms = Array(Set(allTerms))
+            if uniqueOnly {
+                allTerms = Array(Set(allTerms))
+            }
             
             var toRemove = [Int]()
             // Lemmatize
@@ -130,9 +141,12 @@ class NoteSimilarity {
     
     func similarNotes(for source: Note, noteIterator: NoteIterator, maxResults: Int = 5) -> [((URL, Note), Double)] {
         var similarNotes = [((URL, Note), Double)]()
+        if noteMatrices[source.getID()] == nil || noteMatrices[source.getID()]!.isEmpty {
+            return [((URL, Note), Double)]()
+        }
         var noteIterator = noteIterator
         while let note = noteIterator.next() {
-            if note.1 == source {
+            if note.1 == source || noteMatrices[note.1.getID()] == nil || noteMatrices[note.1.getID()]!.isEmpty {
                 continue
             }
             let similarity = self.similarity(between: source, and: note.1)
@@ -164,6 +178,22 @@ class NoteSimilarity {
             matrix.map{ $0[index] }
         }
     }
+    
+    /*private func transpose(matrix: [[Double]]) -> [[Double]] {
+        let M = Int32(matrix.count)
+        let N = Int32(matrix[0].count)
+        
+        // Transposed matrix has dimensions NxM
+        var result: [Double] = [[Double]](repeating: [Double](repeating: 0, count: Int(M)), count: Int(N)).flatMap { $0 }
+        var matrix_flat = matrix.flatMap { $0 }
+        // Accelerate framework only works on flat (1D) arrays
+        vDSP_mtransD(&matrix_flat, vDSP_Stride(1), &result, vDSP_Stride(1), vDSP_Length(N), vDSP_Length(M))
+        // Transform transposed array to 2D matrix
+        let matrix_2d_pattern = [[Double]](repeating: [Double](repeating: 0, count: Int(M)), count: Int(N))
+        var iter = result.makeIterator()
+        let matrix_2d = matrix_2d_pattern.map { $0.compactMap { _ in iter.next() } }
+        return matrix_2d
+    }*/
     
     private enum MatrixNorm {
         case Frobenius

@@ -33,7 +33,7 @@ class SearchViewController: UIViewController, UICollectionViewDelegate, UICollec
         
         searchTextField.delegate = self
         
-        searchButton.layer.cornerRadius = 14
+        searchButton.layer.cornerRadius = 4
 
         notesCollectionView.delegate = self
         notesCollectionView.dataSource = self
@@ -83,7 +83,7 @@ class SearchViewController: UIViewController, UICollectionViewDelegate, UICollec
         var noteIterator = NeoLibrary.getNoteIterator()
         while let note = noteIterator.next() {
             TF_IDF.shared.addNote(note: note.1)
-            NoteSimilarity.shared.add(note: note.1, useSentenceEmbedding: false, normalizeVector: false, parse: true, useKeywords: false, useDocuments: false)
+            NoteSimilarity.shared.add(note: note.1, uniqueOnly: true, useSentenceEmbedding: true, normalizeVector: true, parse: true, useKeywords: false, useDocuments: false, filterSentences: true)
         }
         logger.info("Reset TF-IDF and semantic matrices for notes library.")
     }
