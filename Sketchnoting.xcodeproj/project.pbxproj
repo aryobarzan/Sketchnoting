@@ -155,6 +155,7 @@
 		9FF0AC962441308B00A82BE8 /* CodableExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FF0AC952441308B00A82BE8 /* CodableExtensions.swift */; };
 		9FF4757B25FAA9DF003CA74A /* NoteSimilarity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FF4757A25FAA9DF003CA74A /* NoteSimilarity.swift */; };
 		9FF4758825FAC5D0003CA74A /* FastTextWordEmbedding.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 9FF4758725FAC5D0003CA74A /* FastTextWordEmbedding.mlmodel */; };
+		9FF8CA4826052DF900A9171B /* NeoKnowledge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FF8CA4726052DF900A9171B /* NeoKnowledge.swift */; };
 		9FFE07E6232A5FE500DBD0AC /* TagTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FFE07E5232A5FE500DBD0AC /* TagTableViewCell.swift */; };
 		9FFE07E8232A622A00DBD0AC /* Tag.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FFE07E7232A622A00DBD0AC /* Tag.swift */; };
 		9FFE07EA232A63BA00DBD0AC /* TagsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FFE07E9232A63BA00DBD0AC /* TagsManager.swift */; };
@@ -320,6 +321,7 @@
 		9FF0AC952441308B00A82BE8 /* CodableExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodableExtensions.swift; sourceTree = "<group>"; };
 		9FF4757A25FAA9DF003CA74A /* NoteSimilarity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteSimilarity.swift; sourceTree = "<group>"; };
 		9FF4758725FAC5D0003CA74A /* FastTextWordEmbedding.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = FastTextWordEmbedding.mlmodel; sourceTree = "<group>"; };
+		9FF8CA4726052DF900A9171B /* NeoKnowledge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NeoKnowledge.swift; sourceTree = "<group>"; };
 		9FFE07E5232A5FE500DBD0AC /* TagTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagTableViewCell.swift; sourceTree = "<group>"; };
 		9FFE07E7232A622A00DBD0AC /* Tag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tag.swift; sourceTree = "<group>"; };
 		9FFE07E9232A63BA00DBD0AC /* TagsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagsManager.swift; sourceTree = "<group>"; };
@@ -403,6 +405,7 @@
 				9F8988D525E8239E005CB90B /* TextParser.swift */,
 				9F72B76825F2C434009E31AA /* TFIDFIndexer.swift */,
 				9FF4757A25FAA9DF003CA74A /* NoteSimilarity.swift */,
+				9FF8CA4726052DF900A9171B /* NeoKnowledge.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -1049,6 +1052,7 @@
 				9FC114D9243919BD004F576A /* ImagePickerHelper.swift in Sources */,
 				9FC02C1C23EDB6290051C576 /* File.swift in Sources */,
 				9FAB4B7C244BEF2700DEA46F /* FittableFontLabel.swift in Sources */,
+				9FF8CA4826052DF900A9171B /* NeoKnowledge.swift in Sources */,
 				9FB9984724868561003773F2 /* MoveFileViewController.swift in Sources */,
 				9F00B9F824C5D56E000153A8 /* NeoDocumentsVC.swift in Sources */,
 				9F92D10E231E95B400BC0E57 /* UICollectionViewExtensions.swift in Sources */,

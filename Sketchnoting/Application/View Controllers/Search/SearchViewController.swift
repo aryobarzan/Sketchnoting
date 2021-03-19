@@ -85,6 +85,7 @@ class SearchViewController: UIViewController, UICollectionViewDelegate, UICollec
             TF_IDF.shared.addNote(note: note.1)
             NoteSimilarity.shared.add(note: note.1, uniqueOnly: true, useSentenceEmbedding: true, normalizeVector: true, parse: true, useKeywords: false, useDocuments: false, filterSentences: true)
         }
+        NeoKnowledge.shared.index(noteIterator: NeoLibrary.getNoteIterator())
         logger.info("Reset TF-IDF and semantic matrices for notes library.")
     }
     

@@ -188,6 +188,7 @@ class NoteSimilarity {
                 continue
             }
             let similarity = self.similarity(between: source, and: note.1)
+            logger.info("TF-IDF Similarity '\(source.getName())' / '\(note.1.getName())': \(cosineDistance(vector1: NeoKnowledge.shared.getTFIDF(for: source), vector2: NeoKnowledge.shared.getTFIDF(for: note.1)))")
             logger.info("Centroid Similarity '\(source.getName())' / '\(note.1.getName())': \(similarityAverage(matrix1: noteMatrices[source.getID()]!, matrix2: noteMatrices[note.1.getID()]!))")
             logger.info("Similarity '\(source.getName())' / '\(note.1.getName())': \(similarity)")
             if similarNotes.isEmpty {
