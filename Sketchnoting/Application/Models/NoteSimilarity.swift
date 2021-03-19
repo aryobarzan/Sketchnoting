@@ -105,105 +105,42 @@ class NoteSimilarity {
         // Note: similarity value is only normalized to [0,1] range for Frobenius & L1,1 norms
     }
     
-    func similarityAverage(notes: [Note], uniqueOnly: Bool = false, useSentenceEmbedding: Bool = false, normalizeVector: Bool = false, parse: Bool = false, useKeywords: Bool = false, useDocuments: Bool = false, useNounsOnly: Bool = false, filterSentences: Bool = false) -> Double {
+    // Baseline approach for comparing 2 notes
+    func similarityAverage(matrix1: [[Double]], matrix2: [[Double]]) -> Double {
         var centroidVectors = [[Double]]()
-        for note in notes {
-            
-            if useSentenceEmbedding {
-                let titleTerms = SemanticSearch.shared.tokenize(text: note.getName(), unit: .sentence)
-                var bodySentences = SemanticSearch.shared.tokenize(text: note.getText(parse: parse), unit: .sentence)
-                if filterSentences {
-                    bodySentences = bodySentences.filter {SemanticSearch.shared.checkPhraseType(queryPartsOfSpeech: SemanticSearch.shared.tag(text: $0, scheme: .lexicalClass)) == .Sentence}
-                }
-                // Convert to set to only retain unique terms
-                var allSentences = (titleTerms + bodySentences).map { $0.lowercased() }
-                if uniqueOnly {
-                    allSentences = Array(Set(allSentences))
-                }
-                // Insert vector for each sentence to matrix
-                var centroid = [Double](repeating: 0.0, count: 300)
-                var count = 0
-                for sentence in allSentences {
-                    let vector = SemanticSearch.shared.getSentenceEmbedding().vector(for: sentence)
-                    if vector != nil {
-                        centroid = zip(centroid, normalizeVector ? normalize(vector!) : vector!).map(+)
-                        count += 1
-                    }
-                }
-                centroid = centroid.map { $0 / Double(count) }
-                centroidVectors.append(centroid)
+        for matrix in [transpose(matrix: matrix1), transpose(matrix: matrix2)] {
+            var centroid = [Double](repeating: 0.0, count: 300)
+            var count = 0
+            for vector in matrix {
+                centroid = zip(centroid, vector).map(+)
+                count += 1
             }
-            else {
-                let titleTerms = SemanticSearch.shared.tokenize(text: note.getName(), unit: .word)
-                let noteText = note.getText(parse: parse)
-                var bodyTerms = SemanticSearch.shared.tokenize(text: noteText, unit: .word)
-                if bodyTerms.count > 10 && useKeywords {
-                    bodyTerms = Reductio.shared.keywords(from: noteText, count: 10)
-                    logger.info(bodyTerms.joined(separator: ", "))
-                }
-                else if useDocuments {
-                    bodyTerms = note.getDocuments().map { $0.title }
-                }
-                else if useNounsOnly {
-                    let taggedTerms = SemanticSearch.shared.tag(text: noteText, scheme: .lexicalClass)
-                    bodyTerms = taggedTerms.filter {$0.1 == NLTag.noun.rawValue }.map { $0.0 }
-                }
-                // Convert to set to only retain unique terms
-                var allTerms = (titleTerms + bodyTerms).map { $0.lowercased() }
-                if uniqueOnly {
-                    allTerms = Array(Set(allTerms))
-                }
-                
-                var toRemove = [Int]()
-                // Lemmatize
-                for i in 0..<allTerms.count {
-                    let lemmatized = SemanticSearch.shared.lemmatize(text: allTerms[i])
-                    if SemanticSearch.shared.getWordEmbedding().contains(lemmatized) {
-                        allTerms[i] = lemmatized
-                    }
-                    if stopwords.contains(allTerms[i]) {
-                        toRemove.append(i)
-                    }
-                }
-                // Remove stop words
-                allTerms = allTerms.enumerated().filter { !toRemove.contains($0.offset) }.map { $0.element }
-                // Insert vector for each term to matrix
-                var centroid = [Double](repeating: 0.0, count: 300)
-                var count = 0
-                for term in allTerms {
-                    let vector = SemanticSearch.shared.getWordEmbedding().vector(for: term)
-                    if vector != nil {
-                        centroid = zip(centroid, normalizeVector ? normalize(vector!) : vector!).map(+)
-                        count += 1
-                    }
-                }
-                centroid = centroid.map { $0 / Double(count) }
-                centroidVectors.append(centroid)
-            }
+            centroid = centroid.map { $0 / Double(count) }
+            centroidVectors.append(centroid)
         }
         return cosineDistance(vector1: centroidVectors[0], vector2: centroidVectors[1])
     }
     
     /** Dot Product **/
-    private func dot(A: [Double], B: [Double]) -> Double {
-        var x: Double = 0
-        for i in 0..<A.count {
-            x += A[i] * B[i]
+    private func dot(vector1: [Double], vector2: [Double]) -> Double {
+        var x: Double = 0.0
+        for i in 0..<vector1.count {
+            x += vector1[i] * vector2[i]
         }
         return x
     }
     
     /** Vector Magnitude **/
-    private func magnitude(A: [Double]) -> Double {
-        var x: Double = 0
-        for elt in A {
-            x += elt * elt
+    private func magnitude(vector: [Double]) -> Double {
+        var x: Double = 0.0
+        for element in vector {
+            x += pow(element, 2)
         }
         return sqrt(x)
     }
     
     private func cosineDistance(vector1: [Double], vector2: [Double]) -> Double {
-        return dot(A: vector1, B: vector2) / (magnitude(A: vector1) * magnitude(A: vector2))
+        return dot(vector1: vector1, vector2: vector2) / (magnitude(vector: vector1) * magnitude(vector: vector2))
     }
     
     private func multiply(_ matrix1: [[Double]], _ matrix2: [[Double]]) -> [Double] {
@@ -251,7 +188,7 @@ class NoteSimilarity {
                 continue
             }
             let similarity = self.similarity(between: source, and: note.1)
-            logger.info("Centroid Similarity '\(source.getName())' / '\(note.1.getName())': \(similarityAverage(notes: [source, note.1], uniqueOnly: true, useSentenceEmbedding: true, normalizeVector: true, parse: true, useKeywords: false, useDocuments: false, useNounsOnly: false, filterSentences: true))")
+            logger.info("Centroid Similarity '\(source.getName())' / '\(note.1.getName())': \(similarityAverage(matrix1: noteMatrices[source.getID()]!, matrix2: noteMatrices[note.1.getID()]!))")
             logger.info("Similarity '\(source.getName())' / '\(note.1.getName())': \(similarity)")
             if similarNotes.isEmpty {
                 similarNotes.append((note, similarity))
