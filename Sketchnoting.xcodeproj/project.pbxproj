@@ -156,6 +156,8 @@
 		9FF4757B25FAA9DF003CA74A /* NoteSimilarity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FF4757A25FAA9DF003CA74A /* NoteSimilarity.swift */; };
 		9FF4758825FAC5D0003CA74A /* FastTextWordEmbedding.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 9FF4758725FAC5D0003CA74A /* FastTextWordEmbedding.mlmodel */; };
 		9FF8CA4826052DF900A9171B /* NeoKnowledge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FF8CA4726052DF900A9171B /* NeoKnowledge.swift */; };
+		9FF8CA4B2609135900A9171B /* SKTextRank.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FF8CA4A2609135900A9171B /* SKTextRank.swift */; };
+		9FF8CA4E260920F600A9171B /* SwiftGraph in Frameworks */ = {isa = PBXBuildFile; productRef = 9FF8CA4D260920F600A9171B /* SwiftGraph */; };
 		9FFE07E6232A5FE500DBD0AC /* TagTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FFE07E5232A5FE500DBD0AC /* TagTableViewCell.swift */; };
 		9FFE07E8232A622A00DBD0AC /* Tag.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FFE07E7232A622A00DBD0AC /* Tag.swift */; };
 		9FFE07EA232A63BA00DBD0AC /* TagsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FFE07E9232A63BA00DBD0AC /* TagsManager.swift */; };
@@ -322,6 +324,7 @@
 		9FF4757A25FAA9DF003CA74A /* NoteSimilarity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteSimilarity.swift; sourceTree = "<group>"; };
 		9FF4758725FAC5D0003CA74A /* FastTextWordEmbedding.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = FastTextWordEmbedding.mlmodel; sourceTree = "<group>"; };
 		9FF8CA4726052DF900A9171B /* NeoKnowledge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NeoKnowledge.swift; sourceTree = "<group>"; };
+		9FF8CA4A2609135900A9171B /* SKTextRank.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SKTextRank.swift; sourceTree = "<group>"; };
 		9FFE07E5232A5FE500DBD0AC /* TagTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagTableViewCell.swift; sourceTree = "<group>"; };
 		9FFE07E7232A622A00DBD0AC /* Tag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tag.swift; sourceTree = "<group>"; };
 		9FFE07E9232A63BA00DBD0AC /* TagsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagsManager.swift; sourceTree = "<group>"; };
@@ -341,6 +344,7 @@
 				9F0D8565242052E600B8BE2F /* BSImagePicker in Frameworks */,
 				9F10EC162347D64C005340AA /* Kingfisher in Frameworks */,
 				9F67CE0A25F2CDAC00346023 /* SwiftyBeaver in Frameworks */,
+				9FF8CA4E260920F600A9171B /* SwiftGraph in Frameworks */,
 				9F2C00062351123700D53EE9 /* SwiftyJSON in Frameworks */,
 				9FC5F90D24AFB07D00CDF2DF /* NVActivityIndicatorView in Frameworks */,
 				9F9460E223F5BAA10073D709 /* Connectivity in Frameworks */,
@@ -396,6 +400,7 @@
 		9F5D0FC6229CBC2A00BCA451 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				9FF8CA492609134800A9171B /* SKTextRank */,
 				9FFE07E9232A63BA00DBD0AC /* TagsManager.swift */,
 				9F5F340523AC64E400EB2804 /* Knowledge.swift */,
 				9F1A0C54249DA60B00E507BC /* SKClipboard.swift */,
@@ -829,6 +834,14 @@
 			path = "Draggable Views";
 			sourceTree = "<group>";
 		};
+		9FF8CA492609134800A9171B /* SKTextRank */ = {
+			isa = PBXGroup;
+			children = (
+				9FF8CA4A2609135900A9171B /* SKTextRank.swift */,
+			);
+			path = SKTextRank;
+			sourceTree = "<group>";
+		};
 		9FFE07DC232A595D00DBD0AC /* Tags */ = {
 			isa = PBXGroup;
 			children = (
@@ -869,6 +882,7 @@
 				9FE5B79F24BDF3AF00D94255 /* ZIPFoundation */,
 				9F72B76625F28EC4009E31AA /* SwiftCoroutine */,
 				9F67CE0925F2CDAC00346023 /* SwiftyBeaver */,
+				9FF8CA4D260920F600A9171B /* SwiftGraph */,
 			);
 			productName = Sketchnoting;
 			productReference = 9FD29BA32220524D00CC969A /* Sketchnoting.app */;
@@ -913,6 +927,7 @@
 				9FE5B79E24BDF3AF00D94255 /* XCRemoteSwiftPackageReference "ZIPFoundation" */,
 				9F72B76525F28EC4009E31AA /* XCRemoteSwiftPackageReference "SwiftCoroutine" */,
 				9F67CE0825F2CDAC00346023 /* XCRemoteSwiftPackageReference "SwiftyBeaver" */,
+				9FF8CA4C260920F600A9171B /* XCRemoteSwiftPackageReference "SwiftGraph" */,
 			);
 			productRefGroup = 9FD29BA42220524D00CC969A /* Products */;
 			projectDirPath = "";
@@ -1097,6 +1112,7 @@
 				9FC02C1E23EDB6400051C576 /* Note.swift in Sources */,
 				9F8988D425E59DAD005CB90B /* SearchDocumentsCard.swift in Sources */,
 				9F318D39244A207300A1B4B5 /* UIFontExtensions.swift in Sources */,
+				9FF8CA4B2609135900A9171B /* SKTextRank.swift in Sources */,
 				9F2C0D75248F0E2600F58F5E /* ArrayExtensions.swift in Sources */,
 				9F8551B123A539D9006EB0B1 /* NotePageCollectionViewCell.swift in Sources */,
 				9FBF6ABA22E9F439001FD730 /* VisionTextElementWrapper.swift in Sources */,
@@ -1446,6 +1462,14 @@
 				minimumVersion = 0.9.12;
 			};
 		};
+		9FF8CA4C260920F600A9171B /* XCRemoteSwiftPackageReference "SwiftGraph" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/davecom/SwiftGraph";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.1.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -1508,6 +1532,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 9FE5B79E24BDF3AF00D94255 /* XCRemoteSwiftPackageReference "ZIPFoundation" */;
 			productName = ZIPFoundation;
+		};
+		9FF8CA4D260920F600A9171B /* SwiftGraph */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9FF8CA4C260920F600A9171B /* XCRemoteSwiftPackageReference "SwiftGraph" */;
+			productName = SwiftGraph;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

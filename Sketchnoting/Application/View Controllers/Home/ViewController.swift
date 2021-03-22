@@ -850,6 +850,9 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     
     var noteForRelatedNotes: (URL, Note)?
     private func showRelatedNotesFor(url: URL, note: Note) {
+        //let keywords = SKTextRank.shared.extractKeywords(text: note.getText(option: .FullText, parse: true))
+        //logger.info(keywords)
+        //logger.info(Reductio.shared.keywords(from: note.getText(option: .FullText, parse: true), count: 10))
         self.noteForRelatedNotes = (url, note)
         self.performSegue(withIdentifier: "showRelatedHomePage", sender: self)
     }

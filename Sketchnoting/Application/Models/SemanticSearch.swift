@@ -86,7 +86,7 @@ class SemanticSearch {
         tagger.string = text
         let tags = tagger.tags(in: text.startIndex..<text.endIndex, unit: .word, scheme: .lemma, options: [.omitPunctuation, .omitWhitespace])
         var textLemmatized = text
-        if tags.count > 0 && tags[0].0 != nil {
+        if tags.count > 0 && tags.first!.0 != nil {
             textLemmatized = tags[0].0!.rawValue
         }
         return textLemmatized

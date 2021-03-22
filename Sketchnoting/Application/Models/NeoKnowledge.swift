@@ -62,7 +62,7 @@ class NeoKnowledge {
                     count += 1.0
                 }
             }
-            wordIDFs[word] = Double(N) / count
+            wordIDFs[word] = Double(N) / (1 + count)
         }
         
         for (key, value) in noteTFs {
