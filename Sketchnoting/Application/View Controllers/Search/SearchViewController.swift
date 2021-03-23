@@ -138,26 +138,28 @@ class SearchViewController: UIViewController, UICollectionViewDelegate, UICollec
         clearResults()
         activityIndicator.isHidden = false
         activityIndicator.startAnimating()
-        SemanticSearch.shared.search(query: query, expandedSearch: expandedSearchSwitch.isOn, searchHandler: {searchResult in
-            logger.info("Search Result - \(searchResult.note == nil ? "Note not a match" : searchResult.note!.1.getName()) / \(searchResult.documents.count) Documents / \(searchResult.personDocuments.count) Person-Documents / \(searchResult.locationDocuments.count) Location-Documents")
-            if searchResult.note != nil {
-                DispatchQueue.main.async {
-                    self.notes.append(searchResult.note!)
-                    self.notesCollectionView.reloadData()
+        let searchResults = SemanticSearch.shared.search(query: query, expandedSearch: expandedSearchSwitch.isOn)
+        for (_, results) in searchResults {
+            for searchResult in results {
+                logger.info("Search Result - \(searchResult.note == nil ? "Note not a match" : searchResult.note!.1.getName()) / \(searchResult.documents.count) Documents / \(searchResult.personDocuments.count) Person-Documents / \(searchResult.locationDocuments.count) Location-Documents")
+                if searchResult.note != nil {
+                    DispatchQueue.main.async {
+                        self.notes.append(searchResult.note!)
+                        self.notesCollectionView.reloadData()
+                    }
+                }
+                if searchResult.documents.count > 0 {
+                    DispatchQueue.main.async {
+                        let searchDocumentsCard = SearchDocumentsCard(documents: searchResult.documents, frame: CGRect(x: 0, y: 0, width: 100, height: 340))
+                        self.contentStackView.addArrangedSubview(searchDocumentsCard)
+                        self.searchDocumentsCards.append(searchDocumentsCard)
+                    }
                 }
             }
-            if searchResult.documents.count > 0 {
-                DispatchQueue.main.async {
-                    let searchDocumentsCard = SearchDocumentsCard(documents: searchResult.documents, frame: CGRect(x: 0, y: 0, width: 100, height: 340))
-                    self.contentStackView.addArrangedSubview(searchDocumentsCard)
-                    self.searchDocumentsCards.append(searchDocumentsCard)
-                }
-            }
-        }, searchFinishHandler: {
-            DispatchQueue.main.async {
-                self.activityIndicator.isHidden = true
-            }
-        })
+        }
+        DispatchQueue.main.async {
+            self.activityIndicator.isHidden = true
+        }
     }
     
     private func clearSearchDocumentsCards() {

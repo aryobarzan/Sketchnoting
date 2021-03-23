@@ -51,13 +51,7 @@ final class TF_IDF {
         let bodyTerms = SemanticSearch.shared.tokenize(text: note.getText(), unit: .word)
         var terms = titleTerms + bodyTerms
         for i in 0..<terms.count {
-            let lemmatized = SemanticSearch.shared.lemmatize(text: terms[i]).lowercased()
-            if SemanticSearch.shared.getWordEmbedding().contains(lemmatized) {
-                terms[i] = lemmatized
-            }
-            else {
-                terms[i] = terms[i].lowercased()
-            }
+            terms[i] = SemanticSearch.shared.lemmatize(text: terms[i].lowercased())
         }
         for term in terms {
             if let count = tf[term] {

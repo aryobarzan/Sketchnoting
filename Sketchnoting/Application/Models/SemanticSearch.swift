@@ -10,6 +10,7 @@ import Foundation
 import UIKit
 import NaturalLanguage
 import SwiftCoroutine
+import CoreML
 
 class SemanticSearch {
     
@@ -112,30 +113,13 @@ class SemanticSearch {
         return sentenceEmbedding
     }
     
-    public func synchronizedAccess(to object: AnyObject, _ block: () -> Void)
-    {
-        objc_sync_enter(object)
-        block()
-        objc_sync_exit(object)
-    }
-    
-    // Only used for measuring search time (ms)
-    func getCurrentTime() -> Int64 {
-        return Int64(Date().timeIntervalSince1970 * 1000)
-    }
-    
-    private func getTermRelevancy(for terms: [String], wordEmbedding embedding: NLEmbedding?) -> [[String]] {
-        let wordEmbedding = embedding == nil ? self.wordEmbedding : embedding!
+    //
+    private func getTermRelevancy(for terms: [String]) -> [[String]] {
+        let wordEmbedding = try! NLEmbedding.init(contentsOf: Bundle.main.url(forResource: "FastTextWordEmbedding", withExtension: "mlmodelc")!)
         // Pre-processing: lemmatize & lowercase the terms
         var terms = terms
         for i in 0..<terms.count {
-            let lemmatized = SemanticSearch.shared.lemmatize(text: terms[i]).lowercased()
-            if wordEmbedding.contains(lemmatized) {
-                terms[i] = lemmatized
-            }
-            else {
-                terms[i] = terms[i].lowercased()
-            }
+            terms[i] = lemmatize(text: terms[i].lowercased())
         }
         // Clustering: separate the terms into semantically related groups/'clusters' which will form separate search queries
         var clusters = [[String]]()
@@ -148,7 +132,7 @@ class SemanticSearch {
             let containingNotes = TF_IDF.shared.documentsForTerm(term: term, positiveOnly: true).compactMap({$0.noteID})
             var closestTerm = ""
             for otherTerm in otherTerms {
-                let distance = wordEmbedding.distance(between: term, and: otherTerm, distanceType: .cosine)
+                let distance = wordEmbedding.distance(between: term, and: otherTerm)
                 if distance < minimumDistance {
                     minimumDistance = distance
                     closestTerm = otherTerm
@@ -166,7 +150,7 @@ class SemanticSearch {
                 }
             }
             var isAdded = false
-            if minimumDistance < 2.0 || highestCommonNotes > 0 {
+            if minimumDistance < 1.0 || highestCommonNotes > 0 {
                 for i in 0..<clusters.count {
                     if clusters[i].contains(closestTerm) {
                         clusters[i] = clusters[i] + [term]
@@ -187,17 +171,6 @@ class SemanticSearch {
     
     private func process(query: String) -> [String] {
         let queryWords = tokenize(text: query, unit: .word)
-        // Spellcheck & lowercase - currently disabled as it wrongly does not know many domain specific terms, e.g. "generics" in programming
-        /*let spellchecker = UITextChecker()
-        for i in 0..<queryWords.count {
-            let range = NSRange(location: 0, length: queryWords[i].utf16.count)
-            let guesses = spellchecker.guesses(forWordRange: range, in: queryWords[i], language: "en")
-            if let guesses = guesses {
-                if !guesses.isEmpty {
-                    queryWords[i] = guesses[0]
-                }
-            }
-        }*/
         if queryWords.count > 1 { // Longer query
             var processedQuery = ""
             var allowed = [NLTag.noun.rawValue, NLTag.number.rawValue, NLTag.adjective.rawValue, NLTag.otherWord.rawValue]
@@ -229,7 +202,7 @@ class SemanticSearch {
                     retainedQueryTerms.append(partsOfSpeech[i].0)
                 }
             }
-            let queryClusters = getTermRelevancy(for: retainedQueryTerms, wordEmbedding: nil)
+            let queryClusters = getTermRelevancy(for: retainedQueryTerms)
             var processedQueryClusters = [String]()
             for queryCluster in queryClusters {
                 processedQueryClusters.append(queryCluster.joined(separator: " ").lowercased().trimmingCharacters(in: .whitespaces))
@@ -243,7 +216,7 @@ class SemanticSearch {
     }
     
     
-    public func search(query: String, expandedSearch: Bool = true, searchHandler: ((SearchResult) -> Void)?, searchFinishHandler: (() -> Void)?) {
+    public func search(query: String, expandedSearch: Bool = true) -> [String : [SearchResult]] {
         // Keyword, Clause, Extended Clause or Sentence
         //let queryType = checkPhraseType(queryPartsOfSpeech: queryPartsOfSpeech)
         let queries = process(query: query)
@@ -255,13 +228,16 @@ class SemanticSearch {
         
         // Start search process, going through each note
         var noteIterator = NeoLibrary.getNoteIterator()
+        var searchResults = [String : [SearchResult]]()
+        let wordEmbedding = try! NLEmbedding.init(contentsOf: Bundle.main.url(forResource: "FastTextWordEmbedding", withExtension: "mlmodelc")!)
         for query in queries {
             noteIterator.reset()
+            var results = [SearchResult]()
             while let note = noteIterator.next() {
                 // queue.addOperation
                 var searchResult = SearchResult()
                 // MARK: Note title
-                var (searchType, closestTarget, score) = self.getStringSimilarity(betweenQuery: query, and: note.1.getName())
+                var (searchType, closestTarget, score) = self.getStringSimilarity(betweenQuery: query, and: note.1.getName(), wordEmbedding: wordEmbedding)
                 switch searchType {
                 case .Lexical:
                     if score >= lexicalThreshold { // Higher is better
@@ -279,7 +255,7 @@ class SemanticSearch {
                 // MARK: Note body (handwritten + PDF text)
                 let noteText = note.1.getText(option: .FullText, parse: false).trimmingCharacters(in: .whitespacesAndNewlines)
                 if !noteText.isEmpty {
-                    (searchType, closestTarget, score) = self.getStringSimilarity(betweenQuery: query, and: noteText)
+                    (searchType, closestTarget, score) = self.getStringSimilarity(betweenQuery: query, and: noteText, wordEmbedding: wordEmbedding)
                     switch searchType {
                     case .Lexical:
                         if score >= lexicalThreshold { // Higher is better
@@ -298,7 +274,7 @@ class SemanticSearch {
                 // MARK: Note recognized drawings
                 let noteDrawingLabels = note.1.getDrawingLabels()
                 if !noteDrawingLabels.isEmpty {
-                    (searchType, closestTarget, score) = self.getStringSimilarity(betweenQuery: query, and: note.1.getDrawingLabels())
+                    (searchType, closestTarget, score) = self.getStringSimilarity(betweenQuery: query, and: note.1.getDrawingLabels(), wordEmbedding: wordEmbedding)
                     switch searchType {
                     case .Lexical:
                         if score >= lexicalThreshold { // Higher is better
@@ -318,7 +294,7 @@ class SemanticSearch {
                 for document in note.1.getDocuments(includeHidden: false) {
                     var isDocumentMatching = false
                     // Document title
-                    (searchType, closestTarget, score) = self.getStringSimilarity(betweenQuery: query, and: document.title)
+                    (searchType, closestTarget, score) = self.getStringSimilarity(betweenQuery: query, and: document.title, wordEmbedding: wordEmbedding)
                     switch searchType {
                     case .Lexical:
                         if score >= lexicalThreshold { // Higher is better
@@ -341,7 +317,7 @@ class SemanticSearch {
                     }
                     // Document description (abstract)
                     if let description = document.getDescription() {
-                        (searchType, closestTarget, score) = self.getStringSimilarity(betweenQuery: query, and: description)
+                        (searchType, closestTarget, score) = self.getStringSimilarity(betweenQuery: query, and: description, wordEmbedding: wordEmbedding)
                         switch searchType {
                         case .Lexical:
                             if score >= lexicalThreshold { // Higher is better
@@ -365,16 +341,12 @@ class SemanticSearch {
                     }
                     // Document types [TODO]
                 }
-                
-                if let searchHandler = searchHandler {
-                    searchHandler(searchResult)
-                }
+                results.append(searchResult)
             }
+            searchResults[query] = results
         }
         logger.info("Search for query '\(query)' completed.")
-        if let searchFinishHandler = searchFinishHandler {
-            searchFinishHandler()
-        }
+        return searchResults
     }
     
     private enum SearchType: String {
@@ -383,14 +355,14 @@ class SemanticSearch {
     }
     
     // Helper function for list of words
-    private func getStringSimilarity(betweenQuery query: String, and target: [String]) -> (SearchType, String, Double) {
+    private func getStringSimilarity(betweenQuery query: String, and target: [String], wordEmbedding: NLEmbedding) -> (SearchType, String, Double) {
         var (searchType, closestTarget, score) = (SearchType.Lexical, "", -1.0)
         for word in target {
             if score == -1.0 {
-                (searchType, closestTarget, score) = getStringSimilarity(betweenQuery: query, and: word)
+                (searchType, closestTarget, score) = getStringSimilarity(betweenQuery: query, and: word, wordEmbedding: wordEmbedding)
             }
             else {
-                let temp = getStringSimilarity(betweenQuery: query, and: word)
+                let temp = getStringSimilarity(betweenQuery: query, and: word, wordEmbedding: wordEmbedding)
                 if temp.0 == .Lexical {
                     if temp.2 > score { // Higher is better
                         (searchType, closestTarget, score) = temp
@@ -406,7 +378,7 @@ class SemanticSearch {
         return (searchType, closestTarget, score)
     }
     
-    private func getStringSimilarity(betweenQuery query: String, and target: String) -> (SearchType, String, Double) {
+    private func getStringSimilarity(betweenQuery query: String, and target: String, wordEmbedding: NLEmbedding) -> (SearchType, String, Double) {
         let target = target.trimmingCharacters(in: .whitespaces)
         let sentences = tokenize(text: target, unit: .sentence)
         let queryWords = tokenize(text: query, unit: .word)
