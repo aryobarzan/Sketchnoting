@@ -107,7 +107,8 @@ private extension Dictionary {
     subscript (from: Key, to: Key) -> Float {
         guard
             let row = self[from] as? [Key: Float],
-            let value = row[to]
+            let value = row[to],
+            !value.isNaN
         else {
                 return 0
         }
