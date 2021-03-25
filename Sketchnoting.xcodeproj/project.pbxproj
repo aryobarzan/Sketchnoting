@@ -49,7 +49,6 @@
 		9F5D8A30246113DC00934C0E /* WATHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5D8A2F246113DC00934C0E /* WATHelper.swift */; };
 		9F5D8A322461157200934C0E /* WATDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5D8A312461157200934C0E /* WATDocument.swift */; };
 		9F5E89F42391CE84002FA8B2 /* DocumentDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5E89F32391CE84002FA8B2 /* DocumentDetailViewController.swift */; };
-		9F5F340623AC64E400EB2804 /* Knowledge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5F340523AC64E400EB2804 /* Knowledge.swift */; };
 		9F5F5D1524328CC100AF79A5 /* DateExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5F5D1424328CC100AF79A5 /* DateExtensions.swift */; };
 		9F65983323EDCEA300CDBE0C /* NotePage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F65983223EDCEA300CDBE0C /* NotePage.swift */; };
 		9F65983523EDD09F00CDBE0C /* NoteText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F65983423EDD09F00CDBE0C /* NoteText.swift */; };
@@ -220,7 +219,6 @@
 		9F5D8B2B228B9D7000F56FEC /* CREDITS.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CREDITS.md; sourceTree = "<group>"; };
 		9F5D8B2C228B9EF800F56FEC /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		9F5E89F32391CE84002FA8B2 /* DocumentDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentDetailViewController.swift; sourceTree = "<group>"; };
-		9F5F340523AC64E400EB2804 /* Knowledge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Knowledge.swift; sourceTree = "<group>"; };
 		9F5F5D1424328CC100AF79A5 /* DateExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateExtensions.swift; sourceTree = "<group>"; };
 		9F65983223EDCEA300CDBE0C /* NotePage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotePage.swift; sourceTree = "<group>"; };
 		9F65983423EDD09F00CDBE0C /* NoteText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteText.swift; sourceTree = "<group>"; };
@@ -402,7 +400,6 @@
 			children = (
 				9FF8CA492609134800A9171B /* SKTextRank */,
 				9FFE07E9232A63BA00DBD0AC /* TagsManager.swift */,
-				9F5F340523AC64E400EB2804 /* Knowledge.swift */,
 				9F1A0C54249DA60B00E507BC /* SKClipboard.swift */,
 				9FFE9B3324B3C77200D92FBA /* NeoLibrary.swift */,
 				9FC5386A2520DB7700911DBF /* SKRecognizer.swift */,
@@ -1120,7 +1117,6 @@
 				9F8988DF25E958C2005CB90B /* Search.swift in Sources */,
 				9FD29BC72224B58600CC969A /* Document.swift in Sources */,
 				9F9898312470DC2700E62CD1 /* TextBoxViewController.swift in Sources */,
-				9F5F340623AC64E400EB2804 /* Knowledge.swift in Sources */,
 				9FBF6AB622E9F3FE001FD730 /* VisionTextBlockWrapper.swift in Sources */,
 				9FE38C6A24F8607800421BAE /* NoteImageView.swift in Sources */,
 				9F8988E525E9590C005CB90B /* Stopwords.swift in Sources */,

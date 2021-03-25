@@ -14,9 +14,14 @@ class NeoKnowledge {
     
     private var note_TFIDF = [String : [Double]]()
     
+    func isSetup() -> Bool {
+        return !note_TFIDF.isEmpty
+    }
+    
     func index(noteIterator: NoteIterator) {
         var noteIterator = noteIterator
         
+        note_TFIDF = [String : [Double]]()
         var noteBags = [String : [String]]()
         var noteTFs = [String : [String : Double]]()
         var wordIDFs = [String : Double]()
@@ -76,5 +81,56 @@ class NeoKnowledge {
     
     func getTFIDF(for note: Note) -> [Double] {
         return note_TFIDF[note.getID()]!
+    }
+    
+    func similarNotesFor(for source: Note, noteIterator: NoteIterator, maxResults: Int = 5) -> [((URL, Note), Double)] {
+        var similarNotes = [((URL, Note), Double)]()
+        var noteIterator = noteIterator
+        while let note = noteIterator.next() {
+            if note.1 == source {
+                continue
+            }
+            let similarity = cosineDistance(vector1: NeoKnowledge.shared.getTFIDF(for: source), vector2: NeoKnowledge.shared.getTFIDF(for: note.1))
+            if similarNotes.isEmpty {
+                similarNotes.append((note, similarity))
+            }
+            else {
+                var isInserted = false
+                for i in 0..<similarNotes.count {
+                    if similarity > similarNotes[i].1 {
+                        similarNotes.insert((note, similarity), at: i)
+                        isInserted = true
+                        break
+                    }
+                }
+                if !isInserted {
+                    similarNotes.append((note, similarity))
+                }
+            }
+        }
+        let maxResults = max(1, maxResults)
+        return Array(similarNotes.prefix(maxResults))
+    }
+    
+    private func cosineDistance(vector1: [Double], vector2: [Double]) -> Double {
+        return dot(vector1: vector1, vector2: vector2) / (magnitude(vector: vector1) * magnitude(vector: vector2))
+    }
+    
+    /** Dot Product **/
+    private func dot(vector1: [Double], vector2: [Double]) -> Double {
+        var x: Double = 0.0
+        for i in 0..<vector1.count {
+            x += vector1[i] * vector2[i]
+        }
+        return x
+    }
+    
+    /** Vector Magnitude **/
+    private func magnitude(vector: [Double]) -> Double {
+        var x: Double = 0.0
+        for element in vector {
+            x += pow(element, 2)
+        }
+        return sqrt(x)
     }
 }

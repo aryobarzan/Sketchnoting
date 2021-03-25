@@ -99,16 +99,11 @@ class RelatedNotesViewController: UIViewController, UICollectionViewDataSource, 
     
     private func refreshRelatedNotes() {
         if similarityMethod == .TF_IDF {
-            if !Knowledge.similarityMatrixIsSetup() {
-                Knowledge.setupSimilarityMatrix()
+            if !NeoKnowledge.shared.isSetup() {
+                NeoKnowledge.shared.index(noteIterator: NeoLibrary.getNoteIterator())
             }
-            let foundNotes = Knowledge.similarNotesFor(url: note.0, note: note.1)
-            self.relatedNotes.removeAll()
-            for (url, note, score) in foundNotes {
-                if score > 0.1 {
-                    self.relatedNotes.append(((url, note), Double(score)))
-                }
-            }
+            let similarNotes = NeoKnowledge.shared.similarNotesFor(for: note.1, noteIterator: NeoLibrary.getNoteIterator(), maxResults: 5)
+            self.relatedNotes = similarNotes
         }
         else {
             let foundNotes = NoteSimilarity.shared.similarNotes(for: note.1, noteIterator: NeoLibrary.getNoteIterator(), maxResults: 5)
@@ -119,7 +114,7 @@ class RelatedNotesViewController: UIViewController, UICollectionViewDataSource, 
     }
     @IBAction func refreshButtonTapped(_ sender: UIBarButtonItem) {
         if similarityMethod == .TF_IDF {
-            Knowledge.setupSimilarityMatrix()
+            NeoKnowledge.shared.index(noteIterator: NeoLibrary.getNoteIterator())
             logger.info("Refreshed note similarity TF-IDF.")
         }
         else {
