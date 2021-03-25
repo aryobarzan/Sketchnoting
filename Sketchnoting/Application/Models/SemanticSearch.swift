@@ -69,7 +69,7 @@ class SemanticSearch {
     func tag(text: String, scheme: NLTagScheme = .lexicalClass) -> [(String, String)] {
         let tagger = NLTagger(tagSchemes: [scheme])
         tagger.string = text
-        let tags = tagger.tags(in: text.startIndex..<text.endIndex, unit: .word, scheme: scheme, options: [.omitPunctuation, .omitWhitespace, .joinNames])
+        let tags = tagger.tags(in: text.startIndex..<text.endIndex, unit: .word, scheme: scheme, options: [.omitPunctuation, .omitWhitespace, .joinNames, .joinContractions])
         var tagsTuple = [(String, String)]()
         for tag in tags {
             if let t = tag.0 {
