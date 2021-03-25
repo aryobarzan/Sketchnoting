@@ -26,7 +26,7 @@ class NoteSimilarity {
         
         if useSentenceEmbedding {
             let titleTerms = SemanticSearch.shared.tokenize(text: note.getName(), unit: .sentence)
-            var bodySentences = SemanticSearch.shared.tokenize(text: note.getText(parse: parse), unit: .sentence)
+            var bodySentences = SemanticSearch.shared.tokenize(text: SKTextRank.shared.summarize(text: note.getText(option: .FullText, parse: parse)), unit: .sentence)
             if filterSentences {
                 bodySentences = bodySentences.filter {SemanticSearch.shared.checkPhraseType(queryPartsOfSpeech: SemanticSearch.shared.tag(text: $0, scheme: .lexicalClass)) == .Sentence}
             }
@@ -106,7 +106,7 @@ class NoteSimilarity {
     }
     
     // Baseline approach for comparing 2 notes
-    func similarityAverage(matrix1: [[Double]], matrix2: [[Double]]) -> Double {
+    private func similarityAverage(matrix1: [[Double]], matrix2: [[Double]]) -> Double {
         var centroidVectors = [[Double]]()
         for matrix in [transpose(matrix: matrix1), transpose(matrix: matrix2)] {
             var centroid = [Double](repeating: 0.0, count: 300)

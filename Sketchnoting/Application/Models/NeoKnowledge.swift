@@ -72,7 +72,6 @@ class NeoKnowledge {
             }
             note_TFIDF[key] = vector
         }
-        logger.info(uniqueWords.count)
     }
     
     func getTFIDF(for note: Note) -> [Double] {

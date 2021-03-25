@@ -103,7 +103,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         DispatchQueue.main.asyncAfter(deadline: .now()) {
             self.updateDisplayedNotes(true)
             self.updateFoldersHierarchy()
-            logger.info("Files loaded.")
+            logger.info("User Library loaded.")
             self.noteLoadingIndicator.stopAnimating()
             self.noteLoadingIndicator.isHidden = true
             self.newNoteButton.isEnabled = true
@@ -410,7 +410,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     }
     
     private func updateFoldersHierarchy() {
-        logger.info("Updating folder navigation hierarchy.")
         for button in folderButtons {
             button.removeFromSuperview()
         }

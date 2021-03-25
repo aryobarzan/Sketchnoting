@@ -81,40 +81,49 @@ class SKTextRank {
         return topKeywords.map { $0.0 }
     }
     
-    func summarize(text: String, numberOfSentences: Int = 10) -> [String] {
-        let sentences = SemanticSearch.shared.tokenize(text: text, unit: .sentence)
-
-        let graph = WeightedGraph<String, Double>()
-        var addedVertices = [String : Int]()
-        for w in Array(Set(sentences)) {
-            let index = graph.addVertex(w)
-            addedVertices[w] = index
+    func summarize(text: String, numberOfSentences: Int? = 10) -> String {
+        let body = SemanticSearch.shared.tokenize(text: text, unit: .sentence)
+        let chunkSize = 10
+        let chunks = stride(from: 0, to: body.count, by: chunkSize).map {
+            Array(body[$0..<min($0 + chunkSize, body.count)])
         }
-        for (i, v) in sentences.enumerated() {
-            let vIndex = addedVertices[v]!
-            for (j, w) in sentences.enumerated() {
-                if i == j {
-                    continue
-                }
-                let wIndex = addedVertices[w]!
-                /*let vWords = SemanticSearch.shared.tokenize(text: v, unit: .word).map{ SemanticSearch.shared.lemmatize(text: $0.lowercased()) }
-                let wWords = SemanticSearch.shared.tokenize(text: w, unit: .word).map{ SemanticSearch.shared.lemmatize(text: $0.lowercased()) }
-                let commonWordsCount = Set(vWords).intersection(wWords).count
-                let weight = Double(commonWordsCount) / Double((log(vWords.count)+log(wWords.count)))*/
-                let weight = 2.0 - SemanticSearch.shared.sentenceDistance(between: v, and: w)
-                if !graph.edgeExists(fromIndex: vIndex, toIndex: wIndex) && !graph.edgeExists(fromIndex: wIndex, toIndex: vIndex){
-                    graph.addEdge(fromIndex: vIndex, toIndex: wIndex, weight: weight, directed: false)
+        var finalSummary = [String]()
+        for chunk in chunks {
+            let sentences = chunk
+            let numberOfSentences = numberOfSentences != nil ? numberOfSentences! : 1/3 * sentences.count
+            let graph = WeightedGraph<String, Double>()
+            var addedVertices = [String : Int]()
+            for w in Array(Set(sentences)) {
+                let index = graph.addVertex(w)
+                addedVertices[w] = index
+            }
+            for (i, v) in sentences.enumerated() {
+                let vIndex = addedVertices[v]!
+                for (j, w) in sentences.enumerated() {
+                    if i == j {
+                        continue
+                    }
+                    let wIndex = addedVertices[w]!
+                    let vWords = SemanticSearch.shared.tokenize(text: v, unit: .word).map{ SemanticSearch.shared.lemmatize(text: $0.lowercased()) }
+                    let wWords = SemanticSearch.shared.tokenize(text: w, unit: .word).map{ SemanticSearch.shared.lemmatize(text: $0.lowercased()) }
+                    let commonWordsCount = Set(vWords).intersection(wWords).count
+                    let weight = Double(commonWordsCount) / Double((log(vWords.count)+log(wWords.count)))
+                    // let weight = 2.0 - SemanticSearch.shared.sentenceDistance(between: v, and: w)
+                    if !graph.edgeExists(fromIndex: vIndex, toIndex: wIndex) && !graph.edgeExists(fromIndex: wIndex, toIndex: vIndex){
+                        graph.addEdge(fromIndex: vIndex, toIndex: wIndex, weight: weight, directed: false)
+                    }
                 }
             }
+            let scores = executeAlgorithm(graph: graph)
+            let topSentences = scores.sorted { x, y in
+                x.1 > y.1
+            }.slice(length: numberOfSentences)
+            let summary = topSentences.map { $0.0 }.sorted { x, y in
+                sentences.firstIndex(of: x)! < sentences.firstIndex(of: y)!
+            }.joined(separator: " ")
+            finalSummary.append(summary)
         }
-        
-        let scores = executeAlgorithm(graph: graph)
-        let topSentences = scores.sorted { x, y in
-            x.1 > y.1
-        }.slice(length: numberOfSentences)
-        return topSentences.map { $0.0 }.sorted { x, y in
-            sentences.firstIndex(of: x)! < sentences.firstIndex(of: y)!
-        }
+        return finalSummary.joined(separator: " ")
     }
     
     private func executeAlgorithm(graph: WeightedGraph<String, Double>, convergenceThreshold: Double = 0.0001) -> [(String, Double)] {
@@ -147,7 +156,7 @@ class SKTextRank {
             convergence = hasConverged(current: Array(scores.values), new: Array(newScores.values))
             scores = newScores
         }
-        logger.info("Iterations: \(iteration) | Convergence: \(convergence)")
+        //logger.info("Iterations: \(iteration) | Convergence: \(convergence)")
         return scores.map { $0 }
     }
     
