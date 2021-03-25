@@ -99,14 +99,14 @@ class RelatedNotesViewController: UIViewController, UICollectionViewDataSource, 
     
     private func refreshRelatedNotes() {
         if similarityMethod == .TF_IDF {
-            if !NeoKnowledge.shared.isSetup() {
-                NeoKnowledge.shared.index(noteIterator: NeoLibrary.getNoteIterator())
+            if !NoteSimilarity.shared.isTFIDFSetup() {
+                NoteSimilarity.shared.setupTFIDF(noteIterator: NeoLibrary.getNoteIterator())
             }
-            let similarNotes = NeoKnowledge.shared.similarNotesFor(for: note.1, noteIterator: NeoLibrary.getNoteIterator(), maxResults: 5)
+            let similarNotes = NoteSimilarity.shared.similarNotes(for: note.1, noteIterator: NeoLibrary.getNoteIterator(), maxResults: 5, similarityMethod: .TFIDF)
             self.relatedNotes = similarNotes
         }
         else {
-            let foundNotes = NoteSimilarity.shared.similarNotes(for: note.1, noteIterator: NeoLibrary.getNoteIterator(), maxResults: 5)
+            let foundNotes = NoteSimilarity.shared.similarNotes(for: note.1, noteIterator: NeoLibrary.getNoteIterator(), maxResults: 5, similarityMethod: .SemanticMatrix)
             self.relatedNotes = foundNotes
         }
         collectionView.reloadData()
@@ -114,7 +114,7 @@ class RelatedNotesViewController: UIViewController, UICollectionViewDataSource, 
     }
     @IBAction func refreshButtonTapped(_ sender: UIBarButtonItem) {
         if similarityMethod == .TF_IDF {
-            NeoKnowledge.shared.index(noteIterator: NeoLibrary.getNoteIterator())
+            NoteSimilarity.shared.setupTFIDF(noteIterator: NeoLibrary.getNoteIterator())
             logger.info("Refreshed note similarity TF-IDF.")
         }
         else {

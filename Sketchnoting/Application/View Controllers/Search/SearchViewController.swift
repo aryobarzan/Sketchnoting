@@ -78,6 +78,7 @@ class SearchViewController: UIViewController, UICollectionViewDelegate, UICollec
         }
     }
     @IBAction func updateButtonTapped(_ sender: UIButton) {
+        logger.info("Updating...")
         TF_IDF.shared.clear()
         NoteSimilarity.shared.clear()
         var noteIterator = NeoLibrary.getNoteIterator()
@@ -85,7 +86,7 @@ class SearchViewController: UIViewController, UICollectionViewDelegate, UICollec
             TF_IDF.shared.addNote(note: note.1)
             NoteSimilarity.shared.add(note: note.1, uniqueOnly: true, useSentenceEmbedding: true, normalizeVector: true, parse: true, useKeywords: false, useDocuments: false, filterSentences: true)
         }
-        NeoKnowledge.shared.index(noteIterator: NeoLibrary.getNoteIterator())
+        NoteSimilarity.shared.setupTFIDF(noteIterator: NeoLibrary.getNoteIterator())
         logger.info("Reset TF-IDF and semantic matrices for notes library.")
     }
     
