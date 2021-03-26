@@ -2227,6 +2227,7 @@
                         <outlet property="notesCollectionView" destination="tTU-cQ-M7Q" id="jGW-6h-6JS"/>
                         <outlet property="searchButton" destination="Rar-0k-hIs" id="KQF-bK-HJo"/>
                         <outlet property="searchTextField" destination="OWB-7G-1Cd" id="Zgw-Th-BBx"/>
+                        <outlet property="updateButton" destination="M2p-g3-U7u" id="zeM-7Y-NlS"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="1Pf-NN-2Yi" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>

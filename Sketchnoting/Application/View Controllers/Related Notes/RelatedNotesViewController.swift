@@ -113,18 +113,11 @@ class RelatedNotesViewController: UIViewController, UICollectionViewDataSource, 
         countLabel.text = "Related Notes: (\(Int(relatedNotes.count)))"
     }
     @IBAction func refreshButtonTapped(_ sender: UIBarButtonItem) {
-        if similarityMethod == .TF_IDF {
-            NoteSimilarity.shared.setupTFIDF(noteIterator: NeoLibrary.getNoteIterator())
-            logger.info("Refreshed note similarity TF-IDF.")
-        }
-        else {
-            NoteSimilarity.shared.clear()
-            var noteIterator = NeoLibrary.getNoteIterator()
-            while let note = noteIterator.next() {
-                NoteSimilarity.shared.add(note: note.1, useSentenceEmbedding: false, normalizeVector: false, parse: true, useKeywords: false, useDocuments: false)
+        SKIndexer.shared.cancelIndexing()
+        SKIndexer.shared.indexLibrary(finishHandler: { finished in
+            DispatchQueue.main.async {
+                self.refreshRelatedNotes()
             }
-            logger.info("Refreshed note similarity matrices (semantic).")
-        }
-        self.refreshRelatedNotes()
+        })
     }
 }

@@ -9,9 +9,10 @@
 import UIKit
 import NVActivityIndicatorView
 import NaturalLanguage
-class SearchViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UITextFieldDelegate, DrawingSearchDelegate {
+class SearchViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UITextFieldDelegate, DrawingSearchDelegate, SKIndexerDelegate {
     
     @IBOutlet weak var activityIndicator: NVActivityIndicatorView!
+    @IBOutlet weak var updateButton: UIButton!
     @IBOutlet weak var searchTextField: UITextField!
     @IBOutlet weak var searchButton: UIButton!
     @IBOutlet weak var drawingSearchButton: UIButton!
@@ -79,15 +80,18 @@ class SearchViewController: UIViewController, UICollectionViewDelegate, UICollec
     }
     @IBAction func updateButtonTapped(_ sender: UIButton) {
         logger.info("Updating...")
-        TF_IDF.shared.clear()
-        NoteSimilarity.shared.clear()
-        var noteIterator = NeoLibrary.getNoteIterator()
-        while let note = noteIterator.next() {
-            TF_IDF.shared.addNote(note: note.1)
-            NoteSimilarity.shared.add(note: note.1, uniqueOnly: true, useSentenceEmbedding: true, normalizeVector: true, parse: true, useKeywords: false, useDocuments: false, filterSentences: true)
-        }
-        NoteSimilarity.shared.setupTFIDF(noteIterator: NeoLibrary.getNoteIterator())
-        logger.info("Reset TF-IDF and semantic matrices for notes library.")
+        sender.isEnabled = false
+        activityIndicator.startAnimating()
+        
+        SKIndexer.shared.delegate = self
+        SKIndexer.shared.cancelIndexing()
+        SKIndexer.shared.indexLibrary(finishHandler: { finished in
+            DispatchQueue.main.async {
+                self.updateButton.setTitle("Update", for: .disabled)
+                self.activityIndicator.stopAnimating()
+                self.updateButton.isEnabled = true
+            }
+        })
     }
     
     func textFieldShouldClear(_ textField: UITextField) -> Bool {
@@ -189,4 +193,11 @@ class SearchViewController: UIViewController, UICollectionViewDelegate, UICollec
         }
     }
     
+    // MARK: SKIndexerDelegate
+    func skIndexerProgress(remainingOperations: Int) {
+        logger.info(remainingOperations)
+        DispatchQueue.main.async {
+            self.updateButton.setTitle("Update (\(remainingOperations))", for: .disabled)
+        }
+    }
 }

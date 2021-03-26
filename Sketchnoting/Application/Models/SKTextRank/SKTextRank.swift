@@ -83,7 +83,7 @@ class SKTextRank {
     
     func summarize(text: String, numberOfSentences: Int? = 10) -> String {
         let body = SemanticSearch.shared.tokenize(text: text, unit: .sentence)
-        let chunkSize = 10
+        let chunkSize = 5
         let chunks = stride(from: 0, to: body.count, by: chunkSize).map {
             Array(body[$0..<min($0 + chunkSize, body.count)])
         }
@@ -122,6 +122,7 @@ class SKTextRank {
                 sentences.firstIndex(of: x)! < sentences.firstIndex(of: y)!
             }.joined(separator: " ")
             finalSummary.append(summary)
+            //graph.mst()
         }
         return finalSummary.joined(separator: " ")
     }
