@@ -195,7 +195,6 @@ class SearchViewController: UIViewController, UICollectionViewDelegate, UICollec
     
     // MARK: SKIndexerDelegate
     func skIndexerProgress(remainingOperations: Int) {
-        logger.info(remainingOperations)
         DispatchQueue.main.async {
             self.updateButton.setTitle("Update (\(remainingOperations))", for: .disabled)
         }

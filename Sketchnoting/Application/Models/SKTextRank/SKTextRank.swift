@@ -15,7 +15,7 @@ class SKTextRank {
     static var shared = SKTextRank()
     private init() {}
     
-    func extractKeywords(text: String, numberOfKeywords: Int = 10) -> [String] {
+    func extractKeywords(text: String, numberOfKeywords: Int = 10, biased: Bool = true, usePostProcessing: Bool = true) -> [String] {
         let partsOfSpeech = SemanticSearch.shared.tag(text: text, scheme: .lexicalClass)
         let nounsAndAdjectives = partsOfSpeech.filter { $0.0.count > 2 }.filter { $0.1 == NLTag.noun.rawValue || $0.1 == NLTag.adjective.rawValue || $0.1 == NLTag.other.rawValue }.map { SemanticSearch.shared.lemmatize(text: $0.0.lowercased()) }.filter { !stopwords.contains($0) }
 
@@ -35,53 +35,35 @@ class SKTextRank {
                     continue
                 }
                 if !graph.edgeExists(fromIndex: index, toIndex: addedVertices[w]!) && !graph.edgeExists(fromIndex: addedVertices[w]!, toIndex: index){
-                    graph.addEdge(fromIndex: index, toIndex: addedVertices[w]!, weight: 1.0, directed: false)
+                    if biased {
+                        let weight = 2.0 - SemanticSearch.shared.wordDistance(between: word, and: w)
+                        if weight > 0.65 {
+                            graph.addEdge(fromIndex: index, toIndex: addedVertices[w]!, weight: 1.0, directed: false)
+                        }
+                    }
+                    else {
+                        graph.addEdge(fromIndex: index, toIndex: addedVertices[w]!, weight: 1.0, directed: false)
+                    }
                 }
             }
         }
         
-        /*let N = 3 // Window size
-        for (i, v) in graph.enumerated() {
-            let minIndex = max(0, i-N)
-            let maxIndex = min(graph.vertexCount, i+N)
-            for w in graph[minIndex..<maxIndex] {
-                if w != v {
-                    graph.addEdge(from: v, to: w, weight: 1.0, directed: false)
-                }
-            }
-        }*/
-        /*let N = 3 // Window size
-        for (i, v) in graph.enumerated() {
-            let minIndex = max(0, i-N)
-            let maxIndex = min(graph.vertexCount, i+N)
-            for w in graph[minIndex..<maxIndex] {
-                if w != v {
-                    let weight = 2.0 - SemanticSearch.shared.wordDistance(between: v, and: w)
-                    graph.addEdge(from: v, to: w, weight: weight, directed: false)
-                }
-            }
-        }*/
-        /*for v in graph {
-            for w in graph {
-                if v != w {
-                    let weight = 2.0 - SemanticSearch.shared.wordDistance(between: v, and: w)
-                    if weight > 1.0 {
-                        graph.addEdge(from: v, to: w, weight: weight, directed: false)
-                    }
-                }
-            }
-        }*/
-        
-        let scores = executeAlgorithm(graph: graph)
+        let scores = iterate(graph: graph)
         let topKeywords = scores.sorted { x, y in
             x.1 > y.1
         }.slice(length: numberOfKeywords)
+        if usePostProcessing {
+            let postprocessedTopKeywords = postprocess(keywords: topKeywords.map { $0.0 }, partsOfSpeech: partsOfSpeech.map {($0.0.lowercased(), $0.1)})
+            return postprocessedTopKeywords
+        }
+        else {
+            return topKeywords.map { $0.0 }
+        }
         //let temp = partsOfSpeech.map { $0.0.lowercased() }//.filter { !stopwords.contains($0) }
         //logger.info(postprocess(keywords: topKeywords.map { $0.0 }, originalWords: temp))
-        return topKeywords.map { $0.0 }
     }
     
-    func summarize(text: String, numberOfSentences: Int? = 10) -> String {
+    func summarize(text: String, numberOfSentences: Int? = 10, biased: Bool = true) -> String {
         let body = SemanticSearch.shared.tokenize(text: text, unit: .sentence)
         let chunkSize = 5
         let chunks = stride(from: 0, to: body.count, by: chunkSize).map {
@@ -104,17 +86,24 @@ class SKTextRank {
                         continue
                     }
                     let wIndex = addedVertices[w]!
-                    let vWords = SemanticSearch.shared.tokenize(text: v, unit: .word).map{ SemanticSearch.shared.lemmatize(text: $0.lowercased()) }
-                    let wWords = SemanticSearch.shared.tokenize(text: w, unit: .word).map{ SemanticSearch.shared.lemmatize(text: $0.lowercased()) }
-                    let commonWordsCount = Set(vWords).intersection(wWords).count
-                    let weight = Double(commonWordsCount) / Double((log(vWords.count)+log(wWords.count)))
-                    // let weight = 2.0 - SemanticSearch.shared.sentenceDistance(between: v, and: w)
-                    if !graph.edgeExists(fromIndex: vIndex, toIndex: wIndex) && !graph.edgeExists(fromIndex: wIndex, toIndex: vIndex){
-                        graph.addEdge(fromIndex: vIndex, toIndex: wIndex, weight: weight, directed: false)
+                    var weight: Double
+                    if biased {
+                        weight = 2.0 - SemanticSearch.shared.sentenceDistance(between: v, and: w)
+                    }
+                    else {
+                        let vWords = SemanticSearch.shared.tokenize(text: v, unit: .word).map{ SemanticSearch.shared.lemmatize(text: $0.lowercased()) }
+                        let wWords = SemanticSearch.shared.tokenize(text: w, unit: .word).map{ SemanticSearch.shared.lemmatize(text: $0.lowercased()) }
+                        let commonWordsCount = Set(vWords).intersection(wWords).count
+                        weight = Double(commonWordsCount) / Double((log(vWords.count)+log(wWords.count)))
+                    }
+                    if !graph.edgeExists(fromIndex: vIndex, toIndex: wIndex) && !graph.edgeExists(fromIndex: wIndex, toIndex: vIndex) {
+                        if !biased || (biased && weight > 1.0) {
+                            graph.addEdge(fromIndex: vIndex, toIndex: wIndex, weight: weight, directed: false)
+                        }
                     }
                 }
             }
-            let scores = executeAlgorithm(graph: graph)
+            let scores = iterate(graph: graph)
             let topSentences = scores.sorted { x, y in
                 x.1 > y.1
             }.slice(length: numberOfSentences)
@@ -122,12 +111,12 @@ class SKTextRank {
                 sentences.firstIndex(of: x)! < sentences.firstIndex(of: y)!
             }.joined(separator: " ")
             finalSummary.append(summary)
-            //graph.mst()
         }
         return finalSummary.joined(separator: " ")
     }
     
-    private func executeAlgorithm(graph: WeightedGraph<String, Double>, convergenceThreshold: Double = 0.0001) -> [(String, Double)] {
+    // TextRank algorithm
+    private func iterate(graph: WeightedGraph<String, Double>, convergenceThreshold: Double = 0.0001) -> [(String, Double)] {
         let d = 0.85
         var scores = [String : Double]()
         for v in graph {
@@ -171,7 +160,96 @@ class SKTextRank {
         return sqrt(total) < threshold
     }
     
-    private func postprocess(keywords: [String], originalWords: [String]) -> [String] {
+    private func postprocess(keywords: [String], partsOfSpeech: [(String, String)]) -> [String] {
+        var processedKeywords = keywords
+        
+        var combinations = [[String]]()
+        var combination = [String]()
+        var lastTag = ""
+        for (token, tag) in partsOfSpeech {
+            if combination.isEmpty {
+                if tag == NLTag.adjective.rawValue || tag == NLTag.noun.rawValue {
+                    combination.append(token)
+                    lastTag = tag
+                }
+            }
+            else {
+                if combination.count == 1 {
+                    if tag == NLTag.noun.rawValue || (tag == NLTag.adjective.rawValue && lastTag != NLTag.noun.rawValue) {
+                        combination.append(token)
+                        lastTag = tag
+                    }
+                    else {
+                        combination.removeAll()
+                        lastTag = ""
+                    }
+                }
+                else { // 2
+                    if tag == NLTag.noun.rawValue {
+                        combination.append(token)
+                        combinations.append(combination)
+                        combination.removeAll()
+                        lastTag = ""
+                    }
+                    else {
+                        if lastTag == NLTag.noun.rawValue {
+                            combinations.append(combination)
+                        }
+                        combination.removeAll()
+                        lastTag = ""
+                    }
+                }
+            }
+        }
+        
+        for (i, v) in keywords.enumerated() {
+            let combinations = combinations.filter{$0.contains(v)}
+            var found = false
+            if combinations.isEmpty {
+                continue
+            }
+            for (j, w) in keywords.enumerated() {
+                if i == j {
+                    continue
+                }
+                let filteredCombinations = combinations.filter {$0.contains(w)}
+                if filteredCombinations.isEmpty {
+                    continue
+                }
+                else {
+                    for c in filteredCombinations {
+                        if c.count == 2 {
+                            processedKeywords[i] = c.joined(separator: " ")
+                            found = true
+                            break
+                        }
+                        else {
+                            for (k, x) in keywords.enumerated() {
+                                if i == k || j == k {
+                                    continue
+                                }
+                                let filteredCombinations = filteredCombinations.filter {$0.contains(x)}
+                                if filteredCombinations.isEmpty {
+                                    continue
+                                }
+                                else {
+                                    processedKeywords[i] = filteredCombinations.first!.joined(separator: " ")
+                                    found = true
+                                    break
+                                }
+                            }
+                        }
+                        if found {
+                            break
+                        }
+                    }
+                }
+            }
+        }
+        return processedKeywords
+    }
+    
+    private func postprocess2(keywords: [String], originalWords: [String]) -> [String] {
         var processedKeywords = keywords
         
         for i in 0..<keywords.count {
@@ -209,7 +287,7 @@ class SKTextRank {
         return processedKeywords
     }
     
-    private func postprocess2(keywords: [String], originalWords: [String]) -> [String] {
+    private func postprocess3(keywords: [String], originalWords: [String]) -> [String] {
         var processedKeywords = keywords
         
         for i in 0..<keywords.count {
