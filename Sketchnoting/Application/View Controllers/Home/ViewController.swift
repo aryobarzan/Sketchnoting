@@ -262,27 +262,60 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     
     private func manageFileImport(urls: [URL]) {
         if urls.count > 0 {
-            let (importedNotes, importedImages, importedPDFs, importedTexts) = ImportHelper.importItems(urls: urls)
-            for note in importedNotes {
-                NeoLibrary.add(note: note.1)
-                logger.info("Imported note \(note.1.getName()).")
+            var cancelled = false
+            self.displayLoadingAlert(title: "Loading", subtitle: "Importing \(Int(urls.count)) selected file(s)...") {
+                // Cancelled by user
+                logger.info("File import cancelled by user.")
+                ImportHelper.cancelImports()
+                cancelled = true
             }
-            if importedImages.count > 0 {
-                _ = NeoLibrary.createNoteFrom(images: importedImages)
-                logger.info("New note from imported images.")
-            }
-            if importedTexts.count > 0 {
-                _ = NeoLibrary.createNoteFrom(typedTexts: importedTexts)
-                logger.info("New note from imported text files.")
-            }
-            for pdf in importedPDFs {
-                if pdf.pageCount > 0 {
-                    _ = NeoLibrary.createNoteFrom(pdf: pdf)
-                    logger.info("New note from imported pdf.")
+            ImportHelper.importItems(urls: urls) { importedNotes, importedImages, importedPDFs, importedTexts in
+                if !cancelled {
+                    // .sketchnote files are directly decoded to Note objects and saved to disk
+                    for note in importedNotes {
+                        NeoLibrary.add(note: note.1)
+                        logger.info("Imported note \(note.1.getName()).")
+                    }
+                    // PDFs, images and text files are first converted to Note objects
+                    var createdNotes = [(URL, Note)]()
+                    if importedImages.count > 0 {
+                        let (url, note) = NeoLibrary.createNoteFrom(images: importedImages)
+                        createdNotes.append((url, note))
+                        logger.info("New note from imported images.")
+                    }
+                    if importedTexts.count > 0 {
+                        let (url, note) = NeoLibrary.createNoteFrom(typedTexts: importedTexts)
+                        createdNotes.append((url, note))
+                        logger.info("New note from imported text files.")
+                    }
+                    for pdf in importedPDFs {
+                        if pdf.pageCount > 0 {
+                            let (url, note) = NeoLibrary.createNoteFrom(pdf: pdf)
+                            createdNotes.append((url, note))
+                            if cancelled {
+                                break
+                            }
+                            logger.info("New note from imported pdf.")
+                        }
+                    }
+                    // Save these created notes to disk
+                    for (url, note) in createdNotes {
+                        if !cancelled {
+                            NeoLibrary.saveSynchronously(note: note, url: url)
+                        }
+                        else {
+                            break
+                        }
+                    }
+                    DispatchQueue.main.async {
+                        if !cancelled {
+                            self.dismissLoadingAlert()
+                            self.view.makeToast("Imported your selected documents.")
+                            self.updateDisplayedNotes(true)
+                        }
+                    }
                 }
             }
-            self.view.makeToast("Imported your selected documents.")
-            self.updateDisplayedNotes(true)
         }
     }
     
@@ -301,7 +334,8 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     private func displayImagePicker() {
         ImagePickerHelper.displayImagePickerWithImageOutput(vc: self, completion: { images in
             if images.count > 0 {
-                _ = NeoLibrary.createNoteFrom(images: images)
+                let (url, note) = NeoLibrary.createNoteFrom(images: images)
+                NeoLibrary.saveSynchronously(note: note, url: url)
                 logger.info("New note from imported images (camera roll).")
                 self.updateDisplayedNotes(true)
             }
@@ -340,7 +374,8 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             let image = scan.imageOfPage(at: i)
             images.append(image)
         }
-        _ = NeoLibrary.createNoteFrom(images: images)
+        let (url, note) = NeoLibrary.createNoteFrom(images: images)
+        NeoLibrary.saveSynchronously(note: note, url: url)
         logger.info("New note from scanned images.")
         self.updateDisplayedNotes(true)
     }
@@ -475,7 +510,9 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     }
 
     @IBAction func newNoteButtonTapped(_ sender: UIButton) {
-        self.noteToEdit = NeoLibrary.createNote(name: "Untitled")
+        let (newURL, newNote) = NeoLibrary.createNote(name: "Untitled")
+        NeoLibrary.saveSynchronously(note: newNote, url: newURL)
+        self.noteToEdit = (newURL, newNote)
         performSegue(withIdentifier: "EditSketchnote", sender: self)
     }
     @IBAction func newFolderButtonTapped(_ sender: UIButton) {
@@ -505,7 +542,8 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             }
             if let copiedPage = SKClipboard.getPage() {
                 let pastePageAction = UIAlertAction(title: "Paste Page", style: .default) { action in
-                    let _ = NeoLibrary.createNoteFrom(notePages: [copiedPage])
+                    let (url, note) = NeoLibrary.createNoteFrom(notePages: [copiedPage])
+                    NeoLibrary.saveSynchronously(note: note, url: url)
                     self.updateDisplayedNotes(true)
                     self.view.makeToast("New note from pasted page created.", duration: 2, position: .center)
                 }
@@ -516,7 +554,8 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
                 case .Image:
                     let pasteLayerAction = UIAlertAction(title: "Paste Image", style: .default) { action in
                         if let noteImage = copiedNoteLayer as? NoteImage {
-                            let _ = NeoLibrary.createNoteFrom(images: [noteImage.image])
+                            let (url, note) = NeoLibrary.createNoteFrom(images: [noteImage.image])
+                            NeoLibrary.saveSynchronously(note: note, url: url)
                             self.view.makeToast("New note from pasted image created.", duration: 2, position: .center)
                             self.updateDisplayedNotes(true)
                         }
@@ -526,7 +565,8 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
                 case .TypedText:
                     let pasteLayerAction = UIAlertAction(title: "Paste Text", style: .default) { action in
                         if let noteTypedText = copiedNoteLayer as? NoteTypedText {
-                            let _ = NeoLibrary.createNoteFrom(typedTexts: [noteTypedText])
+                            let (url, note) = NeoLibrary.createNoteFrom(typedTexts: [noteTypedText])
+                            NeoLibrary.saveSynchronously(note: note, url: url)
                             self.view.makeToast("New note from pasted typed text created.", duration: 2, position: .center)
                             self.updateDisplayedNotes(true)
                         }
@@ -1066,12 +1106,14 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         logger.info("Pasting note layer.")
         if let layer = SKClipboard.getNoteLayer() {
             if let noteImage = layer as? NoteImage {
-                _ = NeoLibrary.createNoteFrom(images: [noteImage.image])
+                let (url, note) = NeoLibrary.createNoteFrom(images: [noteImage.image])
+                NeoLibrary.saveSynchronously(note: note, url: url)
                 self.updateDisplayedNotes(true)
                 self.view.makeToast("Created new note \"Note Image Copy\" from pasted note image.")
             }
             if let noteTypedText = layer as? NoteTypedText {
-                _ = NeoLibrary.createNoteFrom(typedTexts: [noteTypedText])
+                let (url, note) = NeoLibrary.createNoteFrom(typedTexts: [noteTypedText])
+                NeoLibrary.saveSynchronously(note: note, url: url)
                 self.updateDisplayedNotes(true)
                 self.view.makeToast("Created new note \"Note Typed Text Copy\" from pasted note typed text.")
             }

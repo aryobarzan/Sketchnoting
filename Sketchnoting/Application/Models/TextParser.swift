@@ -35,7 +35,7 @@ class TextParser {
                 validSentences.append(sentence.trimmingCharacters(in: .whitespacesAndNewlines))
             }
             else {
-                logger.error("Invalid sentence: \(sentence)")
+                //logger.error("Invalid sentence: \(sentence)")
                 continue
             }
             // 2
@@ -43,7 +43,7 @@ class TextParser {
             let phraseType = SemanticSearch.shared.checkPhraseType(queryPartsOfSpeech: partsOfSpeech)
             if (phraseType == .Keyword && !partsOfSpeech.isEmpty && partsOfSpeech[0].1 != "Noun") {
                 validSentences.removeLast()
-                logger.error("Invalid phrase type '\(phraseType.rawValue)' - \(sentence)")
+                //logger.error("Invalid phrase type '\(phraseType.rawValue)' - \(sentence)")
                 continue
             }
             // 3
@@ -53,7 +53,7 @@ class TextParser {
                 if sentence.contains(invalidCharacter) {
                     invalid = true
                     validSentences.removeLast()
-                    logger.error("Invalid character '\(invalidCharacter)' - \(sentence)")
+                    //logger.error("Invalid character '\(invalidCharacter)' - \(sentence)")
                     break
                 }
             }
@@ -63,7 +63,7 @@ class TextParser {
             // 4
             if sentence.range(of: ".*for\\s\\(.*\\).*", options: .regularExpression, range: nil) != nil {
                 validSentences.removeLast()
-                logger.error("Invalid pattern 'for ()' - \(sentence)")
+                //logger.error("Invalid pattern 'for ()' - \(sentence)")
                 continue
             }
             // 5
@@ -74,7 +74,7 @@ class TextParser {
         }
         // Remove extra whitespaces
         let finalText = validSentences.joined(separator: " ").replacingOccurrences(of: "[\\s\n]+", with: " ", options: .regularExpression, range: nil)
-        logger.info("Out of \(Int(sentences.count)) sentences, \(Int(validSentences.count)) are valid.")
+        //logger.info("Out of \(Int(sentences.count)) sentences, \(Int(validSentences.count)) are valid.")
         return finalText
     }
 }

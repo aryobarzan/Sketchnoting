@@ -311,14 +311,12 @@ class NeoLibrary {
         }
         let url = location.appendingPathComponent(n + ".sketchnote")
         let note = Note(name: n, documents: nil)
-        self.saveSynchronously(note: note, url: url)
         return (url, note)
     }
     
     public static func createNoteFrom(notePages: [NotePage], at location: URL = currentLocation) -> (URL, Note) {
         let (url, note) = NeoLibrary.createNote(name: "Imported Note Pages")
         note.pages = notePages
-        self.saveSynchronously(note: note, url: url)
         return (url, note)
     }
     
@@ -336,7 +334,6 @@ class NeoLibrary {
         for noteImage in noteImages {
             note.getCurrentPage().add(layer: noteImage)
         }
-        self.saveSynchronously(note: note, url: url)
         return (url, note)
     }
     
@@ -345,7 +342,6 @@ class NeoLibrary {
         for typedText in typedTexts {
             note.getCurrentPage().add(layer: typedText)
         }
-        self.saveSynchronously(note: note, url: url)
         return (url, note)
     }
     
@@ -373,7 +369,6 @@ class NeoLibrary {
                 }
             }
         }
-        self.saveSynchronously(note: note, url: url)
         return (url, note)
     }
     

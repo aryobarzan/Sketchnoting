@@ -16,12 +16,17 @@ import Highlightr
 class ImportHelper {
     static var importUTTypes = [UTType.image, UTType("com.sketchnote")!, UTType.pdf, UTType.text, UTType.cSource, UTType.plainText, UTType.sourceCode, UTType("com.sun.java-source")!, UTType.archive, UTType("com.pkware.zip-archive")!, UTType.zip]
     static var noteEditingUTTypes = [UTType.image, UTType("com.sketchnote")!, UTType.pdf, UTType.text, UTType.cSource, UTType.plainText, UTType.sourceCode, UTType("com.sun.java-source")!]
-    static func importItems(urls: [URL]) -> ([(URL, Note)], [UIImage], [PDFDocument], [NoteTypedText]) {
+    
+    private static let operationQueue = OperationQueue()
+    static func importItems(urls: [URL], completion: (([(URL, Note)], [UIImage], [PDFDocument], [NoteTypedText]) -> Void)?) {
+        operationQueue.cancelAllOperations()
+        operationQueue.maxConcurrentOperationCount = 1
         var notes = [(URL, Note)]()
         var images = [UIImage]()
         var pdfs = [PDFDocument]()
         var texts = [NoteTypedText]()
         for url in urls {
+            operationQueue.addOperation {
             do {
                 let data = try Data(contentsOf: url)
                 logger.info("Importing item of type: \(url.typeIdentifier!)")
@@ -72,8 +77,18 @@ class ImportHelper {
                 logger.error("Imported URL could not be decoded: \(url.absoluteString)")
                 logger.error(error)
             }
+            }
         }
-        return (notes, images, pdfs, texts)
+        operationQueue.addBarrierBlock {
+            if let completion = completion {
+                completion(notes, images, pdfs, texts)
+            }
+        }
+        //return (notes, images, pdfs, texts)
+    }
+    
+    static func cancelImports() {
+        operationQueue.cancelAllOperations()
     }
     
     private static func createNoteTypedText(text: String, codeLanguage: String?, fileExtension: String?) -> NoteTypedText {

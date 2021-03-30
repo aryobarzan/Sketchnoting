@@ -204,7 +204,6 @@ class NotePage: Codable {
     public func getText(option: NoteTextViewOption = .FullText, parse: Bool = false) -> String {
         var text: String = ""
         switch option {
-        
         case .FullText:
             text += getRecognizedText().getText()
             if !text.isEmpty {

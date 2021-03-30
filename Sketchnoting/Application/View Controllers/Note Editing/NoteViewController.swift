@@ -1313,37 +1313,53 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     
     func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
         if urls.count > 0 {
-            self.view.makeToast("Imported the selected documents.")
-            let (notes, images, pdfs, texts) = ImportHelper.importItems(urls: urls)
-            for n in notes {
-                logger.info("Added pages of imported note to currently open note.")
-                note.1.pages += n.1.pages
+            self.view.makeToast("Importing the selected files...")
+            var cancelled = false
+            self.displayLoadingAlert(title: "Loading", subtitle: "Importing \(Int(urls.count)) selected file(s)...") {
+                // Cancelled by user
+                logger.info("File import cancelled by user.")
+                ImportHelper.cancelImports()
+                cancelled = true
             }
-            for img in images {
-                self.addNoteImage(image: img)
-            }
-            var setPDFForCurrentPage = false
-            for pdf in pdfs {
-                for i in 0..<pdf.pageCount {
-                    if let pdfPage = pdf.page(at: i) {
-                        if !setPDFForCurrentPage {
-                            setPDFForCurrentPage = true
-                            note.1.getCurrentPage().set(pdfDocument: pdfPage.dataRepresentation)
-                            self.pdfView.document = PDFDocument(data: pdfPage.dataRepresentation!)
+            ImportHelper.importItems(urls: urls) { importedNotes, importedImages, importedPDFs, importedTexts in
+                DispatchQueue.main.async {
+                    if !cancelled {
+                        for n in importedNotes {
+                            logger.info("Added pages of imported note to currently open note.")
+                            self.note.1.pages += n.1.pages
                         }
-                        else {
-                            let newPage = NotePage()
-                            newPage.set(pdfDocument: pdfPage.dataRepresentation)
-                            note.1.pages.insert(newPage, at: note.1.activePageIndex + 1)
+                        for img in importedImages {
+                            self.addNoteImage(image: img)
+                        }
+                        var setPDFForCurrentPage = false
+                        for pdf in importedPDFs {
+                            for i in 0..<pdf.pageCount {
+                                if let pdfPage = pdf.page(at: i) {
+                                    if !setPDFForCurrentPage {
+                                        setPDFForCurrentPage = true
+                                        self.note.1.getCurrentPage().set(pdfDocument: pdfPage.dataRepresentation)
+                                        self.pdfView.document = PDFDocument(data: pdfPage.dataRepresentation!)
+                                    }
+                                    else {
+                                        let newPage = NotePage()
+                                        newPage.set(pdfDocument: pdfPage.dataRepresentation)
+                                        self.note.1.pages.insert(newPage, at: self.note.1.activePageIndex + 1)
+                                    }
+                                }
+                            }
+                        }
+                        for text in importedTexts {
+                            self.note.1.getCurrentPage().add(layer: text)
+                            self.displayNoteTypedText(typedText: text)
+                        }
+                        if !cancelled {
+                            self.dismissLoadingAlert()
+                            self.view.makeToast("Imported your selected documents.")
+                            NeoLibrary.save(note: self.note.1, url: self.note.0)
                         }
                     }
                 }
             }
-            for text in texts {
-                note.1.getCurrentPage().add(layer: text)
-                self.displayNoteTypedText(typedText: text)
-            }
-            NeoLibrary.save(note: note.1, url: note.0)
         }
     }
     

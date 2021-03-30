@@ -43,4 +43,30 @@ extension UIViewController {
 
         self.present(alert, animated: true, completion: nil)
     }
+    
+    //
+    private struct activityAlert {
+        static var activityIndicatorAlert: UIAlertController?
+    }
+    //completion : ((Int, String) -> Void)?)
+    func displayLoadingAlert(title: String, subtitle: String, _ onCancel : (()-> Void)?) {
+        activityAlert.activityIndicatorAlert = UIAlertController(title: title, message: subtitle , preferredStyle: UIAlertController.Style.alert)
+        activityAlert.activityIndicatorAlert!.addActivityIndicator()
+        // MARK: TODO - Modify for multi-window iPad support
+        var topController:UIViewController = UIApplication.shared.windows.filter {$0.isKeyWindow}.first!.rootViewController!
+        while ((topController.presentedViewController) != nil) {
+            topController = topController.presentedViewController!
+        }
+        
+        activityAlert.activityIndicatorAlert!.addAction(UIAlertAction.init(title:NSLocalizedString("Cancel", comment: ""), style: .default, handler: { (UIAlertAction) in
+            self.dismissLoadingAlert()
+            onCancel?()
+        }))
+        topController.present(activityAlert.activityIndicatorAlert!, animated:true, completion:nil)
+    }
+    
+    func dismissLoadingAlert() {
+        activityAlert.activityIndicatorAlert?.dismissActivityIndicator()
+        activityAlert.activityIndicatorAlert = nil
+    }
 }
