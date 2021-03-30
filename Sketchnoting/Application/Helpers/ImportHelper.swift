@@ -70,6 +70,7 @@ class ImportHelper {
                 }
             } catch {
                 logger.error("Imported URL could not be decoded: \(url.absoluteString)")
+                logger.error(error)
             }
         }
         return (notes, images, pdfs, texts)
