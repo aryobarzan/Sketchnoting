@@ -63,7 +63,7 @@ class SKTextRank {
         //logger.info(postprocess(keywords: topKeywords.map { $0.0 }, originalWords: temp))
     }
     
-    func summarize(text: String, numberOfSentences: Int? = 10, biased: Bool = true) -> String {
+    func summarize(text: String, numberOfSentences: Int? = 10, biased: Bool = false) -> String {
         let body = SemanticSearch.shared.tokenize(text: text, unit: .sentence)
         let chunkSize = 5
         let chunks = stride(from: 0, to: body.count, by: chunkSize).map {

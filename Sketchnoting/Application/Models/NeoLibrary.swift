@@ -168,7 +168,7 @@ class NeoLibrary {
         }
     }
     
-    private static func saveSynchronously(note: Note, url: URL) {
+    static func saveSynchronously(note: Note, url: URL) {
         if let encoded = note.encodeFileAsData() {
             try? encoded.write(to: url)
             logger.info("Note \(note.getName()) saved synchronously.")

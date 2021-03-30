@@ -105,6 +105,12 @@ class NoteSimilarity {
         noteMatrices[note.getID()] = transpose(matrix: matrix)
     }
     
+    func remove(note: Note) {
+        if noteMatrices[note.getID()] != nil {
+            noteMatrices.removeValue(forKey: note.getID())
+        }
+    }
+    
     private func normalize(_ vector: [Double]) -> [Double] {
         var norm = 0.0
         for value in vector {
@@ -194,7 +200,7 @@ class NoteSimilarity {
     private var columns: Int = 1
     private var rows: Int = 1
     
-    private func semanticMatrix_similarNotes(for source: Note, noteIterator: NoteIterator, maxResults: Int = 5) -> [((URL, Note), Double)] {
+    private func semanticMatrix_similarNotes(for source: Note, noteIterator: NoteIterator, maxResults: Int = 5, debug: Bool = false) -> [((URL, Note), Double)] {
         var similarNotes = [((URL, Note), Double)]()
         if noteMatrices[source.getID()] == nil || noteMatrices[source.getID()]!.isEmpty {
             return [((URL, Note), Double)]()
@@ -205,10 +211,13 @@ class NoteSimilarity {
                 continue
             }
             let similarity = self.similarity(between: source, and: note.1)
-            logger.info("TF-IDF Similarity '\(source.getName())' / '\(note.1.getName())': \(cosineDistance(vector1: getTFIDF(for: source), vector2: getTFIDF(for: note.1)))")
-            logger.info("Centroid Similarity '\(source.getName())' / '\(note.1.getName())': \(similarityAverage(matrix1: noteMatrices[source.getID()]!, matrix2: noteMatrices[note.1.getID()]!))")
-            logger.info("Similarity '\(source.getName())' / '\(note.1.getName())': \(similarity)")
-            logger.info("----------")
+            if debug {
+                logger.info("TF-IDF Similarity '\(source.getName())' / '\(note.1.getName())': \(cosineDistance(vector1: getTFIDF(for: source), vector2: getTFIDF(for: note.1)))")
+                logger.info("Centroid Similarity '\(source.getName())' / '\(note.1.getName())': \(similarityAverage(matrix1: noteMatrices[source.getID()]!, matrix2: noteMatrices[note.1.getID()]!))")
+                logger.info("Similarity '\(source.getName())' / '\(note.1.getName())': \(similarity)")
+                logger.info("----------")
+            }
+            
             if similarNotes.isEmpty {
                 similarNotes.append((note, similarity))
             }
@@ -236,22 +245,6 @@ class NoteSimilarity {
             matrix.map{ $0[index] }
         }
     }
-    
-    /*private func transpose(matrix: [[Double]]) -> [[Double]] {
-        let M = Int32(matrix.count)
-        let N = Int32(matrix[0].count)
-        
-        // Transposed matrix has dimensions NxM
-        var result: [Double] = [[Double]](repeating: [Double](repeating: 0, count: Int(M)), count: Int(N)).flatMap { $0 }
-        var matrix_flat = matrix.flatMap { $0 }
-        // Accelerate framework only works on flat (1D) arrays
-        vDSP_mtransD(&matrix_flat, vDSP_Stride(1), &result, vDSP_Stride(1), vDSP_Length(N), vDSP_Length(M))
-        // Transform transposed array to 2D matrix
-        let matrix_2d_pattern = [[Double]](repeating: [Double](repeating: 0, count: Int(M)), count: Int(N))
-        var iter = result.makeIterator()
-        let matrix_2d = matrix_2d_pattern.map { $0.compactMap { _ in iter.next() } }
-        return matrix_2d
-    }*/
     
     private enum MatrixNorm {
         case Frobenius

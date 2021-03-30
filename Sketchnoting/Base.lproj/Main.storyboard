@@ -1752,10 +1752,10 @@
             </objects>
             <point key="canvasLocation" x="2052.34375" y="993.74999999999989"/>
         </scene>
-        <!--Note Info View Controller-->
+        <!--File Info View Controller-->
         <scene sceneID="sUO-08-BxB">
             <objects>
-                <viewController id="NOn-L7-Vqa" customClass="NoteInfoViewController" customModule="Sketchnoting" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="NoteInfoViewController" useStoryboardIdentifierAsRestorationIdentifier="YES" id="NOn-L7-Vqa" customClass="FileInfoViewController" customModule="Sketchnoting" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="SWt-nQ-mw0">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="493"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>

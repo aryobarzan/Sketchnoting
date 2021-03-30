@@ -813,38 +813,26 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     }
     
     private func renameFile(url: URL, file: File, indexPath: IndexPath) {
-        let alertController = UIAlertController(title: "Rename File", message: nil, preferredStyle: .alert)
-        
-        let confirmAction = UIAlertAction(title: "Set", style: .default) { (_) in
-            
-            let name = alertController.textFields?[0].text
-            let newURL = NeoLibrary.rename(url: url, file: file, name: name ?? "Untitled")
-            if newURL == nil {
-                self.view.makeToast("File could not be renamed.")
-            }
-            else {
-                if let note = file as? Note {
-                    note.setName(name: newURL!.deletingPathExtension().lastPathComponent)
-                    NeoLibrary.save(note: note, url: newURL!)
-                }
+        let cell = noteCollectionView.cellForItem(at: indexPath)
+        let cellFrame = cell?.frame ?? CGRect.zero
+        if let fileInfoVC = self.storyboard?.instantiateViewController(withIdentifier: "NoteInfoViewController") as? FileInfoViewController {
+            fileInfoVC.modalPresentationStyle = .popover
+            fileInfoVC.file = (url, file)
+            fileInfoVC.renameCompletion = { newName, newURL in
                 self.noteCollectionView.performBatchUpdates({
                     self.noteCollectionView.reloadItems(at: [indexPath])
                 })
                 self.updateDisplayedNotes(false)
                 self.view.makeToast("File renamed.")
             }
-        }
-        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel) { (_) in }
-        
-        alertController.addTextField { (textField) in
-            textField.placeholder = "Name..."
-            if !file.getName().isEmpty && file.getName() != "Untitled" {
-                textField.text = file.getName()
+            if let popoverPresentationController = fileInfoVC.popoverPresentationController {
+                popoverPresentationController.permittedArrowDirections = .up
+                popoverPresentationController.sourceView = self.view
+                popoverPresentationController.sourceRect = cellFrame
+                popoverPresentationController.delegate = self
+                present(fileInfoVC, animated: true, completion: nil)
             }
         }
-        alertController.addAction(confirmAction)
-        alertController.addAction(cancelAction)
-        self.present(alertController, animated: true, completion: nil)
     }
     
     var noteForRelatedNotes: (URL, Note)?
@@ -1092,5 +1080,4 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     func clearClipboardTapped() {
         self.view.makeToast("Cleared SKClipboard.")
     }
-    
 }

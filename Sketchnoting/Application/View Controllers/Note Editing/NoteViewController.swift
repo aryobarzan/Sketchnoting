@@ -25,7 +25,7 @@ import Highlightr
 import Toast
 import MLKitDigitalInkRecognition
 
-class NoteViewController: UIViewController, UIPencilInteractionDelegate, UICollectionViewDelegate, NoteDelegate, PKCanvasViewDelegate, PKToolPickerObserver, UIScreenshotServiceDelegate, NoteOptionsDelegate, DocumentsViewControllerDelegate, NotePagesDelegate, VNDocumentCameraViewControllerDelegate, UIDocumentPickerDelegate, RelatedNotesVCDelegate, TextBoxViewControllerDelegate, MoveFileViewControllerDelegate, UIPopoverPresentationControllerDelegate, NoteInfoDelegate, PDFViewDelegate, NoteLayersDelegate, NeoDraggableViewDelegate {
+class NoteViewController: UIViewController, UIPencilInteractionDelegate, UICollectionViewDelegate, NoteDelegate, PKCanvasViewDelegate, PKToolPickerObserver, UIScreenshotServiceDelegate, NoteOptionsDelegate, DocumentsViewControllerDelegate, NotePagesDelegate, VNDocumentCameraViewControllerDelegate, UIDocumentPickerDelegate, RelatedNotesVCDelegate, TextBoxViewControllerDelegate, MoveFileViewControllerDelegate, UIPopoverPresentationControllerDelegate, PDFViewDelegate, NoteLayersDelegate, NeoDraggableViewDelegate {
     
     private var documentsVC: NeoDocumentsVC!
     
@@ -255,9 +255,15 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             }
             break
         case "ShowNoteInfo":
-            if let destination = segue.destination as? NoteInfoViewController {
-                destination.delegate = self
-                destination.note = self.note
+            if let destination = segue.destination as? FileInfoViewController {
+                destination.file = self.note
+                destination.renameCompletion = { newName, newURL in
+                    self.noteTitleButton.setTitle(" \(newName)", for: .normal)
+                    self.note.0 = newURL
+                    self.note.1.setName(name: newName)
+                    // self.saveCurrentPage()
+                    self.documentsVC.note = self.note
+                }
             }
             break
         case "EditCurrentNoteTags":
@@ -1507,16 +1513,6 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
                 break
             }
         }
-    }
-    
-    
-    // MARK: NoteInfoDelegate
-    func noteRenamed(newName: String, newURL: URL) {
-        self.noteTitleButton.setTitle(" \(newName)", for: .normal)
-        self.note.0 = newURL
-        self.note.1.setName(name: newName)
-        self.saveCurrentPage()
-        self.documentsVC.note = self.note
     }
     
     // MARK: NoteLayersDelegate
