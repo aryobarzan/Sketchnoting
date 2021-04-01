@@ -12,7 +12,9 @@ class NoteCollectionViewCell: UICollectionViewCell {
     @IBOutlet weak var imageView: UIImageView!
     @IBOutlet weak var titleBackgroundView: UIView!
     @IBOutlet weak var titleLabel: UILabel!
-    @IBOutlet weak var selectedImage: UIImageView!
+    @IBOutlet weak var selectedIndicatorView: UIView!
+    @IBOutlet weak var selectedImageView: UIImageView!
+    @IBOutlet weak var selectedLabel: UILabel!
     @IBOutlet weak var progressView: UIProgressView!
     
     var file: File!
@@ -32,6 +34,8 @@ class NoteCollectionViewCell: UICollectionViewCell {
         
         self.imageView.layer.cornerRadius = 6
         self.imageView.image = nil
+        
+        self.selectedIndicatorView.layer.cornerRadius = 4
         
         file.getPreviewImage() { image in
             self.imageView.image = image
@@ -64,14 +68,29 @@ class NoteCollectionViewCell: UICollectionViewCell {
     
     func toggleSelected(isFileSelected: Bool) {
         if isFileSelected {
-            self.selectedImage.image = UIImage(systemName: "checkmark.circle.fill")
+            self.selectedImageView.image = UIImage(systemName: "checkmark.circle.fill")
+            self.selectedImageView.tintColor = UIColor.white
+            self.selectedLabel.textColor = UIColor.white
+            self.selectedLabel.text = "Selected"
+            //self.transform = CGAffineTransform(scaleX: 1.0, y: 1.0)
+            //self.layer.removeAllAnimations()
+            self.selectedIndicatorView.backgroundColor = UIColor.link
         }
         else {
-            self.selectedImage.image = UIImage(systemName: "checkmark.circle")
+            /*UIView.animate(withDuration: 1,
+                           delay: 0,
+                           options: [.repeat, .autoreverse, .allowUserInteraction],
+                           animations: {
+                            self.transform = CGAffineTransform(scaleX: 1.025, y: 1.025)
+                            self.layoutIfNeeded()
+            }, completion: nil)*/
+            self.selectedImageView.image = UIImage(systemName: "checkmark.circle")
+            self.selectedLabel.text = "Select"
+            self.selectedIndicatorView.backgroundColor = UIColor.darkGray
         }
     }
     
     func toggleSelectionModeIndicator(status: Bool) {
-        self.selectedImage.isHidden = !status
+        self.selectedIndicatorView.isHidden = !status
     }
 }

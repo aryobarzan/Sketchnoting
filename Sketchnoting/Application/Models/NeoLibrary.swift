@@ -676,6 +676,15 @@ class NeoLibrary {
         return Date()
     }
     
+    public static func getFileSize(url: URL) -> Double {
+        if let attributes = try? FileManager.default.attributesOfItem(atPath: url.path) as [FileAttributeKey: Any] {
+            if let size = attributes[FileAttributeKey.size] as? UInt64 {
+                return Double(size) / 1000000.0 // bytes to megabytes
+            }
+        }
+        return -1.0
+    }
+    
     // MARK: Document storage
     private static var documentsIndex: [String : [String]] = [String : [String]]()
     private static func getDocumentsURL(for type: DocumentType) -> URL {

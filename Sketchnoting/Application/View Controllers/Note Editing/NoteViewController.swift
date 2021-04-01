@@ -741,6 +741,9 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
     func movedFiles(items: [(URL, File)]) {
         self.view.makeToast("Note moved.", duration: 1.0, position: .center)
     }
+    func selectedFolder(url: URL, for notes: [(URL, File)]) {
+        
+    }
     
     private func undo() {
         self.startRecognitionTimer()

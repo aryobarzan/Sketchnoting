@@ -112,6 +112,8 @@
 		9FAD28F623A52AC700F2203E /* NoteTextViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F05BC7E23761C4A00D49A88 /* NoteTextViewController.swift */; };
 		9FB5155D260E44AA004F91E2 /* SKIndexer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB5155C260E44AA004F91E2 /* SKIndexer.swift */; };
 		9FB5156226139BDC004F91E2 /* UIAlertControllerExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB5156126139BDC004F91E2 /* UIAlertControllerExtensions.swift */; };
+		9FB5158426152CA0004F91E2 /* ImportViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB5158326152CA0004F91E2 /* ImportViewController.swift */; };
+		9FB5158626152DA7004F91E2 /* ImportTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB5158526152DA7004F91E2 /* ImportTableViewCell.swift */; };
 		9FB87CF624B0061200A262D8 /* ARDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB87CF524B0061200A262D8 /* ARDocument.swift */; };
 		9FB87CF924B006B900A262D8 /* ALMAARHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB87CF824B006B900A262D8 /* ALMAARHelper.swift */; };
 		9FB9984724868561003773F2 /* MoveFileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB9984624868561003773F2 /* MoveFileViewController.swift */; };
@@ -279,6 +281,8 @@
 		9FAB4B7D244BEF2E00DEA46F /* UILabelExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UILabelExtension.swift; sourceTree = "<group>"; };
 		9FB5155C260E44AA004F91E2 /* SKIndexer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SKIndexer.swift; sourceTree = "<group>"; };
 		9FB5156126139BDC004F91E2 /* UIAlertControllerExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIAlertControllerExtensions.swift; sourceTree = "<group>"; };
+		9FB5158326152CA0004F91E2 /* ImportViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportViewController.swift; sourceTree = "<group>"; };
+		9FB5158526152DA7004F91E2 /* ImportTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportTableViewCell.swift; sourceTree = "<group>"; };
 		9FB87CF524B0061200A262D8 /* ARDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARDocument.swift; sourceTree = "<group>"; };
 		9FB87CF824B006B900A262D8 /* ALMAARHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ALMAARHelper.swift; sourceTree = "<group>"; };
 		9FB9984624868561003773F2 /* MoveFileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoveFileViewController.swift; sourceTree = "<group>"; };
@@ -425,6 +429,7 @@
 		9F5E89EA2391AF1B002FA8B2 /* View Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				9FB5158226152C94004F91E2 /* Import */,
 				9F7BAFF4239C1D110045CD12 /* Home */,
 				9F65984923F3174A00CDBE0C /* Search */,
 				9F7BAFF5239C1D230045CD12 /* Note Editing */,
@@ -644,6 +649,15 @@
 				9F2FF439249B083D00597AD6 /* NoteDrawing.swift */,
 			);
 			path = Note;
+			sourceTree = "<group>";
+		};
+		9FB5158226152C94004F91E2 /* Import */ = {
+			isa = PBXGroup;
+			children = (
+				9FB5158326152CA0004F91E2 /* ImportViewController.swift */,
+				9FB5158526152DA7004F91E2 /* ImportTableViewCell.swift */,
+			);
+			path = Import;
 			sourceTree = "<group>";
 		};
 		9FB87CF724B006A200A262D8 /* ALMA_AR */ = {
@@ -1053,6 +1067,7 @@
 				9FA6239522DE3741007ED794 /* BioPortalDocument.swift in Sources */,
 				9FBC2E0924904DAD002AC8A3 /* AppSearch.swift in Sources */,
 				9FFE07E6232A5FE500DBD0AC /* TagTableViewCell.swift in Sources */,
+				9FB5158426152CA0004F91E2 /* ImportViewController.swift in Sources */,
 				9F5D8A30246113DC00934C0E /* WATHelper.swift in Sources */,
 				9FE38C6824F8603E00421BAE /* NeoDraggableView.swift in Sources */,
 				9F5D80F02332D32600552D58 /* SVGImageProcessorExtension.swift in Sources */,
@@ -1102,6 +1117,7 @@
 				9FD8BB97243D5BE500542BFA /* ImportHelper.swift in Sources */,
 				9F4BB37424ED807A00ED1E2F /* NoteLayersViewController.swift in Sources */,
 				9FA5A482244AB14E006D9FB2 /* UILabelExtensions.swift in Sources */,
+				9FB5158626152DA7004F91E2 /* ImportTableViewCell.swift in Sources */,
 				9F318D3B244A20A000A1B4B5 /* UITextViewExtensions.swift in Sources */,
 				9F75E44F230D848200488BBD /* SettingsViewController.swift in Sources */,
 				9F75E484231419FA00488BBD /* TAGMEDocument.swift in Sources */,

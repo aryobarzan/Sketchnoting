@@ -31,8 +31,6 @@ class SKIndexer {
     }
     
     func indexLibrary(_ note: Note? = nil, options: [SKIndexerOption] = [SKIndexerOption.Similarity, SKIndexerOption.TFIDF], finishHandler: ((Bool) -> Void)? = nil) {
-        logger.info("Indexing entire user library.")
-        NoteSimilarity.shared.clear()
         let options = Array(Set(options))
         if let note = note {
             addOperation {
@@ -40,6 +38,8 @@ class SKIndexer {
             }
         }
         else {
+            logger.info("Indexing entire user library.")
+            NoteSimilarity.shared.clear()
             var noteIterator = NeoLibrary.getNoteIterator()
             while let note = noteIterator.next() {
                 addOperation {
@@ -80,6 +80,16 @@ class SKIndexer {
         operationQueue.addOperation {
             block()
             self.delegate?.skIndexerProgress(remainingOperations: self.operationQueue.operationCount - 1)
+        }
+    }
+    
+    func isIndexed(note: Note) -> Bool {
+        return NoteSimilarity.shared.noteMatrices[note.getID()] != nil
+    }
+    
+    func remove(note: Note) {
+        if isIndexed(note: note) {
+            NoteSimilarity.shared.remove(note: note)
         }
     }
 }

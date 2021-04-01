@@ -120,6 +120,14 @@ class NoteSimilarity {
         return vector.map { $0 / norm }
     }
     
+    // Matrix multiplication based approach
+    private func similarity(between matrix1: [[Double]], and matrix2: [[Double]], norm: MatrixNorm = .Frobenius) -> Double {
+        let numerator = compute(norm: norm, for: replaceNegative(multiply(matrix1, matrix2)))
+        let denominator_1 = compute(norm: norm, for: replaceNegative(multiply(matrix1, matrix1)))
+        let denominator_2 = compute(norm: norm, for: replaceNegative(multiply(matrix2, matrix2)))
+        return numerator / (sqrt(denominator_1 * denominator_2))
+        // Note: similarity value is only normalized to [0,1] range for Frobenius & L1,1 norms
+    }
     private func similarity(between note1: Note, and note2: Note, norm: MatrixNorm = .Frobenius) -> Double {
         let numerator = compute(norm: norm, for: replaceNegative(multiply(noteMatrices[note1.getID()]!, noteMatrices[note2.getID()]!)))
         let denominator_1 = compute(norm: norm, for: replaceNegative(multiply(noteMatrices[note1.getID()]!, noteMatrices[note1.getID()]!)))
@@ -207,7 +215,7 @@ class NoteSimilarity {
         }
         var noteIterator = noteIterator
         while let note = noteIterator.next() {
-            if note.1 == source || noteMatrices[note.1.getID()] == nil || noteMatrices[note.1.getID()]!.isEmpty {
+            if note.1 == source || noteMatrices[note.1.getID()] == nil || noteMatrices[source.getID()]!.isEmpty {
                 continue
             }
             let similarity = self.similarity(between: source, and: note.1)
@@ -217,7 +225,6 @@ class NoteSimilarity {
                 logger.info("Similarity '\(source.getName())' / '\(note.1.getName())': \(similarity)")
                 logger.info("----------")
             }
-            
             if similarNotes.isEmpty {
                 similarNotes.append((note, similarity))
             }
@@ -428,4 +435,30 @@ class NoteSimilarity {
         let maxResults = max(1, maxResults)
         return Array(similarNotes.prefix(maxResults))
     }
+    
+    // MARK: Note clustering
+    /*private func clusterNotes(noteIterator: NoteIterator, centroidCount: Int = 2){
+        let centroidCount = max(2, centroidCount)
+        let noteMatrixValues = self.noteMatrices.map {$0.value}
+        var centroids = Array(noteMatrixValues.shuffled().prefix(centroidCount))
+        var clusters = [Int : [[Double]]]()
+        
+        for matrix in noteMatrixValues {
+            var closestCentroidIdx: Int = 0
+            var highestSimilarity: Double = 0.0
+            for (i, centroid) in centroids.enumerated() {
+                let similarity = self.similarity(between: matrix, and: centroid)
+                if similarity > highestSimilarity {
+                    highestSimilarity = similarity
+                    closestCentroidIdx = i
+                }
+            }
+            if clusters[closestCentroidIdx] == nil {
+                clusters[closestCentroidIdx] = [[Double]]()
+            }
+            var list = clusters[closestCentroidIdx]
+            list.append(matrix)
+            clusters[closestCentroidIdx] = list
+        }
+    }*/
 }

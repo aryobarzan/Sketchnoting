@@ -8,6 +8,11 @@
 
 import UIKit
 
+enum MoveFileMode {
+    case Move
+    case Select
+}
+
 class MoveFileViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
 
     @IBOutlet weak var backButton: UIButton!
@@ -18,6 +23,7 @@ class MoveFileViewController: UIViewController, UITableViewDataSource, UITableVi
     var filesToMove = [(URL, File)]()
     var currentFolder: URL = NeoLibrary.currentLocation
     var items = [URL]()
+    var mode: MoveFileMode = .Move
     override func viewDidLoad() {
         super.viewDidLoad()
                 
@@ -103,13 +109,20 @@ class MoveFileViewController: UIViewController, UITableViewDataSource, UITableVi
         self.dismiss(animated: true, completion: nil)
     }
     @IBAction func moveTapped(_ sender: UIBarButtonItem) {
-        var newFiles = [(URL, File)]()
-        for file in filesToMove {
-            if let url = NeoLibrary.move(file: file.1, from: file.0, to: currentFolder) {
-                newFiles.append((url, file.1))
+        switch self.mode {
+        case .Move:
+            var newFiles = [(URL, File)]()
+            for file in filesToMove {
+                if let url = NeoLibrary.move(file: file.1, from: file.0, to: currentFolder) {
+                    newFiles.append((url, file.1))
+                }
             }
+            self.delegate?.movedFiles(items: newFiles)
+            break
+        case .Select:
+            self.delegate?.selectedFolder(url: currentFolder, for: self.filesToMove)
+            break
         }
-        self.delegate?.movedFiles(items: newFiles)
         self.dismiss(animated: true, completion: nil)
     }
 }
@@ -117,4 +130,5 @@ class MoveFileViewController: UIViewController, UITableViewDataSource, UITableVi
 
 protocol MoveFileViewControllerDelegate {
     func movedFiles(items: [(URL, File)])
+    func selectedFolder(url: URL, for notes: [(URL, File)])
 }

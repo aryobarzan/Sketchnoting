@@ -271,11 +271,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             }
             ImportHelper.importItems(urls: urls) { importedNotes, importedImages, importedPDFs, importedTexts in
                 if !cancelled {
-                    // .sketchnote files are directly decoded to Note objects and saved to disk
-                    for note in importedNotes {
-                        NeoLibrary.add(note: note.1)
-                        logger.info("Imported note \(note.1.getName()).")
-                    }
                     // PDFs, images and text files are first converted to Note objects
                     var createdNotes = [(URL, Note)]()
                     if importedImages.count > 0 {
@@ -298,24 +293,31 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
                             logger.info("New note from imported pdf.")
                         }
                     }
-                    // Save these created notes to disk
-                    for (url, note) in createdNotes {
-                        if !cancelled {
-                            NeoLibrary.saveSynchronously(note: note, url: url)
-                        }
-                        else {
-                            break
-                        }
-                    }
                     DispatchQueue.main.async {
                         if !cancelled {
                             self.dismissLoadingAlert()
-                            self.view.makeToast("Imported your selected documents.")
-                            self.updateDisplayedNotes(true)
+                            self.showImportVC(importedNotes: createdNotes + importedNotes)
                         }
                     }
                 }
             }
+        }
+    }
+    
+    private func showImportVC(importedNotes: [(URL, Note)]) {
+        if let importVC = self.storyboard?.instantiateViewController(withIdentifier: "ImportViewController") as? ImportViewController {
+            importVC.modalPresentationStyle = .pageSheet
+            importVC.items = importedNotes
+            importVC.importCompletion = { didImport in
+                if didImport {
+                    self.view.makeToast("Imported your selected documents.")
+                    self.updateDisplayedNotes(true)
+                }
+            }
+            
+            let navigationController = UINavigationController(rootViewController: importVC)
+            navigationController.modalPresentationStyle = .pageSheet
+            present(navigationController, animated: true, completion: nil)
         }
     }
     
@@ -904,6 +906,9 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     // MoveFileViewControllerDelegate
     func movedFiles(items: [(URL, File)]) {
         self.updateDisplayedNotes(true)
+    }
+    func selectedFolder(url: URL, for notes: [(URL, File)]) {
+        
     }
     // Related Notes VC delegate
     func openRelatedNote(url: URL, note: Note) {
