@@ -113,9 +113,18 @@ class SemanticSearch {
         return sentenceEmbedding
     }
     
+    func createFastTextWordEmbedding() -> NLEmbedding {
+        if let resource = Bundle.main.url(forResource: "FastTextWordEmbedding", withExtension: "mlmodelc"), let embedding = try? NLEmbedding.init(contentsOf: resource) {
+            return embedding
+        }
+        else {
+            return NLEmbedding.wordEmbedding(for: .english)!
+        }
+    }
+    
     //
     private func getTermRelevancy(for terms: [String]) -> [[String]] {
-        let wordEmbedding = try! NLEmbedding.init(contentsOf: Bundle.main.url(forResource: "FastTextWordEmbedding", withExtension: "mlmodelc")!)
+        let wordEmbedding = createFastTextWordEmbedding()
         // Pre-processing: lemmatize & lowercase the terms
         var terms = terms
         for i in 0..<terms.count {
@@ -128,8 +137,8 @@ class SemanticSearch {
             var otherTerms = terms
             otherTerms.remove(object: term)
             var minimumDistance = 999.0
-            var highestCommonNotes = 0
-            let containingNotes = TF_IDF.shared.documentsForTerm(term: term, positiveOnly: true).compactMap({$0.noteID})
+            //var highestCommonNotes = 0
+            //let containingNotes = TF_IDF.shared.documentsForTerm(term: term, positiveOnly: true).compactMap({$0.noteID})
             var closestTerm = ""
             for otherTerm in otherTerms {
                 let distance = wordEmbedding.distance(between: term, and: otherTerm)
@@ -137,20 +146,20 @@ class SemanticSearch {
                     minimumDistance = distance
                     closestTerm = otherTerm
                 }
-                if distance >= 2.0 && !containingNotes.isEmpty {
+               /* if distance >= 2.0 && !containingNotes.isEmpty {
                     let commonNotes = TF_IDF.shared.documentsForTerm(term: otherTerm, positiveOnly: true, documents: containingNotes)
                     let count = Int(commonNotes.count)
                     if count > highestCommonNotes {
                         highestCommonNotes = count
                         closestTerm = otherTerm
                     }
-                }
+                }*/
                 if closestTerm.isEmpty {
                     closestTerm = otherTerm
                 }
             }
             var isAdded = false
-            if minimumDistance < 1.0 || highestCommonNotes > 0 {
+            if minimumDistance < 1.0  { // || highestCommonNotes > 0
                 for i in 0..<clusters.count {
                     if clusters[i].contains(closestTerm) {
                         clusters[i] = clusters[i] + [term]
@@ -215,39 +224,38 @@ class SemanticSearch {
         return [queryWords.joined(separator: " ")]
     }
     
-    
-    public func search(query: String, expandedSearch: Bool = true) -> [String : [SearchResult]] {
+    public func search(query originalQuery: String, expandedSearch: Bool = true) -> [SearchResult] {
         // Keyword, Clause, Extended Clause or Sentence
         //let queryType = checkPhraseType(queryPartsOfSpeech: queryPartsOfSpeech)
-        let queries = process(query: query)
+        let queries = process(query: originalQuery)
         logger.info("----")
-        logger.info("Original query: \(query)")
+        logger.info("Original query: \(originalQuery)")
         logger.info("Query has been divided into \(Int(queries.count)) semantically different queries.")
         // Expanded Search means a lower threshold for the lexical search, i.e. more tolerant to minor typos
         let lexicalThreshold = expandedSearch ? 0.9 : 1.0
         
         // Start search process, going through each note
         var noteIterator = NeoLibrary.getNoteIterator()
-        var searchResults = [String : [SearchResult]]()
-        let wordEmbedding = try! NLEmbedding.init(contentsOf: Bundle.main.url(forResource: "FastTextWordEmbedding", withExtension: "mlmodelc")!)
+        var searchResults = [SearchResult]()
+        let wordEmbedding = createFastTextWordEmbedding()
         for query in queries {
             noteIterator.reset()
-            var results = [SearchResult]()
+            var searchResult = SearchResult(query: query)
             while let note = noteIterator.next() {
                 // queue.addOperation
-                var searchResult = SearchResult()
+                var noteResult: (URL, Note)?
                 // MARK: Note title
                 var (searchType, closestTarget, score) = self.getStringSimilarity(betweenQuery: query, and: note.1.getName(), wordEmbedding: wordEmbedding)
                 switch searchType {
                 case .Lexical:
                     if score >= lexicalThreshold { // Higher is better
-                        searchResult.note = note
+                        noteResult = note
                         logger.info("[Lexical] Note title ('\(closestTarget)') = \(score)")
                         break
                     }
                 case .Semantic:
                     if score <= self.SEARCH_THRESHOLD { // Lower is better
-                        searchResult.note = note
+                        noteResult = note
                         logger.info("[Semantic] Note title ('\(closestTarget)') = \(score)")
                         break
                     }
@@ -259,13 +267,13 @@ class SemanticSearch {
                     switch searchType {
                     case .Lexical:
                         if score >= lexicalThreshold { // Higher is better
-                            searchResult.note = note
+                            noteResult = note
                             logger.info("[Lexical] Note body ('\(closestTarget)') = \(score)")
                             break
                         }
                     case .Semantic:
                         if score <= self.SEARCH_THRESHOLD { // Lower is better
-                            searchResult.note = note
+                            noteResult = note
                             logger.info("[Semantic] Note body ('\(closestTarget)') = \(score)")
                             break
                         }
@@ -278,13 +286,13 @@ class SemanticSearch {
                     switch searchType {
                     case .Lexical:
                         if score >= lexicalThreshold { // Higher is better
-                            searchResult.note = note
+                            noteResult = note
                             logger.info("[Lexical] Note drawing ('\(closestTarget)') = \(score)")
                             break
                         }
                     case .Semantic:
                         if score <= self.DRAWING_THRESHOLD { // Lower is better
-                            searchResult.note = note
+                            noteResult = note
                             logger.info("[Semantic] Note drawing ('\(closestTarget)') = \(score)")
                             break
                         }
@@ -298,14 +306,14 @@ class SemanticSearch {
                     switch searchType {
                     case .Lexical:
                         if score >= lexicalThreshold { // Higher is better
-                            searchResult.note = note
+                            noteResult = note
                             isDocumentMatching = true
                             logger.info("[Lexical] Document ('\(document.title)') title ('\(closestTarget)') = \(score)")
                             break
                         }
                     case .Semantic:
                         if score <= self.SEARCH_THRESHOLD { // Lower is better
-                            searchResult.note = note
+                            noteResult = note
                             isDocumentMatching = true
                             logger.info("[Semantic] Document ('\(document.title)') title ('\(closestTarget)') = \(score)")
                             break
@@ -321,14 +329,14 @@ class SemanticSearch {
                         switch searchType {
                         case .Lexical:
                             if score >= lexicalThreshold { // Higher is better
-                                searchResult.note = note
+                                noteResult = note
                                 isDocumentMatching = true
                                 logger.info("[Lexical] Document ('\(document.title)') description ('\(closestTarget)') = \(score)")
                                 break
                             }
                         case .Semantic:
                             if score <= self.SEARCH_THRESHOLD { // Lower is better
-                                searchResult.note = note
+                                noteResult = note
                                 isDocumentMatching = true
                                 logger.info("[Semantic] Document ('\(document.title)') description ('\(closestTarget)') = \(score)")
                                 break
@@ -340,12 +348,17 @@ class SemanticSearch {
                         continue
                     }
                     // Document types [TODO]
+                    
                 }
-                results.append(searchResult)
+                if let noteResult = noteResult {
+                    if searchResult.notes[noteResult.0] == nil {
+                        searchResult.notes[noteResult.0] = noteResult.1
+                    }
+                }
             }
-            searchResults[query] = results
+            searchResults.append(searchResult)
         }
-        logger.info("Search for query '\(query)' completed.")
+        logger.info("Search for query '\(originalQuery)' completed.")
         return searchResults
     }
     
@@ -492,7 +505,8 @@ class SemanticSearch {
 }
 
 struct SearchResult {
-    var note: (URL, Note)?
+    var query: String
+    var notes = [URL : Note]()
     var documents = [Document]()
     var locationDocuments = [Document]()
     var personDocuments = [Document]()

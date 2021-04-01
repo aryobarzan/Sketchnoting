@@ -114,6 +114,8 @@
 		9FB5156226139BDC004F91E2 /* UIAlertControllerExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB5156126139BDC004F91E2 /* UIAlertControllerExtensions.swift */; };
 		9FB5158426152CA0004F91E2 /* ImportViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB5158326152CA0004F91E2 /* ImportViewController.swift */; };
 		9FB5158626152DA7004F91E2 /* ImportTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB5158526152DA7004F91E2 /* ImportTableViewCell.swift */; };
+		9FB5158826164CE6004F91E2 /* SearchNotesCard.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9FB5158726164CE6004F91E2 /* SearchNotesCard.xib */; };
+		9FB5158A26164E66004F91E2 /* SearchNotesCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB5158926164E66004F91E2 /* SearchNotesCard.swift */; };
 		9FB87CF624B0061200A262D8 /* ARDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB87CF524B0061200A262D8 /* ARDocument.swift */; };
 		9FB87CF924B006B900A262D8 /* ALMAARHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB87CF824B006B900A262D8 /* ALMAARHelper.swift */; };
 		9FB9984724868561003773F2 /* MoveFileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB9984624868561003773F2 /* MoveFileViewController.swift */; };
@@ -283,6 +285,8 @@
 		9FB5156126139BDC004F91E2 /* UIAlertControllerExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIAlertControllerExtensions.swift; sourceTree = "<group>"; };
 		9FB5158326152CA0004F91E2 /* ImportViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportViewController.swift; sourceTree = "<group>"; };
 		9FB5158526152DA7004F91E2 /* ImportTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportTableViewCell.swift; sourceTree = "<group>"; };
+		9FB5158726164CE6004F91E2 /* SearchNotesCard.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SearchNotesCard.xib; sourceTree = "<group>"; };
+		9FB5158926164E66004F91E2 /* SearchNotesCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchNotesCard.swift; sourceTree = "<group>"; };
 		9FB87CF524B0061200A262D8 /* ARDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARDocument.swift; sourceTree = "<group>"; };
 		9FB87CF824B006B900A262D8 /* ALMAARHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ALMAARHelper.swift; sourceTree = "<group>"; };
 		9FB9984624868561003773F2 /* MoveFileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoveFileViewController.swift; sourceTree = "<group>"; };
@@ -566,6 +570,8 @@
 				9F65984723F315FE00CDBE0C /* SearchFilterCollectionViewCell.swift */,
 				9F8988D125E59D9B005CB90B /* SearchDocumentsCard.xib */,
 				9F8988D325E59DAD005CB90B /* SearchDocumentsCard.swift */,
+				9FB5158726164CE6004F91E2 /* SearchNotesCard.xib */,
+				9FB5158926164E66004F91E2 /* SearchNotesCard.swift */,
 			);
 			path = Search;
 			sourceTree = "<group>";
@@ -966,6 +972,7 @@
 				9F92D11A23217CFA00BC0E57 /* SearchFilterView.xib in Resources */,
 				9FD29C6622431C0000CC969A /* labels.txt in Resources */,
 				9F75E44D230C583200488BBD /* NoteCollectionViewCell.xib in Resources */,
+				9FB5158826164CE6004F91E2 /* SearchNotesCard.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1147,6 +1154,7 @@
 				9FA6239E22E66D73007ED794 /* HandwritingRecognizer.swift in Sources */,
 				9F2FF43A249B083D00597AD6 /* NoteDrawing.swift in Sources */,
 				9FF0AC9424412F4C00A82BE8 /* NoteImage.swift in Sources */,
+				9FB5158A26164E66004F91E2 /* SearchNotesCard.swift in Sources */,
 				9F65983523EDD09F00CDBE0C /* NoteText.swift in Sources */,
 				9FC5F90A24A8E20000CDF2DF /* NoteOptionsCollectionViewCell.swift in Sources */,
 				9FD5516E246A4364005D14D2 /* RelatedNotesViewController.swift in Sources */,

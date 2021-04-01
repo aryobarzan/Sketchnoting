@@ -72,18 +72,9 @@ class NoteCollectionViewCell: UICollectionViewCell {
             self.selectedImageView.tintColor = UIColor.white
             self.selectedLabel.textColor = UIColor.white
             self.selectedLabel.text = "Selected"
-            //self.transform = CGAffineTransform(scaleX: 1.0, y: 1.0)
-            //self.layer.removeAllAnimations()
             self.selectedIndicatorView.backgroundColor = UIColor.link
         }
         else {
-            /*UIView.animate(withDuration: 1,
-                           delay: 0,
-                           options: [.repeat, .autoreverse, .allowUserInteraction],
-                           animations: {
-                            self.transform = CGAffineTransform(scaleX: 1.025, y: 1.025)
-                            self.layoutIfNeeded()
-            }, completion: nil)*/
             self.selectedImageView.image = UIImage(systemName: "checkmark.circle")
             self.selectedLabel.text = "Select"
             self.selectedIndicatorView.backgroundColor = UIColor.darkGray

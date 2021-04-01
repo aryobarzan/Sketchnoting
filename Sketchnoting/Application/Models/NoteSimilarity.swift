@@ -209,13 +209,16 @@ class NoteSimilarity {
     private var rows: Int = 1
     
     private func semanticMatrix_similarNotes(for source: Note, noteIterator: NoteIterator, maxResults: Int = 5, debug: Bool = false) -> [((URL, Note), Double)] {
-        var similarNotes = [((URL, Note), Double)]()
+        // Source note is either not indexed yet or has no text to be indexed
         if noteMatrices[source.getID()] == nil || noteMatrices[source.getID()]!.isEmpty {
             return [((URL, Note), Double)]()
         }
+        
+        var similarNotes = [((URL, Note), Double)]()
+        
         var noteIterator = noteIterator
         while let note = noteIterator.next() {
-            if note.1 == source || noteMatrices[note.1.getID()] == nil || noteMatrices[source.getID()]!.isEmpty {
+            if note.1 == source || noteMatrices[note.1.getID()] == nil || noteMatrices[note.1.getID()]!.isEmpty {
                 continue
             }
             let similarity = self.similarity(between: source, and: note.1)

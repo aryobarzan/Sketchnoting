@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="SearchNotesCard" customModule="Sketchnoting" customModuleProvider="target">
+            <connections>
+                <outlet property="closeButton" destination="naA-GQ-jJa" id="SoG-ef-46G"/>
+                <outlet property="collectionView" destination="lJj-Nx-BDh" id="fZw-9G-fgE"/>
+                <outlet property="contentView" destination="iN0-l3-epB" id="nTR-fN-Vlo"/>
+                <outlet property="titleLabel" destination="3Wn-1f-kKY" id="b4c-Mb-aNU"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="iN0-l3-epB">
+            <rect key="frame" x="0.0" y="0.0" width="735" height="340"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="&quot;Gravity&quot;" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="3Wn-1f-kKY">
+                    <rect key="frame" x="20" y="15" width="110" height="34"/>
+                    <fontDescription key="fontDescription" style="UICTFontTextStyleTitle1"/>
+                    <nil key="textColor"/>
+                    <nil key="highlightedColor"/>
+                </label>
+                <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="none" translatesAutoresizingMaskIntoConstraints="NO" id="lJj-Nx-BDh">
+                    <rect key="frame" x="20" y="64" width="695" height="261"/>
+                    <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="261" id="eDx-Li-UPb"/>
+                    </constraints>
+                    <collectionViewFlowLayout key="collectionViewLayout" scrollDirection="horizontal" minimumLineSpacing="10" minimumInteritemSpacing="10" id="Me4-og-JPt">
+                        <size key="itemSize" width="128" height="128"/>
+                        <size key="headerReferenceSize" width="0.0" height="0.0"/>
+                        <size key="footerReferenceSize" width="0.0" height="0.0"/>
+                        <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
+                    </collectionViewFlowLayout>
+                </collectionView>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="naA-GQ-jJa">
+                    <rect key="frame" x="693" y="17" width="22" height="22"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="22" id="T8T-uo-AcV"/>
+                        <constraint firstAttribute="height" constant="22" id="sv0-Bb-o0N"/>
+                    </constraints>
+                    <state key="normal" title="Button" image="xmark" catalog="system">
+                        <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="large" weight="bold"/>
+                    </state>
+                    <connections>
+                        <action selector="closeTapped:" destination="-1" eventType="touchUpInside" id="vxC-Yh-1uY"/>
+                    </connections>
+                </button>
+            </subviews>
+            <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
+            <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+            <constraints>
+                <constraint firstItem="lJj-Nx-BDh" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" constant="20" id="0MT-bV-cEp"/>
+                <constraint firstItem="3Wn-1f-kKY" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" constant="20" id="5TT-lk-MoO"/>
+                <constraint firstItem="3Wn-1f-kKY" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="15" id="ANO-89-ble"/>
+                <constraint firstAttribute="bottom" secondItem="lJj-Nx-BDh" secondAttribute="bottom" constant="15" id="GVw-it-4YR"/>
+                <constraint firstAttribute="trailing" secondItem="naA-GQ-jJa" secondAttribute="trailing" constant="20" id="WTS-15-vmG"/>
+                <constraint firstItem="naA-GQ-jJa" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="17" id="cO1-9k-fo6"/>
+                <constraint firstItem="lJj-Nx-BDh" firstAttribute="top" secondItem="3Wn-1f-kKY" secondAttribute="bottom" constant="15" id="loM-6n-VAD"/>
+                <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="lJj-Nx-BDh" secondAttribute="trailing" constant="20" id="mbd-Ph-SJa"/>
+            </constraints>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <point key="canvasLocation" x="309.4202898550725" y="-101.11607142857143"/>
+        </view>
+    </objects>
+    <resources>
+        <image name="xmark" catalog="system" width="128" height="113"/>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
+</document>

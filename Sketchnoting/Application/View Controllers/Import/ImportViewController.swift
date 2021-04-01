@@ -108,6 +108,7 @@ class ImportViewController: UIViewController, UITableViewDataSource, UITableView
                                                 UIAction(title: "Remove",
                                                          image: UIImage(systemName: "trash.circle"), attributes: .destructive) { action in
                                                     self.items.remove(at: indexPath.row)
+                                                    SKIndexer.shared.remove(note: item.1)
                                                     self.reload()
                                                 }
                                             return UIMenu(title: "", children: [selectFolderAction, suggestFolderAction, removeAction])

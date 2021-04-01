@@ -9,7 +9,7 @@
 import UIKit
 import NVActivityIndicatorView
 import NaturalLanguage
-class SearchViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UITextFieldDelegate, DrawingSearchDelegate, SKIndexerDelegate {
+class SearchViewController: UIViewController, UITextFieldDelegate, DrawingSearchDelegate, SKIndexerDelegate, SearchNotesCardDelegate {
     
     @IBOutlet weak var activityIndicator: NVActivityIndicatorView!
     @IBOutlet weak var updateButton: UIButton!
@@ -18,13 +18,13 @@ class SearchViewController: UIViewController, UICollectionViewDelegate, UICollec
     @IBOutlet weak var drawingSearchButton: UIButton!
     @IBOutlet weak var expandedSearchLabel: UILabel!
     @IBOutlet weak var expandedSearchSwitch: UISwitch!
-    @IBOutlet weak var notesCollectionView: UICollectionView!
     @IBOutlet weak var contentStackView: UIStackView!
+    @IBOutlet weak var dividerView: UIView!
     
     var searchFilters = [SearchFilter]()
-    var notes = [(URL, Note)]()
     var currentSearchType = SearchType.All
     
+    var searchNotesCards = [SearchNotesCard]()
     var searchDocumentsCards = [SearchDocumentsCard]()
     
     private var appSearch = AppSearch()
@@ -33,16 +33,10 @@ class SearchViewController: UIViewController, UICollectionViewDelegate, UICollec
         self.tabBarController?.tabBar.isHidden = false
         
         searchTextField.delegate = self
-        
         searchButton.layer.cornerRadius = 4
-
-        notesCollectionView.delegate = self
-        notesCollectionView.dataSource = self
     }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        notesCollectionView.register(UINib(nibName: "NoteCollectionViewCell", bundle: nil), forCellWithReuseIdentifier: "NoteCollectionViewCell")
-        notesCollectionView.reloadData()
     }
     
     @IBAction func searchTapped(_ sender: UIButton) {
@@ -61,7 +55,6 @@ class SearchViewController: UIViewController, UICollectionViewDelegate, UICollec
     }
     func drawingSearchRecognized(label: String) {
         // TODO
-        self.updateResults()
     }
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         // Hide the keyboard.
@@ -79,7 +72,6 @@ class SearchViewController: UIViewController, UICollectionViewDelegate, UICollec
         }
     }
     @IBAction func updateButtonTapped(_ sender: UIButton) {
-        logger.info("Updating...")
         sender.isEnabled = false
         activityIndicator.startAnimating()
         
@@ -95,38 +87,8 @@ class SearchViewController: UIViewController, UICollectionViewDelegate, UICollec
     }
     
     func textFieldShouldClear(_ textField: UITextField) -> Bool {
-        clearResults()
+        clearSearchCards()
         return true
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return notes.count
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "NoteCollectionViewCell", for: indexPath as IndexPath) as! NoteCollectionViewCell
-        cell.setFile(url: notes[indexPath.item].0 ,file: notes[indexPath.item].1)
-        return cell
-    }
-    
-    // MARK: UICollectionViewDelegate
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        self.openNote(url: self.notes[indexPath.item].0, note: self.notes[indexPath.item].1)
-        logger.info("Note tapped.")
-    }
-    
-    func collectionView(_ collectionView: UICollectionView,
-                        layout collectionViewLayout: UICollectionViewLayout,
-                        sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: CGFloat(200), height: CGFloat(300))
-    }
-    
-    //
-    
-    private func clearResults() {
-        self.notes = [(URL, Note)]()
-        notesCollectionView.reloadData()
-        self.clearSearchDocumentsCards()
     }
     
     private func performSearch() {
@@ -140,43 +102,54 @@ class SearchViewController: UIViewController, UICollectionViewDelegate, UICollec
     private func performSemanticSearch() {
         let query = searchTextField.text!.trimmingCharacters(in: .whitespacesAndNewlines)
         // Search
-        clearResults()
+        clearSearchCards()
         activityIndicator.isHidden = false
         activityIndicator.startAnimating()
         let searchResults = SemanticSearch.shared.search(query: query, expandedSearch: expandedSearchSwitch.isOn)
-        for (_, results) in searchResults {
-            for searchResult in results {
-                logger.info("Search Result - \(searchResult.note == nil ? "Note not a match" : searchResult.note!.1.getName()) / \(searchResult.documents.count) Documents / \(searchResult.personDocuments.count) Person-Documents / \(searchResult.locationDocuments.count) Location-Documents")
-                if searchResult.note != nil {
-                    DispatchQueue.main.async {
-                        self.notes.append(searchResult.note!)
-                        self.notesCollectionView.reloadData()
-                    }
-                }
-                if searchResult.documents.count > 0 {
-                    DispatchQueue.main.async {
-                        let searchDocumentsCard = SearchDocumentsCard(documents: searchResult.documents, frame: CGRect(x: 0, y: 0, width: 100, height: 340))
-                        self.contentStackView.addArrangedSubview(searchDocumentsCard)
-                        self.searchDocumentsCards.append(searchDocumentsCard)
-                    }
-                }
+        for result in searchResults {
+            if !result.notes.isEmpty {
+                createNotesCard(query: result.query, notes: result.notes.map{($0.key, $0.value)})
             }
+            if !result.documents.isEmpty {
+                createDocumentsCard(documents: result.documents)
+            }
+            logger.info("Search Result for query '\(query)' - \(Int(result.notes.count)) notes / \(Int(result.documents.count)) Documents")
         }
         DispatchQueue.main.async {
             self.activityIndicator.isHidden = true
         }
     }
     
-    private func clearSearchDocumentsCards() {
+    private func createNotesCard(query: String, notes: [(URL, Note)]) {
+        DispatchQueue.main.async {
+            let searchNotesCard = SearchNotesCard(query: query, notes: notes, frame: CGRect(x: 0, y: 0, width: 100, height: 340))
+            searchNotesCard.delegate = self
+            self.contentStackView.addArrangedSubview(searchNotesCard)
+            self.searchNotesCards.append(searchNotesCard)
+        }
+    }
+    
+    private func createDocumentsCard(documents: [Document]) {
+        DispatchQueue.main.async {
+            let searchDocumentsCard = SearchDocumentsCard(documents: documents, frame: CGRect(x: 0, y: 0, width: 100, height: 340))
+            self.contentStackView.addArrangedSubview(searchDocumentsCard)
+            self.searchDocumentsCards.append(searchDocumentsCard)
+        }
+    }
+    
+    private func clearSearchCards() {
+        for card in searchNotesCards {
+            card.removeFromSuperview()
+        }
         for card in searchDocumentsCards {
             card.removeFromSuperview()
         }
-        searchDocumentsCards = [SearchDocumentsCard]()
+        searchNotesCards.removeAll()
+        searchDocumentsCards.removeAll()
     }
     
-    private func updateResults() {
-        self.notes = appSearch.search(filters: self.searchFilters)
-        notesCollectionView.reloadData()
+    func noteTapped(url: URL, note: Note) {
+        openNote(url: url, note: note)
     }
     
     var noteToOpen: (URL, Note)?
