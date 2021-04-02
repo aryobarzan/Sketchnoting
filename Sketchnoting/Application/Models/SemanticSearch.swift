@@ -178,7 +178,7 @@ class SemanticSearch {
         return clusters
     }
     
-    private func process(query: String) -> [String] {
+    private func process(query: String, useFullQuery: Bool) -> [String] {
         let queryWords = tokenize(text: query, unit: .word)
         if queryWords.count > 1 { // Longer query
             var processedQuery = ""
@@ -211,12 +211,17 @@ class SemanticSearch {
                     retainedQueryTerms.append(partsOfSpeech[i].0)
                 }
             }
-            let queryClusters = getTermRelevancy(for: retainedQueryTerms)
-            var processedQueryClusters = [String]()
-            for queryCluster in queryClusters {
-                processedQueryClusters.append(queryCluster.joined(separator: " ").lowercased().trimmingCharacters(in: .whitespaces))
+            if useFullQuery {
+                return [retainedQueryTerms.joined(separator: " ").lowercased().trimmingCharacters(in: .whitespaces)]
             }
-            return processedQueryClusters
+            else {
+                let queryClusters = getTermRelevancy(for: retainedQueryTerms)
+                var processedQueryClusters = [String]()
+                for queryCluster in queryClusters {
+                    processedQueryClusters.append(queryCluster.joined(separator: " ").lowercased().trimmingCharacters(in: .whitespaces))
+                }
+                return processedQueryClusters
+            }
         }
         else if queryWords.count == 1 { // Keyword query
             return [lemmatize(text: queryWords[0].lowercased())]
@@ -224,10 +229,10 @@ class SemanticSearch {
         return [queryWords.joined(separator: " ")]
     }
     
-    public func search(query originalQuery: String, expandedSearch: Bool = true) -> [SearchResult] {
+    public func search(query originalQuery: String, expandedSearch: Bool = true, useFullQuery: Bool = false) -> [SearchResult] {
         // Keyword, Clause, Extended Clause or Sentence
         //let queryType = checkPhraseType(queryPartsOfSpeech: queryPartsOfSpeech)
-        let queries = process(query: originalQuery)
+        let queries = process(query: originalQuery, useFullQuery: useFullQuery)
         logger.info("----")
         logger.info("Original query: \(originalQuery)")
         logger.info("Query has been divided into \(Int(queries.count)) semantically different queries.")

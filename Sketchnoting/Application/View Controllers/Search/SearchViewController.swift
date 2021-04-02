@@ -9,7 +9,7 @@
 import UIKit
 import NVActivityIndicatorView
 import NaturalLanguage
-class SearchViewController: UIViewController, UITextFieldDelegate, DrawingSearchDelegate, SKIndexerDelegate, SearchNotesCardDelegate {
+class SearchViewController: UIViewController, UITextFieldDelegate, DrawingSearchDelegate, SKIndexerDelegate, UITableViewDelegate, UITableViewDataSource, SearchNoteCellDelegate {
     
     @IBOutlet weak var activityIndicator: NVActivityIndicatorView!
     @IBOutlet weak var updateButton: UIButton!
@@ -18,14 +18,14 @@ class SearchViewController: UIViewController, UITextFieldDelegate, DrawingSearch
     @IBOutlet weak var drawingSearchButton: UIButton!
     @IBOutlet weak var expandedSearchLabel: UILabel!
     @IBOutlet weak var expandedSearchSwitch: UISwitch!
-    @IBOutlet weak var contentStackView: UIStackView!
-    @IBOutlet weak var dividerView: UIView!
+    @IBOutlet weak var searchTableView: UITableView!
     
     var searchFilters = [SearchFilter]()
     var currentSearchType = SearchType.All
+
+    fileprivate var items = [SearchTableItem]()
     
-    var searchNotesCards = [SearchNotesCard]()
-    var searchDocumentsCards = [SearchDocumentsCard]()
+    var noteToOpen: (URL, Note)?
     
     private var appSearch = AppSearch()
     override func viewDidLoad() {
@@ -34,6 +34,9 @@ class SearchViewController: UIViewController, UITextFieldDelegate, DrawingSearch
         
         searchTextField.delegate = self
         searchButton.layer.cornerRadius = 4
+        
+        searchTableView.dataSource = self
+        searchTableView.delegate = self
     }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -87,7 +90,7 @@ class SearchViewController: UIViewController, UITextFieldDelegate, DrawingSearch
     }
     
     func textFieldShouldClear(_ textField: UITextField) -> Bool {
-        clearSearchCards()
+        clear()
         return true
     }
     
@@ -99,64 +102,43 @@ class SearchViewController: UIViewController, UITextFieldDelegate, DrawingSearch
         }
     }
     
-    private func performSemanticSearch() {
-        let query = searchTextField.text!.trimmingCharacters(in: .whitespacesAndNewlines)
+    private func performSemanticSearch(specificQuery: String? = nil, useFullQuery: Bool = false) {
+        let query = (specificQuery != nil) ? specificQuery! : searchTextField.text!.trimmingCharacters(in: .whitespacesAndNewlines)
         // Search
-        clearSearchCards()
+        clear()
         activityIndicator.isHidden = false
         activityIndicator.startAnimating()
-        let searchResults = SemanticSearch.shared.search(query: query, expandedSearch: expandedSearchSwitch.isOn)
+        let searchResults = SemanticSearch.shared.search(query: query, expandedSearch: expandedSearchSwitch.isOn, useFullQuery: useFullQuery)
+        if searchResults.count > 1 {
+            let item = SearchTableInformationItem(query: query, message: "Your query '\(query)' has been split into \(Int(searchResults.count)) different subqueries: \(searchResults.map{"'\($0.query)'"}.joined(separator: ", ")). Do you want to view results for the full query?")
+            self.items.append(item)
+        }
         for result in searchResults {
             if !result.notes.isEmpty {
-                createNotesCard(query: result.query, notes: result.notes.map{($0.key, $0.value.0, $0.value.1)})
+                let item = SearchTableNotesItem(query: result.query, notes: result.notes.map{($0.key, $0.value.0, $0.value.1)})
+                self.items.append(item)
             }
             if !result.documents.isEmpty {
-                createDocumentsCard(documents: result.documents)
+                let item = SearchTableDocumentsItem(query: result.query, documents: result.documents)
+                self.items.append(item)
             }
-            logger.info("Search Result for query '\(query)' - \(Int(result.notes.count)) notes / \(Int(result.documents.count)) Documents")
+            logger.info("Search Result for query '\(result.query)' - \(Int(result.notes.count)) notes / \(Int(result.documents.count)) Documents")
         }
         DispatchQueue.main.async {
+            self.reload()
             self.activityIndicator.isHidden = true
         }
     }
     
-    private func createNotesCard(query: String, notes: [(URL, Note, Double)]) {
-        DispatchQueue.main.async {
-            let searchNotesCard = SearchNotesCard(query: query, notes: notes, frame: CGRect(x: 0, y: 0, width: 100, height: 400))
-            searchNotesCard.delegate = self
-            self.contentStackView.addArrangedSubview(searchNotesCard)
-            self.searchNotesCards.append(searchNotesCard)
-        }
+    private func reload() {
+        searchTableView.reloadData()
     }
     
-    private func createDocumentsCard(documents: [Document]) {
-        DispatchQueue.main.async {
-            let searchDocumentsCard = SearchDocumentsCard(documents: documents, frame: CGRect(x: 0, y: 0, width: 100, height: 400))
-            self.contentStackView.addArrangedSubview(searchDocumentsCard)
-            self.searchDocumentsCards.append(searchDocumentsCard)
-        }
+    private func clear() {
+        self.items.removeAll()
+        self.reload()
     }
-    
-    private func clearSearchCards() {
-        for card in searchNotesCards {
-            card.removeFromSuperview()
-        }
-        for card in searchDocumentsCards {
-            card.removeFromSuperview()
-        }
-        searchNotesCards.removeAll()
-        searchDocumentsCards.removeAll()
-    }
-    
-    func noteTapped(url: URL, note: Note) {
-        openNote(url: url, note: note)
-    }
-    
-    var noteToOpen: (URL, Note)?
-    func openNote(url: URL, note: Note) {
-        noteToOpen = (url, note)
-        Timer.scheduledTimer(timeInterval: 0.2, target: self, selector: #selector(switchToHomeTab), userInfo: nil, repeats: false)
-    }
+
     @objc func switchToHomeTab() {
         tabBarController!.selectedIndex = 0
         if let nc = tabBarController!.viewControllers![0] as? UINavigationController {
@@ -172,4 +154,110 @@ class SearchViewController: UIViewController, UITextFieldDelegate, DrawingSearch
             self.updateButton.setTitle("Update (\(remainingOperations))", for: .disabled)
         }
     }
+    
+    // MARK: Table view
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return items.count
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let item = items[indexPath.row]
+        switch item.type {
+        case .Notes:
+            let cell = searchTableView.dequeueReusableCell(withIdentifier: "SearchNoteCell", for: indexPath) as! SearchNoteCell
+            if let notesItem = item as? SearchTableNotesItem {
+                cell.setContent(query: item.query, notes: notesItem.notes)
+            }
+            cell.delegate = self
+            return cell
+        case .Documents:
+            let cell = searchTableView.dequeueReusableCell(withIdentifier: "SearchDocumentCell", for: indexPath) as! SearchDocumentCell
+            if let documentsItem = item as? SearchTableDocumentsItem {
+                cell.setContent(query: item.query, documents: documentsItem.documents)
+            }
+            return cell
+        case .Information:
+            let cell = searchTableView.dequeueReusableCell(withIdentifier: "SearchInformationCell", for: indexPath) as! SearchInformationCell
+            if let informationItem = item as? SearchTableInformationItem {
+                cell.setContent(message: informationItem.message)
+            }
+            return cell
+        }
+    }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        let item = items[indexPath.row]
+        switch item.type {
+        case .Notes:
+            return CGFloat(380)
+        case .Documents:
+            return CGFloat(210)
+        case .Information:
+            return CGFloat(60)
+        }
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let item = items[indexPath.row]
+        if item.type == .Information {
+            self.items.remove(at: indexPath.row)
+            self.searchTableView.deleteRows(at: [indexPath], with: .automatic)
+            performSemanticSearch(specificQuery: item.query, useFullQuery: true)
+        }
+    }
+    
+    func tableView(_ tableView: UITableView, contextMenuConfigurationForRowAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
+        return UIContextMenuConfiguration(identifier: nil, previewProvider: nil, actionProvider: { suggestedActions in
+            let removeAction = UIAction(title: "Remove", image: UIImage(systemName: "trash.circle"), attributes: .destructive) { action in
+                self.items.remove(at: indexPath.row)
+                self.searchTableView.deleteRows(at: [indexPath], with: .automatic)
+            }
+            return UIMenu(title: "Search result", children: [removeAction])
+        })
+    }
+    
+    // MARK: SearchNoteCellDelegate
+    func tappedNote(url: URL, note: Note) {
+        noteToOpen = (url, note)
+        Timer.scheduledTimer(timeInterval: 0.2, target: self, selector: #selector(switchToHomeTab), userInfo: nil, repeats: false)
+    }
+}
+
+fileprivate class SearchTableItem {
+    var type: SearchTableItemType
+    var query: String
+    init(query: String, type: SearchTableItemType = .Notes) {
+        self.query = query
+        self.type = type
+    }
+}
+
+fileprivate class SearchTableNotesItem: SearchTableItem {
+    var notes: [(URL, Note, Double)]
+    init(query: String, notes: [(URL, Note, Double)]) {
+        self.notes = notes
+        super.init(query: query, type: .Notes)
+    }
+}
+
+fileprivate class SearchTableDocumentsItem: SearchTableItem {
+    var documents: [Document]
+    init(query: String, documents: [Document]) {
+        self.documents = documents
+        super.init(query: query, type: .Documents)
+    }
+}
+
+fileprivate class SearchTableInformationItem: SearchTableItem {
+    var message: String
+    init(query: String, message: String) {
+        self.message = message
+        super.init(query: query, type: .Information)
+    }
+}
+
+fileprivate enum SearchTableItemType {
+    case Notes
+    case Documents
+    case Information
 }

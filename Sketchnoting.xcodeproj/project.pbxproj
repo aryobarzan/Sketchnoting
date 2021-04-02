@@ -74,8 +74,6 @@
 		9F77DBCA23FFD619007C8B7D /* AnnotationUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F77DBC923FFD619007C8B7D /* AnnotationUtilities.swift */; };
 		9F8551B123A539D9006EB0B1 /* NotePageCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F8551B023A539D9006EB0B1 /* NotePageCollectionViewCell.swift */; };
 		9F87A47D2445441500F83B12 /* NoteTypedText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F87A47C2445441500F83B12 /* NoteTypedText.swift */; };
-		9F8988D225E59D9B005CB90B /* SearchDocumentsCard.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9F8988D125E59D9B005CB90B /* SearchDocumentsCard.xib */; };
-		9F8988D425E59DAD005CB90B /* SearchDocumentsCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F8988D325E59DAD005CB90B /* SearchDocumentsCard.swift */; };
 		9F8988D625E8239E005CB90B /* TextParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F8988D525E8239E005CB90B /* TextParser.swift */; };
 		9F8988D925E95873005CB90B /* Array+Combinations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F8988D825E95873005CB90B /* Array+Combinations.swift */; };
 		9F8988DB25E95892005CB90B /* Keyword.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F8988DA25E95892005CB90B /* Keyword.swift */; };
@@ -114,8 +112,9 @@
 		9FB5156226139BDC004F91E2 /* UIAlertControllerExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB5156126139BDC004F91E2 /* UIAlertControllerExtensions.swift */; };
 		9FB5158426152CA0004F91E2 /* ImportViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB5158326152CA0004F91E2 /* ImportViewController.swift */; };
 		9FB5158626152DA7004F91E2 /* ImportTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB5158526152DA7004F91E2 /* ImportTableViewCell.swift */; };
-		9FB5158826164CE6004F91E2 /* SearchNotesCard.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9FB5158726164CE6004F91E2 /* SearchNotesCard.xib */; };
-		9FB5158A26164E66004F91E2 /* SearchNotesCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB5158926164E66004F91E2 /* SearchNotesCard.swift */; };
+		9FB515AB26177FFF004F91E2 /* SearchNoteCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB515AA26177FFF004F91E2 /* SearchNoteCell.swift */; };
+		9FB515AD26178016004F91E2 /* SearchDocumentCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB515AC26178016004F91E2 /* SearchDocumentCell.swift */; };
+		9FB515AF26179C34004F91E2 /* SearchInformationCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB515AE26179C34004F91E2 /* SearchInformationCell.swift */; };
 		9FB87CF624B0061200A262D8 /* ARDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB87CF524B0061200A262D8 /* ARDocument.swift */; };
 		9FB87CF924B006B900A262D8 /* ALMAARHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB87CF824B006B900A262D8 /* ALMAARHelper.swift */; };
 		9FB9984724868561003773F2 /* MoveFileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB9984624868561003773F2 /* MoveFileViewController.swift */; };
@@ -247,8 +246,6 @@
 		9F77DBC923FFD619007C8B7D /* AnnotationUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnnotationUtilities.swift; sourceTree = "<group>"; };
 		9F8551B023A539D9006EB0B1 /* NotePageCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotePageCollectionViewCell.swift; sourceTree = "<group>"; };
 		9F87A47C2445441500F83B12 /* NoteTypedText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteTypedText.swift; sourceTree = "<group>"; };
-		9F8988D125E59D9B005CB90B /* SearchDocumentsCard.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SearchDocumentsCard.xib; sourceTree = "<group>"; };
-		9F8988D325E59DAD005CB90B /* SearchDocumentsCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchDocumentsCard.swift; sourceTree = "<group>"; };
 		9F8988D525E8239E005CB90B /* TextParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextParser.swift; sourceTree = "<group>"; };
 		9F8988D825E95873005CB90B /* Array+Combinations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Array+Combinations.swift"; sourceTree = "<group>"; };
 		9F8988DA25E95892005CB90B /* Keyword.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Keyword.swift; sourceTree = "<group>"; };
@@ -285,8 +282,9 @@
 		9FB5156126139BDC004F91E2 /* UIAlertControllerExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIAlertControllerExtensions.swift; sourceTree = "<group>"; };
 		9FB5158326152CA0004F91E2 /* ImportViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportViewController.swift; sourceTree = "<group>"; };
 		9FB5158526152DA7004F91E2 /* ImportTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportTableViewCell.swift; sourceTree = "<group>"; };
-		9FB5158726164CE6004F91E2 /* SearchNotesCard.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SearchNotesCard.xib; sourceTree = "<group>"; };
-		9FB5158926164E66004F91E2 /* SearchNotesCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchNotesCard.swift; sourceTree = "<group>"; };
+		9FB515AA26177FFF004F91E2 /* SearchNoteCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchNoteCell.swift; sourceTree = "<group>"; };
+		9FB515AC26178016004F91E2 /* SearchDocumentCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchDocumentCell.swift; sourceTree = "<group>"; };
+		9FB515AE26179C34004F91E2 /* SearchInformationCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchInformationCell.swift; sourceTree = "<group>"; };
 		9FB87CF524B0061200A262D8 /* ARDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARDocument.swift; sourceTree = "<group>"; };
 		9FB87CF824B006B900A262D8 /* ALMAARHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ALMAARHelper.swift; sourceTree = "<group>"; };
 		9FB9984624868561003773F2 /* MoveFileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoveFileViewController.swift; sourceTree = "<group>"; };
@@ -433,9 +431,9 @@
 		9F5E89EA2391AF1B002FA8B2 /* View Controllers */ = {
 			isa = PBXGroup;
 			children = (
-				9FB5158226152C94004F91E2 /* Import */,
 				9F7BAFF4239C1D110045CD12 /* Home */,
 				9F65984923F3174A00CDBE0C /* Search */,
+				9FB5158226152C94004F91E2 /* Import */,
 				9F7BAFF5239C1D230045CD12 /* Note Editing */,
 				9FB9984524868545003773F2 /* Move File */,
 				9F5E89F12391CE5A002FA8B2 /* Documents Bookshelf */,
@@ -474,6 +472,9 @@
 			children = (
 				9F65984A23F3175E00CDBE0C /* SearchViewController.swift */,
 				9F65984C23F3227300CDBE0C /* DrawingSearchViewController.swift */,
+				9FB515AA26177FFF004F91E2 /* SearchNoteCell.swift */,
+				9FB515AC26178016004F91E2 /* SearchDocumentCell.swift */,
+				9FB515AE26179C34004F91E2 /* SearchInformationCell.swift */,
 			);
 			path = Search;
 			sourceTree = "<group>";
@@ -568,10 +569,6 @@
 				9F92D11923217CFA00BC0E57 /* SearchFilterView.xib */,
 				9F92D11B23217D0500BC0E57 /* SearchFilterView.swift */,
 				9F65984723F315FE00CDBE0C /* SearchFilterCollectionViewCell.swift */,
-				9F8988D125E59D9B005CB90B /* SearchDocumentsCard.xib */,
-				9F8988D325E59DAD005CB90B /* SearchDocumentsCard.swift */,
-				9FB5158726164CE6004F91E2 /* SearchNotesCard.xib */,
-				9FB5158926164E66004F91E2 /* SearchNotesCard.swift */,
 			);
 			path = Search;
 			sourceTree = "<group>";
@@ -963,7 +960,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9F8988D225E59D9B005CB90B /* SearchDocumentsCard.xib in Resources */,
 				9FD29C442239525A00CC969A /* GoogleService-Info.plist in Resources */,
 				9FD29BB12220525000CC969A /* LaunchScreen.storyboard in Resources */,
 				9FD29BAE2220525000CC969A /* Assets.xcassets in Resources */,
@@ -972,7 +968,6 @@
 				9F92D11A23217CFA00BC0E57 /* SearchFilterView.xib in Resources */,
 				9FD29C6622431C0000CC969A /* labels.txt in Resources */,
 				9F75E44D230C583200488BBD /* NoteCollectionViewCell.xib in Resources */,
-				9FB5158826164CE6004F91E2 /* SearchNotesCard.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1054,6 +1049,7 @@
 				9F00428923E9FB2600961636 /* BadgeHub.swift in Sources */,
 				9FF4757B25FAA9DF003CA74A /* NoteSimilarity.swift in Sources */,
 				9F65983B23EDD29300CDBE0C /* NoteTextBlock.swift in Sources */,
+				9FB515AF26179C34004F91E2 /* SearchInformationCell.swift in Sources */,
 				9F8988E925E95935005CB90B /* TextRank.swift in Sources */,
 				9FB87CF624B0061200A262D8 /* ARDocument.swift in Sources */,
 				9F8988D925E95873005CB90B /* Array+Combinations.swift in Sources */,
@@ -1061,6 +1057,7 @@
 				9F65984B23F3175E00CDBE0C /* SearchViewController.swift in Sources */,
 				9F65983723EDD15C00CDBE0C /* NoteTextElement.swift in Sources */,
 				9FA6238822CEA7FE007ED794 /* MapHelper.swift in Sources */,
+				9FB515AB26177FFF004F91E2 /* SearchNoteCell.swift in Sources */,
 				9F4B38C123EA41C900F87B61 /* ReceivedNotesController.swift in Sources */,
 				9F05B5A3232BF0C800983AF2 /* NoteCollectionViewDetailCell.swift in Sources */,
 				9F5D8A322461157200934C0E /* WATDocument.swift in Sources */,
@@ -1086,6 +1083,7 @@
 				9F4D2338239C22FD0078B364 /* OtherExtensions.swift in Sources */,
 				9F0C8D98253DB000002E9811 /* SKRecognizedText.swift in Sources */,
 				9FD29BA72220524D00CC969A /* AppDelegate.swift in Sources */,
+				9FB515AD26178016004F91E2 /* SearchDocumentCell.swift in Sources */,
 				9FD29C6422431BFA00CC969A /* DrawnImageClassifier.mlmodel in Sources */,
 				9F0C8D9A253DB12B002E9811 /* SKRecognizedLine.swift in Sources */,
 				9FC114D9243919BD004F576A /* ImagePickerHelper.swift in Sources */,
@@ -1134,7 +1132,6 @@
 				9FBF6AB422E9F391001FD730 /* VisionTextWrapper.swift in Sources */,
 				9FAADE88255A1FE800A5E6A3 /* CGRectExtensions.swift in Sources */,
 				9FC02C1E23EDB6400051C576 /* Note.swift in Sources */,
-				9F8988D425E59DAD005CB90B /* SearchDocumentsCard.swift in Sources */,
 				9F318D39244A207300A1B4B5 /* UIFontExtensions.swift in Sources */,
 				9FF8CA4B2609135900A9171B /* SKTextRank.swift in Sources */,
 				9F2C0D75248F0E2600F58F5E /* ArrayExtensions.swift in Sources */,
@@ -1154,7 +1151,6 @@
 				9FA6239E22E66D73007ED794 /* HandwritingRecognizer.swift in Sources */,
 				9F2FF43A249B083D00597AD6 /* NoteDrawing.swift in Sources */,
 				9FF0AC9424412F4C00A82BE8 /* NoteImage.swift in Sources */,
-				9FB5158A26164E66004F91E2 /* SearchNotesCard.swift in Sources */,
 				9F65983523EDD09F00CDBE0C /* NoteText.swift in Sources */,
 				9FC5F90A24A8E20000CDF2DF /* NoteOptionsCollectionViewCell.swift in Sources */,
 				9FD5516E246A4364005D14D2 /* RelatedNotesViewController.swift in Sources */,
