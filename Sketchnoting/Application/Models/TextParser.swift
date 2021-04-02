@@ -41,7 +41,7 @@ class TextParser {
             // 2
             let partsOfSpeech = SemanticSearch.shared.tag(text: sentence.trimmingCharacters(in: .whitespaces), scheme: .lexicalClass)
             let phraseType = SemanticSearch.shared.checkPhraseType(queryPartsOfSpeech: partsOfSpeech)
-            if (phraseType == .Keyword && !partsOfSpeech.isEmpty && partsOfSpeech[0].1 != "Noun") {
+            if (phraseType == .Keyword && !partsOfSpeech.isEmpty && partsOfSpeech[0].1 != NLTag.noun.rawValue) {
                 validSentences.removeLast()
                 //logger.error("Invalid phrase type '\(phraseType.rawValue)' - \(sentence)")
                 continue
@@ -73,7 +73,8 @@ class TextParser {
             }
         }
         // Remove extra whitespaces
-        let finalText = validSentences.joined(separator: " ").replacingOccurrences(of: "[\\s\n]+", with: " ", options: .regularExpression, range: nil)
+        let finalText = validSentences.map{ !($0.hasSuffix(".") || $0.hasSuffix("?") || $0.hasSuffix("!")) ? $0 + "." : $0 }
+            .joined(separator: " ").replacingOccurrences(of: "[\\s\n]+", with: " ", options: .regularExpression, range: nil)
         //logger.info("Out of \(Int(sentences.count)) sentences, \(Int(validSentences.count)) are valid.")
         return finalText
     }

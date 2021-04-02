@@ -136,7 +136,7 @@ class SemanticSearch {
         for term in terms[1..<terms.count] {
             var otherTerms = terms
             otherTerms.remove(object: term)
-            var minimumDistance = 999.0
+            var minimumDistance = 2.0
             //var highestCommonNotes = 0
             //let containingNotes = TF_IDF.shared.documentsForTerm(term: term, positiveOnly: true).compactMap({$0.noteID})
             var closestTerm = ""
@@ -414,13 +414,13 @@ class SemanticSearch {
         let sentences = tokenize(text: target, unit: .sentence)
         let queryWords = tokenize(text: query, unit: .word)
         
-        var minimumSemanticDistance = 999.0 // Lower is better
+        var minimumSemanticDistance = 2.0 // Lower is better
         var highestLevenshteinRatio = 0.0 // Higher is better
         var closestTarget = ""
         for sentence in sentences {
             let sentence = sentence.trimmingCharacters(in: .whitespaces)
             let targetWords = tokenize(text: sentence, unit: .word)
-            var semanticDistance = 999.0
+            var semanticDistance = 2.0
             if queryWords.count > 1 {
                 semanticDistance = sentenceEmbedding.distance(between: query, and: sentence, distanceType: .cosine)
                 if semanticDistance < minimumSemanticDistance {
@@ -440,14 +440,14 @@ class SemanticSearch {
             }
             else {
                 for word in targetWords {
-                    let word = word.trimmingCharacters(in: .whitespaces)
-                    semanticDistance = wordEmbedding.distance(between: query.lowercased(), and: word.lowercased())
+                    let word = word.trimmingCharacters(in: .whitespaces).lowercased()
+                    semanticDistance = wordEmbedding.distance(between: query, and: word)
                     if semanticDistance < minimumSemanticDistance {
                         minimumSemanticDistance = semanticDistance
                         closestTarget = sentence
                     }
                     if semanticDistance >= 2.0 {
-                        let levenshteinDistance = query.lowercased().distance(between: word.lowercased(), metric: .DamerauLevenshtein)
+                        let levenshteinDistance = query.lowercased().distance(between: word, metric: .DamerauLevenshtein)
                         let lengthsSum = Double(query.count + word.count)
                         let temp: Double = (lengthsSum - Double(levenshteinDistance))/lengthsSum
                         if temp > highestLevenshteinRatio {
@@ -465,13 +465,6 @@ class SemanticSearch {
             return (SearchType.Semantic, closestTarget, minimumSemanticDistance)
         }
     }
-    
-    /*func synced(_ lock: Any, closure: () -> ()) {
-        objc_sync_enter(lock)
-        closure()
-        objc_sync_exit(lock)
-    }*/
-    
     //
     
     enum PhraseType: String {
