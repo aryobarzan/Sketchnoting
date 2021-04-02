@@ -242,6 +242,7 @@ class SemanticSearch {
             noteIterator.reset()
             var searchResult = SearchResult(query: query)
             while let note = noteIterator.next() {
+                var scores = [Double]()
                 // queue.addOperation
                 var noteResult: (URL, Note)?
                 // MARK: Note title
@@ -256,6 +257,7 @@ class SemanticSearch {
                 case .Semantic:
                     if score <= self.SEARCH_THRESHOLD { // Lower is better
                         noteResult = note
+                        scores.append(2.0 - score)
                         logger.info("[Semantic] Note title ('\(closestTarget)') = \(score)")
                         break
                     }
@@ -274,6 +276,7 @@ class SemanticSearch {
                     case .Semantic:
                         if score <= self.SEARCH_THRESHOLD { // Lower is better
                             noteResult = note
+                            scores.append(2.0 - score)
                             logger.info("[Semantic] Note body ('\(closestTarget)') = \(score)")
                             break
                         }
@@ -299,6 +302,7 @@ class SemanticSearch {
                     }
                 }
                 // MARK: Documents
+                var lowestDistance = 2.0
                 for document in note.1.getDocuments(includeHidden: false) {
                     var isDocumentMatching = false
                     // Document title
@@ -314,6 +318,9 @@ class SemanticSearch {
                     case .Semantic:
                         if score <= self.SEARCH_THRESHOLD { // Lower is better
                             noteResult = note
+                            if score < lowestDistance {
+                                lowestDistance = score
+                            }
                             isDocumentMatching = true
                             logger.info("[Semantic] Document ('\(document.title)') title ('\(closestTarget)') = \(score)")
                             break
@@ -337,6 +344,9 @@ class SemanticSearch {
                         case .Semantic:
                             if score <= self.SEARCH_THRESHOLD { // Lower is better
                                 noteResult = note
+                                if score < lowestDistance {
+                                    lowestDistance = score
+                                }
                                 isDocumentMatching = true
                                 logger.info("[Semantic] Document ('\(document.title)') description ('\(closestTarget)') = \(score)")
                                 break
@@ -348,11 +358,19 @@ class SemanticSearch {
                         continue
                     }
                     // Document types [TODO]
-                    
                 }
+                if lowestDistance != 2.0 {
+                    scores.append(2.0 - lowestDistance)
+                }
+                
                 if let noteResult = noteResult {
                     if searchResult.notes[noteResult.0] == nil {
-                        searchResult.notes[noteResult.0] = noteResult.1
+                        var finalScore = 0.0
+                        if !scores.isEmpty {
+                            finalScore = (Double(scores.reduce(0.0, +))/Double(scores.count)) / 2.0
+                            logger.info("\(finalScore)")
+                        }
+                        searchResult.notes[noteResult.0] = (noteResult.1, finalScore)
                     }
                 }
             }
@@ -506,7 +524,7 @@ class SemanticSearch {
 
 struct SearchResult {
     var query: String
-    var notes = [URL : Note]()
+    var notes = [URL : (Note, Double)]()
     var documents = [Document]()
     var locationDocuments = [Document]()
     var personDocuments = [Document]()

@@ -1541,6 +1541,15 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         self.startSaveTimer()
     }
     
+    func pdfScaleApplyAll() {
+        if !self.note.1.pages.isEmpty {
+            for (i, _) in self.note.1.pages.enumerated() {
+                self.note.1.pages[i].pdfScale = self.note.1.getCurrentPage().pdfScale
+            }
+        }
+        self.startSaveTimer()
+    }
+    
     func deleteLayer(layer: NoteLayer) {
         note.1.getCurrentPage().deleteLayer(layer: layer)
         self.removeDraggableView(layer: layer)

@@ -117,6 +117,12 @@ class NoteLayersViewController: UITableViewController, NoteLayersViewCellDelegat
             menuTitle = "PDF"
             break
         }
+        if item.type == .PDF {
+            let applyZoomToAllAction = UIAction(title: "Apply zoom to all pages", image: UIImage(systemName: "magnifyingglass.circle")) { action in
+                self.delegate?.pdfScaleApplyAll()
+            }
+            menuElements.append(applyZoomToAllAction)
+        }
         let deleteAction = UIAction(title: (item.type == .Canvas) ? "Clear" : "Delete", image: UIImage(systemName: "xmark.circle.fill"), attributes: .destructive) { action in
             switch item.type {
             case .Canvas:
@@ -140,6 +146,8 @@ class NoteLayersViewController: UITableViewController, NoteLayersViewCellDelegat
             }
         }
         menuElements.append(deleteAction)
+        
+        
         return UIContextMenuConfiguration(identifier: nil, previewProvider: nil, actionProvider: { suggestedActions in
             return UIMenu(title: menuTitle, children: menuElements)
         })
@@ -207,6 +215,7 @@ class NoteLayersViewController: UITableViewController, NoteLayersViewCellDelegat
 
 protocol NoteLayersDelegate {
     func pdfScaleChanged(value: Float)
+    func pdfScaleApplyAll()
     func deleteLayer(layer: NoteLayer)
     func deletePDF()
     func clearCanvas()

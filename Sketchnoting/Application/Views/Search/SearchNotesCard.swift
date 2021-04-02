@@ -20,7 +20,7 @@ class SearchNotesCard: UIView, UICollectionViewDelegate, UICollectionViewDataSou
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var closeButton: UIButton!
     
-    var notes = [(URL, Note)]()
+    var notes = [(URL, Note, Double)]()
     var delegate: SearchNotesCardDelegate?
     
     override init(frame: CGRect) {
@@ -33,7 +33,7 @@ class SearchNotesCard: UIView, UICollectionViewDelegate, UICollectionViewDataSou
         commonInit()
     }
     
-    public init(query: String, notes: [(URL, Note)], frame: CGRect) {
+    public init(query: String, notes: [(URL, Note, Double)], frame: CGRect) {
         super.init(frame: frame)
         Bundle.main.loadNibNamed(kCONTENT_XIB_NAME, owner: self, options: nil)
         contentView.fixInView(self)
@@ -54,9 +54,11 @@ class SearchNotesCard: UIView, UICollectionViewDelegate, UICollectionViewDataSou
         contentView.fixInView(self)
     }
     
-    func setContent(query: String, notes: [(URL, Note)]) {
+    func setContent(query: String, notes: [(URL, Note, Double)]) {
         titleLabel.text = "'\(query)'"
-        self.notes = notes
+        self.notes = notes.sorted { note1, note2 in
+            note1.2 > note2.2
+        }
         collectionView.reloadData()
     }
     
@@ -66,7 +68,8 @@ class SearchNotesCard: UIView, UICollectionViewDelegate, UICollectionViewDataSou
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "NoteCollectionViewCell", for: indexPath as IndexPath) as! NoteCollectionViewCell
-        cell.setFile(url: notes[indexPath.item].0 ,file: notes[indexPath.item].1)
+        let (url, note, score) = (notes[indexPath.item].0, notes[indexPath.item].1, notes[indexPath.item].2)
+        cell.setFile(url: url, file: note, progress: score)
         return cell
     }
     
@@ -78,7 +81,7 @@ class SearchNotesCard: UIView, UICollectionViewDelegate, UICollectionViewDataSou
     func collectionView(_ collectionView: UICollectionView,
                         layout collectionViewLayout: UICollectionViewLayout,
                         sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: CGFloat(160), height: CGFloat(240))
+        return CGSize(width: CGFloat(200), height: CGFloat(300))
     }
     
     @IBAction func closeTapped(_ sender: UIButton) {

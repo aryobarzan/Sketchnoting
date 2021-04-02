@@ -68,14 +68,14 @@ class NoteLayersViewCell: UITableViewCell {
             bottomControlImage.isHidden = false
             zoomLabel.isHidden = false
             zoomStepper.isHidden = false
-            zoomLabel.text = "\(floor(item.zoom! * 100))%"
+            zoomLabel.text = "\(Int(floor(item.zoom! * 100)))%"
             zoomStepper.value = Double((item.zoom! * 100))
         }
     }
 
     @IBAction func zoomStepperChanged(_ sender: UIStepper) {
         delegate?.zoomValueChanged(value: sender.value/100)
-        zoomLabel.text = "\(floor(sender.value))%"
+        zoomLabel.text = "\(Int(floor(sender.value)))%"
     }
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)

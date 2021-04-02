@@ -108,7 +108,7 @@ class SearchViewController: UIViewController, UITextFieldDelegate, DrawingSearch
         let searchResults = SemanticSearch.shared.search(query: query, expandedSearch: expandedSearchSwitch.isOn)
         for result in searchResults {
             if !result.notes.isEmpty {
-                createNotesCard(query: result.query, notes: result.notes.map{($0.key, $0.value)})
+                createNotesCard(query: result.query, notes: result.notes.map{($0.key, $0.value.0, $0.value.1)})
             }
             if !result.documents.isEmpty {
                 createDocumentsCard(documents: result.documents)
@@ -120,9 +120,9 @@ class SearchViewController: UIViewController, UITextFieldDelegate, DrawingSearch
         }
     }
     
-    private func createNotesCard(query: String, notes: [(URL, Note)]) {
+    private func createNotesCard(query: String, notes: [(URL, Note, Double)]) {
         DispatchQueue.main.async {
-            let searchNotesCard = SearchNotesCard(query: query, notes: notes, frame: CGRect(x: 0, y: 0, width: 100, height: 340))
+            let searchNotesCard = SearchNotesCard(query: query, notes: notes, frame: CGRect(x: 0, y: 0, width: 100, height: 400))
             searchNotesCard.delegate = self
             self.contentStackView.addArrangedSubview(searchNotesCard)
             self.searchNotesCards.append(searchNotesCard)
@@ -131,7 +131,7 @@ class SearchViewController: UIViewController, UITextFieldDelegate, DrawingSearch
     
     private func createDocumentsCard(documents: [Document]) {
         DispatchQueue.main.async {
-            let searchDocumentsCard = SearchDocumentsCard(documents: documents, frame: CGRect(x: 0, y: 0, width: 100, height: 340))
+            let searchDocumentsCard = SearchDocumentsCard(documents: documents, frame: CGRect(x: 0, y: 0, width: 100, height: 400))
             self.contentStackView.addArrangedSubview(searchDocumentsCard)
             self.searchDocumentsCards.append(searchDocumentsCard)
         }
