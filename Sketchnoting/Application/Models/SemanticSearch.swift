@@ -373,7 +373,7 @@ class SemanticSearch {
                         var finalScore = 0.0
                         if !scores.isEmpty {
                             finalScore = (Double(scores.reduce(0.0, +))/Double(scores.count)) / 2.0
-                            logger.info("\(finalScore)")
+                            logger.info("Search score for note '\(note.1.getName())' = \(finalScore)")
                         }
                         searchResult.notes[noteResult.0] = (noteResult.1, finalScore)
                     }
@@ -417,43 +417,75 @@ class SemanticSearch {
     private func getStringSimilarity(betweenQuery query: String, and target: String, wordEmbedding: NLEmbedding) -> (SearchType, String, Double) {
         let target = target.trimmingCharacters(in: .whitespaces)
         let sentences = tokenize(text: target, unit: .sentence)
+        let words = tokenize(text: target, unit: .word)
         let queryWords = tokenize(text: query, unit: .word)
         
-        var minimumSemanticDistance = 2.0 // Lower is better
-        var highestLevenshteinRatio = 0.0 // Higher is better
-        var closestTarget = ""
-        for sentence in sentences {
-            let sentence = sentence.trimmingCharacters(in: .whitespaces)
-            let targetWords = tokenize(text: sentence, unit: .word)
-            var semanticDistance = 2.0
-            if queryWords.count > 1 {
-                semanticDistance = sentenceEmbedding.distance(between: query, and: sentence, distanceType: .cosine)
-                if semanticDistance < minimumSemanticDistance {
-                    minimumSemanticDistance = semanticDistance
-                    closestTarget = sentence
-                }
-                if semanticDistance >= 2.0 { // Meaning: sentence is unknown to sentence embedder (has no vector representation)
-                    // Lexical
-                    let levenshteinDistance = query.lowercased().distance(between: sentence.lowercased(), metric: .DamerauLevenshtein)
-                    let lengthsSum = Double(query.count + sentence.count)
-                    let temp: Double = (lengthsSum - Double(levenshteinDistance))/lengthsSum
-                    if temp > highestLevenshteinRatio {
-                        highestLevenshteinRatio = temp
-                        closestTarget = sentence
+        var queryPhraseType: PhraseType = .Clause
+        let partsOfSpeech = tag(text: queryWords.joined(separator: " "), scheme: .lexicalClass)
+        queryPhraseType = checkPhraseType(queryPartsOfSpeech: partsOfSpeech)
+        
+        if queryPhraseType == .Clause || queryPhraseType == .ExtendedClause {
+            var semanticDistances = [Double]()
+            var levenshteinRatios = [Double]()
+            var closestTargets = [String]()
+            for queryWord in queryWords {
+                var minimumSemanticDistance = 2.0 // Lower is better
+                var highestLevenshteinRatio = 0.0 // Higher is better
+                var closestTarget = ""
+                for word in words {
+                    let word = word.trimmingCharacters(in: .whitespaces).lowercased()
+                    let semanticDistance = wordEmbedding.distance(between: queryWord, and: word)
+                    if semanticDistance < minimumSemanticDistance {
+                        minimumSemanticDistance = semanticDistance
+                        closestTarget = word
+                    }
+                    if semanticDistance >= 2.0 {
+                        let levenshteinDistance = queryWord.distance(between: word, metric: .DamerauLevenshtein)
+                        let lengthsSum = Double(query.count + word.count)
+                        let temp: Double = (lengthsSum - Double(levenshteinDistance))/lengthsSum
+                        if temp > highestLevenshteinRatio {
+                            highestLevenshteinRatio = temp
+                            closestTarget = word
+                        }
                     }
                 }
+                semanticDistances.append(minimumSemanticDistance)
+                levenshteinRatios.append(highestLevenshteinRatio)
+                closestTargets.append(closestTarget)
+            }
+            var semanticDistance = 0.0
+            if !semanticDistances.isEmpty {
+                semanticDistance = Double(semanticDistances.reduce(0.0, +)) / Double(semanticDistances.count)
+            }
+            var levenshteinRatio = 0.0
+            if !levenshteinRatios.isEmpty {
+                levenshteinRatio = Double(levenshteinRatios.reduce(0.0, +)) / Double(levenshteinRatios.count)
+            }
+            if semanticDistance >= 2.0 {
+                return (SearchType.Lexical, closestTargets.joined(separator: " "), levenshteinRatio)
             }
             else {
-                for word in targetWords {
-                    let word = word.trimmingCharacters(in: .whitespaces).lowercased()
-                    semanticDistance = wordEmbedding.distance(between: query, and: word)
+                return (SearchType.Semantic, closestTargets.joined(separator: " "), semanticDistance)
+            }
+        }
+        else {
+            var minimumSemanticDistance = 2.0 // Lower is better
+            var highestLevenshteinRatio = 0.0 // Higher is better
+            var closestTarget = ""
+            for sentence in sentences {
+                let sentence = sentence.trimmingCharacters(in: .whitespaces)
+                let targetWords = tokenize(text: sentence, unit: .word)
+                var semanticDistance = 2.0
+                if queryWords.count > 1 {
+                    semanticDistance = sentenceEmbedding.distance(between: query, and: sentence, distanceType: .cosine)
                     if semanticDistance < minimumSemanticDistance {
                         minimumSemanticDistance = semanticDistance
                         closestTarget = sentence
                     }
-                    if semanticDistance >= 2.0 {
-                        let levenshteinDistance = query.lowercased().distance(between: word, metric: .DamerauLevenshtein)
-                        let lengthsSum = Double(query.count + word.count)
+                    if semanticDistance >= 2.0 { // Meaning: sentence is unknown to sentence embedder (has no vector representation)
+                        // Lexical
+                        let levenshteinDistance = query.lowercased().distance(between: sentence.lowercased(), metric: .DamerauLevenshtein)
+                        let lengthsSum = Double(query.count + sentence.count)
                         let temp: Double = (lengthsSum - Double(levenshteinDistance))/lengthsSum
                         if temp > highestLevenshteinRatio {
                             highestLevenshteinRatio = temp
@@ -461,13 +493,32 @@ class SemanticSearch {
                         }
                     }
                 }
+                else {
+                    for word in targetWords {
+                        let word = word.trimmingCharacters(in: .whitespaces).lowercased()
+                        semanticDistance = wordEmbedding.distance(between: query, and: word)
+                        if semanticDistance < minimumSemanticDistance {
+                            minimumSemanticDistance = semanticDistance
+                            closestTarget = sentence
+                        }
+                        if semanticDistance >= 2.0 {
+                            let levenshteinDistance = query.lowercased().distance(between: word, metric: .DamerauLevenshtein)
+                            let lengthsSum = Double(query.count + word.count)
+                            let temp: Double = (lengthsSum - Double(levenshteinDistance))/lengthsSum
+                            if temp > highestLevenshteinRatio {
+                                highestLevenshteinRatio = temp
+                                closestTarget = sentence
+                            }
+                        }
+                    }
+                }
             }
-        }
-        if minimumSemanticDistance >= 2.0 {
-            return (SearchType.Lexical, closestTarget, highestLevenshteinRatio)
-        }
-        else {
-            return (SearchType.Semantic, closestTarget, minimumSemanticDistance)
+            if minimumSemanticDistance >= 2.0 {
+                return (SearchType.Lexical, closestTarget, highestLevenshteinRatio)
+            }
+            else {
+                return (SearchType.Semantic, closestTarget, minimumSemanticDistance)
+            }
         }
     }
     //

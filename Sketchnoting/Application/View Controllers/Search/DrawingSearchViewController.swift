@@ -22,6 +22,7 @@ class DrawingSearchViewController: UIViewController, PKCanvasViewDelegate {
         canvasView.tool = PKInkingTool(.pen, color: .black, width: 4)
         canvasView.drawing = PKDrawing()
         canvasView.delegate = self
+        canvasView.drawingPolicy = .anyInput
         canvasView.overrideUserInterfaceStyle = .dark
         canvasView.layer.masksToBounds = true
         canvasView.layer.cornerRadius = 5

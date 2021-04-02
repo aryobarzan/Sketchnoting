@@ -2361,7 +2361,7 @@
                                                     <rect key="frame" x="642" y="15" width="70" height="30"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="30" id="bm7-96-130"/>
-                                                        <constraint firstAttribute="width" constant="70" id="zho-C2-kCL"/>
+                                                        <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="44" id="zho-C2-kCL"/>
                                                     </constraints>
                                                     <state key="normal" title="Okay"/>
                                                     <connections>

@@ -57,7 +57,8 @@ class SearchViewController: UIViewController, UITextFieldDelegate, DrawingSearch
         }
     }
     func drawingSearchRecognized(label: String) {
-        // TODO
+        self.searchTextField.text = label
+        performSearch()
     }
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         // Hide the keyboard.
