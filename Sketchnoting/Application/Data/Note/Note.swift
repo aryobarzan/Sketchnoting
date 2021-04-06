@@ -245,7 +245,7 @@ class Note: File, DocumentDelegate {
             text = text + page.getText(option: option, parse: parse)
             text += "\n"
         }
-        return text
+        return text.trimmingCharacters(in: .whitespacesAndNewlines)
     }
     
     // MARK: PDF Generation

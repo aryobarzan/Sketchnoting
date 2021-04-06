@@ -226,7 +226,7 @@ class NotePage: Codable {
                 text += getPDFText()
             }
         }
-        return text
+        return text.trimmingCharacters(in: .whitespacesAndNewlines)
     }
     
     private func updateParsedPDFText() {

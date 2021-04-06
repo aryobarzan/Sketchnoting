@@ -52,7 +52,7 @@ class SearchViewController: UIViewController, UITextFieldDelegate, DrawingSearch
         if let drawingSearchVC = drawingSearchVC {
             drawingSearchVC.modalPresentationStyle = .popover
             drawingSearchVC.popoverPresentationController?.sourceView = sender
-            present(drawingSearchVC, animated: true, completion:nil)
+            present(drawingSearchVC, animated: true, completion: nil)
             drawingSearchVC.delegate = self
         }
     }

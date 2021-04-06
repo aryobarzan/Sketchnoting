@@ -29,9 +29,9 @@ class SemanticSearch {
         personSynonyms = ["person"]
     }
     
-    private let SEARCH_THRESHOLD = 0.8
-    private let DRAWING_THRESHOLD = 0.7
-    private let KEYWORD_THRESHOLD = 0.6
+    private let SEARCH_THRESHOLD = 0.5
+    private let DRAWING_THRESHOLD = 0.5
+    private let KEYWORD_THRESHOLD = 0.5
     private var locationSynonyms: [String]
     private var personSynonyms: [String]
     
@@ -178,7 +178,7 @@ class SemanticSearch {
         return clusters
     }
     
-    private func process(query: String, useFullQuery: Bool) -> [String] {
+    private func preprocess(query: String, useFullQuery: Bool) -> [String] {
         let queryWords = tokenize(text: query, unit: .word)
         if queryWords.count > 1 { // Longer query
             var processedQuery = ""
@@ -231,151 +231,105 @@ class SemanticSearch {
     
     public func search(query originalQuery: String, expandedSearch: Bool = true, useFullQuery: Bool = false) -> [SearchResult] {
         // Keyword, Clause, Extended Clause or Sentence
-        //let queryType = checkPhraseType(queryPartsOfSpeech: queryPartsOfSpeech)
-        let queries = process(query: originalQuery, useFullQuery: useFullQuery)
+        let queries = preprocess(query: originalQuery, useFullQuery: useFullQuery)
         logger.info("----")
         logger.info("Original query: \(originalQuery)")
-        logger.info("Query has been divided into \(Int(queries.count)) semantically different queries.")
+        if queries.count > 1 {
+            logger.info("Query has been divided into \(Int(queries.count)) semantically different queries.")
+        }
         // Expanded Search means a lower threshold for the lexical search, i.e. more tolerant to minor typos
         let lexicalThreshold = expandedSearch ? 0.9 : 1.0
         
-        // Start search process, going through each note
+        let wordEmbedding = createFastTextWordEmbedding()
         var noteIterator = NeoLibrary.getNoteIterator()
         var searchResults = [SearchResult]()
-        let wordEmbedding = createFastTextWordEmbedding()
         for query in queries {
             noteIterator.reset()
             var searchResult = SearchResult(query: query)
             while let note = noteIterator.next() {
                 var scores = [Double]()
+                var score_noteTitle = 0.0
+                var score_noteText = 0.0
+                var score_noteDrawings = 0.0
+                var score_noteDocuments = 0.0
                 // queue.addOperation
                 var noteResult: (URL, Note)?
                 // MARK: Note title
-                var (searchType, closestTarget, score) = self.getStringSimilarity(betweenQuery: query, and: note.1.getName(), wordEmbedding: wordEmbedding)
-                switch searchType {
-                case .Lexical:
-                    if score >= lexicalThreshold { // Higher is better
-                        noteResult = note
-                        logger.info("[Lexical] Note title ('\(closestTarget)') = \(score)")
-                        break
-                    }
-                case .Semantic:
-                    if score <= self.SEARCH_THRESHOLD { // Lower is better
-                        noteResult = note
-                        scores.append(2.0 - score)
-                        logger.info("[Semantic] Note title ('\(closestTarget)') = \(score)")
-                        break
-                    }
+                let similarityResult = self.getStringSimilarity(betweenQuery: query, and: note.1.getName(), wordEmbedding: wordEmbedding)
+                if similarityResult.lexicalSimilarity >= lexicalThreshold || similarityResult.semanticSimilarity >= self.SEARCH_THRESHOLD {
+                    noteResult = note
+                    scores.append(similarityResult.getHighestSimilarity())
+                    score_noteTitle = similarityResult.getHighestSimilarity()
+                    //logger.info("[Lexical] Note title ('\(closestTarget)') = \(score)")
                 }
                 // MARK: Note body (handwritten + PDF text)
-                let noteText = note.1.getText(option: .FullText, parse: false).trimmingCharacters(in: .whitespacesAndNewlines)
+                let noteText = note.1.getText(option: .FullText, parse: false)
                 if !noteText.isEmpty {
-                    (searchType, closestTarget, score) = self.getStringSimilarity(betweenQuery: query, and: noteText, wordEmbedding: wordEmbedding)
-                    switch searchType {
-                    case .Lexical:
-                        if score >= lexicalThreshold { // Higher is better
-                            noteResult = note
-                            logger.info("[Lexical] Note body ('\(closestTarget)') = \(score)")
-                            break
-                        }
-                    case .Semantic:
-                        if score <= self.SEARCH_THRESHOLD { // Lower is better
-                            noteResult = note
-                            scores.append(2.0 - score)
-                            logger.info("[Semantic] Note body ('\(closestTarget)') = \(score)")
-                            break
-                        }
+                    let similarityResult = self.getStringSimilarity(betweenQuery: query, and: noteText, wordEmbedding: wordEmbedding)
+                    if similarityResult.lexicalSimilarity >= lexicalThreshold || similarityResult.semanticSimilarity >= self.SEARCH_THRESHOLD {
+                        noteResult = note
+                        scores.append(similarityResult.getHighestSimilarity())
+                        score_noteText = similarityResult.getHighestSimilarity()
+                        //logger.info("[Semantic] Note body ('\(closestTarget)') = \(score)")
                     }
                 }
                 // MARK: Note recognized drawings
                 let noteDrawingLabels = note.1.getDrawingLabels()
                 if !noteDrawingLabels.isEmpty {
-                    (searchType, closestTarget, score) = self.getStringSimilarity(betweenQuery: query, and: note.1.getDrawingLabels(), wordEmbedding: wordEmbedding)
-                    switch searchType {
-                    case .Lexical:
-                        if score >= lexicalThreshold { // Higher is better
-                            noteResult = note
-                            logger.info("[Lexical] Note drawing ('\(closestTarget)') = \(score)")
-                            break
-                        }
-                    case .Semantic:
-                        if score <= self.DRAWING_THRESHOLD { // Lower is better
-                            noteResult = note
-                            logger.info("[Semantic] Note drawing ('\(closestTarget)') = \(score)")
-                            break
-                        }
+                    let similarityResult = self.getStringSimilarity(betweenQuery: query, and: note.1.getDrawingLabels().joined(separator: " "), wordEmbedding: wordEmbedding)
+                    if similarityResult.lexicalSimilarity >= lexicalThreshold || similarityResult.semanticSimilarity >= self.DRAWING_THRESHOLD {
+                        noteResult = note
+                        scores.append(similarityResult.getHighestSimilarity())
+                        score_noteDrawings = similarityResult.getHighestSimilarity()
+                        //logger.info("[Semantic] Note drawing ('\(closestTarget)') = \(score)")
                     }
                 }
                 // MARK: Documents
-                var lowestDistance = 2.0
+                var highestSemanticSimilarity = 0.0
+                var highestLexicalSimilarity = 0.0
                 for document in note.1.getDocuments(includeHidden: false) {
                     var isDocumentMatching = false
                     // Document title
-                    (searchType, closestTarget, score) = self.getStringSimilarity(betweenQuery: query, and: document.title, wordEmbedding: wordEmbedding)
-                    switch searchType {
-                    case .Lexical:
-                        if score >= lexicalThreshold { // Higher is better
-                            noteResult = note
-                            isDocumentMatching = true
-                            logger.info("[Lexical] Document ('\(document.title)') title ('\(closestTarget)') = \(score)")
-                            break
-                        }
-                    case .Semantic:
-                        if score <= self.SEARCH_THRESHOLD { // Lower is better
-                            noteResult = note
-                            if score < lowestDistance {
-                                lowestDistance = score
-                            }
-                            isDocumentMatching = true
-                            logger.info("[Semantic] Document ('\(document.title)') title ('\(closestTarget)') = \(score)")
-                            break
-                        }
+                    let similarityResult = self.getStringSimilarity(betweenQuery: query, and: document.title, wordEmbedding: wordEmbedding)
+                    if similarityResult.lexicalSimilarity >= lexicalThreshold || similarityResult.semanticSimilarity >= self.SEARCH_THRESHOLD {
+                        noteResult = note
+                        isDocumentMatching = true
+                        //logger.info("[Semantic] Document ('\(document.title)') title ('\(closestTarget)') = \(score)")
                     }
-                    if isDocumentMatching {
-                        searchResult.documents.append(document)
-                        continue
-                    }
+                    highestSemanticSimilarity = max(highestSemanticSimilarity, similarityResult.semanticSimilarity)
+                    highestLexicalSimilarity = max(highestLexicalSimilarity, similarityResult.lexicalSimilarity)
                     // Document description (abstract)
                     if let description = document.getDescription() {
-                        (searchType, closestTarget, score) = self.getStringSimilarity(betweenQuery: query, and: description, wordEmbedding: wordEmbedding)
-                        switch searchType {
-                        case .Lexical:
-                            if score >= lexicalThreshold { // Higher is better
-                                noteResult = note
-                                isDocumentMatching = true
-                                logger.info("[Lexical] Document ('\(document.title)') description ('\(closestTarget)') = \(score)")
-                                break
-                            }
-                        case .Semantic:
-                            if score <= self.SEARCH_THRESHOLD { // Lower is better
-                                noteResult = note
-                                if score < lowestDistance {
-                                    lowestDistance = score
-                                }
-                                isDocumentMatching = true
-                                logger.info("[Semantic] Document ('\(document.title)') description ('\(closestTarget)') = \(score)")
-                                break
-                            }
+                        let similarityResult = self.getStringSimilarity(betweenQuery: query, and: description, wordEmbedding: wordEmbedding)
+                        if similarityResult.lexicalSimilarity >= lexicalThreshold || similarityResult.semanticSimilarity >= self.SEARCH_THRESHOLD {
+                            noteResult = note
+                            isDocumentMatching = true
+                            //logger.info("[Semantic] Document ('\(document.title)') description ('\(closestTarget)') = \(score)")
                         }
+                        highestSemanticSimilarity = max(highestSemanticSimilarity, similarityResult.semanticSimilarity)
+                        highestLexicalSimilarity = max(highestLexicalSimilarity, similarityResult.lexicalSimilarity)
                     }
                     if isDocumentMatching {
                         searchResult.documents.append(document)
-                        continue
                     }
                     // Document types [TODO]
                 }
-                if lowestDistance != 2.0 {
-                    scores.append(2.0 - lowestDistance)
+                let highestDocumentSimilarity = max(highestSemanticSimilarity, highestLexicalSimilarity)
+                if highestDocumentSimilarity > self.SEARCH_THRESHOLD {
+                    scores.append(highestDocumentSimilarity)
+                    score_noteDocuments = highestDocumentSimilarity
+                    
                 }
-                
                 if let noteResult = noteResult {
                     if searchResult.notes[noteResult.0] == nil {
                         var finalScore = 0.0
                         if !scores.isEmpty {
-                            finalScore = (Double(scores.reduce(0.0, +))/Double(scores.count)) / 2.0
+                            finalScore = (Double(scores.reduce(0.0, +))/Double(scores.count))
                             logger.info("Search score for note '\(note.1.getName())' = \(finalScore)")
+                            logger.info("Score (new) = \(score_noteTitle + score_noteText + score_noteDrawings + score_noteDocuments)")
                         }
-                        searchResult.notes[noteResult.0] = (noteResult.1, finalScore)
+                        var newScore = score_noteTitle + score_noteText + score_noteDrawings + score_noteDocuments
+                        searchResult.notes[noteResult.0] = (noteResult.1, newScore)
                     }
                 }
             }
@@ -389,139 +343,103 @@ class SemanticSearch {
         case Lexical
         case Semantic
     }
-    
-    // Helper function for list of words
-    private func getStringSimilarity(betweenQuery query: String, and target: [String], wordEmbedding: NLEmbedding) -> (SearchType, String, Double) {
-        var (searchType, closestTarget, score) = (SearchType.Lexical, "", -1.0)
-        for word in target {
-            if score == -1.0 {
-                (searchType, closestTarget, score) = getStringSimilarity(betweenQuery: query, and: word, wordEmbedding: wordEmbedding)
-            }
-            else {
-                let temp = getStringSimilarity(betweenQuery: query, and: word, wordEmbedding: wordEmbedding)
-                if temp.0 == .Lexical {
-                    if temp.2 > score { // Higher is better
-                        (searchType, closestTarget, score) = temp
-                    }
-                }
-                else if temp.0 == .Semantic {
-                    if temp.2 < score { // Lower is better
-                        (searchType, closestTarget, score) = temp
-                    }
-                }
-            }
-        }
-        return (searchType, closestTarget, score)
-    }
-    
-    private func getStringSimilarity(betweenQuery query: String, and target: String, wordEmbedding: NLEmbedding) -> (SearchType, String, Double) {
-        let target = target.trimmingCharacters(in: .whitespaces)
-        let sentences = tokenize(text: target, unit: .sentence)
-        let words = tokenize(text: target, unit: .word)
+
+    private func getStringSimilarity(betweenQuery query: String, and target: String, wordEmbedding: NLEmbedding) -> StringSimilarityResult {
+        let target = target.trimmingCharacters(in: .whitespacesAndNewlines)
+        let targetSentences = tokenize(text: target, unit: .sentence)
+        let targetWords = tokenize(text: target, unit: .word)
         let queryWords = tokenize(text: query, unit: .word)
         
-        var queryPhraseType: PhraseType = .Clause
-        let partsOfSpeech = tag(text: queryWords.joined(separator: " "), scheme: .lexicalClass)
-        queryPhraseType = checkPhraseType(queryPartsOfSpeech: partsOfSpeech)
+        let partsOfSpeech = tag(text: query, scheme: .lexicalClass)
+        let queryPhraseType = checkPhraseType(queryPartsOfSpeech: partsOfSpeech)
         
         if queryPhraseType == .Clause || queryPhraseType == .ExtendedClause {
-            var semanticDistances = [Double]()
-            var levenshteinRatios = [Double]()
-            var closestTargets = [String]()
+            var semanticSimilarities = [Double]()
+            var lexicalSimilarities = [Double]()
+            var closestSemanticTarget: String = ""
+            var closestLexicalTarget: String = ""
             for queryWord in queryWords {
-                var minimumSemanticDistance = 2.0 // Lower is better
-                var highestLevenshteinRatio = 0.0 // Higher is better
-                var closestTarget = ""
-                for word in words {
-                    let word = word.trimmingCharacters(in: .whitespaces).lowercased()
-                    let semanticDistance = wordEmbedding.distance(between: queryWord, and: word)
-                    if semanticDistance < minimumSemanticDistance {
-                        minimumSemanticDistance = semanticDistance
-                        closestTarget = word
+                var highestSemanticSimilarity = 0.0 // Higher is better - Semantic distance
+                var highestLexicalSimilarity = 0.0 // Higher is better - Damerau-Levenshtein ratio
+                var temp_closestSemanticTarget = ""
+                var temp_closestLexicalTarget = ""
+                for word in targetWords {
+                    let word = word.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+                    let semanticSimilarity = (2.0 - wordEmbedding.distance(between: queryWord, and: word)) / 2.0
+                    if semanticSimilarity > highestSemanticSimilarity {
+                        highestSemanticSimilarity = semanticSimilarity
+                        temp_closestSemanticTarget = word
                     }
-                    if semanticDistance >= 2.0 {
-                        let levenshteinDistance = queryWord.distance(between: word, metric: .DamerauLevenshtein)
-                        let lengthsSum = Double(query.count + word.count)
-                        let temp: Double = (lengthsSum - Double(levenshteinDistance))/lengthsSum
-                        if temp > highestLevenshteinRatio {
-                            highestLevenshteinRatio = temp
-                            closestTarget = word
-                        }
+                    let levenshteinDistance = queryWord.distance(between: word, metric: .DamerauLevenshtein)
+                    let lengthsSum = Double(query.count + word.count)
+                    let levenshteinRatio: Double = (lengthsSum - Double(levenshteinDistance))/lengthsSum
+                    if levenshteinRatio > highestLexicalSimilarity {
+                        highestLexicalSimilarity = levenshteinRatio
+                        temp_closestLexicalTarget = word
                     }
                 }
-                semanticDistances.append(minimumSemanticDistance)
-                levenshteinRatios.append(highestLevenshteinRatio)
-                closestTargets.append(closestTarget)
+                semanticSimilarities.append(highestSemanticSimilarity)
+                lexicalSimilarities.append(highestLexicalSimilarity)
+                closestSemanticTarget += temp_closestSemanticTarget
+                closestLexicalTarget += temp_closestLexicalTarget
             }
-            var semanticDistance = 0.0
-            if !semanticDistances.isEmpty {
-                semanticDistance = Double(semanticDistances.reduce(0.0, +)) / Double(semanticDistances.count)
+            var semanticSimilarity = 0.0
+            if !semanticSimilarities.isEmpty {
+                semanticSimilarity = Double(semanticSimilarities.reduce(0.0, +)) / Double(semanticSimilarities.count)
             }
-            var levenshteinRatio = 0.0
-            if !levenshteinRatios.isEmpty {
-                levenshteinRatio = Double(levenshteinRatios.reduce(0.0, +)) / Double(levenshteinRatios.count)
+            var lexicalSimilarity = 0.0
+            if !lexicalSimilarities.isEmpty {
+                lexicalSimilarity = Double(lexicalSimilarities.reduce(0.0, +)) / Double(lexicalSimilarities.count)
             }
-            if semanticDistance >= 2.0 {
-                return (SearchType.Lexical, closestTargets.joined(separator: " "), levenshteinRatio)
-            }
-            else {
-                return (SearchType.Semantic, closestTargets.joined(separator: " "), semanticDistance)
-            }
+            let result = StringSimilarityResult(closestSemanticTarget, closestLexicalTarget, semanticSimilarity, lexicalSimilarity)
+            return result
         }
         else {
-            var minimumSemanticDistance = 2.0 // Lower is better
-            var highestLevenshteinRatio = 0.0 // Higher is better
-            var closestTarget = ""
-            for sentence in sentences {
+            var highestSemanticSimilarity = 0.0 // Higher is better - Semantic distance
+            var highestLexicalSimilarity = 0.0 // Higher is better - Damerau-Levenshtein ratio
+            var closestSemanticTarget = ""
+            var closestLexicalTarget = ""
+            for sentence in targetSentences {
                 let sentence = sentence.trimmingCharacters(in: .whitespaces)
                 let targetWords = tokenize(text: sentence, unit: .word)
-                var semanticDistance = 2.0
+                var semanticSimilarity = 0.0
                 if queryWords.count > 1 {
-                    semanticDistance = sentenceEmbedding.distance(between: query, and: sentence, distanceType: .cosine)
-                    if semanticDistance < minimumSemanticDistance {
-                        minimumSemanticDistance = semanticDistance
-                        closestTarget = sentence
+                    semanticSimilarity = (2.0 - sentenceEmbedding.distance(between: query, and: sentence)) / 2.0
+                    if semanticSimilarity > highestSemanticSimilarity {
+                        highestSemanticSimilarity = semanticSimilarity
+                        closestSemanticTarget = sentence
                     }
-                    if semanticDistance >= 2.0 { // Meaning: sentence is unknown to sentence embedder (has no vector representation)
-                        // Lexical
-                        let levenshteinDistance = query.lowercased().distance(between: sentence.lowercased(), metric: .DamerauLevenshtein)
-                        let lengthsSum = Double(query.count + sentence.count)
-                        let temp: Double = (lengthsSum - Double(levenshteinDistance))/lengthsSum
-                        if temp > highestLevenshteinRatio {
-                            highestLevenshteinRatio = temp
-                            closestTarget = sentence
-                        }
+                    // Lexical
+                    let levenshteinDistance = query.lowercased().distance(between: sentence.lowercased(), metric: .DamerauLevenshtein)
+                    let lengthsSum = Double(query.count + sentence.count)
+                    let lexicalSimilarity: Double = (lengthsSum - Double(levenshteinDistance))/lengthsSum
+                    if lexicalSimilarity > highestLexicalSimilarity {
+                        highestLexicalSimilarity = lexicalSimilarity
+                        closestLexicalTarget = sentence
                     }
                 }
                 else {
                     for word in targetWords {
-                        let word = word.trimmingCharacters(in: .whitespaces).lowercased()
-                        semanticDistance = wordEmbedding.distance(between: query, and: word)
-                        if semanticDistance < minimumSemanticDistance {
-                            minimumSemanticDistance = semanticDistance
-                            closestTarget = sentence
+                        let word = word.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+                        semanticSimilarity = (2.0 - wordEmbedding.distance(between: query, and: word)) / 2.0
+                        if semanticSimilarity > highestSemanticSimilarity {
+                            highestSemanticSimilarity = semanticSimilarity
+                            closestSemanticTarget = sentence
                         }
-                        if semanticDistance >= 2.0 {
-                            let levenshteinDistance = query.lowercased().distance(between: word, metric: .DamerauLevenshtein)
-                            let lengthsSum = Double(query.count + word.count)
-                            let temp: Double = (lengthsSum - Double(levenshteinDistance))/lengthsSum
-                            if temp > highestLevenshteinRatio {
-                                highestLevenshteinRatio = temp
-                                closestTarget = sentence
-                            }
+                        let levenshteinDistance = query.lowercased().distance(between: word, metric: .DamerauLevenshtein)
+                        let lengthsSum = Double(query.count + word.count)
+                        let lexicalSimilarity: Double = (lengthsSum - Double(levenshteinDistance))/lengthsSum
+                        if lexicalSimilarity > highestLexicalSimilarity {
+                            highestLexicalSimilarity = lexicalSimilarity
+                            closestLexicalTarget = sentence
                         }
                     }
                 }
             }
-            if minimumSemanticDistance >= 2.0 {
-                return (SearchType.Lexical, closestTarget, highestLevenshteinRatio)
-            }
-            else {
-                return (SearchType.Semantic, closestTarget, minimumSemanticDistance)
-            }
+            let result = StringSimilarityResult(closestSemanticTarget, closestLexicalTarget, highestSemanticSimilarity, highestLexicalSimilarity)
+            return result
         }
     }
-    //
     
     enum PhraseType: String {
         case Keyword = "Keyword"
@@ -581,4 +499,22 @@ struct SearchResult {
     var bodyScore: Double = 0.0
     var drawingScore: Double = 0.0
     var documentScore: Double = 0.0
+}
+
+struct StringSimilarityResult {
+    var closestSemanticTarget: String
+    var closestLexicalTarget: String
+    var semanticSimilarity: Double
+    var lexicalSimilarity: Double
+    
+    init(_ closestSemanticTarget: String, _ closestLexicalTarget: String, _ semanticSimilarity: Double, _ lexicalSimilarity: Double) {
+        self.closestSemanticTarget = closestSemanticTarget
+        self.closestLexicalTarget = closestLexicalTarget
+        self.semanticSimilarity = semanticSimilarity
+        self.lexicalSimilarity = lexicalSimilarity
+    }
+    
+    func getHighestSimilarity() -> Double {
+        return max(semanticSimilarity, lexicalSimilarity)
+    }
 }
