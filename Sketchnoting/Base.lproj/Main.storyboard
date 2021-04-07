@@ -580,7 +580,7 @@
                                             <constraint firstAttribute="width" constant="28" id="cYP-Jc-yGB"/>
                                             <constraint firstAttribute="height" constant="30" id="np6-ZL-bts"/>
                                         </constraints>
-                                        <state key="normal" image="square.and.arrow.down" catalog="system">
+                                        <state key="normal" image="square.and.arrow.down.fill" catalog="system">
                                             <preferredSymbolConfiguration key="preferredSymbolConfiguration" configurationType="pointSize" pointSize="20"/>
                                         </state>
                                         <connections>
@@ -593,7 +593,7 @@
                                             <constraint firstAttribute="height" constant="30" id="MvT-1R-W6y"/>
                                             <constraint firstAttribute="width" constant="28" id="Q59-QE-aKw"/>
                                         </constraints>
-                                        <state key="normal" image="folder.badge.plus" catalog="system">
+                                        <state key="normal" image="folder.badge.plus.fill" catalog="system">
                                             <preferredSymbolConfiguration key="preferredSymbolConfiguration" configurationType="pointSize" pointSize="20"/>
                                         </state>
                                         <connections>
@@ -606,7 +606,7 @@
                                             <constraint firstAttribute="width" constant="28" id="YtX-06-tI0"/>
                                             <constraint firstAttribute="height" constant="30" id="oH0-e8-gxJ"/>
                                         </constraints>
-                                        <state key="normal" image="doc.on.clipboard" catalog="system">
+                                        <state key="normal" image="doc.on.clipboard.fill" catalog="system">
                                             <preferredSymbolConfiguration key="preferredSymbolConfiguration" configurationType="pointSize" pointSize="20"/>
                                         </state>
                                         <connections>
@@ -637,11 +637,11 @@
                                     <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="khA-pa-wBN">
                                         <rect key="frame" x="0.0" y="89" width="768" height="829"/>
                                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                                        <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="5" minimumInteritemSpacing="20" id="TAb-Qi-OQa">
+                                        <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="5" minimumInteritemSpacing="5" id="TAb-Qi-OQa">
                                             <size key="itemSize" width="220" height="320"/>
                                             <size key="headerReferenceSize" width="0.0" height="0.0"/>
                                             <size key="footerReferenceSize" width="0.0" height="0.0"/>
-                                            <inset key="sectionInset" minX="5" minY="0.0" maxX="5" maxY="5"/>
+                                            <inset key="sectionInset" minX="5" minY="0.0" maxX="5" maxY="15"/>
                                         </collectionViewFlowLayout>
                                         <cells/>
                                         <connections>
@@ -685,7 +685,7 @@
                                         </constraints>
                                         <fontDescription key="fontDescription" type="system" pointSize="15"/>
                                         <state key="normal" image="square.fill.text.grid.1x2" catalog="system">
-                                            <color key="titleColor" red="0.26875244110000002" green="0.49985405119999998" blue="0.82210710099999995" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                            <color key="titleColor" systemColor="systemBlueColor"/>
                                             <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="large"/>
                                         </state>
                                         <connections>
@@ -733,13 +733,13 @@
                                         <rect key="frame" x="8" y="42" width="752" height="42"/>
                                         <subviews>
                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="leading" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Hdy-fw-B6W">
-                                                <rect key="frame" x="8" y="8.5" width="89" height="25"/>
+                                                <rect key="frame" x="8" y="8.5" width="69" height="25"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="25" id="N8p-c3-SiW"/>
                                                 </constraints>
                                                 <fontDescription key="fontDescription" type="system" pointSize="15"/>
-                                                <state key="normal" title=" Select All" image="checkmark.circle.fill" catalog="system">
-                                                    <color key="titleColor" red="0.26875244110000002" green="0.49985405119999998" blue="0.82210710099999995" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                <state key="normal" title=" Select All">
+                                                    <color key="titleColor" systemColor="systemBlueColor"/>
                                                     <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="medium"/>
                                                 </state>
                                                 <connections>
@@ -768,25 +768,11 @@
                                                 </constraints>
                                                 <fontDescription key="fontDescription" type="system" pointSize="15"/>
                                                 <state key="normal" title=" Move" image="folder" catalog="system">
-                                                    <color key="titleColor" red="0.26875244110000002" green="0.49985405119999998" blue="0.82210710099999995" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    <color key="titleColor" systemColor="systemBlueColor"/>
                                                     <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="small"/>
                                                 </state>
                                                 <connections>
                                                     <action selector="moveSelectedButtonTapped:" destination="BYZ-38-t0r" eventType="touchUpInside" id="Z39-BT-QEP"/>
-                                                </connections>
-                                            </button>
-                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="leading" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Ysg-uh-uEX">
-                                                <rect key="frame" x="105" y="8.5" width="106" height="25"/>
-                                                <constraints>
-                                                    <constraint firstAttribute="height" constant="25" id="Ud5-by-dq9"/>
-                                                </constraints>
-                                                <fontDescription key="fontDescription" type="system" pointSize="15"/>
-                                                <state key="normal" title=" Deselect All" image="checkmark.circle" catalog="system">
-                                                    <color key="titleColor" red="0.26875244110000002" green="0.49985405119999998" blue="0.82210710099999995" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                                    <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="medium"/>
-                                                </state>
-                                                <connections>
-                                                    <action selector="deselectAllButtonTapped:" destination="BYZ-38-t0r" eventType="touchUpInside" id="pun-18-cfA"/>
                                                 </connections>
                                             </button>
                                             <button opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="249" contentHorizontalAlignment="leading" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Hwh-HZ-MqI">
@@ -796,7 +782,7 @@
                                                 </constraints>
                                                 <fontDescription key="fontDescription" type="system" pointSize="15"/>
                                                 <state key="normal" title=" Export" image="square.and.arrow.up" catalog="system">
-                                                    <color key="titleColor" red="0.26875244110000002" green="0.49985405119999998" blue="0.82210710099999995" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    <color key="titleColor" systemColor="systemBlueColor"/>
                                                     <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="small"/>
                                                 </state>
                                                 <connections>
@@ -807,28 +793,25 @@
                                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                         <constraints>
                                             <constraint firstItem="wHb-fC-SNw" firstAttribute="centerY" secondItem="OkZ-qt-G8e" secondAttribute="centerY" id="3P2-LD-QoP"/>
-                                            <constraint firstItem="Ysg-uh-uEX" firstAttribute="centerY" secondItem="OkZ-qt-G8e" secondAttribute="centerY" id="6PP-x6-Wiq"/>
                                             <constraint firstItem="Is9-l7-CB7" firstAttribute="centerY" secondItem="OkZ-qt-G8e" secondAttribute="centerY" id="AOG-HU-N5l"/>
-                                            <constraint firstItem="Hwh-HZ-MqI" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="Ysg-uh-uEX" secondAttribute="trailing" constant="8" symbolic="YES" id="CK4-w4-xlx"/>
                                             <constraint firstItem="Hdy-fw-B6W" firstAttribute="leading" secondItem="OkZ-qt-G8e" secondAttribute="leading" constant="8" id="ISC-mH-E8Q"/>
                                             <constraint firstItem="Hwh-HZ-MqI" firstAttribute="centerY" secondItem="OkZ-qt-G8e" secondAttribute="centerY" id="OSk-ji-C7v"/>
                                             <constraint firstItem="wHb-fC-SNw" firstAttribute="leading" secondItem="Hwh-HZ-MqI" secondAttribute="trailing" constant="8" id="ZZt-dZ-4s1"/>
                                             <constraint firstItem="Hdy-fw-B6W" firstAttribute="centerY" secondItem="OkZ-qt-G8e" secondAttribute="centerY" id="a3K-IL-saR"/>
+                                            <constraint firstItem="Hwh-HZ-MqI" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="Hdy-fw-B6W" secondAttribute="trailing" constant="8" symbolic="YES" id="eH5-Bm-ENo"/>
                                             <constraint firstAttribute="trailing" secondItem="Is9-l7-CB7" secondAttribute="trailing" constant="8" id="ftH-gX-MCS"/>
                                             <constraint firstAttribute="height" constant="42" id="gwS-zk-pyi"/>
                                             <constraint firstItem="Is9-l7-CB7" firstAttribute="leading" secondItem="wHb-fC-SNw" secondAttribute="trailing" constant="8" id="iAE-Ib-pKQ"/>
-                                            <constraint firstItem="Ysg-uh-uEX" firstAttribute="leading" secondItem="Hdy-fw-B6W" secondAttribute="trailing" constant="8" id="qXT-GK-Q6N"/>
                                         </constraints>
                                     </view>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="leading" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="lgv-jf-NTo">
-                                        <rect key="frame" x="702" y="5" width="25" height="25"/>
+                                        <rect key="frame" x="683" y="5" width="44" height="25"/>
                                         <constraints>
-                                            <constraint firstAttribute="width" constant="25" id="G5N-0a-BMg"/>
                                             <constraint firstAttribute="height" constant="25" id="V0O-bL-i43"/>
                                         </constraints>
                                         <fontDescription key="fontDescription" type="system" pointSize="15"/>
-                                        <state key="normal" image="checkmark.square" catalog="system">
-                                            <color key="titleColor" red="0.26875244110000002" green="0.49985405119999998" blue="0.82210710099999995" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <state key="normal" title="Select">
+                                            <color key="titleColor" systemColor="systemBlueColor"/>
                                             <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="large"/>
                                         </state>
                                         <connections>
@@ -880,7 +863,6 @@
                     <connections>
                         <outlet property="clipboardButton" destination="Psf-Sy-qRg" id="r4t-Es-XUY"/>
                         <outlet property="deleteSelectedButton" destination="Is9-l7-CB7" id="cgW-zl-cyz"/>
-                        <outlet property="deselectAllButton" destination="Ysg-uh-uEX" id="Qb4-p9-dvW"/>
                         <outlet property="filtersButton" destination="QAN-3k-yxQ" id="66B-EJ-JR9"/>
                         <outlet property="moveSelectedButton" destination="wHb-fC-SNw" id="UGK-aa-euB"/>
                         <outlet property="navigationHierarchyScrollView" destination="4x9-Nc-HFb" id="mxf-aA-F9W"/>
@@ -2081,7 +2063,7 @@
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <textField opaque="NO" tag="101" contentMode="scaleToFill" horizontalHuggingPriority="249" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Enter your search query" textAlignment="natural" minimumFontSize="17" clearButtonMode="unlessEditing" translatesAutoresizingMaskIntoConstraints="NO" id="OWB-7G-1Cd">
+                            <textField opaque="NO" tag="101" contentMode="scaleToFill" horizontalHuggingPriority="249" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Enter your search query..." textAlignment="natural" minimumFontSize="17" clearButtonMode="unlessEditing" translatesAutoresizingMaskIntoConstraints="NO" id="OWB-7G-1Cd">
                                 <rect key="frame" x="20" y="77" width="571" height="34"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences" returnKeyType="search"/>
@@ -3595,19 +3577,17 @@
         <image name="books.vertical" catalog="system" width="128" height="103"/>
         <image name="calendar.circle" catalog="system" width="128" height="121"/>
         <image name="calendar.circle.fill" catalog="system" width="128" height="121"/>
-        <image name="checkmark.circle" catalog="system" width="128" height="121"/>
-        <image name="checkmark.circle.fill" catalog="system" width="128" height="121"/>
-        <image name="checkmark.square" catalog="system" width="128" height="114"/>
         <image name="chevron.down.circle" catalog="system" width="128" height="121"/>
         <image name="clear.fill" catalog="system" width="128" height="114"/>
         <image name="doc.circle" catalog="system" width="128" height="121"/>
         <image name="doc.on.clipboard" catalog="system" width="116" height="128"/>
+        <image name="doc.on.clipboard.fill" catalog="system" width="116" height="128"/>
         <image name="doc.richtext" catalog="system" width="115" height="128"/>
         <image name="doc.text.viewfinder" catalog="system" width="128" height="115"/>
         <image name="ellipsis.circle.fill" catalog="system" width="128" height="121"/>
         <image name="ellipsis.rectangle.fill" catalog="system" width="128" height="81"/>
         <image name="folder" catalog="system" width="128" height="97"/>
-        <image name="folder.badge.plus" catalog="system" width="128" height="91"/>
+        <image name="folder.badge.plus.fill" catalog="system" width="128" height="91"/>
         <image name="folder.fill.badge.plus" catalog="system" width="128" height="91"/>
         <image name="gearshape.fill" catalog="system" width="128" height="121"/>
         <image name="hand.thumbsdown.fill" catalog="system" width="128" height="121"/>
@@ -3625,7 +3605,7 @@
         <image name="scribble" catalog="system" width="128" height="118"/>
         <image name="scribble.variable" catalog="system" width="128" height="118"/>
         <image name="slider.horizontal.3" catalog="system" width="128" height="100"/>
-        <image name="square.and.arrow.down" catalog="system" width="121" height="128"/>
+        <image name="square.and.arrow.down.fill" catalog="system" width="121" height="128"/>
         <image name="square.and.arrow.up" catalog="system" width="115" height="128"/>
         <image name="square.and.arrow.up.on.square.fill" catalog="system" width="117" height="128"/>
         <image name="square.fill.text.grid.1x2" catalog="system" width="128" height="100"/>

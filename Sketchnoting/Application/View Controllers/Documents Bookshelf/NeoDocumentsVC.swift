@@ -175,10 +175,7 @@ class NeoDocumentsVC: UIViewController, UICollectionViewDelegate, UISearchBarDel
     }
     
     // MARK: Interactions
-    func collectionView(
-        _ collectionView: UICollectionView,
-        didSelectItemAt indexPath: IndexPath
-    ) {
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         guard let document = dataSource.itemIdentifier(for: indexPath) else {
             return
         }

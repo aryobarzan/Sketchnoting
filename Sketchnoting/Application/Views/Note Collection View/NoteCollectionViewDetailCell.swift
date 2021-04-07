@@ -8,12 +8,12 @@
 
 import UIKit
 
-class NoteCollectionViewDetailCell: UICollectionViewCell {
+class NoteCollectionViewDetailCell: UICollectionViewCell, ItemSelectionProtocol {
     
     @IBOutlet weak var imageView: UIImageView!
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var creationLabel: UILabel!
-    @IBOutlet weak var selectedImage: UIImageView!
+    @IBOutlet weak var selectedImageView: UIImageView!
     
     var file: File!
     var url: URL!
@@ -28,7 +28,20 @@ class NoteCollectionViewDetailCell: UICollectionViewCell {
         super.init(coder: aDecoder)
     }
     
-    func setFile(url: URL, file: File, isInSelectionMode: Bool = false, isFileSelected: Bool = false) {
+    override var isSelected: Bool {
+      didSet {
+        if isSelected {
+            selectedImageView.image = UIImage(systemName: "checkmark.circle.fill")
+            selectedImageView.tintColor = UIColor.systemBlue
+        }
+        else {
+            selectedImageView.image = UIImage(systemName: "circle")
+            selectedImageView.tintColor = UIColor.systemGray
+        }
+      }
+    }
+    
+    func setFile(url: URL, file: File) {
         self.file = file
         self.url = url
         
@@ -53,21 +66,9 @@ class NoteCollectionViewDetailCell: UICollectionViewCell {
         titleLabel.text = file.getName()
         
         self.creationLabel.text = NeoLibrary.getCreationDate(url: url).getFormattedDate()
-        
-        self.toggleSelectionModeIndicator(status: isInSelectionMode)
-        self.toggleSelected(isFileSelected: isFileSelected)
     }
     
-    func toggleSelected(isFileSelected: Bool) {
-        if isFileSelected {
-            self.selectedImage.image = UIImage(systemName: "checkmark.circle.fill")
-        }
-        else {
-            self.selectedImage.image = UIImage(systemName: "checkmark.circle")
-        }
-    }
-    
-    func toggleSelectionModeIndicator(status: Bool) {
-        self.selectedImage.isHidden = !status
+    func toggleSelectionMode(status: Bool) {
+        selectedImageView.isHidden = !status
     }
 }

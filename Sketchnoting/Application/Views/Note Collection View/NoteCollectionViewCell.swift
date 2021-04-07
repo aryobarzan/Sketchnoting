@@ -8,13 +8,12 @@
 
 import UIKit
 
-class NoteCollectionViewCell: UICollectionViewCell {
+class NoteCollectionViewCell: UICollectionViewCell, ItemSelectionProtocol {
+    
     @IBOutlet weak var imageView: UIImageView!
     @IBOutlet weak var titleBackgroundView: UIView!
     @IBOutlet weak var titleLabel: UILabel!
-    @IBOutlet weak var selectedIndicatorView: UIView!
     @IBOutlet weak var selectedImageView: UIImageView!
-    @IBOutlet weak var selectedLabel: UILabel!
     @IBOutlet weak var progressView: UIProgressView!
     
     var file: File!
@@ -28,34 +27,45 @@ class NoteCollectionViewCell: UICollectionViewCell {
         super.init(coder: aDecoder)
     }
     
-    func setFile(url: URL, file: File, isInSelectionMode: Bool = false, isFileSelected: Bool = false, progress: Double? = nil) {
+    override var isSelected: Bool {
+      didSet {
+        if isSelected {
+            selectedImageView.image = UIImage(systemName: "checkmark.circle.fill")
+            selectedImageView.tintColor = UIColor.systemBlue
+        }
+        else {
+            selectedImageView.image = UIImage(systemName: "circle")
+            selectedImageView.tintColor = UIColor.systemGray
+        }
+      }
+    }
+        
+    func setFile(url: URL, file: File, progress: Double? = nil) {
         self.file = file
         self.url = url
         
-        self.imageView.layer.cornerRadius = 6
-        self.imageView.image = nil
-        
-        self.selectedIndicatorView.layer.cornerRadius = 4
+        imageView.layer.cornerRadius = 6
+        imageView.image = nil
+        selectedImageView.tintColor = UIColor.systemGray
+
         
         file.getPreviewImage() { image in
             self.imageView.image = image
         }
         titleLabel.text = file.getName()
         if file is Note {
-            self.imageView.backgroundColor = .white
-            self.imageView.layer.borderWidth = 1
-            self.imageView.layer.borderColor = UIColor.black.cgColor
-            if self.traitCollection.userInterfaceStyle == .dark {
-                self.imageView.layer.borderColor = UIColor.gray.cgColor
+            imageView.backgroundColor = .white
+            imageView.layer.borderWidth = 1
+            imageView.layer.borderColor = UIColor.black.cgColor
+            if traitCollection.userInterfaceStyle == .dark {
+                imageView.layer.borderColor = UIColor.gray.cgColor
             }
             
         }
         else { // Folder
-            self.imageView.backgroundColor = .clear
-            self.imageView.layer.borderColor = nil
+            imageView.backgroundColor = .clear
+            imageView.layer.borderColor = nil
         }
-        self.toggleSelectionModeIndicator(status: isInSelectionMode)
-        self.toggleSelected(isFileSelected: isFileSelected)
         
         if let progress = progress {
             progressView.progress = Float(progress)
@@ -66,22 +76,7 @@ class NoteCollectionViewCell: UICollectionViewCell {
         }
     }
     
-    func toggleSelected(isFileSelected: Bool) {
-        if isFileSelected {
-            self.selectedImageView.image = UIImage(systemName: "checkmark.circle.fill")
-            self.selectedImageView.tintColor = UIColor.white
-            self.selectedLabel.textColor = UIColor.white
-            self.selectedLabel.text = "Selected"
-            self.selectedIndicatorView.backgroundColor = UIColor.link
-        }
-        else {
-            self.selectedImageView.image = UIImage(systemName: "checkmark.circle")
-            self.selectedLabel.text = "Select"
-            self.selectedIndicatorView.backgroundColor = UIColor.darkGray
-        }
-    }
-    
-    func toggleSelectionModeIndicator(status: Bool) {
-        self.selectedIndicatorView.isHidden = !status
+    func toggleSelectionMode(status: Bool) {
+        selectedImageView.isHidden = !status
     }
 }

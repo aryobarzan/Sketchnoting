@@ -685,6 +685,17 @@ class NeoLibrary {
         return -1.0
     }
     
+    public static func getFolderItemsCount(url: URL) -> Int {
+        let dirContents = try? FileManager.default.contentsOfDirectory(atPath: url.path)
+        let count = dirContents?.count
+        if count != nil {
+            return Int(count!)
+        }
+        else {
+            return -1
+        }
+    }
+    
     // MARK: Document storage
     private static var documentsIndex: [String : [String]] = [String : [String]]()
     private static func getDocumentsURL(for type: DocumentType) -> URL {

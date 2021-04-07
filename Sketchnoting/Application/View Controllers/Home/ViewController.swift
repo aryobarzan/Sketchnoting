@@ -30,6 +30,16 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     
     private var selectedNoteForTagEditing: (URL, Note)?
     
+    private var selectedFiles = [URL : File]()
+    private var isMultipleSelectionActive: Bool = false {
+        didSet {
+            noteCollectionView.allowsMultipleSelection = isMultipleSelectionActive
+            noteCollectionView.selectItem(at: nil, animated: true, scrollPosition: [])
+            selectedFiles.removeAll()
+            selectionControlsView.isHidden = !self.isMultipleSelectionActive
+        }
+    }
+    
     @IBOutlet var newNoteButton: UIButton!
     @IBOutlet var noteLoadingIndicator: NVActivityIndicatorView!
     @IBOutlet weak var clipboardButton: UIButton!
@@ -63,9 +73,12 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     //
     var filesToExport = [(URL, File)]()
     
+    let noteCollectionViewCellIdentifier = "NoteCollectionViewCell"
+    let folderCollectionViewCellIdentifier = "FolderCollectionViewCell"
+    let noteCollectionViewDetailCellIdentifier = "NoteCollectionViewDetailCell"
+    
     @IBOutlet weak var selectionModeButton: UIButton!
     @IBOutlet weak var selectAllButton: UIButton!
-    @IBOutlet weak var deselectAllButton: UIButton!
     @IBOutlet weak var moveSelectedButton: UIButton!
     @IBOutlet weak var deleteSelectedButton: UIButton!
     @IBOutlet weak var selectionControlsView: UIView!
@@ -91,8 +104,9 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         noteListViewButton.layer.masksToBounds = true
         noteListViewButton.layer.cornerRadius = 5
         
-        noteCollectionView.register(UINib(nibName: "NoteCollectionViewCell", bundle: nil), forCellWithReuseIdentifier: reuseIdentifier)
-        noteCollectionView.register(UINib(nibName: "NoteCollectionViewDetailCell", bundle: nil), forCellWithReuseIdentifier: reuseIdentifierDetailCell)
+        noteCollectionView.register(UINib(nibName: noteCollectionViewCellIdentifier, bundle: nil), forCellWithReuseIdentifier: noteCollectionViewCellIdentifier)
+        noteCollectionView.register(UINib(nibName: folderCollectionViewCellIdentifier, bundle: nil), forCellWithReuseIdentifier: folderCollectionViewCellIdentifier)
+        noteCollectionView.register(UINib(nibName: noteCollectionViewDetailCellIdentifier, bundle: nil), forCellWithReuseIdentifier: noteCollectionViewDetailCellIdentifier)
         noteCollectionView.dragDelegate = self
         noteCollectionView.dropDelegate = self
         noteCollectionView.dragInteractionEnabled = true
@@ -241,7 +255,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             if let noteToOpen = vc.openNote {
                 if let segue = sender as? UIStoryboardSegueWithCompletion {
                     segue.completion = {
-                        self.open(url: noteToOpen.0, note: noteToOpen.1)
+                        self.open(url: noteToOpen.0, file: noteToOpen.1)
                     }
                 }
             }
@@ -391,11 +405,12 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     
     // MARK: Note display management
     private func updateDisplayedNotes(_ animated: Bool) {
-        self.items = NeoLibrary.getFiles()
+        self.items = Array(repeating: [], count: 2)
+        var files = NeoLibrary.getFiles()
         
         if TagsManager.filterTags.count > 0 {
             var filteredItems = [(URL, File)]()
-            for item in self.items {
+            for item in files {
                 if let note = item.1 as? Note {
                     for tag in TagsManager.filterTags {
                         if note.tags.contains(tag) {
@@ -407,34 +422,36 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
                 else { // Folder
                 }
             }
-            self.items = filteredItems
+            files = filteredItems
         }
         
         switch SettingsManager.getFileSorting() {
-            
         case .ByNewest:
-            self.items = self.items.sorted(by: { (item0: (URL, File), item1: (URL, File)) -> Bool in
+            files = files.sorted(by: { (item0: (URL, File), item1: (URL, File)) -> Bool in
                 if NeoLibrary.getCreationDate(url: item0.0) > NeoLibrary.getCreationDate(url: item1.0) {
                     return true
                 }
                 return false
             })
         case .ByOldest:
-            self.items = self.items.sorted(by: { (item0: (URL, File), item1: (URL, File)) -> Bool in
+            files = files.sorted(by: { (item0: (URL, File), item1: (URL, File)) -> Bool in
                 if NeoLibrary.getCreationDate(url: item0.0) < NeoLibrary.getCreationDate(url: item1.0) {
                     return true
                 }
                 return false
             })
         case .ByNameAZ:
-            self.items = self.items.sorted(by: { (item0: (URL, File), item1: (URL, File)) -> Bool in
+            files = files.sorted(by: { (item0: (URL, File), item1: (URL, File)) -> Bool in
                 return item0.1.getName() < item1.1.getName()
             })
         case .ByNameZA:
-            self.items = self.items.sorted(by: { (item0: (URL, File), item1: (URL, File)) -> Bool in
+            files = files.sorted(by: { (item0: (URL, File), item1: (URL, File)) -> Bool in
                 return item0.1.getName() > item1.1.getName()
             })
         }
+        let folders = files.filter{!($0.1 is Note)}
+        let notes = files.filter{$0.1 is Note}
+        self.items = [folders, notes]
         noteCollectionView.reloadData()
         if animated {
             let animations = [AnimationType.vector(CGVector(dx: 200, dy: 0))]
@@ -444,6 +461,8 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
                 })
             })
         }
+        
+        updateSelectAllButton()
     }
     
     private func updateFoldersHierarchy() {
@@ -454,7 +473,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         var component = NeoLibrary.currentLocation
         var limit = 0
         while !NeoLibrary.isHomeDirectory(url: component) && component != NeoLibrary.getHomeDirectoryURL() {
-            logger.info(component)
             let folderButton = FolderButton()
             folderButton.frame = CGRect(x: 0, y: 0, width: 100, height: 35)
             folderButton.set(directoryURL: component)
@@ -627,10 +645,8 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         self.present(alert, animated: true)
     }
     func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
-
         return UIContextMenuConfiguration(identifier: nil, previewProvider: nil, actionProvider: { suggestedActions in
-
-            return self.makeFileContextMenu(url: self.items[indexPath.row].0, file: self.items[indexPath.row].1, point: point, cellIndexPath: indexPath)
+            return self.makeFileContextMenu(url: self.items[indexPath.section][indexPath.row].0, file: self.items[indexPath.section][indexPath.row].1, point: point, cellIndexPath: indexPath)
         })
     }
     
@@ -771,87 +787,90 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     private var noteCollectionViewState = SettingsManager.getFileDisplayLayout()
     
     @IBOutlet weak var noteCollectionView: UICollectionView!
-    let reuseIdentifier = "NoteCollectionViewCell" // also enter this string as the cell identifier in the storyboard
-    let reuseIdentifierDetailCell = "NoteCollectionViewDetailCell"
-    var items = [(URL, File)]()
+    
+    var items: [[(URL, File)]] = Array(repeating: [], count: 2)
+
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
+        return 2
+    }
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return items.count
+        return self.items[section].count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let item = self.items[indexPath.section][indexPath.row]
         switch self.noteCollectionViewState {
         case .Grid:
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath as IndexPath) as! NoteCollectionViewCell
-            cell.setFile(url: self.items[indexPath.item].0, file: self.items[indexPath.item].1, isInSelectionMode: self.isSelectionModeActive, isFileSelected: self.selectedFiles[self.items[indexPath.item].0] != nil)
-            return cell
+            if item.1 is Note {
+                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: noteCollectionViewCellIdentifier, for: indexPath as IndexPath) as! NoteCollectionViewCell
+                cell.toggleSelectionMode(status: self.isMultipleSelectionActive)
+                cell.setFile(url: item.0, file: item.1)
+                return cell
+            }
+            else { // Folder
+                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: folderCollectionViewCellIdentifier, for: indexPath as IndexPath) as! FolderCollectionViewCell
+                cell.toggleSelectionMode(status: self.isMultipleSelectionActive)
+                cell.setFile(url: item.0, file: item.1)
+                return cell
+            }
+            
         case .List:
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifierDetailCell, for: indexPath as IndexPath) as! NoteCollectionViewDetailCell
-            cell.setFile(url: self.items[indexPath.item].0, file: self.items[indexPath.item].1, isInSelectionMode: self.isSelectionModeActive, isFileSelected: self.selectedFiles[self.items[indexPath.item].0] != nil)
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: noteCollectionViewDetailCellIdentifier, for: indexPath as IndexPath) as! NoteCollectionViewDetailCell
+            cell.toggleSelectionMode(status: self.isMultipleSelectionActive)
+            cell.setFile(url: item.0, file: item.1)
             return cell
         }
     }
     
-    func collectionView(_ collectionView: UICollectionView,
-                        layout collectionViewLayout: UICollectionViewLayout,
-                        sizeForItemAt indexPath: IndexPath) -> CGSize {
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        let item = self.items[indexPath.section][indexPath.row]
         switch self.noteCollectionViewState {
         case .Grid:
-            return CGSize(width: CGFloat(200), height: CGFloat(300))
+            if item.1 is Note {
+                return CGSize(width: CGFloat(200), height: CGFloat(300))
+            }
+            else { // Folder
+                return CGSize(width: CGFloat(200), height: CGFloat(150))
+            }
+            
         case .List:
             return CGSize(width: collectionView.bounds.size.width - CGFloat(10), height: CGFloat(100))
         }
     }
     
+    
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let item = self.items[indexPath.item]
-        if self.isSelectionModeActive {
-            var selection = false
+        let item = self.items[indexPath.section][indexPath.row]
+        if self.isMultipleSelectionActive {
+            self.selectedFiles[item.0] = item.1
+            updateSelectAllButton()
+        }
+        else {
+            self.open(url: item.0, file: item.1)
+        }
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
+        let item = self.items[indexPath.section][indexPath.row]
+        if self.isMultipleSelectionActive {
             if self.selectedFiles[item.0] != nil {
                 self.selectedFiles[item.0] = nil
             }
-            else {
-                self.selectedFiles[item.0] = item.1
-                selection = true
-            }
-            // Update UI
-            if let cell = collectionView.cellForItem(at: indexPath) {
-                self.updateFileCellSelection(cell: cell, selection: selection)
-            }
-        }
-        else {
-            if let note = item.1 as? Note {
-                self.open(url: item.0, note: note)
-            }
-            else {
-                self.open(url: item.0, folder: item.1)
-            }
+            updateSelectAllButton()
         }
     }
     
-    private func updateFileCellSelection(cell: UICollectionViewCell, selection: Bool) {
-        switch noteCollectionViewState {
-        case .Grid:
-            if let cell = cell as? NoteCollectionViewCell {
-                cell.toggleSelected(isFileSelected: selection)
-            }
-        case .List:
-            if let cell = cell as? NoteCollectionViewDetailCell {
-                cell.toggleSelected(isFileSelected: selection)
-            }
+    public func open(url: URL, file: File) {
+        if let note = file as? Note {
+            self.noteToEdit = (url, note)
+            self.performSegue(withIdentifier: "EditSketchnote", sender: self)
+            logger.info("Opening note.")
         }
-    }
-    
-    public func open(url: URL, note: Note) {
-        self.noteToEdit = (url, note)
-        self.performSegue(withIdentifier: "EditSketchnote", sender: self)
-        logger.info("Opening note.")
-    }
-    
-    private func open(url: URL, folder: File) {
-        NeoLibrary.currentLocation = url
-        self.updateDisplayedNotes(false)
-        self.updateFoldersHierarchy()
-        logger.info("Opening folder.")
+        else { // Folder
+            NeoLibrary.currentLocation = url
+            self.updateDisplayedNotes(false)
+            self.updateFoldersHierarchy()
+        }
     }
     
     private func renameFile(url: URL, file: File, indexPath: IndexPath) {
@@ -912,7 +931,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     }
     // Related Notes VC delegate
     func openRelatedNote(url: URL, note: Note) {
-        self.open(url: url, note: note)
+        self.open(url: url, file: note)
     }
     func mergedNotes(note1: Note, note2: Note) {
     }
@@ -955,7 +974,8 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     private func deleteFile(url: URL, file: File) {
         let alert = UIAlertController(title: "Delete File", message: "Are you sure you want to delete this file?", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Delete", style: .destructive, handler: { action in
-            self.items.removeAll{$0.0 == url}
+            self.items[0].removeAll{$0.0 == url}
+            self.items[1].removeAll{$0.0 == url}
             NeoLibrary.delete(url: url)
             self.noteCollectionView.reloadData()
         }))
@@ -966,14 +986,13 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     }
     
     func collectionView(_ collectionView: UICollectionView, itemsForBeginning session: UIDragSession, at indexPath: IndexPath) -> [UIDragItem] {
-        let item = self.items[indexPath.row]
+        let item = self.items[indexPath.section][indexPath.row]
         let itemProvider = NSItemProvider(object: item.1.getName() as NSString)
         let dragItem = UIDragItem(itemProvider: itemProvider)
         return [dragItem]
     }
     
-    func collectionView(_ collectionView: UICollectionView,
-                        canHandle session: UIDropSession) -> Bool {
+    func collectionView(_ collectionView: UICollectionView, canHandle session: UIDropSession) -> Bool {
       return true
     }
     
@@ -986,8 +1005,8 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             return
           }
           collectionView.performBatchUpdates({
-            let sourceFile = self.items[sourceIndexPath.item]
-            let destinationItem = self.items[destinationIndexPath.item]
+            let sourceFile = self.items[sourceIndexPath.section][sourceIndexPath.row]
+            let destinationItem = self.items[destinationIndexPath.section][destinationIndexPath.row]
             if !(destinationItem.1 is Note) { // Folder
                 logger.info("Moving file to folder.")
                 _ = NeoLibrary.move(file: sourceFile.1, from: sourceFile.0, to: destinationItem.0)
@@ -1000,7 +1019,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     
     func collectionView(_ collectionView: UICollectionView, dropSessionDidUpdate session: UIDropSession, withDestinationIndexPath destinationIndexPath: IndexPath?) -> UICollectionViewDropProposal {
         if let destinationIndexPath = destinationIndexPath {
-            let file = self.items[destinationIndexPath.row]
+            let file = self.items[destinationIndexPath.section][destinationIndexPath.row]
             if file.1 is Note {
                 return UICollectionViewDropProposal(operation: .forbidden, intent: .insertIntoDestinationIndexPath)
             }
@@ -1011,51 +1030,55 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         return UICollectionViewDropProposal(operation: .forbidden, intent: .insertIntoDestinationIndexPath)
     }
     
-    // Selection
-    private var isSelectionModeActive = false
-    private var selectedFiles = [URL : File]()
+    // MARK: Selection
     @IBAction func selectionModeButtonTapped(_ sender: UIButton) {
-        if self.isSelectionModeActive {
-            selectionModeButton.setImage(UIImage(systemName: "checkmark.square"), for: .normal)
+        if self.isMultipleSelectionActive {
+            selectionModeButton.setTitle("Select", for: .normal)
             self.selectedFiles = [URL : File]()
         }
         else {
-            selectionModeButton.setImage(UIImage(systemName: "checkmark.square.fill"), for: .normal)
+            selectionModeButton.setTitle("Done", for: .normal)
         }
-        self.isSelectionModeActive = !self.isSelectionModeActive
-        selectionControlsView.isHidden = !self.isSelectionModeActive
-        for cell in noteCollectionView.visibleCells {
-            switch noteCollectionViewState {
-            case .Grid:
-                if let gridCell = cell as? NoteCollectionViewCell {
-                    gridCell.toggleSelectionModeIndicator(status: self.isSelectionModeActive)
-                }
-                break
-            case .List:
-                if let listCell = cell as? NoteCollectionViewDetailCell {
-                    listCell.toggleSelectionModeIndicator(status: self.isSelectionModeActive)
-                }
-                break
+        self.isMultipleSelectionActive = !self.isMultipleSelectionActive
+        self.noteCollectionView.visibleCells.forEach {cell in
+            if let cell = cell as? ItemSelectionProtocol {
+                cell.toggleSelectionMode(status: self.isMultipleSelectionActive)
             }
         }
+        updateSelectAllButton()
     }
     
     @IBAction func selectAllButtonTapped(_ sender: UIButton) {
-        for item in self.items {
-            self.selectedFiles[item.0] = item.1
+        // Select all
+        if selectedFiles.isEmpty {
+            self.items.forEach { item in
+                item.forEach { file in
+                    self.selectedFiles[file.0] = file.1
+                }
+            }
+            noteCollectionView.visibleCells.forEach { cell in
+                noteCollectionView.selectItem(at: noteCollectionView.indexPath(for: cell), animated: true, scrollPosition: .top)
+            }
         }
-        for cell in noteCollectionView.visibleCells {
-            self.updateFileCellSelection(cell: cell, selection: true)
+        // Deselect all
+        else {
+            self.selectedFiles.removeAll()
+            noteCollectionView.visibleCells.forEach { cell in
+                noteCollectionView.selectItem(at: nil, animated: true, scrollPosition: .top)
+            }
         }
-        //self.updateDisplayedNotes(false)
+        updateSelectAllButton()
     }
-    @IBAction func deselectAllButtonTapped(_ sender: UIButton) {
-        self.selectedFiles = [URL : File]()
-        for cell in noteCollectionView.visibleCells {
-            self.updateFileCellSelection(cell: cell, selection: false)
+    
+    private func updateSelectAllButton() {
+        if selectedFiles.isEmpty {
+            selectAllButton.setTitle("Select All", for: .normal)
         }
-        //self.updateDisplayedNotes(false)
+        else {
+            selectAllButton.setTitle("Deselect All", for: .normal)
+        }
     }
+    
     @IBAction func moveSelectedButtonTapped(_ sender: UIButton) {
         if !self.selectedFiles.isEmpty {
             self.filesToMove = selectedFiles.map {($0, $1)} // Convert dictionary to array of tuples

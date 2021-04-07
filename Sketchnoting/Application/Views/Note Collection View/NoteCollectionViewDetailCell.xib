@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="16097.3" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
-    <device id="retina6_1" orientation="portrait" appearance="light"/>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16087"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -44,7 +44,7 @@
                             </label>
                             <imageView hidden="YES" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="checkmark.circle" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="m72-Xh-jKx">
                                 <rect key="frame" x="25" y="35.5" width="30" height="29"/>
-                                <color key="tintColor" systemColor="systemPurpleColor" red="0.68627450980000004" green="0.32156862749999998" blue="0.87058823529999996" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <color key="tintColor" systemColor="systemPurpleColor"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="30" id="5Be-Bk-4rp"/>
                                     <constraint firstAttribute="height" constant="30" id="y0D-L6-ldf"/>
@@ -66,17 +66,17 @@
                     </view>
                 </subviews>
             </view>
+            <viewLayoutGuide key="safeArea" id="8qu-mG-EWh"/>
             <constraints>
                 <constraint firstItem="sY4-k3-X1u" firstAttribute="leading" secondItem="D54-Ht-Gil" secondAttribute="leading" id="2bT-lv-8Eb"/>
                 <constraint firstAttribute="bottom" secondItem="sY4-k3-X1u" secondAttribute="bottom" id="2j9-uC-ZEi"/>
                 <constraint firstItem="sY4-k3-X1u" firstAttribute="top" secondItem="D54-Ht-Gil" secondAttribute="top" id="6ZM-Fd-NOX"/>
                 <constraint firstAttribute="trailing" secondItem="sY4-k3-X1u" secondAttribute="trailing" id="ZEm-hv-cUp"/>
             </constraints>
-            <viewLayoutGuide key="safeArea" id="8qu-mG-EWh"/>
             <connections>
                 <outlet property="creationLabel" destination="k0v-ST-wt7" id="yKR-al-Fyh"/>
                 <outlet property="imageView" destination="3Bf-8B-bSK" id="rez-vB-1Cj"/>
-                <outlet property="selectedImage" destination="m72-Xh-jKx" id="FgR-KL-mRQ"/>
+                <outlet property="selectedImageView" destination="m72-Xh-jKx" id="FgR-KL-mRQ"/>
                 <outlet property="titleLabel" destination="PJ2-PF-qai" id="sh5-jE-0Sg"/>
             </connections>
             <point key="canvasLocation" x="-165.21739130434784" y="40.848214285714285"/>
@@ -88,5 +88,8 @@
         <namedColor name="SketchnotingTextColor">
             <color red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
+        <systemColor name="systemPurpleColor">
+            <color red="0.68627450980392157" green="0.32156862745098042" blue="0.87058823529411766" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
     </resources>
 </document>

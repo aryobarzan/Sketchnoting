@@ -144,7 +144,7 @@ class SearchViewController: UIViewController, UITextFieldDelegate, DrawingSearch
         tabBarController!.selectedIndex = 0
         if let nc = tabBarController!.viewControllers![0] as? UINavigationController {
             if let vc = nc.topViewController as? ViewController {
-                vc.open(url: noteToOpen!.0, note: noteToOpen!.1)
+                vc.open(url: noteToOpen!.0, file: noteToOpen!.1)
             }
         }
     }
@@ -242,8 +242,8 @@ fileprivate class SearchTableNotesItem: SearchTableItem {
 }
 
 fileprivate class SearchTableDocumentsItem: SearchTableItem {
-    var documents: [Document]
-    init(query: String, documents: [Document]) {
+    var documents: [(Document, Double)]
+    init(query: String, documents: [(Document, Double)]) {
         self.documents = documents
         super.init(query: query, type: .Documents)
     }

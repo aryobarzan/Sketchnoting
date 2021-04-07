@@ -19,7 +19,7 @@ class SearchDocumentCell: UITableViewCell {
     @IBOutlet weak var previousButton: UIButton!
     @IBOutlet weak var pageLabel: UILabel!
     
-    var documents = [Document]()
+    var documents = [(Document, Double)]()
     var images = [UIImage]()
     
     var currentIndex = 0
@@ -42,13 +42,25 @@ class SearchDocumentCell: UITableViewCell {
         // Configure the view for the selected state
     }
     
-    func setContent(query: String, documents: [Document]) {
+    func setContent(query: String, documents: [(Document, Double)]) {
         self.documents = documents
+        self.documents = documents.sorted { document1, document2 in
+            document1.1 > document2.1
+        }
+        normalizeDocumentSimilarities()
         currentIndex = 0
         currentImageIndex = 0
         updateDisplayedDocument()
         updateDocumentIndex()
         subtitleLabel.text = "For search query: '\(query)'"
+    }
+    
+    private func normalizeDocumentSimilarities() {
+        if !documents.isEmpty {
+            let maxSimilarity = documents.map{$0.1}.max()!
+            let minSimilarity = 0.0 //documents.map{$0.1}.min()!
+            self.documents = documents.map {($0.0, ($0.1 - minSimilarity)/(maxSimilarity-minSimilarity))}
+        }
     }
     
     @IBAction func previewImageViewSwipeLeft(_ sender: UISwipeGestureRecognizer) {
@@ -83,7 +95,7 @@ class SearchDocumentCell: UITableViewCell {
     
     private func updateDisplayedDocument() {
         if !documents.isEmpty {
-            let document = documents[currentIndex]
+            let document = documents[currentIndex].0
             titleLabel.text = document.title
             bodyTextView.text = document.getDescription()
         }
@@ -94,8 +106,8 @@ class SearchDocumentCell: UITableViewCell {
     private func fetchDocumentImages() {
         if !documents.isEmpty {
             images = [UIImage]()
-            self.previewImageView.image = nil
-            let currentDocument = documents[currentIndex]
+            self.previewImageView.image = UIImage(systemName: "book.circle")
+            let currentDocument = documents[currentIndex].0
             currentDocument.retrieveImage(type: .Standard, completion: { result in
                 switch result {
                 case .success(let value):
@@ -133,20 +145,14 @@ class SearchDocumentCell: UITableViewCell {
     
     private func updateImageView() {
         DispatchQueue.main.async {
-            self.previewImageView.image = nil
-        }
-        if !images.isEmpty {
-            DispatchQueue.main.async {
+            self.previewImageView.image = UIImage(systemName: "book.circle")
+            if !self.images.isEmpty {
                 self.previewImageView.image = self.images[self.currentImageIndex]
             }
-        }
-        if images.count < 2 {
-            DispatchQueue.main.async {
+            if self.images.count < 2 {
                 self.imagesPageControl.isHidden = true
             }
-        }
-        else {
-            DispatchQueue.main.async {
+            else {
                 self.imagesPageControl.isHidden = false
                 self.imagesPageControl.currentPage = self.currentImageIndex
             }

@@ -44,7 +44,7 @@ class SearchNoteCell: UITableViewCell, UICollectionViewDelegate, UICollectionVie
         collectionView.reloadData()
     }
     
-    func normalizeNoteSimilarities() {
+    private func normalizeNoteSimilarities() {
         if !notes.isEmpty {
             let maxSimilarity = notes.map{$0.2}.max()!
             let minSimilarity = 0.0 //notes.map{$0.2}.min()!
