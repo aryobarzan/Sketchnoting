@@ -25,6 +25,7 @@ class SKTextRank {
             let index = graph.addVertex(w)
             addedVertices[w] = index
         }
+        let wordEmbedding = SemanticSearch.shared.createFastTextWordEmbedding()
         for (i, word) in nounsAndAdjectives.enumerated() {
             let index = addedVertices[word]!
             let N = 3
@@ -36,7 +37,7 @@ class SKTextRank {
                 }
                 if !graph.edgeExists(fromIndex: index, toIndex: addedVertices[w]!) && !graph.edgeExists(fromIndex: addedVertices[w]!, toIndex: index){
                     if biased {
-                        let weight = 2.0 - SemanticSearch.shared.wordDistance(between: word, and: w)
+                        let weight = 2.0 - wordEmbedding.distance(between: word, and: w)
                         if weight > 0.65 {
                             graph.addEdge(fromIndex: index, toIndex: addedVertices[w]!, weight: 1.0, directed: false)
                         }
