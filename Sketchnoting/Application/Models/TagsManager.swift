@@ -9,42 +9,41 @@
 import UIKit
 
 class TagsManager {
-    static var tags: [Tag] = getTags()
+    private var tagRepository: TagRepository
     static var filterTags = [Tag]()
-    public static func getTags() -> [Tag] {
-        let decoder = JSONDecoder()
-        
-        var tags = [Tag]()
-        for (key, _) in UserDefaults.tags.dictionaryRepresentation() {
-            if let data = UserDefaults.tags.data(forKey: key),
-                let loadedTag = try? decoder.decode(Tag.self, from: data) {
-                tags.append(loadedTag)
-            }
+    
+    init() {
+        self.tagRepository = NeoLibrary.loadTagRepository()
+    }
+    
+    public func reload() {
+        self.tagRepository = NeoLibrary.loadTagRepository()
+    }
+    
+    public func getTags(for note: Note? = nil) -> [Tag] {
+        if let note = note {
+            return tagRepository.getTags(for: note)
         }
-        tags = tags.sorted(by: { $0.title < $1.title })
-        return tags
-    }
-    public static func reload() {
-        self.tags = getTags()
-    }
-    public static func add(tag: Tag) {
-        let encoder = JSONEncoder()
-        
-        if !self.tags.contains(tag) {
-            self.tags.append(tag)
-            if let encoded = try? encoder.encode(tag) {
-                UserDefaults.tags.set(encoded, forKey: tag.title)
-                logger.info("Tag \(String(describing: tag.title)) added.")
-            }
-            else {
-                logger.error("Failed adding new tag \(String(describing: tag.title)).")
-            }
+        else {
+            return tagRepository.getTags()
         }
     }
-    public static func delete(tag: Tag) {
-        if self.tags.contains(tag) {
-            tags.removeAll{$0 == tag}
-            UserDefaults.tags.removeObject(forKey: tag.title)
+
+    public func add(tag: Tag) {
+        _ = tagRepository.add(tag: tag)
+        NeoLibrary.save(tagRepository: tagRepository)
+    }
+    
+    public func delete(tag: Tag) {
+        _ = tagRepository.delete(tag: tag)
+        NeoLibrary.save(tagRepository: tagRepository)
+        if TagsManager.filterTags.contains(tag) {
+            TagsManager.filterTags.remove(object: tag)
         }
+    }
+    
+    public func set(tags: [Tag], for note: Note) {
+        tagRepository.set(tags: tags, for: note)
+        NeoLibrary.save(tagRepository: tagRepository)
     }
 }

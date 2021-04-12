@@ -380,7 +380,6 @@ class NeoLibrary {
         let duplicateURL =  url.deletingLastPathComponent().appendingPathComponent(n + ".sketchnote")
         let documents = note.getDocuments()
         let duplicate = Note(name: n, documents: documents)
-        duplicate.tags = note.tags
         duplicate.pages = note.pages
         self.saveSynchronously(note: duplicate, url: duplicateURL)
         return (duplicateURL, duplicate)
@@ -696,7 +695,26 @@ class NeoLibrary {
         }
     }
     
-    // MARK: Document storage
+    // MARK: Tags
+    
+    static func save(tagRepository: TagRepository) {
+        neoLibraryQueue.async {
+            let jsonEncoder = JSONEncoder()
+            if let jsonData = try? jsonEncoder.encode(tagRepository) {
+                try? jsonData.write(to: getDocumentsURL().appendingPathComponent("SKTagRepository.json"))
+            }
+        }
+    }
+    
+    static func loadTagRepository() -> TagRepository {
+        let jsonDecoder = JSONDecoder()
+        if let jsonData = try? Data(contentsOf: getDocumentsURL().appendingPathComponent("SKTagRepository.json")), let tagRepository = try? jsonDecoder.decode(TagRepository.self, from: jsonData) {
+            return tagRepository
+        }
+        return TagRepository()
+    }
+    
+    // MARK: Document storage - unused
     private static var documentsIndex: [String : [String]] = [String : [String]]()
     private static func getDocumentsURL(for type: DocumentType) -> URL {
         let documentsPath = self.getDocumentsURL()

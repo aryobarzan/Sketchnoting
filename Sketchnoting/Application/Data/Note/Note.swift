@@ -27,7 +27,6 @@ class Note: File, DocumentDelegate {
     private var id: String
     var pages: [NotePage]
     private var documents: [Document]
-    var tags: [Tag]
     var activePageIndex = 0
     var helpLinesType: HelpLinesType
     var tagmeEpsilon: Float = 0.3
@@ -40,7 +39,6 @@ class Note: File, DocumentDelegate {
         self.id = UUID.init().uuidString
         self.documents = documents ?? [Document]()
         self.pages = [NotePage]()
-        self.tags = [Tag]()
         self.helpLinesType = .None
         let firstPage = NotePage()
         self.pages.append(firstPage)
@@ -51,7 +49,6 @@ class Note: File, DocumentDelegate {
     enum NoteCodingKeys: String, CodingKey {
         case id = "id"
         case documents = "documents"
-        case tags = "tags"
         case activePageIndex
         case helpLinesType = "helpLinesType"
         case pages = "pages"
@@ -75,7 +72,6 @@ class Note: File, DocumentDelegate {
             logger.error("Error while encoding documents of note.")
         }
         try container.encode(id, forKey: .id)
-        try container.encode(tags, forKey: .tags)
         try container.encode(activePageIndex, forKey: .activePageIndex)
         try container.encode(helpLinesType, forKey: .helpLinesType)
         try container.encode(pages, forKey: .pages)
@@ -118,7 +114,6 @@ class Note: File, DocumentDelegate {
         documents = docs
         
         id = (try? container.decode(String.self, forKey: .id)) ?? UUID.init().uuidString
-        tags = (try? container.decode([Tag].self, forKey: .tags)) ?? [Tag]()
         activePageIndex = try container.decode(Int.self, forKey: .activePageIndex)
         helpLinesType = (try? container.decode(HelpLinesType.self, forKey: .helpLinesType)) ?? .None
         pages = try container.decode([NotePage].self, forKey: .pages)
@@ -360,15 +355,6 @@ class Note: File, DocumentDelegate {
         if note != self {
             for page in note.pages {
                 self.pages.append(page)
-            }
-            self.mergeTagsWith(note: note)
-        }
-    }
-    
-    public func mergeTagsWith(note: Note) {
-        for tag in note.tags {
-            if !self.tags.contains(tag) {
-                self.tags.append(tag)
             }
         }
     }

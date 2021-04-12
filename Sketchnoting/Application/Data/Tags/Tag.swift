@@ -39,7 +39,6 @@ public struct Tag: Equatable, Codable {
         if title == nil || title.isEmpty {
             title = "Untitled Tag"
         }
-        
         let redValue = try? container.decode(CGFloat.self, forKey: .colorRed)
         let greenValue = try? container.decode(CGFloat.self, forKey: .colorGreen)
         let blueValue = try? container.decode(CGFloat.self, forKey: .colorBlue)

@@ -77,6 +77,8 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     let folderCollectionViewCellIdentifier = "FolderCollectionViewCell"
     let noteCollectionViewDetailCellIdentifier = "NoteCollectionViewDetailCell"
     
+    let tagsManager = TagsManager()
+    
     @IBOutlet weak var selectionModeButton: UIButton!
     @IBOutlet weak var selectAllButton: UIButton!
     @IBOutlet weak var moveSelectedButton: UIButton!
@@ -151,9 +153,10 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     }
     
     func popoverPresentationControllerDidDismissPopover(_ popoverPresentationController: UIPopoverPresentationController) {
+        tagsManager.reload()
         self.updateDisplayedNotes(false)
         self.selectedNoteForTagEditing = nil
-        activeFiltersBadge.setCount(TagsManager.filterTags.count)        
+        activeFiltersBadge.setCount(TagsManager.filterTags.count)
     }
     
     // Respond to NotificationCenter events
@@ -412,8 +415,9 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             var filteredItems = [(URL, File)]()
             for item in files {
                 if let note = item.1 as? Note {
+                    let noteTags = tagsManager.getTags(for: note)
                     for tag in TagsManager.filterTags {
-                        if note.tags.contains(tag) {
+                        if noteTags.contains(tag) {
                             filteredItems.append(item)
                             break
                         }
@@ -908,7 +912,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         let sentences = SKTextRank.shared.summarize(text: text, numberOfSentences: 4)
         logger.info(sentences)
         logger.info(Reductio.shared.summarize(text: text, count: 4))*/
-        /*let keywords = SKTextRank.shared.extractKeywords(text: note.getText(option: .FullText, parse: true), numberOfKeywords: 10)
+        /*let keywords = SKTextRank.shared.extractKeywords(text: note.getText(option: .FullText, parse: true), numberOfKeywords: 10, usePostProcessing: false)
         logger.info(keywords)
         logger.info(Reductio.shared.keywords(from: note.getText(option: .FullText, parse: true), count: 10))*/
         self.noteForRelatedNotes = (url, note)
@@ -938,18 +942,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     
     var selectedCellForTagEditing: UICollectionViewCell?
     private func editNoteTags(url: URL, note: Note, cell: UICollectionViewCell?) {
-        var looseTagsToRemove = [Tag]()
-        for tag in note.tags {
-            if !TagsManager.tags.contains(tag) {
-                looseTagsToRemove.append(tag)
-            }
-        }
-        if looseTagsToRemove.count > 0 {
-            for t in looseTagsToRemove {
-                note.tags.removeAll{$0 == t}
-            }
-            NeoLibrary.save(note: note, url: url)
-        }
         self.selectedNoteForTagEditing = (url, note)
         self.selectedCellForTagEditing = cell
         self.performSegue(withIdentifier: "EditNoteTags", sender: self)

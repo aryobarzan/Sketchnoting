@@ -16,6 +16,8 @@ class TagsCreationViewController: UIViewController, UICollectionViewDelegate, UI
     @IBOutlet weak var colorsCollectionView: UICollectionView!
     @IBOutlet weak var createButton: UIButton!
     
+    let tagsManager = TagsManager()
+    
     var selectedColor = #colorLiteral(red: 0.1215686277, green: 0.01176470611, blue: 0.4235294163, alpha: 1)
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -25,8 +27,8 @@ class TagsCreationViewController: UIViewController, UICollectionViewDelegate, UI
 
     @IBAction func createTapped(_ sender: UIButton) {
         if !(nameField.text?.isEmpty ?? true) {
-            let newTag = Tag(title: nameField.text ?? "Tag", color: selectedColor)
-            TagsManager.add(tag: newTag)
+            let newTag = Tag(title: nameField.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? "Tag", color: selectedColor)
+            tagsManager.add(tag: newTag)
             self.dismiss(animated: true, completion: nil)
         }
     }

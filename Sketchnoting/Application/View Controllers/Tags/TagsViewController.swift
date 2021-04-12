@@ -15,6 +15,8 @@ class TagsViewController: UIViewController, UITableViewDataSource, UITableViewDe
     var isEditingTags: Bool = false
     var isFiltering: Bool = false
     
+    let tagsManager = TagsManager()
+    
     var note: (URL, Note)?
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -27,6 +29,7 @@ class TagsViewController: UIViewController, UITableViewDataSource, UITableViewDe
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        tagsManager.reload()
         tagsTableView.reloadData()
         
         refreshSelectionAllowance()
@@ -51,8 +54,8 @@ class TagsViewController: UIViewController, UITableViewDataSource, UITableViewDe
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
             // Delete the row from the data source
-            let tag = TagsManager.tags[indexPath.row]
-            TagsManager.delete(tag: tag)
+            let tag = tagsManager.getTags()[indexPath.row]
+            tagsManager.delete(tag: tag)
             logger.info("Tag deleted.")
             tableView.deleteRows(at: [indexPath], with: .fade)
             tagsTableView.reloadData()
@@ -62,20 +65,20 @@ class TagsViewController: UIViewController, UITableViewDataSource, UITableViewDe
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return TagsManager.tags.count
+        return tagsManager.getTags().count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tagsTableView.dequeueReusableCell(withIdentifier: "TagTableViewCell", for: indexPath) as! TagTableViewCell
         
-        let tag = TagsManager.tags[indexPath.row]
+        let tag = tagsManager.getTags()[indexPath.row]
         cell.setTag(tag: tag)
         return cell
     }
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         if let cell = cell as? TagTableViewCell {
             if note != nil {
-                for t in note!.1.tags {
+                for t in tagsManager.getTags(for: note!.1) {
                     if cell.noteTag == t {
                         tableView.selectRow(at: indexPath, animated: false, scrollPosition: .none)
                         break
@@ -104,15 +107,14 @@ class TagsViewController: UIViewController, UITableViewDataSource, UITableViewDe
             
         if let indexPathsForSelectedRows = tagsTableView.indexPathsForSelectedRows {
             for i in indexPathsForSelectedRows {
-                if i.row < TagsManager.tags.count {
-                    let tag = TagsManager.tags[i.row]
+                if i.row < tagsManager.getTags().count {
+                    let tag = tagsManager.getTags()[i.row]
                     selectedTags.append(tag)
                 }
             }
         }
         if note != nil {
-            note!.1.tags = selectedTags
-            NeoLibrary.save(note: note!.1, url: note!.0)
+            tagsManager.set(tags: selectedTags, for: note!.1)
         }
         else if isFiltering {
             TagsManager.filterTags = selectedTags
@@ -123,8 +125,8 @@ class TagsViewController: UIViewController, UITableViewDataSource, UITableViewDe
         var selectedTags = [Tag]()
         if let indexPathsForSelectedRows = tagsTableView.indexPathsForSelectedRows {
             for i in indexPathsForSelectedRows {
-                if i.row < TagsManager.tags.count {
-                    let tag = TagsManager.tags[i.row]
+                if i.row < tagsManager.getTags().count {
+                    let tag = tagsManager.getTags()[i.row]
                     selectedTags.append(tag)
                 }
             }

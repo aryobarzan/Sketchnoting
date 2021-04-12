@@ -593,7 +593,7 @@
                                             <constraint firstAttribute="height" constant="30" id="MvT-1R-W6y"/>
                                             <constraint firstAttribute="width" constant="28" id="Q59-QE-aKw"/>
                                         </constraints>
-                                        <state key="normal" image="folder.badge.plus.fill" catalog="system">
+                                        <state key="normal" image="folder.fill.badge.plus" catalog="system">
                                             <preferredSymbolConfiguration key="preferredSymbolConfiguration" configurationType="pointSize" pointSize="20"/>
                                         </state>
                                         <connections>
@@ -1714,24 +1714,6 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="aJk-De-WiL" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="5733.59375" y="1752.5390625"/>
-        </scene>
-        <!--Navigation Controller-->
-        <scene sceneID="xdO-4n-2vR">
-            <objects>
-                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="c9U-Ez-J2q" sceneMemberID="viewController">
-                    <toolbarItems/>
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" barStyle="black" id="f8c-HY-CKR">
-                        <rect key="frame" x="0.0" y="0.0" width="768" height="50"/>
-                        <autoresizingMask key="autoresizingMask"/>
-                    </navigationBar>
-                    <nil name="viewControllers"/>
-                    <connections>
-                        <segue destination="lDo-DG-9fX" kind="relationship" relationship="rootViewController" id="NP1-U9-fiV"/>
-                    </connections>
-                </navigationController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="qnQ-PW-Qq9" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="2052.34375" y="993.74999999999989"/>
         </scene>
         <!--File Info View Controller-->
         <scene sceneID="sUO-08-BxB">
@@ -3220,10 +3202,7 @@
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Note" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MIF-rS-AVI">
-                                                    <rect key="frame" x="50" y="8" width="90" height="15"/>
-                                                    <constraints>
-                                                        <constraint firstAttribute="width" constant="90" id="hq4-27-eP6"/>
-                                                    </constraints>
+                                                    <rect key="frame" x="50" y="8" width="27.5" height="15"/>
                                                     <fontDescription key="fontDescription" style="UICTFontTextStyleCaption1"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
@@ -3240,6 +3219,7 @@
                                                 <constraint firstItem="HQ6-GN-rId" firstAttribute="leading" secondItem="mbh-QJ-sOj" secondAttribute="leading" constant="8" id="RbX-Wo-RPp"/>
                                                 <constraint firstItem="HQ6-GN-rId" firstAttribute="top" secondItem="Ahy-bT-dPf" secondAttribute="bottom" constant="2" id="XyI-sL-rmY"/>
                                                 <constraint firstAttribute="bottom" secondItem="HQ6-GN-rId" secondAttribute="bottom" constant="6" id="ZiE-3i-i1K"/>
+                                                <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="MIF-rS-AVI" secondAttribute="trailing" constant="20" symbolic="YES" id="oda-q6-22V"/>
                                                 <constraint firstItem="Ahy-bT-dPf" firstAttribute="top" secondItem="mbh-QJ-sOj" secondAttribute="top" constant="22" id="qPj-Qu-UO7"/>
                                             </constraints>
                                         </collectionViewCellContentView>
@@ -3254,10 +3234,9 @@
                                 </cells>
                             </collectionView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="RPG-Ja-7zg">
-                                <rect key="frame" x="141" y="555" width="258" height="45"/>
+                                <rect key="frame" x="20" y="555" width="500" height="45"/>
                                 <color key="backgroundColor" systemColor="systemBlueColor"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="258" id="KCm-LM-NAB"/>
                                     <constraint firstAttribute="height" constant="45" id="Lmv-ja-qTd"/>
                                 </constraints>
                                 <state key="normal" title="Export">
@@ -3291,10 +3270,9 @@
                                 </constraints>
                             </view>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ALu-w3-Uqi">
-                                <rect key="frame" x="382" y="173" width="140" height="22"/>
+                                <rect key="frame" x="386" y="173" width="136" height="22"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="22" id="aVq-A6-lrs"/>
-                                    <constraint firstAttribute="width" constant="140" id="zf1-oO-Xyj"/>
                                 </constraints>
                                 <state key="normal" title=" Quick Actions" image="chevron.down.circle" catalog="system">
                                     <color key="titleColor" systemColor="systemBlueColor"/>
@@ -3304,20 +3282,22 @@
                                 </connections>
                             </button>
                             <visualEffectView hidden="YES" opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="vdi-TQ-Z6x">
-                                <rect key="frame" x="141" y="555" width="258" height="45"/>
+                                <rect key="frame" x="20" y="555" width="500" height="45"/>
                                 <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="ic6-Yc-s34">
-                                    <rect key="frame" x="0.0" y="0.0" width="258" height="45"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="500" height="45"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" animating="YES" style="medium" translatesAutoresizingMaskIntoConstraints="NO" id="wS9-39-ppU">
-                                            <rect key="frame" x="119" y="12" width="20" height="20"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" animating="YES" style="medium" translatesAutoresizingMaskIntoConstraints="NO" id="wS9-39-ppU">
+                                            <rect key="frame" x="240" y="12.5" width="20" height="20"/>
                                         </activityIndicatorView>
                                     </subviews>
+                                    <constraints>
+                                        <constraint firstItem="wS9-39-ppU" firstAttribute="centerX" secondItem="ic6-Yc-s34" secondAttribute="centerX" id="3Fe-tc-nkO"/>
+                                        <constraint firstItem="wS9-39-ppU" firstAttribute="centerY" secondItem="ic6-Yc-s34" secondAttribute="centerY" id="jJ6-wc-Ai0"/>
+                                    </constraints>
                                 </view>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="45" id="BYm-zV-K1A"/>
-                                    <constraint firstAttribute="width" constant="258" id="bql-LX-eC4"/>
                                 </constraints>
                                 <blurEffect style="regular"/>
                             </visualEffectView>
@@ -3327,16 +3307,19 @@
                         <constraints>
                             <constraint firstItem="xjC-v5-Oil" firstAttribute="leading" secondItem="gr3-tU-8N4" secondAttribute="leading" constant="20" id="5Ec-mu-i56"/>
                             <constraint firstItem="ALu-w3-Uqi" firstAttribute="top" secondItem="xjC-v5-Oil" secondAttribute="bottom" constant="8" id="7Kc-cP-Ee3"/>
-                            <constraint firstItem="vdi-TQ-Z6x" firstAttribute="centerX" secondItem="iXc-fX-057" secondAttribute="centerX" id="7j1-Ax-a0P"/>
+                            <constraint firstItem="gr3-tU-8N4" firstAttribute="trailing" secondItem="vdi-TQ-Z6x" secondAttribute="trailing" constant="20" id="BiH-hs-1sh"/>
                             <constraint firstItem="gr3-tU-8N4" firstAttribute="trailing" secondItem="Qtw-zU-3Ea" secondAttribute="trailing" constant="20" id="Eam-RW-ID0"/>
+                            <constraint firstItem="vdi-TQ-Z6x" firstAttribute="leading" secondItem="gr3-tU-8N4" secondAttribute="leading" constant="20" id="Ihf-IE-pIz"/>
                             <constraint firstItem="Qtw-zU-3Ea" firstAttribute="leading" secondItem="gr3-tU-8N4" secondAttribute="leading" constant="20" id="IzF-r3-C2z"/>
                             <constraint firstItem="gr3-tU-8N4" firstAttribute="bottom" secondItem="vdi-TQ-Z6x" secondAttribute="bottom" constant="20" id="L9o-Dl-ZcV"/>
-                            <constraint firstItem="RPG-Ja-7zg" firstAttribute="centerX" secondItem="iXc-fX-057" secondAttribute="centerX" id="SBf-gs-hlS"/>
+                            <constraint firstItem="ALu-w3-Uqi" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="gr3-tU-8N4" secondAttribute="leading" symbolic="YES" id="RTe-tH-MhQ"/>
                             <constraint firstItem="gr3-tU-8N4" firstAttribute="trailing" secondItem="ALu-w3-Uqi" secondAttribute="trailing" constant="18" id="TVj-Ye-o5a"/>
                             <constraint firstItem="xjC-v5-Oil" firstAttribute="top" secondItem="gr3-tU-8N4" secondAttribute="top" constant="9" id="WYV-1Z-l5g"/>
                             <constraint firstItem="Qtw-zU-3Ea" firstAttribute="top" secondItem="ALu-w3-Uqi" secondAttribute="bottom" constant="8" id="X4Z-U5-naf"/>
                             <constraint firstItem="gr3-tU-8N4" firstAttribute="trailing" secondItem="xjC-v5-Oil" secondAttribute="trailing" constant="20" id="fyx-Ec-jFb"/>
+                            <constraint firstItem="gr3-tU-8N4" firstAttribute="trailing" secondItem="RPG-Ja-7zg" secondAttribute="trailing" constant="20" id="hKO-YV-zJl"/>
                             <constraint firstItem="gr3-tU-8N4" firstAttribute="bottom" secondItem="RPG-Ja-7zg" secondAttribute="bottom" constant="20" id="jIf-uA-Yru"/>
+                            <constraint firstItem="RPG-Ja-7zg" firstAttribute="leading" secondItem="gr3-tU-8N4" secondAttribute="leading" constant="20" id="rgl-mC-MFr"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" title="Export" id="XKY-4k-bC3">
@@ -3562,7 +3545,7 @@
         <segue reference="fmI-KU-Ur1"/>
         <segue reference="ig0-q1-Lq9"/>
         <segue reference="ghm-KV-m2E"/>
-        <segue reference="lta-QB-BHq"/>
+        <segue reference="ct4-u7-KZY"/>
     </inferredMetricsTieBreakers>
     <resources>
         <image name="antenna.radiowaves.left.and.right" catalog="system" width="128" height="109"/>
@@ -3587,7 +3570,6 @@
         <image name="ellipsis.circle.fill" catalog="system" width="128" height="121"/>
         <image name="ellipsis.rectangle.fill" catalog="system" width="128" height="81"/>
         <image name="folder" catalog="system" width="128" height="97"/>
-        <image name="folder.badge.plus.fill" catalog="system" width="128" height="91"/>
         <image name="folder.fill.badge.plus" catalog="system" width="128" height="91"/>
         <image name="gearshape.fill" catalog="system" width="128" height="121"/>
         <image name="hand.thumbsdown.fill" catalog="system" width="128" height="121"/>
