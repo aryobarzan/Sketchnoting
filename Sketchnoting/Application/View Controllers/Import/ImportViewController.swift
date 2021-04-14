@@ -74,7 +74,7 @@ class ImportViewController: UIViewController, UITableViewDataSource, UITableView
                                                             // Cancelled by user
                                                             cancelled = true
                                                         }
-                                                        SKIndexer.shared.indexLibrary(item.1) { isFinished in
+                                                        SKIndexer.shared.indexLibrary(item.1, indexTFIDF: false) { isFinished in
                                                             if !cancelled {
                                                                 DispatchQueue.main.async {
                                                                     self.dismissLoadingAlert()

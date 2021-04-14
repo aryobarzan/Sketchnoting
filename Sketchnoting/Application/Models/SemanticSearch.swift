@@ -492,6 +492,14 @@ struct SearchResult {
     var documents = [(Document, Score)]()
 }
 
+struct SearchNoteResult {
+    var note: (URL, Note)
+    var noteScore: Double
+    var pageIndices: [Int]
+    var pageHits: [String]
+    var pageHitContexts: [String]
+}
+
 struct StringSimilarityResult {
     var closestSemanticTarget: String
     var closestLexicalTarget: String

@@ -915,6 +915,9 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         /*let keywords = SKTextRank.shared.extractKeywords(text: note.getText(option: .FullText, parse: true), numberOfKeywords: 10, usePostProcessing: false)
         logger.info(keywords)
         logger.info(Reductio.shared.keywords(from: note.getText(option: .FullText, parse: true), count: 10))*/
+        // MARK: TODO - temporary fix - to replace
+        NoteSimilarity.shared.setupTFIDF(noteIterator: NeoLibrary.getNoteIterator())
+        
         self.noteForRelatedNotes = (url, note)
         self.performSegue(withIdentifier: "showRelatedHomePage", sender: self)
     }

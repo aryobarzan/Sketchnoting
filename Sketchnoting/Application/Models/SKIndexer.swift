@@ -30,7 +30,7 @@ class SKIndexer {
         operationQueue.cancelAllOperations()
     }
     
-    func indexLibrary(_ note: Note? = nil, options: [SKIndexerOption] = [SKIndexerOption.Similarity, SKIndexerOption.TFIDF], finishHandler: ((Bool) -> Void)? = nil) {
+    func indexLibrary(_ note: Note? = nil, options: [SKIndexerOption] = [SKIndexerOption.Similarity, SKIndexerOption.TFIDF], indexTFIDF: Bool = true, finishHandler: ((Bool) -> Void)? = nil) {
         let options = Array(Set(options))
         if let note = note {
             addOperation {
@@ -48,10 +48,13 @@ class SKIndexer {
             }
         }
         
-        addOperation {
-            logger.info("Indexing entire library into TF-IDF matrix.")
-            NoteSimilarity.shared.setupTFIDF(noteIterator: NeoLibrary.getNoteIterator())
-            logger.info("(Indexing) TF-IDF indexing complete.")
+        // MARK: TODO - this step needs to be done when importing files again
+        if indexTFIDF {
+            addOperation {
+                logger.info("Indexing entire library into TF-IDF matrix.")
+                NoteSimilarity.shared.setupTFIDF(noteIterator: NeoLibrary.getNoteIterator())
+                logger.info("(Indexing) TF-IDF indexing complete.")
+            }
         }
         
         operationQueue.addBarrierBlock {

@@ -49,6 +49,9 @@ public class TagRepository: Codable {
     func delete(tag: Tag) -> Bool {
         if tags.contains(tag) {
             tags.remove(object: tag)
+            for (key, values) in noteTags {
+                noteTags[key] = values.filter {$0 != tag.title}
+            }
             return true
         }
         return false
