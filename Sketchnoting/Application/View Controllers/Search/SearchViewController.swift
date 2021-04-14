@@ -9,32 +9,23 @@
 import UIKit
 import NVActivityIndicatorView
 import NaturalLanguage
-class SearchViewController: UIViewController, UITextFieldDelegate, DrawingSearchDelegate, SKIndexerDelegate, UITableViewDelegate, UITableViewDataSource, SearchNoteCellDelegate {
+class SearchViewController: UIViewController, DrawingSearchDelegate, SKIndexerDelegate, UITableViewDelegate, UITableViewDataSource, SearchNoteCellDelegate, UISearchBarDelegate {
     
+    @IBOutlet weak var searchBar: UISearchBar!
     @IBOutlet weak var activityIndicator: NVActivityIndicatorView!
     @IBOutlet weak var updateButton: UIButton!
-    @IBOutlet weak var searchTextField: UITextField!
-    @IBOutlet weak var searchButton: UIButton!
     @IBOutlet weak var drawingSearchButton: UIButton!
     @IBOutlet weak var expandedSearchLabel: UILabel!
     @IBOutlet weak var expandedSearchSwitch: UISwitch!
     @IBOutlet weak var searchTableView: UITableView!
-    
-    var searchFilters = [SearchFilter]()
-    var currentSearchType = SearchType.All
 
     fileprivate var items = [SearchTableItem]()
-    
     var noteToOpen: (URL, Note)?
     
-    private var appSearch = AppSearch()
     override func viewDidLoad() {
         super.viewDidLoad()
         self.tabBarController?.tabBar.isHidden = false
-        
-        searchTextField.delegate = self
-        searchButton.layer.cornerRadius = 4
-        
+        searchBar.delegate = self
         searchTableView.dataSource = self
         searchTableView.delegate = self
     }
@@ -42,9 +33,13 @@ class SearchViewController: UIViewController, UITextFieldDelegate, DrawingSearch
         super.viewWillAppear(animated)
     }
     
-    @IBAction func searchTapped(_ sender: UIButton) {
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         performSearch()
-        searchTextField.resignFirstResponder()
+        searchBar.resignFirstResponder()
+    }
+    
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        clear()
     }
   
     @IBAction func drawingSearchTapped(_ sender: UIButton) {
@@ -57,24 +52,18 @@ class SearchViewController: UIViewController, UITextFieldDelegate, DrawingSearch
         }
     }
     func drawingSearchRecognized(label: String) {
-        self.searchTextField.text = label
+        self.searchBar.text = label
         performSearch()
     }
-    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        // Hide the keyboard.
-        if textField.tag == 101 {
-            searchTextField.resignFirstResponder()
-            performSearch()
-        }
-        return true
-    }
+    
     @IBAction func expandedSearchSwitchChanged(_ sender: UISwitch) {
-        if let text = searchTextField.text {
+        if let text = searchBar.text {
             if !text.isEmpty {
                 performSearch()
             }
         }
     }
+    
     @IBAction func updateButtonTapped(_ sender: UIButton) {
         sender.isEnabled = false
         activityIndicator.startAnimating()
@@ -90,13 +79,8 @@ class SearchViewController: UIViewController, UITextFieldDelegate, DrawingSearch
         })
     }
     
-    func textFieldShouldClear(_ textField: UITextField) -> Bool {
-        clear()
-        return true
-    }
-    
     private func performSearch() {
-        if let searchTextFieldText = searchTextField.text {
+        if let searchTextFieldText = searchBar.text {
             if !searchTextFieldText.isEmpty {
                 self.performSemanticSearch()
             }
@@ -104,7 +88,7 @@ class SearchViewController: UIViewController, UITextFieldDelegate, DrawingSearch
     }
     
     private func performSemanticSearch(specificQuery: String? = nil, useFullQuery: Bool = false) {
-        let query = (specificQuery != nil) ? specificQuery! : searchTextField.text!.trimmingCharacters(in: .whitespacesAndNewlines)
+        let query = (specificQuery != nil) ? specificQuery! : searchBar.text!.trimmingCharacters(in: .whitespacesAndNewlines)
         // Search
         clear()
         activityIndicator.isHidden = false
@@ -116,7 +100,7 @@ class SearchViewController: UIViewController, UITextFieldDelegate, DrawingSearch
         }
         for result in searchResults {
             if !result.notes.isEmpty {
-                let item = SearchTableNotesItem(query: result.query, notes: result.notes.map{($0.key, $0.value.0, $0.value.1)})
+                let item = SearchTableNotesItem(query: result.query, noteResults: result.notes.map{$0.value})
                 self.items.append(item)
             }
             if !result.documents.isEmpty {
@@ -167,7 +151,7 @@ class SearchViewController: UIViewController, UITextFieldDelegate, DrawingSearch
         case .Notes:
             let cell = searchTableView.dequeueReusableCell(withIdentifier: "SearchNoteCell", for: indexPath) as! SearchNoteCell
             if let notesItem = item as? SearchTableNotesItem {
-                cell.setContent(query: item.query, notes: notesItem.notes)
+                cell.setContent(query: item.query, noteResults: notesItem.noteResults)
             }
             cell.delegate = self
             return cell
@@ -234,9 +218,9 @@ fileprivate class SearchTableItem {
 }
 
 fileprivate class SearchTableNotesItem: SearchTableItem {
-    var notes: [(URL, Note, Double)]
-    init(query: String, notes: [(URL, Note, Double)]) {
-        self.notes = notes
+    var noteResults: [SearchNoteResult]
+    init(query: String, noteResults: [SearchNoteResult]) {
+        self.noteResults = noteResults
         super.init(query: query, type: .Notes)
     }
 }

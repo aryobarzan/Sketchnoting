@@ -18,7 +18,7 @@ class SearchNoteCell: UITableViewCell, UICollectionViewDelegate, UICollectionVie
     @IBOutlet weak var subtitleLabel: UILabel!
     @IBOutlet weak var collectionView: UICollectionView!
     
-    var notes = [(URL, Note, Double)]()
+    var noteResults = [SearchNoteResult]()
     var delegate: SearchNoteCellDelegate?
     
     override func awakeFromNib() {
@@ -28,38 +28,34 @@ class SearchNoteCell: UITableViewCell, UICollectionViewDelegate, UICollectionVie
         collectionView.delegate = self
         collectionView.dataSource = self
     }
-
-    override func setSelected(_ selected: Bool, animated: Bool) {
-        super.setSelected(selected, animated: animated)
-        // Configure the view for the selected state
-    }
     
-    func setContent(query: String, notes: [(URL, Note, Double)]) {
-        titleLabel.text = "Notes (\(Int(notes.count)))"
+    func setContent(query: String, noteResults: [SearchNoteResult]) {
+        titleLabel.text = "Notes (\(Int(noteResults.count)))"
         subtitleLabel.text = "For search query: '\(query)'"
-        self.notes = notes.sorted { note1, note2 in
-            note1.2 > note2.2
+        self.noteResults = noteResults.sorted { note1, note2 in
+            note1.noteScore > note2.noteScore
         }
         normalizeNoteSimilarities()
         collectionView.reloadData()
     }
     
     private func normalizeNoteSimilarities() {
-        if !notes.isEmpty {
-            let maxSimilarity = notes.map{$0.2}.max()!
+        if !noteResults.isEmpty {
+            let maxSimilarity = noteResults.map{$0.noteScore}.max()!
             let minSimilarity = 0.0 //notes.map{$0.2}.min()!
-            self.notes = notes.map {($0.0, $0.1, ($0.2 - minSimilarity)/(maxSimilarity-minSimilarity))}
+            self.noteResults = noteResults.map {SearchNoteResult(note: $0.note, noteScore: ($0.noteScore - minSimilarity)/(maxSimilarity-minSimilarity), pageHits: $0.pageHits)}
         }
     }
 
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return notes.count
+        return noteResults.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "NoteCollectionViewCell", for: indexPath as IndexPath) as! NoteCollectionViewCell
-        let (url, note, score) = (notes[indexPath.item].0, notes[indexPath.item].1, notes[indexPath.item].2)
+        let (url, note, score) = (noteResults[indexPath.item].note.0, noteResults[indexPath.item].note.1, noteResults[indexPath.item].noteScore)
         cell.setFile(url: url, file: note, progress: score)
+        cell.toggleSelectionMode(status: false)
         return cell
     }
     
@@ -70,7 +66,7 @@ class SearchNoteCell: UITableViewCell, UICollectionViewDelegate, UICollectionVie
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let item = notes[indexPath.row]
-        delegate?.tappedNote(url: item.0, note: item.1)
+        let item = noteResults[indexPath.row]
+        delegate?.tappedNote(url: item.note.0, note: item.note.1)
     }
 }
