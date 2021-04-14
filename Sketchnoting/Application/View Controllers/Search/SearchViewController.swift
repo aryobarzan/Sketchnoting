@@ -41,7 +41,7 @@ class SearchViewController: UIViewController, DrawingSearchDelegate, SKIndexerDe
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
         clear()
     }
-  
+      
     @IBAction func drawingSearchTapped(_ sender: UIButton) {
         let drawingSearchVC = UIStoryboard(name: "Main", bundle: Bundle.main).instantiateViewController(withIdentifier: "DrawingSearchViewController") as? DrawingSearchViewController
         if let drawingSearchVC = drawingSearchVC {

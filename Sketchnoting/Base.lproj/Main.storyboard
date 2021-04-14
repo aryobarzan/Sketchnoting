@@ -2046,13 +2046,13 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="tH4-HJ-5MO">
-                                <rect key="frame" x="699" y="133" width="51" height="31"/>
+                                <rect key="frame" x="699" y="167" width="51" height="31"/>
                                 <connections>
                                     <action selector="expandedSearchSwitchChanged:" destination="kPL-Mg-aaB" eventType="valueChanged" id="txF-Bi-RRh"/>
                                 </connections>
                             </switch>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Expanded Search" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="D8l-la-vhm">
-                                <rect key="frame" x="564" y="139" width="127" height="19.5"/>
+                                <rect key="frame" x="564" y="173" width="127" height="19.5"/>
                                 <fontDescription key="fontDescription" style="UICTFontTextStyleCallout"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
@@ -2079,7 +2079,7 @@
                                 </connections>
                             </button>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="HIq-1Q-FoN">
-                                <rect key="frame" x="20" y="184" width="728" height="770"/>
+                                <rect key="frame" x="20" y="218" width="728" height="736"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="SearchNoteCell" rowHeight="380" id="fzM-eR-wwb" customClass="SearchNoteCell" customModule="Sketchnoting" customModuleProvider="target">
@@ -2321,12 +2321,12 @@
                                     </tableViewCell>
                                 </prototypes>
                             </tableView>
-                            <searchBar contentMode="redraw" translatesAutoresizingMaskIntoConstraints="NO" id="A4p-La-YPV">
-                                <rect key="frame" x="0.0" y="69" width="768" height="56"/>
+                            <searchBar contentMode="redraw" searchBarStyle="minimal" prompt="Your query can be keywords, a sentence or even a basic question." placeholder="Search for notes and documents..." translatesAutoresizingMaskIntoConstraints="NO" id="A4p-La-YPV">
+                                <rect key="frame" x="0.0" y="69" width="768" height="90"/>
                                 <textInputTraits key="textInputTraits"/>
                             </searchBar>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="San-i8-ecq">
-                                <rect key="frame" x="535" y="134" width="21" height="28"/>
+                                <rect key="frame" x="535" y="168" width="21" height="28"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="21" id="Wq9-r3-A36"/>
                                     <constraint firstAttribute="height" constant="28" id="X47-oo-mcc"/>

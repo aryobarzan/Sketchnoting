@@ -280,7 +280,7 @@ class SemanticSearch {
                             let similarityResult = self.getStringSimilarity(betweenQuery: query, and: paragraph, wordEmbedding: wordEmbedding)
                             if similarityResult.lexicalSimilarity >= lexicalThreshold || similarityResult.semanticSimilarity >= self.SEARCH_THRESHOLD {
                                 noteResult = note
-                                pageResults.append((pageIndex, similarityResult.closestLexicalTarget.isEmpty ? similarityResult.closestSemanticTarget : similarityResult.closestLexicalTarget, paragraph))
+                                pageResults.append((pageIndex, similarityResult.closestLexicalTarget.isEmpty ? similarityResult.closestSemanticTarget.trimmingCharacters(in: .whitespacesAndNewlines) : similarityResult.closestLexicalTarget.trimmingCharacters(in: .whitespacesAndNewlines), paragraph.trimmingCharacters(in: .whitespacesAndNewlines)))
                                 if similarityResult.getHighestSimilarity() > score_noteText {
                                     score_noteText = similarityResult.getHighestSimilarity()
                                 }
@@ -331,7 +331,7 @@ class SemanticSearch {
                     if isDocumentMatching {
                         let documentScore = score_documentTitle + score_documentDescription
                         searchResult.documents.append((document, documentScore))
-                        logger.info("Document \(document.title) score = \(documentScore)")
+                        //logger.info("Document \(document.title) score = \(documentScore)")
                     }
                     // Document types [TODO]
                 }
