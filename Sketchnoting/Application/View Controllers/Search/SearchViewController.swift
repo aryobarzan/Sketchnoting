@@ -38,8 +38,12 @@ class SearchViewController: UIViewController, DrawingSearchDelegate, SKIndexerDe
         searchBar.resignFirstResponder()
     }
     
-    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
-        clear()
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        if searchText.isEmpty {
+            DispatchQueue.main.async {
+                self.clear()
+            }
+        }
     }
       
     @IBAction func drawingSearchTapped(_ sender: UIButton) {
@@ -65,15 +69,12 @@ class SearchViewController: UIViewController, DrawingSearchDelegate, SKIndexerDe
     }
     
     @IBAction func updateButtonTapped(_ sender: UIButton) {
-        sender.isEnabled = false
-        activityIndicator.startAnimating()
-        
+        sender.isEnabled = false        
         SKIndexer.shared.delegate = self
         SKIndexer.shared.cancelIndexing()
         SKIndexer.shared.indexLibrary(finishHandler: { finished in
             DispatchQueue.main.async {
                 self.updateButton.setTitle("Update", for: .disabled)
-                self.activityIndicator.stopAnimating()
                 self.updateButton.isEnabled = true
             }
         })
@@ -93,30 +94,38 @@ class SearchViewController: UIViewController, DrawingSearchDelegate, SKIndexerDe
         clear()
         activityIndicator.isHidden = false
         activityIndicator.startAnimating()
-        let searchResults = SemanticSearch.shared.search(query: query, expandedSearch: expandedSearchSwitch.isOn, useFullQuery: useFullQuery)
-        if searchResults.count > 1 {
-            let item = SearchTableInformationItem(query: query, message: "Your query '\(query)' has been split into \(Int(searchResults.count)) different subqueries: \(searchResults.map{"'\($0.query)'"}.joined(separator: ", ")). Do you want to view results for the full query?")
-            self.items.append(item)
-        }
-        for result in searchResults {
-            if !result.notes.isEmpty {
-                let item = SearchTableNotesItem(query: result.query, noteResults: result.notes.map{$0.value})
-                self.items.append(item)
-            }
-            if !result.documents.isEmpty {
-                let item = SearchTableDocumentsItem(query: result.query, documents: result.documents)
-                self.items.append(item)
-            }
-            logger.info("Search Result for query '\(result.query)' - \(Int(result.notes.count)) notes / \(Int(result.documents.count)) Documents")
-        }
-        DispatchQueue.main.async {
-            self.reload()
-            self.activityIndicator.isHidden = true
+        
+        let isExpandedSearch = expandedSearchSwitch.isOn
+        DispatchQueue.global(qos: .userInitiated).async {
+            SemanticSearch.shared.search(query: query, expandedSearch: isExpandedSearch, useFullQuery: useFullQuery, resultHandler: {result in
+                if !result.notes.isEmpty {
+                    let item = SearchTableNotesItem(query: result.query, noteResults: result.notes.map{$0.value})
+                    self.items.append(item)
+                }
+                if !result.documents.isEmpty {
+                    let item = SearchTableDocumentsItem(query: result.query, documents: result.documents)
+                    self.items.append(item)
+                }
+                logger.info("Search Result for query '\(result.query)' - \(Int(result.notes.count)) notes / \(Int(result.documents.count)) Documents")
+                self.reload()
+                
+            }, subqueriesHandler: { queries in
+                if queries.count > 1 {
+                    let item = SearchTableInformationItem(query: query, message: "Your query '\(query)' has been split into \(Int(queries.count)) different subqueries: \(queries.joined(separator: ", ")). Do you want to view results for the full query?")
+                    self.items.append(item)
+                }
+            }, searchFinishHandler: {
+                DispatchQueue.main.async {
+                    self.activityIndicator.isHidden = true
+                }
+            })
         }
     }
     
     private func reload() {
-        searchTableView.reloadData()
+        DispatchQueue.main.async {
+            self.searchTableView.reloadData()
+        }
     }
     
     private func clear() {

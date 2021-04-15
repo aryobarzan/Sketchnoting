@@ -18,6 +18,7 @@ class SearchDocumentCell: UITableViewCell {
     @IBOutlet weak var nextButton: UIButton!
     @IBOutlet weak var previousButton: UIButton!
     @IBOutlet weak var pageLabel: UILabel!
+    @IBOutlet weak var progressView: UIProgressView!
     
     var documents = [(Document, Double)]()
     var images = [UIImage]()
@@ -95,9 +96,10 @@ class SearchDocumentCell: UITableViewCell {
     
     private func updateDisplayedDocument() {
         if !documents.isEmpty {
-            let document = documents[currentIndex].0
-            titleLabel.text = document.title
-            bodyTextView.text = document.getDescription()
+            let document = documents[currentIndex]
+            titleLabel.text = document.0.title
+            bodyTextView.text = document.0.getDescription()
+            progressView.setProgress(Float(document.1), animated: true)
         }
         fetchDocumentImages()
         updateDocumentIndex()

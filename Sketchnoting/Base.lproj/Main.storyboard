@@ -2164,10 +2164,10 @@
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="JUE-5Z-Gd3">
-                                                    <rect key="frame" x="12" y="47" width="575" height="150"/>
+                                                    <rect key="frame" x="12" y="51" width="575" height="136"/>
                                                     <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                                     <constraints>
-                                                        <constraint firstAttribute="height" constant="150" id="vN9-tW-zvj"/>
+                                                        <constraint firstAttribute="height" constant="136" id="vN9-tW-zvj"/>
                                                     </constraints>
                                                     <string key="text">Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nam liber te conscient to factor tum poen legum odioque civiuda.</string>
                                                     <color key="textColor" systemColor="labelColor"/>
@@ -2238,6 +2238,9 @@
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
+                                                <progressView opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" progress="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="Axc-rk-Cfm">
+                                                    <rect key="frame" x="16" y="195" width="696" height="4"/>
+                                                </progressView>
                                             </subviews>
                                             <constraints>
                                                 <constraint firstAttribute="trailing" secondItem="taw-5s-RMb" secondAttribute="trailing" constant="15" id="8IT-CB-ceK"/>
@@ -2246,14 +2249,17 @@
                                                 <constraint firstItem="fZo-Im-exH" firstAttribute="top" secondItem="CGz-Vw-Xom" secondAttribute="bottom" id="ILK-Ib-pLk"/>
                                                 <constraint firstItem="DDS-3g-EXd" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="fZo-Im-exH" secondAttribute="trailing" constant="8" symbolic="YES" id="Jiq-hC-wnW"/>
                                                 <constraint firstItem="CGz-Vw-Xom" firstAttribute="top" secondItem="b5u-Fq-llV" secondAttribute="topMargin" id="LAb-HS-uT2"/>
+                                                <constraint firstItem="Axc-rk-Cfm" firstAttribute="bottom" secondItem="b5u-Fq-llV" secondAttribute="bottomMargin" id="Q62-BF-KOJ"/>
                                                 <constraint firstItem="taw-5s-RMb" firstAttribute="top" secondItem="czo-wr-pXT" secondAttribute="bottom" constant="14" id="Uy4-QQ-Sx8"/>
+                                                <constraint firstItem="Axc-rk-Cfm" firstAttribute="trailing" secondItem="b5u-Fq-llV" secondAttribute="trailingMargin" id="Uyz-s4-wsd"/>
                                                 <constraint firstItem="JUE-5Z-Gd3" firstAttribute="leading" secondItem="b5u-Fq-llV" secondAttribute="leading" constant="12" id="VeH-ad-yvG"/>
                                                 <constraint firstItem="taw-5s-RMb" firstAttribute="leading" secondItem="JUE-5Z-Gd3" secondAttribute="trailing" constant="12" id="X7s-3k-e1W"/>
                                                 <constraint firstItem="czo-wr-pXT" firstAttribute="leading" secondItem="9hW-eP-PsZ" secondAttribute="trailing" constant="14" id="bt6-qq-1a2"/>
                                                 <constraint firstItem="9hW-eP-PsZ" firstAttribute="leading" secondItem="DDS-3g-EXd" secondAttribute="trailing" constant="14" id="dhw-P5-1qY"/>
-                                                <constraint firstItem="JUE-5Z-Gd3" firstAttribute="top" secondItem="fZo-Im-exH" secondAttribute="bottom" id="k8z-R5-qmP"/>
+                                                <constraint firstItem="JUE-5Z-Gd3" firstAttribute="top" secondItem="fZo-Im-exH" secondAttribute="bottom" constant="4" id="k8z-R5-qmP"/>
                                                 <constraint firstItem="czo-wr-pXT" firstAttribute="top" secondItem="b5u-Fq-llV" secondAttribute="topMargin" id="kZK-Za-S8R"/>
                                                 <constraint firstItem="CGz-Vw-Xom" firstAttribute="leading" secondItem="b5u-Fq-llV" secondAttribute="leadingMargin" id="myD-HA-U2i"/>
+                                                <constraint firstItem="Axc-rk-Cfm" firstAttribute="leading" secondItem="b5u-Fq-llV" secondAttribute="leadingMargin" id="myZ-Rf-cTk"/>
                                                 <constraint firstItem="fZo-Im-exH" firstAttribute="leading" secondItem="b5u-Fq-llV" secondAttribute="leadingMargin" id="rRi-05-u63"/>
                                                 <constraint firstItem="czo-wr-pXT" firstAttribute="trailing" secondItem="b5u-Fq-llV" secondAttribute="trailingMargin" id="tmG-NR-Fld"/>
                                                 <constraint firstItem="DDS-3g-EXd" firstAttribute="top" secondItem="b5u-Fq-llV" secondAttribute="topMargin" id="uuI-hv-O4v"/>
@@ -2266,6 +2272,7 @@
                                             <outlet property="pageLabel" destination="9hW-eP-PsZ" id="dCc-Iw-glu"/>
                                             <outlet property="previewImageView" destination="jcs-0a-0yC" id="gsJ-qL-Hef"/>
                                             <outlet property="previousButton" destination="DDS-3g-EXd" id="GcF-ir-631"/>
+                                            <outlet property="progressView" destination="Axc-rk-Cfm" id="RNd-4A-uSi"/>
                                             <outlet property="subtitleLabel" destination="fZo-Im-exH" id="qfi-16-Uhs"/>
                                             <outlet property="titleLabel" destination="CGz-Vw-Xom" id="Zxe-pl-I7x"/>
                                         </connections>
@@ -2323,7 +2330,7 @@
                             </tableView>
                             <searchBar contentMode="redraw" searchBarStyle="minimal" prompt="Your query can be keywords, a sentence or even a basic question." placeholder="Search for notes and documents..." translatesAutoresizingMaskIntoConstraints="NO" id="A4p-La-YPV">
                                 <rect key="frame" x="0.0" y="69" width="768" height="90"/>
-                                <textInputTraits key="textInputTraits"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences" spellCheckingType="yes"/>
                             </searchBar>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="San-i8-ecq">
                                 <rect key="frame" x="535" y="168" width="21" height="28"/>

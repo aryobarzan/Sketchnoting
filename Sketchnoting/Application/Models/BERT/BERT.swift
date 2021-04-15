@@ -24,7 +24,7 @@ class BERT {
     ///     - document: The document text that (should) contain an answer.
     /// - returns: The answer string or an error descripton.
     /// - Tag: FindAnswerForQuestionInDocument
-    func findAnswer(for question: String, in document: String) -> Substring {
+    func findAnswer(for question: String, in document: String) -> Substring? {
         // Prepare the input for the BERT model.
         let bertInput = BERTInput(documentString: document, questionString: question)
         
@@ -32,7 +32,8 @@ class BERT {
             var message = "Text and question are too long"
             message += " (\(bertInput.totalTokenSize) tokens)"
             message += " for the BERT model's \(BERTInput.maxTokens) token limit."
-            return Substring(message)
+            logger.error(message)
+            return nil
         }
         
         // The MLFeatureProvider that supplies the BERT model with its input MLMultiArrays.
@@ -40,13 +41,15 @@ class BERT {
         
         // Make a prediction with the BERT model.
         guard let prediction = try? bertModel.prediction(input: modelInput) else {
-            return "The BERT model is unable to make a prediction."
+            logger.error("The BERT model is unable to make a prediction.")
+            return nil
         }
 
         // Analyze the output form the BERT model.
         guard let bestLogitIndices = bestLogitsIndices(from: prediction,
                                                        in: bertInput.documentRange) else {
-            return "Couldn't find a valid answer. Please try again."
+            logger.error("Couldn't find a valid answer. Please try again.")
+            return nil
         }
 
         // Find the indices of the original string.

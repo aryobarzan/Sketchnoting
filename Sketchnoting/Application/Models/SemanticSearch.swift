@@ -178,11 +178,12 @@ class SemanticSearch {
         return clusters
     }
     
-    private func preprocess(query: String, useFullQuery: Bool) -> [String] {
+    private func preprocess(query: String, useFullQuery: Bool) -> ([String], Bool) {
+        var useFullQuery = useFullQuery
         let queryWords = tokenize(text: query, unit: .word)
         if queryWords.count > 1 { // Longer query
             var processedQuery = ""
-            var allowed = [NLTag.noun.rawValue, NLTag.number.rawValue, NLTag.adjective.rawValue, NLTag.otherWord.rawValue]
+            var allowed = [NLTag.noun.rawValue, NLTag.adjective.rawValue, NLTag.otherWord.rawValue]
             let partsOfSpeech = tag(text: queryWords.joined(separator: " "), scheme: .lexicalClass)
             var wordsDebug = ""
             var tagsDebug = ""
@@ -193,26 +194,35 @@ class SemanticSearch {
             logger.info(wordsDebug)
             logger.info(tagsDebug)
             let phraseType = checkPhraseType(queryPartsOfSpeech: partsOfSpeech)
+            var isQuestion = false
             if phraseType == .Sentence {
-                let isQuestion = isSentenceQuestion(text: query)
+                isQuestion = isSentenceQuestion(text: query)
                 if !isQuestion {
                     allowed.append(NLTag.verb.rawValue)
                 }
             }
             var retainedQueryTerms = [String]()
-            for i in 0..<partsOfSpeech.count {
-                if allowed.contains(partsOfSpeech[i].1) {
-                    if partsOfSpeech[i].1 == NLTag.otherWord.rawValue {
-                        if stopwords.contains(partsOfSpeech[i].0) {
-                            continue
+            // MARK: TODO - more improvements needed
+            if partsOfSpeech.filter({$0.1 != NLTag.otherWord.rawValue}).isEmpty {
+                retainedQueryTerms = partsOfSpeech.map{$0.0.lowercased()}.filter{!stopwords.contains($0)}
+                useFullQuery = true
+                isQuestion = isSentenceQuestion(text: query)
+            }
+            else {
+                for i in 0..<partsOfSpeech.count {
+                    if allowed.contains(partsOfSpeech[i].1) {
+                        if partsOfSpeech[i].1 == NLTag.otherWord.rawValue {
+                            if stopwords.contains(partsOfSpeech[i].0) {
+                                continue
+                            }
                         }
+                        processedQuery.append("\(partsOfSpeech[i].0.lowercased()) ")
+                        retainedQueryTerms.append(partsOfSpeech[i].0)
                     }
-                    processedQuery.append("\(partsOfSpeech[i].0.lowercased()) ")
-                    retainedQueryTerms.append(partsOfSpeech[i].0)
                 }
             }
             if useFullQuery {
-                return [retainedQueryTerms.joined(separator: " ").lowercased().trimmingCharacters(in: .whitespaces)]
+                return ([retainedQueryTerms.joined(separator: " ").lowercased().trimmingCharacters(in: .whitespaces)], isQuestion)
             }
             else {
                 let queryClusters = getTermRelevancy(for: retainedQueryTerms)
@@ -220,29 +230,29 @@ class SemanticSearch {
                 for queryCluster in queryClusters {
                     processedQueryClusters.append(queryCluster.joined(separator: " ").lowercased().trimmingCharacters(in: .whitespaces))
                 }
-                return processedQueryClusters
+                return (processedQueryClusters, isQuestion)
             }
         }
         else if queryWords.count == 1 { // Keyword query
-            return [lemmatize(text: queryWords[0].lowercased())]
+            return ([lemmatize(text: queryWords[0].lowercased())], false)
         }
-        return [queryWords.joined(separator: " ")]
+        return ([queryWords.joined(separator: " ")], false)
     }
     
-    public func search(query originalQuery: String, expandedSearch: Bool = true, useFullQuery: Bool = false) -> [SearchResult] {
+    public func search(query originalQuery: String, expandedSearch: Bool = true, useFullQuery: Bool = false, resultHandler: (SearchResult) -> Void, subqueriesHandler: ([String]) -> Void, searchFinishHandler: () -> Void) {
         // Keyword, Clause, Extended Clause or Sentence
-        let queries = preprocess(query: originalQuery, useFullQuery: useFullQuery)
+        let (queries, isQuestion) = preprocess(query: originalQuery, useFullQuery: useFullQuery)
         logger.info("----")
         logger.info("Original query: \(originalQuery)")
         if queries.count > 1 {
             logger.info("Query has been divided into \(Int(queries.count)) semantically different queries.")
+            subqueriesHandler(queries)
         }
         // Expanded Search means a lower threshold for the lexical search, i.e. more tolerant to minor typos
         let lexicalThreshold = expandedSearch ? 0.9 : 1.0
-        
+        let bert = BERT()
         let wordEmbedding = createFastTextWordEmbedding()
         var noteIterator = NeoLibrary.getNoteIterator()
-        var searchResults = [SearchResult]()
         for query in queries {
             noteIterator.reset()
             var searchResult = SearchResult(query: query)
@@ -270,8 +280,8 @@ class SemanticSearch {
                         //logger.info("[Semantic] Note drawing ('\(closestTarget)') = \(score)")
                     }
                 }
-                // MARK: Note body (handwritten + PDF text)
-                var pageResults = [(PageIndex, PageHit, PageHitContext)]()
+                // MARK: Note body
+                var pageResults = [(PageIndex, PageHit, PageHitContext, PageHitSimilarity)]()
                 for (pageIndex, page) in note.1.pages.enumerated() {
                     let pageText = page.getText(option: .FullText, parse: false)
                     if !pageText.isEmpty {
@@ -280,7 +290,7 @@ class SemanticSearch {
                             let similarityResult = self.getStringSimilarity(betweenQuery: query, and: paragraph, wordEmbedding: wordEmbedding)
                             if similarityResult.lexicalSimilarity >= lexicalThreshold || similarityResult.semanticSimilarity >= self.SEARCH_THRESHOLD {
                                 noteResult = note
-                                pageResults.append((pageIndex, similarityResult.closestLexicalTarget.isEmpty ? similarityResult.closestSemanticTarget.trimmingCharacters(in: .whitespacesAndNewlines) : similarityResult.closestLexicalTarget.trimmingCharacters(in: .whitespacesAndNewlines), paragraph.trimmingCharacters(in: .whitespacesAndNewlines)))
+                                pageResults.append((pageIndex, similarityResult.closestLexicalTarget.isEmpty ? similarityResult.closestSemanticTarget.trimmingCharacters(in: .whitespacesAndNewlines) : similarityResult.closestLexicalTarget.trimmingCharacters(in: .whitespacesAndNewlines), paragraph.trimmingCharacters(in: .whitespacesAndNewlines), similarityResult.getHighestSimilarity()))
                                 if similarityResult.getHighestSimilarity() > score_noteText {
                                     score_noteText = similarityResult.getHighestSimilarity()
                                 }
@@ -289,16 +299,6 @@ class SemanticSearch {
                         }
                     }
                 }
-                
-                /*let noteText = note.1.getText(option: .FullText, parse: false)
-                if !noteText.isEmpty {
-                    let similarityResult = self.getStringSimilarity(betweenQuery: query, and: noteText, wordEmbedding: wordEmbedding)
-                    if similarityResult.lexicalSimilarity >= lexicalThreshold || similarityResult.semanticSimilarity >= self.SEARCH_THRESHOLD {
-                        noteResult = note
-                        score_noteText = similarityResult.getHighestSimilarity()
-                        //logger.info("[Semantic] Note body ('\(closestTarget)') = \(score)")
-                    }
-                }*/
                 // MARK: Documents
                 var highestSemanticSimilarity = 0.0
                 var highestLexicalSimilarity = 0.0
@@ -331,9 +331,9 @@ class SemanticSearch {
                     if isDocumentMatching {
                         let documentScore = score_documentTitle + score_documentDescription
                         searchResult.documents.append((document, documentScore))
-                        //logger.info("Document \(document.title) score = \(documentScore)")
+                        // logger.info("Document \(document.title) score = \(documentScore)")
                     }
-                    // Document types [TODO]
+                    // MARK: Document types [TODO]
                 }
                 let highestDocumentSimilarity = max(highestSemanticSimilarity, highestLexicalSimilarity)
                 if highestDocumentSimilarity > self.SEARCH_THRESHOLD {
@@ -345,13 +345,44 @@ class SemanticSearch {
                         logger.info("Search score for note '\(note.1.getName())' = \(score)")
                         searchNoteResult = SearchNoteResult(note: noteResult, noteScore: score, pageHits: pageResults)
                         searchResult.notes[noteResult.0] = searchNoteResult
+                        if isQuestion {
+                            logger.info("---------- Question-answer search in note body:")
+                            for noteHit in searchNoteResult!.pageHits.filter({$0.3 >= 1.0}).sorted(by: {pageHit1, pageHit2 in pageHit1.3 > pageHit2.3}).prefix(2)  {
+                                let phraseType = checkPhraseType(queryPartsOfSpeech: tag(text: noteHit.2, scheme: .lexicalClass))
+                                if phraseType == .Sentence {
+                                    if let answer = findAnswer(for: originalQuery, in: noteHit.2, with: bert) {
+                                        logger.info("For note '\(searchNoteResult!.note.1.getName())': \(noteHit.2)")
+                                        logger.info(answer)
+                                        logger.info("---")
+                                    }
+                                }
+                            }
+                            logger.info("---------- Question-Answer search in documents:")
+                            for doc in searchResult.documents.filter({$0.1 >= 1.0}).sorted(by: {doc1, doc2 in doc1.1 > doc2.1}).prefix(2) {
+                                if let documentDescription = doc.0.getDescription() {
+                                    if let answer = findAnswer(for: originalQuery, in: documentDescription, with: bert) {
+                                        logger.info("For document '\(doc.0.title)': \(documentDescription)")
+                                        logger.info(answer)
+                                        logger.info("---")
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
-            searchResults.append(searchResult)
+            resultHandler(searchResult)
         }
         logger.info("Search for query '\(originalQuery)' completed.")
-        return searchResults
+        searchFinishHandler()
+    }
+    
+    private func findAnswer(for question: String, in text: String, with bert: BERT = BERT()) -> Substring? {
+        let availableLength = 384 - question.count - 3
+        let text = String(text[0..<availableLength])
+        
+        let answer = bert.findAnswer(for: question, in: text)
+        return answer
     }
     
     private enum SearchType: String {
@@ -368,7 +399,8 @@ class SemanticSearch {
         let partsOfSpeech = tag(text: query, scheme: .lexicalClass)
         let queryPhraseType = checkPhraseType(queryPartsOfSpeech: partsOfSpeech)
         
-        if queryPhraseType == .Clause || queryPhraseType == .ExtendedClause {
+        // MARK: TODO - To improve
+        if queryPhraseType == .Keyword || queryPhraseType == .Clause || queryPhraseType == .ExtendedClause {
             var semanticSimilarities = [Double]()
             var lexicalSimilarities = [Double]()
             var closestSemanticTarget: String = ""
@@ -514,11 +546,12 @@ struct SearchResult {
 typealias PageIndex = Int
 typealias PageHit = String
 typealias PageHitContext = String
+typealias PageHitSimilarity = Double
 
 struct SearchNoteResult {
     var note: (URL, Note)
     var noteScore: Double
-    var pageHits: [(PageIndex, PageHit, PageHitContext)]
+    var pageHits: [(PageIndex, PageHit, PageHitContext, PageHitSimilarity)]
 }
 
 struct StringSimilarityResult {
