@@ -12,7 +12,7 @@ class SearchInformationCell: UITableViewCell {
 
     @IBOutlet weak var leftImageView: UIImageView!
     @IBOutlet weak var informationLabel: UILabel!
-    @IBOutlet weak var actionButton: UIButton!
+    
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
@@ -25,8 +25,5 @@ class SearchInformationCell: UITableViewCell {
     
     func setContent(message: String) {
         informationLabel.text = message
-    }
-    
-    @IBAction func actionButtonTapped(_ sender: UIButton) {
     }
 }

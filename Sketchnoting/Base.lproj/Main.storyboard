@@ -2292,36 +2292,21 @@
                                                     </constraints>
                                                 </imageView>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Your query '' has been split into 3 different subqueries: '', ''. Do you want to instead view results for the full query?" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="BMX-zd-oQp">
-                                                    <rect key="frame" x="54" y="15" width="584" height="30"/>
+                                                    <rect key="frame" x="54" y="23" width="643" height="14.5"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="12"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
-                                                <button opaque="NO" userInteractionEnabled="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Bg0-bV-9bO">
-                                                    <rect key="frame" x="642" y="15" width="70" height="30"/>
-                                                    <constraints>
-                                                        <constraint firstAttribute="height" constant="30" id="bm7-96-130"/>
-                                                        <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="44" id="zho-C2-kCL"/>
-                                                    </constraints>
-                                                    <state key="normal" title="Okay"/>
-                                                    <connections>
-                                                        <action selector="actionButtonTapped:" destination="hLQ-iG-6rb" eventType="touchUpInside" id="Gwh-Cy-o3q"/>
-                                                    </connections>
-                                                </button>
                                             </subviews>
                                             <constraints>
                                                 <constraint firstItem="BMX-zd-oQp" firstAttribute="centerY" secondItem="1OL-Pm-zSY" secondAttribute="centerY" id="2DJ-zL-kdA"/>
-                                                <constraint firstItem="Bg0-bV-9bO" firstAttribute="centerY" secondItem="1OL-Pm-zSY" secondAttribute="centerY" id="Erw-Hn-1pb"/>
-                                                <constraint firstItem="Bg0-bV-9bO" firstAttribute="leading" secondItem="BMX-zd-oQp" secondAttribute="trailing" constant="4" id="GQx-aK-pZY"/>
                                                 <constraint firstItem="BMX-zd-oQp" firstAttribute="leading" secondItem="sKL-z1-63l" secondAttribute="trailing" constant="8" symbolic="YES" id="Rw7-yD-25n"/>
-                                                <constraint firstItem="Bg0-bV-9bO" firstAttribute="trailing" secondItem="1OL-Pm-zSY" secondAttribute="trailingMargin" id="e1f-A4-gpI"/>
+                                                <constraint firstAttribute="trailingMargin" secondItem="BMX-zd-oQp" secondAttribute="trailing" constant="15" id="fuY-No-Bcz"/>
                                                 <constraint firstItem="sKL-z1-63l" firstAttribute="leading" secondItem="1OL-Pm-zSY" secondAttribute="leadingMargin" constant="6" id="kB4-mT-YwR"/>
                                                 <constraint firstItem="sKL-z1-63l" firstAttribute="centerY" secondItem="1OL-Pm-zSY" secondAttribute="centerY" id="sw3-LZ-rLl"/>
-                                                <constraint firstItem="BMX-zd-oQp" firstAttribute="top" secondItem="1OL-Pm-zSY" secondAttribute="topMargin" constant="4" id="wqH-hT-hHU"/>
                                             </constraints>
                                         </tableViewCellContentView>
                                         <connections>
-                                            <outlet property="actionButton" destination="Bg0-bV-9bO" id="qxH-d7-hwz"/>
                                             <outlet property="informationLabel" destination="BMX-zd-oQp" id="YZZ-3n-fws"/>
                                             <outlet property="leftImageView" destination="sKL-z1-63l" id="uuc-j9-Omk"/>
                                         </connections>
@@ -2333,12 +2318,14 @@
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences" spellCheckingType="yes"/>
                             </searchBar>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="San-i8-ecq">
-                                <rect key="frame" x="535" y="168" width="21" height="28"/>
+                                <rect key="frame" x="20" y="168" width="139.5" height="28"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="21" id="Wq9-r3-A36"/>
                                     <constraint firstAttribute="height" constant="28" id="X47-oo-mcc"/>
                                 </constraints>
-                                <state key="normal" image="scribble" catalog="system"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                                <state key="normal" title=" Drawing Search" image="scribble" catalog="system">
+                                    <color key="titleColor" systemColor="systemBlueColor"/>
+                                </state>
                                 <connections>
                                     <action selector="drawingSearchTapped:" destination="kPL-Mg-aaB" eventType="touchUpInside" id="EQD-32-wni"/>
                                 </connections>
@@ -2349,9 +2336,10 @@
                         <constraints>
                             <constraint firstItem="A4p-La-YPV" firstAttribute="trailing" secondItem="MqQ-2V-Ujw" secondAttribute="trailing" id="0en-7g-ZpD"/>
                             <constraint firstItem="HIq-1Q-FoN" firstAttribute="top" secondItem="tH4-HJ-5MO" secondAttribute="bottom" constant="20" id="1AR-Cb-V5D"/>
+                            <constraint firstItem="San-i8-ecq" firstAttribute="leading" secondItem="MqQ-2V-Ujw" secondAttribute="leading" constant="20" id="1c6-Hr-41l"/>
                             <constraint firstItem="MqQ-2V-Ujw" firstAttribute="trailing" secondItem="M2p-g3-U7u" secondAttribute="trailing" constant="20" id="AKg-Q5-Ex6"/>
                             <constraint firstItem="tH4-HJ-5MO" firstAttribute="top" secondItem="A4p-La-YPV" secondAttribute="bottom" constant="8" id="DXo-u7-6GR"/>
-                            <constraint firstItem="D8l-la-vhm" firstAttribute="leading" secondItem="San-i8-ecq" secondAttribute="trailing" constant="8" id="QQb-Mc-FO1"/>
+                            <constraint firstItem="D8l-la-vhm" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="San-i8-ecq" secondAttribute="trailing" constant="8" symbolic="YES" id="Ls6-Oo-bLS"/>
                             <constraint firstItem="D8l-la-vhm" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="MqQ-2V-Ujw" secondAttribute="leading" symbolic="YES" id="RkZ-JW-pUI"/>
                             <constraint firstItem="Axk-yc-h7I" firstAttribute="top" secondItem="MqQ-2V-Ujw" secondAttribute="top" constant="20" id="U5y-RD-OyJ"/>
                             <constraint firstItem="DtE-Wh-w1z" firstAttribute="leading" secondItem="Axk-yc-h7I" secondAttribute="trailing" constant="8" id="UBO-RX-SRO"/>

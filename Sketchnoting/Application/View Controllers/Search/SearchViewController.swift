@@ -80,45 +80,55 @@ class SearchViewController: UIViewController, DrawingSearchDelegate, SKIndexerDe
         })
     }
     
-    private func performSearch() {
-        if let searchTextFieldText = searchBar.text {
-            if !searchTextFieldText.isEmpty {
-                self.performSemanticSearch()
+    private func performSearch(specificQuery: String? = nil, useFullQuery: Bool = false) {
+        let query = (specificQuery != nil) ? specificQuery! : searchBar.text?.trimmingCharacters(in: .whitespacesAndNewlines)
+        if let query = query {
+            clear()
+            activityIndicator.isHidden = false
+            activityIndicator.startAnimating()
+            let isExpandedSearch = expandedSearchSwitch.isOn
+            DispatchQueue.global(qos: .userInitiated).async {
+                SemanticSearch.shared.search(query: query, expandedSearch: isExpandedSearch, useFullQuery: useFullQuery, resultHandler: {result in
+                    if !result.notes.isEmpty {
+                        let item = SearchTableNotesItem(query: result.query, noteResults: result.notes.map{$0.value})
+                        self.items.append(item)
+                    }
+                    if !result.documents.isEmpty {
+                        let item = SearchTableDocumentsItem(query: result.query, documents: result.documents)
+                        self.items.append(item)
+                    }
+                    logger.info("Search Result for query '\(result.query)' - \(Int(result.notes.count)) notes / \(Int(result.documents.count)) Documents")
+                    self.reload()
+                    
+                }, subqueriesHandler: { queries in
+                    if queries.count > 1 {
+                        let item = SearchTableInformationItem(query: query, message: "Your query '\(query)' has been split into \(Int(queries.count)) different subqueries: \(queries.joined(separator: ", ")). Do you want to view results for the full query?")
+                        self.items.append(item)
+                    }
+                }, searchFinishHandler: {
+                    DispatchQueue.main.async {
+                        self.activityIndicator.isHidden = true
+                        if self.items.isEmpty {
+                            var message = "Sorry, no results could be found matching your query '\(query)'."
+                            if !self.expandedSearchSwitch.isOn {
+                                message += " Try enabling 'Expanded Search'!"
+                            }
+                            else {
+                                let queryWords = SemanticSearch.shared.tokenize(text: query, unit: .word)
+                                if queryWords.count > 3 {
+                                    message += " Try shortening your query by only specifying 1 to 3 keywords!"
+                                }
+                                else if queryWords.count == 1 {
+                                    message += " Double check the spelling of your query or try a different keyword!"
+                                }
+                            }
+                            let item = SearchTableInformationItem(query: query, message: message, informationType: .Basic)
+                            self.items.append(item)
+                            self.reload()
+                        }
+                    }
+                })
             }
-        }
-    }
-    
-    private func performSemanticSearch(specificQuery: String? = nil, useFullQuery: Bool = false) {
-        let query = (specificQuery != nil) ? specificQuery! : searchBar.text!.trimmingCharacters(in: .whitespacesAndNewlines)
-        // Search
-        clear()
-        activityIndicator.isHidden = false
-        activityIndicator.startAnimating()
-        
-        let isExpandedSearch = expandedSearchSwitch.isOn
-        DispatchQueue.global(qos: .userInitiated).async {
-            SemanticSearch.shared.search(query: query, expandedSearch: isExpandedSearch, useFullQuery: useFullQuery, resultHandler: {result in
-                if !result.notes.isEmpty {
-                    let item = SearchTableNotesItem(query: result.query, noteResults: result.notes.map{$0.value})
-                    self.items.append(item)
-                }
-                if !result.documents.isEmpty {
-                    let item = SearchTableDocumentsItem(query: result.query, documents: result.documents)
-                    self.items.append(item)
-                }
-                logger.info("Search Result for query '\(result.query)' - \(Int(result.notes.count)) notes / \(Int(result.documents.count)) Documents")
-                self.reload()
-                
-            }, subqueriesHandler: { queries in
-                if queries.count > 1 {
-                    let item = SearchTableInformationItem(query: query, message: "Your query '\(query)' has been split into \(Int(queries.count)) different subqueries: \(queries.joined(separator: ", ")). Do you want to view results for the full query?")
-                    self.items.append(item)
-                }
-            }, searchFinishHandler: {
-                DispatchQueue.main.async {
-                    self.activityIndicator.isHidden = true
-                }
-            })
         }
     }
     
@@ -194,9 +204,17 @@ class SearchViewController: UIViewController, DrawingSearchDelegate, SKIndexerDe
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let item = items[indexPath.row]
         if item.type == .Information {
-            self.items.remove(at: indexPath.row)
-            self.searchTableView.deleteRows(at: [indexPath], with: .automatic)
-            performSemanticSearch(specificQuery: item.query, useFullQuery: true)
+            if let informationItem = item as? SearchTableInformationItem {
+                switch informationItem.informationType {
+                case .Basic:
+                    break
+                case .Subqueries:
+                    self.items.remove(at: indexPath.row)
+                    self.searchTableView.deleteRows(at: [indexPath], with: .automatic)
+                    performSearch(specificQuery: item.query, useFullQuery: true)
+                    break
+                }
+            }
         }
     }
     
@@ -244,9 +262,16 @@ fileprivate class SearchTableDocumentsItem: SearchTableItem {
 
 fileprivate class SearchTableInformationItem: SearchTableItem {
     var message: String
-    init(query: String, message: String) {
+    var informationType: SearchTableInformationItemType
+    init(query: String, message: String, informationType: SearchTableInformationItemType = .Basic) {
         self.message = message
+        self.informationType = informationType
         super.init(query: query, type: .Information)
+    }
+    
+    enum SearchTableInformationItemType {
+        case Subqueries
+        case Basic
     }
 }
 
