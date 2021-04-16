@@ -346,27 +346,33 @@ class SemanticSearch {
                         searchNoteResult = SearchNoteResult(note: noteResult, noteScore: score, pageHits: pageResults)
                         searchResult.notes[noteResult.0] = searchNoteResult
                         if isQuestion {
-                            logger.info("---------- Question-answer search in note body:")
-                            for noteHit in searchNoteResult!.pageHits.filter({$0.3 >= 1.0}).sorted(by: {pageHit1, pageHit2 in pageHit1.3 > pageHit2.3}).prefix(2)  {
+                            for noteHit in searchNoteResult!.pageHits.filter({$0.3 >= 1.0}).sorted(by: {pageHit1, pageHit2 in pageHit1.3 > pageHit2.3}).prefix(5)  {
                                 let phraseType = checkPhraseType(queryPartsOfSpeech: tag(text: noteHit.2, scheme: .lexicalClass))
                                 if phraseType == .Sentence {
                                     if let answer = findAnswer(for: originalQuery, in: noteHit.2, with: bert) {
-                                        logger.info("For note '\(searchNoteResult!.note.1.getName())': \(noteHit.2)")
-                                        logger.info(answer)
-                                        logger.info("---")
+                                        if !searchResult.questionAnswers.contains(where: {x in
+                                            (x.1, x.2) == answer
+                                        }) {
+                                            searchResult.questionAnswers.append(("Note '\(note.1.getName())'", answer.0, answer.1))
+                                        }
                                     }
                                 }
                             }
-                            logger.info("---------- Question-Answer search in documents:")
-                            for doc in searchResult.documents.filter({$0.1 >= 1.0}).sorted(by: {doc1, doc2 in doc1.1 > doc2.1}).prefix(2) {
+                            for doc in searchResult.documents.filter({$0.1 >= 1.0 && $0.0.documentType != .ALMAAR}).sorted(by: {doc1, doc2 in doc1.1 > doc2.1}).prefix(5) {
                                 if let documentDescription = doc.0.getDescription() {
                                     if let answer = findAnswer(for: originalQuery, in: documentDescription, with: bert) {
-                                        logger.info("For document '\(doc.0.title)': \(documentDescription)")
-                                        logger.info(answer)
-                                        logger.info("---")
+                                        if !searchResult.questionAnswers.contains(where: {x in
+                                            (x.1, x.2) == answer
+                                        }) {
+                                            searchResult.questionAnswers.append(("Document '\(doc.0.title)'", answer.0, answer.1))
+                                        }
+                                        
                                     }
                                 }
                             }
+                        }
+                        searchResult.questionAnswers = searchResult.questionAnswers.sorted {answer0, answer1 in
+                            answer0.2 > answer1.2
                         }
                     }
                 }
@@ -377,7 +383,7 @@ class SemanticSearch {
         searchFinishHandler()
     }
     
-    private func findAnswer(for question: String, in text: String, with bert: BERT = BERT()) -> Substring? {
+    private func findAnswer(for question: String, in text: String, with bert: BERT = BERT()) -> (String, Double)? {
         let availableLength = 384 - question.count - 3
         if availableLength > 0 {
             let text = String(text[0..<availableLength])
@@ -490,9 +496,12 @@ class SemanticSearch {
 
 struct SearchResult {
     typealias Score = Double
+    typealias AnswerContext = String
+    typealias Answer = String
     var query: String
     var notes = [URL : SearchNoteResult]()
     var documents = [(Document, Score)]()
+    var questionAnswers = [(AnswerContext, Answer, Score)]()
 }
 
 typealias PageIndex = Int

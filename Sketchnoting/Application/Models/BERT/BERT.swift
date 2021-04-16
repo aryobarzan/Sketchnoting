@@ -24,7 +24,7 @@ class BERT {
     ///     - document: The document text that (should) contain an answer.
     /// - returns: The answer string or an error descripton.
     /// - Tag: FindAnswerForQuestionInDocument
-    func findAnswer(for question: String, in document: String) -> Substring? {
+    func findAnswer(for question: String, in document: String) -> (String, Double)? {
         // Prepare the input for the BERT model.
         let bertInput = BERTInput(documentString: document, questionString: question)
         
@@ -45,10 +45,10 @@ class BERT {
             return nil
         }
 
-        // Analyze the output form the BERT model.
+        // Analyze output of BERT model.
         guard let bestLogitIndices = bestLogitsIndices(from: prediction,
                                                        in: bertInput.documentRange) else {
-            logger.error("Couldn't find a valid answer. Please try again.")
+            // No valid answer found
             return nil
         }
 
@@ -59,6 +59,6 @@ class BERT {
         
         // Return the portion of the original string as the answer.
         let originalText = bertInput.document.original
-        return originalText[answerStart..<answerEnd]
+        return (String(originalText[answerStart..<answerEnd]), bestLogitIndices.confidence)
     }
 }

@@ -97,12 +97,17 @@ class SearchViewController: UIViewController, DrawingSearchDelegate, SKIndexerDe
                         let item = SearchTableDocumentsItem(query: result.query, documents: result.documents)
                         self.items.append(item)
                     }
-                    logger.info("Search Result for query '\(result.query)' - \(Int(result.notes.count)) notes / \(Int(result.documents.count)) Documents")
+                    result.questionAnswers.forEach { answer in
+                        let item = SearchTableInformationItem(query: query, message: "Possible answer to your question '\(query)' from \(answer.0): \(answer.1) (\(Int(answer.2*100))% Confidence)", informationType: .QuestionAnswer)
+                        self.items.append(item)
+                    }
+                    logger.info("Search Result for query '\(result.query)' - \(Int(result.notes.count)) notes / \(Int(result.documents.count)) Documents / \(Int(result.questionAnswers.count)) answers")
                     self.reload()
+                    
                     
                 }, subqueriesHandler: { queries in
                     if queries.count > 1 {
-                        let item = SearchTableInformationItem(query: query, message: "Your query '\(query)' has been split into \(Int(queries.count)) different subqueries: \(queries.joined(separator: ", ")). Do you want to view results for the full query?")
+                        let item = SearchTableInformationItem(query: query, message: "Your query '\(query)' has been split into \(Int(queries.count)) different subqueries: \(queries.joined(separator: ", ")). Do you want to view results for the full query?", informationType: .Subqueries)
                         self.items.append(item)
                     }
                 }, searchFinishHandler: {
@@ -183,7 +188,7 @@ class SearchViewController: UIViewController, DrawingSearchDelegate, SKIndexerDe
         case .Information:
             let cell = searchTableView.dequeueReusableCell(withIdentifier: "SearchInformationCell", for: indexPath) as! SearchInformationCell
             if let informationItem = item as? SearchTableInformationItem {
-                cell.setContent(message: informationItem.message)
+                cell.setContent(message: informationItem.message, type: informationItem.informationType)
             }
             return cell
         }
@@ -206,7 +211,7 @@ class SearchViewController: UIViewController, DrawingSearchDelegate, SKIndexerDe
         if item.type == .Information {
             if let informationItem = item as? SearchTableInformationItem {
                 switch informationItem.informationType {
-                case .Basic:
+                case .Basic, .QuestionAnswer:
                     break
                 case .Subqueries:
                     self.items.remove(at: indexPath.row)
@@ -269,10 +274,13 @@ fileprivate class SearchTableInformationItem: SearchTableItem {
         super.init(query: query, type: .Information)
     }
     
-    enum SearchTableInformationItemType {
-        case Subqueries
-        case Basic
-    }
+    
+}
+
+enum SearchTableInformationItemType {
+    case Basic
+    case QuestionAnswer
+    case Subqueries
 }
 
 fileprivate enum SearchTableItemType {

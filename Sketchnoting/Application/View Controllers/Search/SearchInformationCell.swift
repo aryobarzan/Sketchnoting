@@ -23,7 +23,19 @@ class SearchInformationCell: UITableViewCell {
         // Configure the view for the selected state
     }
     
-    func setContent(message: String) {
+    func setContent(message: String, type: SearchTableInformationItemType = .Basic) {
         informationLabel.text = message
+        switch type {
+        case .Basic:
+            leftImageView.image = UIImage(systemName: "info.circle.fill")
+            break
+        case .Subqueries:
+            leftImageView.image = UIImage(systemName: "magnifyingglass.circle.fill")
+            break
+        case .QuestionAnswer:
+            leftImageView.image = UIImage(systemName: "questionmark.circle.fill")
+            break
+        }
+        
     }
 }
