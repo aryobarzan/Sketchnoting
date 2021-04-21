@@ -196,17 +196,20 @@ class SemanticSearch {
             let phraseType = checkPhraseType(queryPartsOfSpeech: partsOfSpeech)
             var isQuestion = false
             if phraseType == .Sentence {
-                isQuestion = isSentenceQuestion(text: query)
+                isQuestion = isQueryQuestion(text: query)
                 if !isQuestion {
                     allowed.append(NLTag.verb.rawValue)
+                }
+                else {
+                    useFullQuery = true
                 }
             }
             var retainedQueryTerms = [String]()
             // MARK: TODO - more improvements needed
-            if partsOfSpeech.filter({$0.1 != NLTag.otherWord.rawValue}).isEmpty {
+            if partsOfSpeech.filter({$0.1 != NLTag.otherWord.rawValue}).isEmpty || useFullQuery {
                 retainedQueryTerms = partsOfSpeech.map{$0.0.lowercased()}.filter{!stopwords.contains($0)}
                 useFullQuery = true
-                isQuestion = isSentenceQuestion(text: query)
+                isQuestion = isQueryQuestion(text: query)
             }
             else {
                 for i in 0..<partsOfSpeech.count {
@@ -239,7 +242,7 @@ class SemanticSearch {
         return ([queryWords.joined(separator: " ")], false)
     }
     
-    public func search(query originalQuery: String, expandedSearch: Bool = true, useFullQuery: Bool = false, resultHandler: (SearchResult) -> Void, subqueriesHandler: ([String]) -> Void, searchFinishHandler: () -> Void) {
+    public func search(query originalQuery: String, expandedSearch: Bool = true, filterQuality: Bool = true, useFullQuery: Bool = false, resultHandler: (SearchResult) -> Void, subqueriesHandler: ([String]) -> Void, searchFinishHandler: () -> Void) {
         // Keyword, Clause, Extended Clause or Sentence
         let (queries, isQuestion) = preprocess(query: originalQuery, useFullQuery: useFullQuery)
         logger.info("----")
@@ -339,48 +342,97 @@ class SemanticSearch {
                 if highestDocumentSimilarity > self.SEARCH_THRESHOLD {
                     score_noteDocuments = highestDocumentSimilarity
                 }
-                if let noteResult = noteResult {
-                    if searchResult.notes[noteResult.0] == nil {
-                        let score = 2 * score_noteTitle + 2 * score_noteText + 2 * score_noteDrawings + score_noteDocuments
-                        logger.info("Search score for note '\(note.1.getName())' = \(score)")
-                        searchNoteResult = SearchNoteResult(note: noteResult, noteScore: score, pageHits: pageResults)
-                        searchResult.notes[noteResult.0] = searchNoteResult
-                        if isQuestion {
-                            for noteHit in searchNoteResult!.pageHits.filter({$0.3 >= 1.0}).sorted(by: {pageHit1, pageHit2 in pageHit1.3 > pageHit2.3}).prefix(5)  {
-                                let phraseType = checkPhraseType(queryPartsOfSpeech: tag(text: noteHit.2, scheme: .lexicalClass))
-                                if phraseType == .Sentence {
-                                    if let answer = findAnswer(for: originalQuery, in: noteHit.2, with: bert) {
-                                        if !searchResult.questionAnswers.contains(where: {x in
-                                            (x.1, x.2) == answer
-                                        }) {
-                                            searchResult.questionAnswers.append(("Note '\(note.1.getName())'", answer.0, answer.1))
-                                        }
+                if isQuestion {
+                    var metaInformation = [String]()
+                    metaInformation.append("The note '\(note.1.getName())' was created on \(NeoLibrary.getCreationDate(url: note.0)).")
+                    metaInformation.append("The note '\(note.1.getName())' was modified on \(NeoLibrary.getModificationDate(url: note.0)).")
+                    if !note.1.pages.filter({ $0.getPDFData() != nil }).isEmpty {
+                        metaInformation.append("The note '\(note.1.getName())' contains \(Int(note.1.pages.filter({ $0.getPDFData() != nil }).count)) imported PDF pages.")
+                    }
+                    if !note.1.getDrawingLabels().isEmpty {
+                        metaInformation.append("The note \(note.1.getName())' contains drawings. The note '\(note.1.getName())' contains the following drawings: \(note.1.getDrawingLabels().joined(separator: ", "))")
+                    }
+                    for metaInfo in metaInformation {
+                        if let answer = findAnswer(for: originalQuery, in: metaInfo, with: bert) {
+                            if !searchResult.questionAnswers.contains(where: {x in
+                                (x.1, x.2) == answer
+                            }) {
+                                searchResult.questionAnswers.append(("[META] Note '\(note.1.getName())'", answer.0, answer.1))
+                                if answer.1 > 0.9 {
+                                    if noteResult == nil {
+                                        logger.info(metaInfo)
+                                        noteResult = note
                                     }
                                 }
                             }
-                            for doc in searchResult.documents.filter({$0.1 >= 1.0 && $0.0.documentType != .ALMAAR}).sorted(by: {doc1, doc2 in doc1.1 > doc2.1}).prefix(5) {
-                                if let documentDescription = doc.0.getDescription() {
-                                    if let answer = findAnswer(for: originalQuery, in: documentDescription, with: bert) {
-                                        if !searchResult.questionAnswers.contains(where: {x in
-                                            (x.1, x.2) == answer
-                                        }) {
-                                            searchResult.questionAnswers.append(("Document '\(doc.0.title)'", answer.0, answer.1))
-                                        }
-                                        
-                                    }
-                                }
-                            }
-                        }
-                        searchResult.questionAnswers = searchResult.questionAnswers.sorted {answer0, answer1 in
-                            answer0.2 > answer1.2
                         }
                     }
                 }
+                if let noteResult = noteResult {
+                    let score = 2 * score_noteTitle + 2 * score_noteText + 2 * score_noteDrawings + score_noteDocuments
+                    logger.info("Search score for note '\(note.1.getName())' = \(score)")
+                    searchNoteResult = SearchNoteResult(note: noteResult, noteScore: score, pageHits: pageResults)
+                    searchResult.notes.append(searchNoteResult!)
+                    if isQuestion {
+                        for noteHit in searchNoteResult!.pageHits.filter({$0.3 >= 1.0}).sorted(by: {pageHit1, pageHit2 in pageHit1.3 > pageHit2.3}).prefix(5)  {
+                            let phraseType = checkPhraseType(queryPartsOfSpeech: tag(text: noteHit.2, scheme: .lexicalClass))
+                            if phraseType == .Sentence {
+                                if let answer = findAnswer(for: originalQuery, in: noteHit.2, with: bert) {
+                                    if !searchResult.questionAnswers.contains(where: {x in
+                                        (x.1, x.2) == answer
+                                    }) {
+                                        searchResult.questionAnswers.append(("Note '\(note.1.getName())'", answer.0, answer.1))
+                                    }
+                                }
+                            }
+                        }
+                        for doc in searchResult.documents.filter({$0.1 >= 1.0 && $0.0.documentType != .ALMAAR}).sorted(by: {doc1, doc2 in doc1.1 > doc2.1}).prefix(5) {
+                            if let documentDescription = doc.0.getDescription() {
+                                if let answer = findAnswer(for: originalQuery, in: documentDescription, with: bert) {
+                                    if !searchResult.questionAnswers.contains(where: {x in
+                                        (x.1, x.2) == answer
+                                    }) {
+                                        searchResult.questionAnswers.append(("Document '\(doc.0.title)'", answer.0, answer.1))
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    searchResult.questionAnswers = searchResult.questionAnswers.sorted {answer0, answer1 in
+                        answer0.2 > answer1.2
+                    }
+                }
+            }
+            searchResult.notes = normalizeNoteSimilarities(noteResults: searchResult.notes)
+            searchResult.documents = normalizeDocumentSimilarities(documents: searchResult.documents)
+            if filterQuality {
+                searchResult.notes = searchResult.notes.filter{$0.noteScore > 0.5}
+                searchResult.documents = searchResult.documents.filter{$0.1 > 0.5}
+                searchResult.questionAnswers = searchResult.questionAnswers.filter{$0.2 > 0.9}
             }
             resultHandler(searchResult)
         }
         logger.info("Search for query '\(originalQuery)' completed.")
         searchFinishHandler()
+    }
+    
+    private func normalizeNoteSimilarities(noteResults: [SearchNoteResult]) -> [SearchNoteResult]{
+        var noteResults = noteResults
+        if !noteResults.isEmpty {
+            let maxSimilarity = noteResults.map{$0.noteScore}.max()!
+            let minSimilarity = 0.0 //notes.map{$0.2}.min()!
+            noteResults = noteResults.map {SearchNoteResult(note: $0.note, noteScore: ($0.noteScore - minSimilarity)/(maxSimilarity-minSimilarity), pageHits: $0.pageHits)}
+        }
+        return noteResults
+    }
+    private func normalizeDocumentSimilarities(documents: [(Document, Double)]) -> [(Document, Double)] {
+        var documents = documents
+        if !documents.isEmpty {
+            let maxSimilarity = documents.map{$0.1}.max()!
+            let minSimilarity = 0.0 //documents.map{$0.1}.min()!
+            documents = documents.map {($0.0, ($0.1 - minSimilarity)/(maxSimilarity-minSimilarity))}
+        }
+        return documents
     }
     
     private func findAnswer(for question: String, in text: String, with bert: BERT = BERT()) -> (String, Double)? {
@@ -478,17 +530,16 @@ class SemanticSearch {
         }
     }
     
-    func isSentenceQuestion(text: String) -> Bool {
-        let questionKeywords = ["who", "what", "where", "which", "when", "whose"]
-        let words = tokenize(text: text, unit: .word)
+    func isQueryQuestion(text: String) -> Bool {
+        let questionKeywords = ["who", "what", "where", "which", "when", "whose", "how"]
+        let words = tokenize(text: text, unit: .word).map{$0.lowercased()}
+        if text.hasSuffix("?") {
+            return true
+        }
         for word in words {
-            let word = lemmatize(text: word).lowercased()
             if questionKeywords.contains(word) {
                 return true
             }
-        }
-        if text.hasSuffix("?") {
-            return true
         }
         return false
     }
@@ -499,7 +550,7 @@ struct SearchResult {
     typealias AnswerContext = String
     typealias Answer = String
     var query: String
-    var notes = [URL : SearchNoteResult]()
+    var notes = [SearchNoteResult]()
     var documents = [(Document, Score)]()
     var questionAnswers = [(AnswerContext, Answer, Score)]()
 }

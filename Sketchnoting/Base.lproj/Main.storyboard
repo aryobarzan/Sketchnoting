@@ -2045,6 +2045,19 @@
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="San-i8-ecq">
+                                <rect key="frame" x="20" y="168" width="139.5" height="28"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="28" id="X47-oo-mcc"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                                <state key="normal" title=" Drawing Search" image="scribble" catalog="system">
+                                    <color key="titleColor" systemColor="systemBlueColor"/>
+                                </state>
+                                <connections>
+                                    <action selector="drawingSearchTapped:" destination="kPL-Mg-aaB" eventType="touchUpInside" id="EQD-32-wni"/>
+                                </connections>
+                            </button>
                             <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="tH4-HJ-5MO">
                                 <rect key="frame" x="699" y="167" width="51" height="31"/>
                                 <connections>
@@ -2317,19 +2330,18 @@
                                 <rect key="frame" x="0.0" y="69" width="768" height="90"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences" spellCheckingType="yes"/>
                             </searchBar>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="San-i8-ecq">
-                                <rect key="frame" x="20" y="168" width="139.5" height="28"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="28" id="X47-oo-mcc"/>
-                                </constraints>
-                                <fontDescription key="fontDescription" type="system" pointSize="16"/>
-                                <state key="normal" title=" Drawing Search" image="scribble" catalog="system">
-                                    <color key="titleColor" systemColor="systemBlueColor"/>
-                                </state>
+                            <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="vPY-X0-jEg">
+                                <rect key="frame" x="507" y="167" width="51" height="31"/>
                                 <connections>
-                                    <action selector="drawingSearchTapped:" destination="kPL-Mg-aaB" eventType="touchUpInside" id="EQD-32-wni"/>
+                                    <action selector="filterQualitySwitchChanged:" destination="kPL-Mg-aaB" eventType="valueChanged" id="Bnh-ez-ZMX"/>
                                 </connections>
-                            </button>
+                            </switch>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Filter Quality" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Uve-sR-lND">
+                                <rect key="frame" x="407" y="173" width="92" height="20"/>
+                                <fontDescription key="fontDescription" style="UICTFontTextStyleCallout"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="MqQ-2V-Ujw"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -2337,8 +2349,11 @@
                             <constraint firstItem="A4p-La-YPV" firstAttribute="trailing" secondItem="MqQ-2V-Ujw" secondAttribute="trailing" id="0en-7g-ZpD"/>
                             <constraint firstItem="HIq-1Q-FoN" firstAttribute="top" secondItem="tH4-HJ-5MO" secondAttribute="bottom" constant="20" id="1AR-Cb-V5D"/>
                             <constraint firstItem="San-i8-ecq" firstAttribute="leading" secondItem="MqQ-2V-Ujw" secondAttribute="leading" constant="20" id="1c6-Hr-41l"/>
+                            <constraint firstItem="vPY-X0-jEg" firstAttribute="top" secondItem="A4p-La-YPV" secondAttribute="bottom" constant="8" id="7hS-TE-U69"/>
                             <constraint firstItem="MqQ-2V-Ujw" firstAttribute="trailing" secondItem="M2p-g3-U7u" secondAttribute="trailing" constant="20" id="AKg-Q5-Ex6"/>
                             <constraint firstItem="tH4-HJ-5MO" firstAttribute="top" secondItem="A4p-La-YPV" secondAttribute="bottom" constant="8" id="DXo-u7-6GR"/>
+                            <constraint firstItem="Uve-sR-lND" firstAttribute="top" secondItem="A4p-La-YPV" secondAttribute="bottom" constant="14" id="Fto-WI-tJd"/>
+                            <constraint firstItem="Uve-sR-lND" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="San-i8-ecq" secondAttribute="trailing" constant="8" symbolic="YES" id="I1w-Nb-WGr"/>
                             <constraint firstItem="D8l-la-vhm" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="San-i8-ecq" secondAttribute="trailing" constant="8" symbolic="YES" id="Ls6-Oo-bLS"/>
                             <constraint firstItem="D8l-la-vhm" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="MqQ-2V-Ujw" secondAttribute="leading" symbolic="YES" id="RkZ-JW-pUI"/>
                             <constraint firstItem="Axk-yc-h7I" firstAttribute="top" secondItem="MqQ-2V-Ujw" secondAttribute="top" constant="20" id="U5y-RD-OyJ"/>
@@ -2349,11 +2364,13 @@
                             <constraint firstItem="M2p-g3-U7u" firstAttribute="top" secondItem="MqQ-2V-Ujw" secondAttribute="top" constant="25" id="aHI-DI-hep"/>
                             <constraint firstItem="MqQ-2V-Ujw" firstAttribute="trailing" secondItem="HIq-1Q-FoN" secondAttribute="trailing" constant="20" id="bmr-db-gIg"/>
                             <constraint firstItem="D8l-la-vhm" firstAttribute="top" secondItem="A4p-La-YPV" secondAttribute="bottom" constant="14" id="chT-yt-A7u"/>
+                            <constraint firstItem="vPY-X0-jEg" firstAttribute="leading" secondItem="Uve-sR-lND" secondAttribute="trailing" constant="8" id="e1K-7K-W8m"/>
                             <constraint firstItem="MqQ-2V-Ujw" firstAttribute="bottom" secondItem="HIq-1Q-FoN" secondAttribute="bottom" constant="20" id="jsh-n4-ONZ"/>
                             <constraint firstItem="Axk-yc-h7I" firstAttribute="leading" secondItem="MqQ-2V-Ujw" secondAttribute="leading" constant="20" id="nTm-Tn-k5e"/>
                             <constraint firstItem="MqQ-2V-Ujw" firstAttribute="trailing" secondItem="tH4-HJ-5MO" secondAttribute="trailing" constant="20" id="oce-4l-sWt"/>
                             <constraint firstItem="tH4-HJ-5MO" firstAttribute="leading" secondItem="D8l-la-vhm" secondAttribute="trailing" constant="8" id="tGm-4e-3bC"/>
                             <constraint firstItem="A4p-La-YPV" firstAttribute="top" secondItem="Axk-yc-h7I" secondAttribute="bottom" constant="8" id="tXg-7j-Xma"/>
+                            <constraint firstItem="D8l-la-vhm" firstAttribute="leading" secondItem="vPY-X0-jEg" secondAttribute="trailing" constant="8" id="wjN-zf-RMM"/>
                             <constraint firstItem="DtE-Wh-w1z" firstAttribute="top" secondItem="MqQ-2V-Ujw" secondAttribute="top" constant="20" id="xbZ-O6-RRZ"/>
                             <constraint firstItem="M2p-g3-U7u" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="DtE-Wh-w1z" secondAttribute="trailing" constant="8" symbolic="YES" id="yAj-X1-jaJ"/>
                         </constraints>
@@ -2364,6 +2381,7 @@
                         <outlet property="drawingSearchButton" destination="San-i8-ecq" id="Pqb-uY-l95"/>
                         <outlet property="expandedSearchLabel" destination="D8l-la-vhm" id="7Bw-0D-EaI"/>
                         <outlet property="expandedSearchSwitch" destination="tH4-HJ-5MO" id="810-q7-r7n"/>
+                        <outlet property="filterQualitySwitch" destination="vPY-X0-jEg" id="tKJ-Hf-KVQ"/>
                         <outlet property="searchBar" destination="A4p-La-YPV" id="d6c-38-6RZ"/>
                         <outlet property="searchTableView" destination="HIq-1Q-FoN" id="Lu8-C6-njA"/>
                         <outlet property="updateButton" destination="M2p-g3-U7u" id="zeM-7Y-NlS"/>

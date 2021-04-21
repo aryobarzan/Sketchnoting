@@ -35,16 +35,7 @@ class SearchNoteCell: UITableViewCell, UICollectionViewDelegate, UICollectionVie
         self.noteResults = noteResults.sorted { note1, note2 in
             note1.noteScore > note2.noteScore
         }
-        normalizeNoteSimilarities()
         collectionView.reloadData()
-    }
-    
-    private func normalizeNoteSimilarities() {
-        if !noteResults.isEmpty {
-            let maxSimilarity = noteResults.map{$0.noteScore}.max()!
-            let minSimilarity = 0.0 //notes.map{$0.2}.min()!
-            self.noteResults = noteResults.map {SearchNoteResult(note: $0.note, noteScore: ($0.noteScore - minSimilarity)/(maxSimilarity-minSimilarity), pageHits: $0.pageHits)}
-        }
     }
 
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {

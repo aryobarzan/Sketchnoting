@@ -17,6 +17,7 @@ class SearchViewController: UIViewController, DrawingSearchDelegate, SKIndexerDe
     @IBOutlet weak var drawingSearchButton: UIButton!
     @IBOutlet weak var expandedSearchLabel: UILabel!
     @IBOutlet weak var expandedSearchSwitch: UISwitch!
+    @IBOutlet weak var filterQualitySwitch: UISwitch!
     @IBOutlet weak var searchTableView: UITableView!
 
     fileprivate var items = [SearchTableItem]()
@@ -67,6 +68,8 @@ class SearchViewController: UIViewController, DrawingSearchDelegate, SKIndexerDe
             }
         }
     }
+    @IBAction func filterQualitySwitchChanged(_ sender: UISwitch) {
+    }
     
     @IBAction func updateButtonTapped(_ sender: UIButton) {
         sender.isEnabled = false        
@@ -87,10 +90,11 @@ class SearchViewController: UIViewController, DrawingSearchDelegate, SKIndexerDe
             activityIndicator.isHidden = false
             activityIndicator.startAnimating()
             let isExpandedSearch = expandedSearchSwitch.isOn
+            let isFilterQuality = filterQualitySwitch.isOn
             DispatchQueue.global(qos: .userInitiated).async {
-                SemanticSearch.shared.search(query: query, expandedSearch: isExpandedSearch, useFullQuery: useFullQuery, resultHandler: {result in
+                SemanticSearch.shared.search(query: query, expandedSearch: isExpandedSearch, filterQuality: isFilterQuality, useFullQuery: useFullQuery, resultHandler: {result in
                     if !result.notes.isEmpty {
-                        let item = SearchTableNotesItem(query: result.query, noteResults: result.notes.map{$0.value})
+                        let item = SearchTableNotesItem(query: result.query, noteResults: result.notes)
                         self.items.append(item)
                     }
                     if !result.documents.isEmpty {
@@ -98,7 +102,7 @@ class SearchViewController: UIViewController, DrawingSearchDelegate, SKIndexerDe
                         self.items.append(item)
                     }
                     result.questionAnswers.forEach { answer in
-                        let item = SearchTableInformationItem(query: query, message: "Possible answer to your question '\(query)' from \(answer.0): \(answer.1) (\(Int(answer.2*100))% Confidence)", informationType: .QuestionAnswer)
+                        let item = SearchTableInformationItem(query: query, message: "'\(query)' (\(answer.0)):\n \(answer.1) (\(Int(answer.2*100))% Confidence)", informationType: .QuestionAnswer)
                         self.items.append(item)
                     }
                     logger.info("Search Result for query '\(result.query)' - \(Int(result.notes.count)) notes / \(Int(result.documents.count)) Documents / \(Int(result.questionAnswers.count)) answers")

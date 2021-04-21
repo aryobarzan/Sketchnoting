@@ -37,31 +37,16 @@ class SearchDocumentCell: UITableViewCell {
         previewImageView.isUserInteractionEnabled = true
     }
 
-    override func setSelected(_ selected: Bool, animated: Bool) {
-        super.setSelected(selected, animated: animated)
-
-        // Configure the view for the selected state
-    }
-    
     func setContent(query: String, documents: [(Document, Double)]) {
         self.documents = documents
         self.documents = documents.sorted { document1, document2 in
             document1.1 > document2.1
         }
-        normalizeDocumentSimilarities()
         currentIndex = 0
         currentImageIndex = 0
         updateDisplayedDocument()
         updateDocumentIndex()
         subtitleLabel.text = "For search query: '\(query)'"
-    }
-    
-    private func normalizeDocumentSimilarities() {
-        if !documents.isEmpty {
-            let maxSimilarity = documents.map{$0.1}.max()!
-            let minSimilarity = 0.0 //documents.map{$0.1}.min()!
-            self.documents = documents.map {($0.0, ($0.1 - minSimilarity)/(maxSimilarity-minSimilarity))}
-        }
     }
     
     @IBAction func previewImageViewSwipeLeft(_ sender: UISwipeGestureRecognizer) {
