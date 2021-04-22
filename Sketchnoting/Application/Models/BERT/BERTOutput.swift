@@ -32,6 +32,12 @@ extension MLMultiArray {
         let unsafeBufferPointer = UnsafeBufferPointer(start: unsafeMutablePointer, count: count)
         return [Double](unsafeBufferPointer)
     }
+    func floatArray() -> [Float] {
+        // Bind the underlying `dataPointer` memory to make a native swift `Array<Float>`
+        let unsafeMutablePointer = dataPointer.bindMemory(to: Float.self, capacity: count)
+        let unsafeBufferPointer = UnsafeBufferPointer(start: unsafeMutablePointer, count: count)
+        return [Float](unsafeBufferPointer)
+    }
 }
 import Accelerate
 extension BERT {
@@ -106,10 +112,11 @@ extension BERT {
         // Only keep the top 20 (out of the possible ~380) indices for faster searching.
         let softmaxedStartLogits = softmax(z: startLogitsOfDoc)
         let softmaxedEndLogits = softmax(z: endLogitsOfDoc)
-        let topStartIndices = startLogitsOfDoc.indicesOfLargest(20)
-        let topEndIndices = endLogitsOfDoc.indicesOfLargest(20)
-        let averageProbability = (softmaxedStartLogits[topStartIndices[0]] + softmaxedEndLogits[topEndIndices[0]])/2
-        if averageProbability < 0.5 {
+        let topStartIndices = startLogitsOfDoc.indicesOfLargest(10)
+        let topEndIndices = endLogitsOfDoc.indicesOfLargest(10)
+        var confidence = max(softmaxedStartLogits[topStartIndices[0]], softmaxedEndLogits[topEndIndices[0]])
+        confidence = round(confidence * 100)/100
+        if confidence < 0.5 {
             return nil
         }
         // Search for the highest valued logit pairing.
@@ -121,7 +128,7 @@ extension BERT {
             guard bestPair.start >= 0 && bestPair.end >= 0 else {
                 return nil
             }
-            var confidence = (softmaxedStartLogits[bestPair.start] + softmaxedEndLogits[bestPair.end])/2
+            var confidence = max(softmaxedStartLogits[bestPair.start], softmaxedEndLogits[bestPair.end])
             confidence = round(confidence * 100)/100 // Round up to 2 decimals
             return (bestPair.start, bestPair.end, confidence)
         }

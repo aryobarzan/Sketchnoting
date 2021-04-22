@@ -67,6 +67,7 @@ class SemanticSearch {
     }
     
     func tag(text: String, scheme: NLTagScheme = .lexicalClass) -> [(String, String)] {
+        let text = text.lowercased()
         let tagger = NLTagger(tagSchemes: [scheme])
         tagger.string = text
         let tags = tagger.tags(in: text.startIndex..<text.endIndex, unit: .word, scheme: scheme, options: [.omitPunctuation, .omitWhitespace, .joinNames, .joinContractions])
@@ -83,6 +84,7 @@ class SemanticSearch {
     }
     
     func lemmatize(text: String) -> String {
+        let text = text.lowercased()
         let tagger = NLTagger(tagSchemes: [.lemma])
         tagger.string = text
         let tags = tagger.tags(in: text.startIndex..<text.endIndex, unit: .word, scheme: .lemma, options: [.omitPunctuation, .omitWhitespace])
@@ -243,17 +245,18 @@ class SemanticSearch {
     }
     
     public func search(query originalQuery: String, expandedSearch: Bool = true, filterQuality: Bool = true, useFullQuery: Bool = false, resultHandler: (SearchResult) -> Void, subqueriesHandler: ([String]) -> Void, searchFinishHandler: () -> Void) {
+        let originalQuery = originalQuery.lowercased()
         // Keyword, Clause, Extended Clause or Sentence
         let (queries, isQuestion) = preprocess(query: originalQuery, useFullQuery: useFullQuery)
-        logger.info("----")
-        logger.info("Original query: \(originalQuery)")
+        logger.info("---- Original query: \(originalQuery)")
         if queries.count > 1 {
             logger.info("Query has been divided into \(Int(queries.count)) semantically different queries.")
             subqueriesHandler(queries)
         }
         // Expanded Search means a lower threshold for the lexical search, i.e. more tolerant to minor typos
         let lexicalThreshold = expandedSearch ? 0.9 : 1.0
-        let bert = BERT()
+        //let bert = BERT()
+        let distilbert = DISTILBERT()
         let wordEmbedding = createFastTextWordEmbedding()
         var noteIterator = NeoLibrary.getNoteIterator()
         for query in queries {
@@ -344,16 +347,16 @@ class SemanticSearch {
                 }
                 if isQuestion {
                     var metaInformation = [String]()
-                    metaInformation.append("The note '\(note.1.getName())' was created on \(NeoLibrary.getCreationDate(url: note.0)).")
-                    metaInformation.append("The note '\(note.1.getName())' was modified on \(NeoLibrary.getModificationDate(url: note.0)).")
+                    metaInformation.append("The note \(note.1.getName()) was created on \(NeoLibrary.getCreationDate(url: note.0)).")
+                    metaInformation.append("The note \(note.1.getName()) was modified on \(NeoLibrary.getModificationDate(url: note.0)).")
                     if !note.1.pages.filter({ $0.getPDFData() != nil }).isEmpty {
-                        metaInformation.append("The note '\(note.1.getName())' contains \(Int(note.1.pages.filter({ $0.getPDFData() != nil }).count)) imported PDF pages.")
+                        metaInformation.append("The note \(note.1.getName()) contains \(Int(note.1.pages.filter({ $0.getPDFData() != nil }).count)) imported PDF pages.")
                     }
-                    if !note.1.getDrawingLabels().isEmpty {
-                        metaInformation.append("The note \(note.1.getName())' contains drawings. The note '\(note.1.getName())' contains the following drawings: \(note.1.getDrawingLabels().joined(separator: ", "))")
-                    }
+                    /*if !note.1.getDrawingLabels().isEmpty {
+                        metaInformation.append("The note \(note.1.getName()) contains drawings. The note '\(note.1.getName())' contains the following drawings: \(note.1.getDrawingLabels().joined(separator: ", "))")
+                    }*/
                     for metaInfo in metaInformation {
-                        if let answer = findAnswer(for: originalQuery, in: metaInfo, with: bert) {
+                        if let answer = findAnswer(for: originalQuery, in: metaInfo, with: distilbert) {
                             if !searchResult.questionAnswers.contains(where: {x in
                                 (x.1, x.2) == answer
                             }) {
@@ -377,7 +380,7 @@ class SemanticSearch {
                         for noteHit in searchNoteResult!.pageHits.filter({$0.3 >= 1.0}).sorted(by: {pageHit1, pageHit2 in pageHit1.3 > pageHit2.3}).prefix(5)  {
                             let phraseType = checkPhraseType(queryPartsOfSpeech: tag(text: noteHit.2, scheme: .lexicalClass))
                             if phraseType == .Sentence {
-                                if let answer = findAnswer(for: originalQuery, in: noteHit.2, with: bert) {
+                                if let answer = findAnswer(for: originalQuery, in: noteHit.2, with: distilbert) {
                                     if !searchResult.questionAnswers.contains(where: {x in
                                         (x.1, x.2) == answer
                                     }) {
@@ -388,7 +391,7 @@ class SemanticSearch {
                         }
                         for doc in searchResult.documents.filter({$0.1 >= 1.0 && $0.0.documentType != .ALMAAR}).sorted(by: {doc1, doc2 in doc1.1 > doc2.1}).prefix(5) {
                             if let documentDescription = doc.0.getDescription() {
-                                if let answer = findAnswer(for: originalQuery, in: documentDescription, with: bert) {
+                                if let answer = findAnswer(for: originalQuery, in: documentDescription, with: distilbert) {
                                     if !searchResult.questionAnswers.contains(where: {x in
                                         (x.1, x.2) == answer
                                     }) {
@@ -406,9 +409,9 @@ class SemanticSearch {
             searchResult.notes = normalizeNoteSimilarities(noteResults: searchResult.notes)
             searchResult.documents = normalizeDocumentSimilarities(documents: searchResult.documents)
             if filterQuality {
-                searchResult.notes = searchResult.notes.filter{$0.noteScore > 0.5}
-                searchResult.documents = searchResult.documents.filter{$0.1 > 0.5}
-                searchResult.questionAnswers = searchResult.questionAnswers.filter{$0.2 > 0.9}
+                searchResult.notes = searchResult.notes.filter{$0.noteScore >= 0.5}
+                searchResult.documents = searchResult.documents.filter{$0.1 >= 0.5}
+                searchResult.questionAnswers = searchResult.questionAnswers.filter{$0.2 >= 0.7}
             }
             resultHandler(searchResult)
         }
@@ -420,7 +423,7 @@ class SemanticSearch {
         var noteResults = noteResults
         if !noteResults.isEmpty {
             let maxSimilarity = noteResults.map{$0.noteScore}.max()!
-            let minSimilarity = 0.0 //notes.map{$0.2}.min()!
+            let minSimilarity = 0.0
             noteResults = noteResults.map {SearchNoteResult(note: $0.note, noteScore: ($0.noteScore - minSimilarity)/(maxSimilarity-minSimilarity), pageHits: $0.pageHits)}
         }
         return noteResults
@@ -429,17 +432,18 @@ class SemanticSearch {
         var documents = documents
         if !documents.isEmpty {
             let maxSimilarity = documents.map{$0.1}.max()!
-            let minSimilarity = 0.0 //documents.map{$0.1}.min()!
+            let minSimilarity = 0.0
             documents = documents.map {($0.0, ($0.1 - minSimilarity)/(maxSimilarity-minSimilarity))}
         }
         return documents
     }
     
-    private func findAnswer(for question: String, in text: String, with bert: BERT = BERT()) -> (String, Double)? {
+    private func findAnswer(for question: String, in text: String, with distilbert: DISTILBERT = DISTILBERT()) -> (String, Double)? {
+        let question = question.hasSuffix("?") ? question : question.hasSuffix(".") || question.hasSuffix("!") ? question[0..<question.count-1] + "?" : question + "?"
         let availableLength = 384 - question.count - 3
         if availableLength > 0 {
             let text = String(text[0..<availableLength])
-            let answer = bert.findAnswer(for: question, in: text)
+            let answer = distilbert.predict(question: question, context: text)
             return answer
         }
         else {
@@ -512,7 +516,7 @@ class SemanticSearch {
         var hasSubject = false
         var hasVerb = false
         for tag in queryPartsOfSpeech {
-            if tag.1 == NLTag.noun.rawValue {
+            if tag.1 == NLTag.noun.rawValue || tag.1 == NLTag.pronoun.rawValue {
                 hasSubject = true
             }
             else if tag.1 == NLTag.verb.rawValue {

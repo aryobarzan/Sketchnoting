@@ -64,6 +64,13 @@
 		9F6A9F3E2550CE4900CF8CF1 /* CollectionExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F6A9F3D2550CE4900CF8CF1 /* CollectionExtensions.swift */; };
 		9F72B76725F28EC4009E31AA /* SwiftCoroutine in Frameworks */ = {isa = PBXBuildFile; productRef = 9F72B76625F28EC4009E31AA /* SwiftCoroutine */; };
 		9F72B76925F2C434009E31AA /* TFIDFIndexer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F72B76825F2C434009E31AA /* TFIDFIndexer.swift */; };
+		9F749EA52631CA8400AA3C6B /* distilbert-squad-384_FP16.mlkitmodel in Sources */ = {isa = PBXBuildFile; fileRef = 9F749EA42631CA8400AA3C6B /* distilbert-squad-384_FP16.mlkitmodel */; };
+		9F749EA72631CB1400AA3C6B /* DISTILBERT.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F749EA62631CB1400AA3C6B /* DISTILBERT.swift */; };
+		9F749EA92631CB5900AA3C6B /* DISTILBERTTokenizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F749EA82631CB5900AA3C6B /* DISTILBERTTokenizer.swift */; };
+		9F749EAB2631CB7400AA3C6B /* DISTILBERTUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F749EAA2631CB7400AA3C6B /* DISTILBERTUtils.swift */; };
+		9F749EAD2631CC0100AA3C6B /* DISTILBERTMath.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F749EAC2631CC0100AA3C6B /* DISTILBERTMath.swift */; };
+		9F749EAF2631CC3E00AA3C6B /* MLMultiArray+Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F749EAE2631CC3E00AA3C6B /* MLMultiArray+Utils.swift */; };
+		9F749EB12631CE5100AA3C6B /* vocab.txt in Resources */ = {isa = PBXBuildFile; fileRef = 9F749EB02631CE5000AA3C6B /* vocab.txt */; };
 		9F75E44C230C583200488BBD /* NoteCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F75E44A230C583200488BBD /* NoteCollectionViewCell.swift */; };
 		9F75E44D230C583200488BBD /* NoteCollectionViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9F75E44B230C583200488BBD /* NoteCollectionViewCell.xib */; };
 		9F75E44F230D848200488BBD /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F75E44E230D848200488BBD /* SettingsViewController.swift */; };
@@ -244,6 +251,13 @@
 		9F65984C23F3227300CDBE0C /* DrawingSearchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrawingSearchViewController.swift; sourceTree = "<group>"; };
 		9F6A9F3D2550CE4900CF8CF1 /* CollectionExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionExtensions.swift; sourceTree = "<group>"; };
 		9F72B76825F2C434009E31AA /* TFIDFIndexer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TFIDFIndexer.swift; sourceTree = "<group>"; };
+		9F749EA42631CA8400AA3C6B /* distilbert-squad-384_FP16.mlkitmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = "distilbert-squad-384_FP16.mlkitmodel"; sourceTree = "<group>"; };
+		9F749EA62631CB1400AA3C6B /* DISTILBERT.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DISTILBERT.swift; sourceTree = "<group>"; };
+		9F749EA82631CB5900AA3C6B /* DISTILBERTTokenizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DISTILBERTTokenizer.swift; sourceTree = "<group>"; };
+		9F749EAA2631CB7400AA3C6B /* DISTILBERTUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DISTILBERTUtils.swift; sourceTree = "<group>"; };
+		9F749EAC2631CC0100AA3C6B /* DISTILBERTMath.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DISTILBERTMath.swift; sourceTree = "<group>"; };
+		9F749EAE2631CC3E00AA3C6B /* MLMultiArray+Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MLMultiArray+Utils.swift"; sourceTree = "<group>"; };
+		9F749EB02631CE5000AA3C6B /* vocab.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = vocab.txt; sourceTree = "<group>"; };
 		9F75E44A230C583200488BBD /* NoteCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteCollectionViewCell.swift; sourceTree = "<group>"; };
 		9F75E44B230C583200488BBD /* NoteCollectionViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NoteCollectionViewCell.xib; sourceTree = "<group>"; };
 		9F75E44E230D848200488BBD /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
@@ -422,6 +436,7 @@
 		9F5D0FC6229CBC2A00BCA451 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				9F749EA32631CA6D00AA3C6B /* DISTILBERT */,
 				9F945DD4262793E000B53464 /* BERT */,
 				9FF8CA492609134800A9171B /* SKTextRank */,
 				9FFE07E9232A63BA00DBD0AC /* TagsManager.swift */,
@@ -494,6 +509,20 @@
 				9FB515AE26179C34004F91E2 /* SearchInformationCell.swift */,
 			);
 			path = Search;
+			sourceTree = "<group>";
+		};
+		9F749EA32631CA6D00AA3C6B /* DISTILBERT */ = {
+			isa = PBXGroup;
+			children = (
+				9F749EB02631CE5000AA3C6B /* vocab.txt */,
+				9F749EA42631CA8400AA3C6B /* distilbert-squad-384_FP16.mlkitmodel */,
+				9F749EA62631CB1400AA3C6B /* DISTILBERT.swift */,
+				9F749EA82631CB5900AA3C6B /* DISTILBERTTokenizer.swift */,
+				9F749EAA2631CB7400AA3C6B /* DISTILBERTUtils.swift */,
+				9F749EAC2631CC0100AA3C6B /* DISTILBERTMath.swift */,
+				9F749EAE2631CC3E00AA3C6B /* MLMultiArray+Utils.swift */,
+			);
+			path = DISTILBERT;
 			sourceTree = "<group>";
 		};
 		9F75E449230C580300488BBD /* Note Collection View */ = {
@@ -992,6 +1021,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9F749EB12631CE5100AA3C6B /* vocab.txt in Resources */,
 				9FD29C442239525A00CC969A /* GoogleService-Info.plist in Resources */,
 				9FD29BB12220525000CC969A /* LaunchScreen.storyboard in Resources */,
 				9FD29BAE2220525000CC969A /* Assets.xcassets in Resources */,
@@ -1084,6 +1114,7 @@
 				9F8E0D0F25DDC02C00A951B1 /* SemanticSearch.swift in Sources */,
 				9F00428923E9FB2600961636 /* BadgeHub.swift in Sources */,
 				9FB515B6261DF5E8004F91E2 /* FolderCollectionViewCell.swift in Sources */,
+				9F749EA72631CB1400AA3C6B /* DISTILBERT.swift in Sources */,
 				9FF4757B25FAA9DF003CA74A /* NoteSimilarity.swift in Sources */,
 				9F65983B23EDD29300CDBE0C /* NoteTextBlock.swift in Sources */,
 				9FB515AF26179C34004F91E2 /* SearchInformationCell.swift in Sources */,
@@ -1122,11 +1153,13 @@
 				9F0C8D98253DB000002E9811 /* SKRecognizedText.swift in Sources */,
 				9FD29BA72220524D00CC969A /* AppDelegate.swift in Sources */,
 				9FB515AD26178016004F91E2 /* SearchDocumentCell.swift in Sources */,
+				9F749EAF2631CC3E00AA3C6B /* MLMultiArray+Utils.swift in Sources */,
 				9F0C8D9A253DB12B002E9811 /* SKRecognizedLine.swift in Sources */,
 				9FC114D9243919BD004F576A /* ImagePickerHelper.swift in Sources */,
 				9FC02C1C23EDB6290051C576 /* File.swift in Sources */,
 				9FAB4B7C244BEF2700DEA46F /* FittableFontLabel.swift in Sources */,
 				9FB9984724868561003773F2 /* MoveFileViewController.swift in Sources */,
+				9F749EAB2631CB7400AA3C6B /* DISTILBERTUtils.swift in Sources */,
 				9F00B9F824C5D56E000153A8 /* NeoDocumentsVC.swift in Sources */,
 				9F92D10E231E95B400BC0E57 /* UICollectionViewExtensions.swift in Sources */,
 				9F9460DF23F5B0460073D709 /* GridView.swift in Sources */,
@@ -1163,6 +1196,7 @@
 				9FA5A482244AB14E006D9FB2 /* UILabelExtensions.swift in Sources */,
 				9FB5158626152DA7004F91E2 /* ImportTableViewCell.swift in Sources */,
 				9F318D3B244A20A000A1B4B5 /* UITextViewExtensions.swift in Sources */,
+				9F749EA92631CB5900AA3C6B /* DISTILBERTTokenizer.swift in Sources */,
 				9FB515B9261E3246004F91E2 /* ItemSelectionProtocol.swift in Sources */,
 				9F75E44F230D848200488BBD /* SettingsViewController.swift in Sources */,
 				9F75E484231419FA00488BBD /* TAGMEDocument.swift in Sources */,
@@ -1174,6 +1208,7 @@
 				9FC02C1E23EDB6400051C576 /* Note.swift in Sources */,
 				9F318D39244A207300A1B4B5 /* UIFontExtensions.swift in Sources */,
 				9FF8CA4B2609135900A9171B /* SKTextRank.swift in Sources */,
+				9F749EA52631CA8400AA3C6B /* distilbert-squad-384_FP16.mlkitmodel in Sources */,
 				9F2C0D75248F0E2600F58F5E /* ArrayExtensions.swift in Sources */,
 				9F8551B123A539D9006EB0B1 /* NotePageCollectionViewCell.swift in Sources */,
 				9FBF6ABA22E9F439001FD730 /* VisionTextElementWrapper.swift in Sources */,
@@ -1187,6 +1222,7 @@
 				9F4B38BD23EA3D8500F87B61 /* ReceivedNoteCollectionViewCell.swift in Sources */,
 				9F0EC7DD2446A8AE000A28CB /* GestureExtensions.swift in Sources */,
 				9F8988DD25E958A6005CB90B /* Reductio.swift in Sources */,
+				9F749EAD2631CC0100AA3C6B /* DISTILBERTMath.swift in Sources */,
 				9F65983323EDCEA300CDBE0C /* NotePage.swift in Sources */,
 				9FA6239E22E66D73007ED794 /* HandwritingRecognizer.swift in Sources */,
 				9F2FF43A249B083D00597AD6 /* NoteDrawing.swift in Sources */,
