@@ -8,6 +8,7 @@
 
 import UIKit
 import Alamofire
+import NaturalLanguage
 
 class MapHelper {
     private static let mapQuestAPIKey = "bAELaFV3A8vNwICyhbziI7tNeSfYdUvr"
@@ -55,7 +56,7 @@ class MapHelper {
     
     private static func isPlace(document: Document) -> Bool {
         for t in SemanticSearch.shared.tag(text: document.title, scheme: .nameType) {
-            if t.1 == "PlaceName" {
+            if t.1 == NLTag.placeName {
                 return true
             }
         }
@@ -69,7 +70,7 @@ class MapHelper {
                         }
                     }
                     for t in SemanticSearch.shared.tag(text: trimmed, scheme: .nameType) {
-                        if t.1 == "PlaceName" {
+                        if t.1 == NLTag.placeName {
                             return true
                         }
                     }

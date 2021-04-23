@@ -73,7 +73,7 @@ class NoteSimilarity {
             }
             else if useNounsOnly {
                 let taggedTerms = SemanticSearch.shared.tag(text: noteText, scheme: .lexicalClass)
-                bodyTerms = taggedTerms.filter {$0.1 == NLTag.noun.rawValue }.map { $0.0 }
+                bodyTerms = taggedTerms.filter {$0.1 == NLTag.noun }.map { $0.0 }
             }
             // Convert to set to only retain unique terms
             var allTerms = (titleTerms + bodyTerms).map { $0.lowercased() }

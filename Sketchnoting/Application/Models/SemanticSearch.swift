@@ -66,19 +66,14 @@ class SemanticSearch {
         return tokensAsString
     }
     
-    func tag(text: String, scheme: NLTagScheme = .lexicalClass) -> [(String, String)] {
+    func tag(text: String, scheme: NLTagScheme = .lexicalClass) -> [(String, NLTag)] {
         let text = text.lowercased()
         let tagger = NLTagger(tagSchemes: [scheme])
         tagger.string = text
         let tags = tagger.tags(in: text.startIndex..<text.endIndex, unit: .word, scheme: scheme, options: [.omitPunctuation, .omitWhitespace, .joinNames, .joinContractions])
-        var tagsTuple = [(String, String)]()
+        var tagsTuple = [(String, NLTag)]()
         for tag in tags {
-            if let t = tag.0 {
-                tagsTuple.append((String(text[tag.1]), t.rawValue))
-            }
-            else {
-                tagsTuple.append((String(text[tag.1]), ""))
-            }
+            tagsTuple.append((String(text[tag.1]), tag.0 ?? NLTag.otherWord))
         }
         return tagsTuple
     }
@@ -184,56 +179,61 @@ class SemanticSearch {
         var useFullQuery = useFullQuery
         let queryWords = tokenize(text: query, unit: .word)
         if queryWords.count > 1 { // Longer query
-            var processedQuery = ""
-            var allowed = [NLTag.noun.rawValue, NLTag.adjective.rawValue, NLTag.otherWord.rawValue]
-            let partsOfSpeech = tag(text: queryWords.joined(separator: " "), scheme: .lexicalClass)
-            var wordsDebug = ""
-            var tagsDebug = ""
-            for p in partsOfSpeech {
-                wordsDebug.append(p.0 + " ")
-                tagsDebug.append(p.1 + " ")
-            }
-            logger.info(wordsDebug)
-            logger.info(tagsDebug)
+            var allowed = [NLTag.noun, NLTag.adjective, NLTag.otherWord]
+            var partsOfSpeech = tag(text: queryWords.joined(separator: " "), scheme: .lexicalClass)
+            partsOfSpeech = partsOfSpeech.map{(lemmatize(text: $0.0.lowercased()), $0.1)}
+            logger.info(partsOfSpeech)
             let phraseType = checkPhraseType(queryPartsOfSpeech: partsOfSpeech)
+            
             var isQuestion = false
             if phraseType == .Sentence {
                 isQuestion = isQueryQuestion(text: query)
                 if !isQuestion {
-                    allowed.append(NLTag.verb.rawValue)
+                    allowed.append(NLTag.verb)
                 }
                 else {
                     useFullQuery = true
                 }
             }
             var retainedQueryTerms = [String]()
-            // MARK: TODO - more improvements needed
-            if partsOfSpeech.filter({$0.1 != NLTag.otherWord.rawValue}).isEmpty || useFullQuery {
-                retainedQueryTerms = partsOfSpeech.map{$0.0.lowercased()}.filter{!stopwords.contains($0)}
+            // If the part of speech tagger is very inaccurate (tags every word as OtherWord), just retain every query term
+            if partsOfSpeech.filter({$0.1 != NLTag.otherWord}).isEmpty {
+                retainedQueryTerms = partsOfSpeech.map{$0.0}.filter{!stopwords.contains($0)}
                 useFullQuery = true
-                isQuestion = isQueryQuestion(text: query)
             }
-            else {
-                for i in 0..<partsOfSpeech.count {
-                    if allowed.contains(partsOfSpeech[i].1) {
-                        if partsOfSpeech[i].1 == NLTag.otherWord.rawValue {
-                            if stopwords.contains(partsOfSpeech[i].0) {
-                                continue
-                            }
-                        }
-                        processedQuery.append("\(partsOfSpeech[i].0.lowercased()) ")
-                        retainedQueryTerms.append(partsOfSpeech[i].0)
+            else { // Otherwise: Only retain nouns and adjectives
+                for pos in partsOfSpeech {
+                    if allowed.contains(pos.1) || (pos.1 == NLTag.otherWord && !stopwords.contains(pos.0)) {
+                        retainedQueryTerms.append(pos.0)
                     }
                 }
             }
             if useFullQuery {
-                return ([Array(Set(retainedQueryTerms)).joined(separator: " ").lowercased().trimmingCharacters(in: .whitespaces)], isQuestion)
+                var uniqueTerms = [String]()
+                for term in retainedQueryTerms {
+                    if !uniqueTerms.contains(term) {
+                        uniqueTerms.append(term)
+                    }
+                }
+                if uniqueTerms.isEmpty {
+                    // If for some reason the query is reduced to 0 terms, just return the original query
+                    return ([query.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)], isQuestion)
+                }
+                else {
+                    return ([uniqueTerms.joined(separator: " ").trimmingCharacters(in: .whitespacesAndNewlines)], isQuestion)
+                }
             }
             else {
                 let queryClusters = getTermRelevancy(for: retainedQueryTerms)
                 var processedQueryClusters = [String]()
                 for queryCluster in queryClusters {
-                    processedQueryClusters.append(Array(Set(queryCluster)).joined(separator: " ").lowercased().trimmingCharacters(in: .whitespaces))
+                    var uniqueTerms = [String]()
+                    for term in queryCluster {
+                        if !uniqueTerms.contains(term) {
+                            uniqueTerms.append(term)
+                        }
+                    }
+                    processedQueryClusters.append(uniqueTerms.joined(separator: " ").trimmingCharacters(in: .whitespacesAndNewlines))
                 }
                 return (processedQueryClusters, isQuestion)
             }
@@ -260,6 +260,8 @@ class SemanticSearch {
         let wordEmbedding = createFastTextWordEmbedding()
         var noteIterator = NeoLibrary.getNoteIterator()
         for query in queries {
+            var mostRecentNotes = [(URL, Note)]()
+            logger.info("-- Query: \(query)")
             noteIterator.reset()
             var searchResult = SearchResult(query: query)
             while let note = noteIterator.next() {
@@ -349,10 +351,10 @@ class SemanticSearch {
                     var metaInformation = [String]()
                     metaInformation.append("The note \(note.1.getName()) was created on \(NeoLibrary.getCreationDate(url: note.0)).")
                     metaInformation.append("The note \(note.1.getName()) was modified on \(NeoLibrary.getModificationDate(url: note.0)).")
-                    if !note.1.pages.filter({ $0.getPDFData() != nil }).isEmpty {
+                    /*if !note.1.pages.filter({ $0.getPDFData() != nil }).isEmpty {
                         metaInformation.append("The note \(note.1.getName()) contains \(Int(note.1.pages.filter({ $0.getPDFData() != nil }).count)) imported PDF pages.")
                     }
-                    /*if !note.1.getDrawingLabels().isEmpty {
+                    if !note.1.getDrawingLabels().isEmpty {
                         metaInformation.append("The note \(note.1.getName()) contains drawings. The note '\(note.1.getName())' contains the following drawings: \(note.1.getDrawingLabels().joined(separator: ", "))")
                     }*/
                     for metaInfo in metaInformation {
@@ -404,6 +406,27 @@ class SemanticSearch {
                     searchResult.questionAnswers = searchResult.questionAnswers.sorted {answer0, answer1 in
                         answer0.2 > answer1.2
                     }
+                }
+                if mostRecentNotes.isEmpty {
+                    mostRecentNotes.append(note)
+                }
+                else {
+                    var mostRecentUpdated = false
+                    for (idx, n) in mostRecentNotes.enumerated() {
+                        if NeoLibrary.getModificationDate(url: note.0) > NeoLibrary.getModificationDate(url: n.0) {
+                            mostRecentNotes.insert(note, at: idx)
+                            mostRecentUpdated = true
+                            break
+                        }
+                    }
+                    if mostRecentNotes.count < 5 && !mostRecentUpdated {
+                        mostRecentNotes.append(note)
+                    }
+                }
+            }
+            if !mostRecentNotes.isEmpty {
+                if let answer = findAnswer(for: originalQuery, in: "Your most recent notes are \(mostRecentNotes.map{$0.1.getName()}.joined(separator: ", ")).", with: distilbert) {
+                    searchResult.questionAnswers.append(("[META]", answer.0, answer.1))
                 }
             }
             searchResult.notes = normalizeNoteSimilarities(noteResults: searchResult.notes)
@@ -509,21 +532,23 @@ class SemanticSearch {
         case Sentence = "Sentence"
     }
     
-    func checkPhraseType(queryPartsOfSpeech: [(String, String)]) -> PhraseType {
+    func checkPhraseType(queryPartsOfSpeech: [(String, NLTag?)]) -> PhraseType {
         if queryPartsOfSpeech.count == 1 {
             return PhraseType.Keyword
         }
         var hasSubject = false
         var hasVerb = false
         for tag in queryPartsOfSpeech {
-            if tag.1 == NLTag.noun.rawValue || tag.1 == NLTag.pronoun.rawValue {
-                hasSubject = true
-            }
-            else if tag.1 == NLTag.verb.rawValue {
-                hasVerb = true
-            }
-            if hasSubject && hasVerb {
-                return PhraseType.Sentence
+            if let lexicalClass = tag.1 {
+                if lexicalClass == NLTag.noun || lexicalClass == NLTag.pronoun {
+                    hasSubject = true
+                }
+                else if lexicalClass == NLTag.verb {
+                    hasVerb = true
+                }
+                if hasSubject && hasVerb {
+                    return PhraseType.Sentence
+                }
             }
         }
         if queryPartsOfSpeech.count >= 5 {

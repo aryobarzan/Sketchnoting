@@ -41,7 +41,7 @@ class TextParser {
             // 2
             let partsOfSpeech = SemanticSearch.shared.tag(text: sentence.trimmingCharacters(in: .whitespaces), scheme: .lexicalClass)
             let phraseType = SemanticSearch.shared.checkPhraseType(queryPartsOfSpeech: partsOfSpeech)
-            if (phraseType == .Keyword && !partsOfSpeech.isEmpty && partsOfSpeech[0].1 != NLTag.noun.rawValue) {
+            if (phraseType == .Keyword && !partsOfSpeech.isEmpty && partsOfSpeech[0].1 != NLTag.noun) {
                 validSentences.removeLast()
                 //logger.error("Invalid phrase type '\(phraseType.rawValue)' - \(sentence)")
                 continue

@@ -23,40 +23,6 @@ class DISTILBERT {
     private let tokenizer = DISTILBERTTokenizer()
     public let seqLen = 384
     
-    /// Main prediction loop:
-    /// - featurization
-    /// - model inference
-    /// - argmax and re-tokenization
-    func predict2(question: String, context: String) -> (answer: String, confidence: Double)? {
-        let input = featurizeTokensDistilled(question: question, context: context)
-        
-        let (output, _) = DISTILBERTUtils.time {
-            return try! model.prediction(input: input)
-        }
-        // Convert the logits MLMultiArrays to [Float].
-        let startLogits = output.start_scores.floatArray()
-        let endLogits = output.end_scores.floatArray()
-        
-        // Only keep the top 20 (out of the possible 382) indices for faster searching.
-        let softmaxedStartLogits = softmax(z: startLogits)
-        let softmaxedEndLogits = softmax(z: endLogits)
-        let start = DISTILBERTMath.argmax32(output.start_scores).0
-        let end = DISTILBERTMath.argmax32(output.end_scores).0
-        if start < end && start >= 0 {
-            var confidence = Double(max(softmaxedStartLogits[start], softmaxedEndLogits[end])) //(softmaxedStartLogits[start] + softmaxedEndLogits[end])/2
-            if confidence < 0.5 {
-                return nil
-            }
-            logger.info(softmaxedStartLogits[start])
-            logger.info(softmaxedEndLogits[end])
-            confidence = round(confidence * 100)/100 // Round up to 2 decimals
-            let tokenIds = Array(MLMultiArray.toIntArray(input.input_ids)[start...end])
-            let tokens = tokenizer.unTokenize(tokens: tokenIds)
-            let answer = tokenizer.convertWordpieceToBasicTokenList(tokens)
-            return (answer, confidence)
-        }
-        return nil
-    }
     func predict(question: String, context: String) -> (answer: String, confidence: Double)? {
         let input = featurizeTokensDistilled(question: question, context: context)
         
@@ -67,7 +33,7 @@ class DISTILBERT {
         let startLogits = output.start_scores.floatArray()
         let endLogits = output.end_scores.floatArray()
         
-        // Only keep the top 20 (out of the possible ~380) indices for faster searching.
+        // Only keep the top 10 (out of the possible ~380) indices for faster searching.
         let softmaxedStartLogits = softmax(z: startLogits)
         let softmaxedEndLogits = softmax(z: endLogits)
         let topStartIndices = startLogits.indicesOfLargest(10)

@@ -17,7 +17,7 @@ class SKTextRank {
     
     func extractKeywords(text: String, numberOfKeywords: Int = 10, biased: Bool = true, usePostProcessing: Bool = true) -> [String] {
         let partsOfSpeech = SemanticSearch.shared.tag(text: text, scheme: .lexicalClass)
-        let nounsAndAdjectives = partsOfSpeech.filter { $0.0.count > 2 }.filter { $0.1 == NLTag.noun.rawValue || $0.1 == NLTag.adjective.rawValue || $0.1 == NLTag.other.rawValue }.map { SemanticSearch.shared.lemmatize(text: $0.0.lowercased()) }.filter { !stopwords.contains($0) }
+        let nounsAndAdjectives = partsOfSpeech.filter { $0.0.count > 2 }.filter { $0.1 == NLTag.noun || $0.1 == NLTag.adjective || $0.1 == NLTag.otherWord }.map { SemanticSearch.shared.lemmatize(text: $0.0.lowercased()) }.filter { !stopwords.contains($0) }
 
         let graph = WeightedGraph<String, Double>()
         var addedVertices = [String : Int]()
@@ -161,43 +161,43 @@ class SKTextRank {
         return sqrt(total) < threshold
     }
     
-    private func postprocess(keywords: [String], partsOfSpeech: [(String, String)]) -> [String] {
+    private func postprocess(keywords: [String], partsOfSpeech: [(String, NLTag)]) -> [String] {
         var processedKeywords = keywords
         
         var combinations = [[String]]()
         var combination = [String]()
-        var lastTag = ""
+        var lastTag = NLTag.otherWord
         for (token, tag) in partsOfSpeech {
             if combination.isEmpty {
-                if tag == NLTag.adjective.rawValue || tag == NLTag.noun.rawValue {
+                if tag == NLTag.adjective || tag == NLTag.noun {
                     combination.append(token)
                     lastTag = tag
                 }
             }
             else {
                 if combination.count == 1 {
-                    if tag == NLTag.noun.rawValue || (tag == NLTag.adjective.rawValue && lastTag != NLTag.noun.rawValue) {
+                    if tag == NLTag.noun || (tag == NLTag.adjective && lastTag != NLTag.noun) {
                         combination.append(token)
                         lastTag = tag
                     }
                     else {
                         combination.removeAll()
-                        lastTag = ""
+                        lastTag = NLTag.otherWord
                     }
                 }
                 else { // 2
-                    if tag == NLTag.noun.rawValue {
+                    if tag == NLTag.noun {
                         combination.append(token)
                         combinations.append(combination)
                         combination.removeAll()
-                        lastTag = ""
+                        lastTag = NLTag.otherWord
                     }
                     else {
-                        if lastTag == NLTag.noun.rawValue {
+                        if lastTag == NLTag.noun {
                             combinations.append(combination)
                         }
                         combination.removeAll()
-                        lastTag = ""
+                        lastTag = NLTag.otherWord
                     }
                 }
             }
