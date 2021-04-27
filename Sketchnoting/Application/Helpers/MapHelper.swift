@@ -74,18 +74,20 @@ class MapHelper {
                             return true
                         }
                     }
-                    let tokens = SemanticSearch.shared.tokenize(text: trimmed, unit: .word)
+                    return false
+                    /*let tokens = SemanticSearch.shared.tokenize(text: trimmed, unit: .word)
                     var minimumSimilarity = 999.0
+                    let wordEmbedding = SemanticSearch.shared.createFastTextWordEmbedding()
                     for token in tokens {
                         let lemma = SemanticSearch.shared.lemmatize(text: token)
-                        let similarity = SemanticSearch.shared.wordDistance(between: lemma, and: "place")
+                        let similarity = wordEmbedding.distance(between: lemma, and: "place")
                         if similarity < minimumSimilarity {
                             minimumSimilarity = similarity
                         }
                     }
                     if minimumSimilarity <= 1.0 {
                         return true
-                    }
+                    }*/
                 }
             }
         }

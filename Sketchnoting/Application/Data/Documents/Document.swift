@@ -84,7 +84,6 @@ class Document: Codable, Visitable, Equatable, Hashable {
         do {
             description = try container.decode(String.self, forKey: .description)
         } catch {
-            logger.error(error)
             description = ""
         }
         do {

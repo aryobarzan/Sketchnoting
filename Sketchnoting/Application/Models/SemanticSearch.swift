@@ -244,7 +244,7 @@ class SemanticSearch {
         return ([queryWords.joined(separator: " ")], false)
     }
     
-    public func search(query originalQuery: String, expandedSearch: Bool = true, filterQuality: Bool = true, useFullQuery: Bool = false, resultHandler: (SearchResult) -> Void, subqueriesHandler: ([String]) -> Void, searchFinishHandler: () -> Void) {
+    public func search(query originalQuery: String, expandedSearch: Bool = true, useFullQuery: Bool = false, resultHandler: (SearchResult) -> Void, subqueriesHandler: ([String]) -> Void, searchFinishHandler: () -> Void) {
         let originalQuery = originalQuery.lowercased()
         // Keyword, Clause, Extended Clause or Sentence
         let (queries, isQuestion) = preprocess(query: originalQuery, useFullQuery: useFullQuery)
@@ -255,6 +255,8 @@ class SemanticSearch {
         }
         // Expanded Search means a lower threshold for the lexical search, i.e. more tolerant to minor typos
         let lexicalThreshold = expandedSearch ? 0.9 : 1.0
+        let searchResultThreshold = expandedSearch ? 0.1 : 0.5
+        let searchResultQAThreshold = expandedSearch ? 0.5 : 0.7
         //let bert = BERT()
         let distilbert = DISTILBERT()
         let wordEmbedding = createFastTextWordEmbedding()
@@ -342,6 +344,12 @@ class SemanticSearch {
                         // logger.info("Document \(document.title) score = \(documentScore)")
                     }
                     // MARK: Document types [TODO]
+                    var documentCategories = [String]()
+                    if document.documentType == .TAGME, let tagmeDocument = document as? TAGMEDocument, let tagmeCategories = tagmeDocument.categories {
+                        documentCategories = tagmeCategories
+                        //logger.info(documentCategories)
+                    }
+                    
                 }
                 let highestDocumentSimilarity = max(highestSemanticSimilarity, highestLexicalSimilarity)
                 if highestDocumentSimilarity > self.SEARCH_THRESHOLD {
@@ -431,11 +439,9 @@ class SemanticSearch {
             }
             searchResult.notes = normalizeNoteSimilarities(noteResults: searchResult.notes)
             searchResult.documents = normalizeDocumentSimilarities(documents: searchResult.documents)
-            if filterQuality {
-                searchResult.notes = searchResult.notes.filter{$0.noteScore >= 0.5}
-                searchResult.documents = searchResult.documents.filter{$0.1 >= 0.5}
-                searchResult.questionAnswers = searchResult.questionAnswers.filter{$0.2 >= 0.7}
-            }
+            searchResult.notes = searchResult.notes.filter{$0.noteScore >= searchResultThreshold}
+            searchResult.documents = searchResult.documents.filter{$0.1 >= searchResultThreshold}
+            searchResult.questionAnswers = searchResult.questionAnswers.filter{$0.2 >= searchResultQAThreshold}
             resultHandler(searchResult)
         }
         logger.info("Search for query '\(originalQuery)' completed.")
@@ -471,6 +477,17 @@ class SemanticSearch {
         }
         else {
             return nil
+        }
+    }
+    
+    public func suggestKeywords(for keyword: String) {
+        var noteIterator = NeoLibrary.getNoteIterator()
+        let wordEmbedding = NLEmbedding.wordEmbedding(for: .english)!
+        logger.info(wordEmbedding.neighbors(for: keyword, maximumCount: 5))
+        while let note = noteIterator.next() {
+            let keywords = SKTextRank.shared.extractKeywords(text: note.1.getText(option: .FullText, parse: true) + "\n" + note.1.getDocuments().map{$0.getDescription() ?? ""}.filter{!$0.isEmpty}.joined(separator: " "), numberOfKeywords: 10, biased: false, usePostProcessing: true)
+            logger.info("\(note.1.getName()) - \(keywords)")
+            logger.info("\(note.1.getName()) - \(keywords.filter {SemanticSearch.shared.getStringSimilarity(betweenQuery: keyword, and: $0, wordEmbedding: wordEmbedding).semanticSimilarity > 0.5})")
         }
     }
     

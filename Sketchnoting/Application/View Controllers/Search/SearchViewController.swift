@@ -17,7 +17,6 @@ class SearchViewController: UIViewController, DrawingSearchDelegate, SKIndexerDe
     @IBOutlet weak var drawingSearchButton: UIButton!
     @IBOutlet weak var expandedSearchLabel: UILabel!
     @IBOutlet weak var expandedSearchSwitch: UISwitch!
-    @IBOutlet weak var filterQualitySwitch: UISwitch!
     @IBOutlet weak var searchTableView: UITableView!
 
     fileprivate var items = [SearchTableItem]()
@@ -61,14 +60,26 @@ class SearchViewController: UIViewController, DrawingSearchDelegate, SKIndexerDe
         performSearch()
     }
     
+    @IBAction func exploreButtonTapped(_ sender: UIButton) {
+        if let exploreSearchVC = self.storyboard?.instantiateViewController(withIdentifier: "ExploreSearchViewController") as? ExploreSearchViewController {
+            exploreSearchVC.modalPresentationStyle = .popover
+            //let navigationController = UINavigationController(rootViewController: exploreSearchVC)
+            //navigationController.modalPresentationStyle = .formSheet
+            if let popoverPresentationController = exploreSearchVC.popoverPresentationController {
+                popoverPresentationController.permittedArrowDirections = .up
+                popoverPresentationController.sourceView = self.view
+                popoverPresentationController.sourceRect = sender.frame
+                present(exploreSearchVC, animated: true, completion: nil)
+            }
+        }
+    }
+    
     @IBAction func expandedSearchSwitchChanged(_ sender: UISwitch) {
         if let text = searchBar.text {
             if !text.isEmpty {
                 performSearch()
             }
         }
-    }
-    @IBAction func filterQualitySwitchChanged(_ sender: UISwitch) {
     }
     
     @IBAction func updateButtonTapped(_ sender: UIButton) {
@@ -90,9 +101,8 @@ class SearchViewController: UIViewController, DrawingSearchDelegate, SKIndexerDe
             activityIndicator.isHidden = false
             activityIndicator.startAnimating()
             let isExpandedSearch = expandedSearchSwitch.isOn
-            let isFilterQuality = filterQualitySwitch.isOn
             DispatchQueue.global(qos: .userInitiated).async {
-                SemanticSearch.shared.search(query: query, expandedSearch: isExpandedSearch, filterQuality: isFilterQuality, useFullQuery: useFullQuery, resultHandler: {result in
+                SemanticSearch.shared.search(query: query, expandedSearch: isExpandedSearch, useFullQuery: useFullQuery, resultHandler: {result in
                     if !result.notes.isEmpty {
                         let item = SearchTableNotesItem(query: result.query, noteResults: result.notes)
                         self.items.append(item)

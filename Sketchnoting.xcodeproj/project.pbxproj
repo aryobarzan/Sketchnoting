@@ -71,6 +71,9 @@
 		9F749EAD2631CC0100AA3C6B /* DISTILBERTMath.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F749EAC2631CC0100AA3C6B /* DISTILBERTMath.swift */; };
 		9F749EAF2631CC3E00AA3C6B /* MLMultiArray+Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F749EAE2631CC3E00AA3C6B /* MLMultiArray+Utils.swift */; };
 		9F749EB12631CE5100AA3C6B /* vocab.txt in Resources */ = {isa = PBXBuildFile; fileRef = 9F749EB02631CE5000AA3C6B /* vocab.txt */; };
+		9F749EB326375E9D00AA3C6B /* SKGraphSearch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F749EB226375E9D00AA3C6B /* SKGraphSearch.swift */; };
+		9F749F4E26385C4A00AA3C6B /* ExploreSearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F749F4D26385C4A00AA3C6B /* ExploreSearchViewController.swift */; };
+		9F749F5026385C6500AA3C6B /* ExploreSearchViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F749F4F26385C6500AA3C6B /* ExploreSearchViewCell.swift */; };
 		9F75E44C230C583200488BBD /* NoteCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F75E44A230C583200488BBD /* NoteCollectionViewCell.swift */; };
 		9F75E44D230C583200488BBD /* NoteCollectionViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9F75E44B230C583200488BBD /* NoteCollectionViewCell.xib */; };
 		9F75E44F230D848200488BBD /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F75E44E230D848200488BBD /* SettingsViewController.swift */; };
@@ -258,6 +261,9 @@
 		9F749EAC2631CC0100AA3C6B /* DISTILBERTMath.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DISTILBERTMath.swift; sourceTree = "<group>"; };
 		9F749EAE2631CC3E00AA3C6B /* MLMultiArray+Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MLMultiArray+Utils.swift"; sourceTree = "<group>"; };
 		9F749EB02631CE5000AA3C6B /* vocab.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = vocab.txt; sourceTree = "<group>"; };
+		9F749EB226375E9D00AA3C6B /* SKGraphSearch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SKGraphSearch.swift; sourceTree = "<group>"; };
+		9F749F4D26385C4A00AA3C6B /* ExploreSearchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExploreSearchViewController.swift; sourceTree = "<group>"; };
+		9F749F4F26385C6500AA3C6B /* ExploreSearchViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExploreSearchViewCell.swift; sourceTree = "<group>"; };
 		9F75E44A230C583200488BBD /* NoteCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteCollectionViewCell.swift; sourceTree = "<group>"; };
 		9F75E44B230C583200488BBD /* NoteCollectionViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NoteCollectionViewCell.xib; sourceTree = "<group>"; };
 		9F75E44E230D848200488BBD /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
@@ -448,6 +454,7 @@
 				9F72B76825F2C434009E31AA /* TFIDFIndexer.swift */,
 				9FF4757A25FAA9DF003CA74A /* NoteSimilarity.swift */,
 				9FB5155C260E44AA004F91E2 /* SKIndexer.swift */,
+				9F749EB226375E9D00AA3C6B /* SKGraphSearch.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -502,6 +509,7 @@
 		9F65984923F3174A00CDBE0C /* Search */ = {
 			isa = PBXGroup;
 			children = (
+				9F749F4C2638535E00AA3C6B /* ExploreSearch */,
 				9F65984A23F3175E00CDBE0C /* SearchViewController.swift */,
 				9F65984C23F3227300CDBE0C /* DrawingSearchViewController.swift */,
 				9FB515AA26177FFF004F91E2 /* SearchNoteCell.swift */,
@@ -523,6 +531,15 @@
 				9F749EAE2631CC3E00AA3C6B /* MLMultiArray+Utils.swift */,
 			);
 			path = DISTILBERT;
+			sourceTree = "<group>";
+		};
+		9F749F4C2638535E00AA3C6B /* ExploreSearch */ = {
+			isa = PBXGroup;
+			children = (
+				9F749F4D26385C4A00AA3C6B /* ExploreSearchViewController.swift */,
+				9F749F4F26385C6500AA3C6B /* ExploreSearchViewCell.swift */,
+			);
+			path = ExploreSearch;
 			sourceTree = "<group>";
 		};
 		9F75E449230C580300488BBD /* Note Collection View */ = {
@@ -1115,6 +1132,7 @@
 				9F00428923E9FB2600961636 /* BadgeHub.swift in Sources */,
 				9FB515B6261DF5E8004F91E2 /* FolderCollectionViewCell.swift in Sources */,
 				9F749EA72631CB1400AA3C6B /* DISTILBERT.swift in Sources */,
+				9F749F4E26385C4A00AA3C6B /* ExploreSearchViewController.swift in Sources */,
 				9FF4757B25FAA9DF003CA74A /* NoteSimilarity.swift in Sources */,
 				9F65983B23EDD29300CDBE0C /* NoteTextBlock.swift in Sources */,
 				9FB515AF26179C34004F91E2 /* SearchInformationCell.swift in Sources */,
@@ -1153,6 +1171,7 @@
 				9F0C8D98253DB000002E9811 /* SKRecognizedText.swift in Sources */,
 				9FD29BA72220524D00CC969A /* AppDelegate.swift in Sources */,
 				9FB515AD26178016004F91E2 /* SearchDocumentCell.swift in Sources */,
+				9F749EB326375E9D00AA3C6B /* SKGraphSearch.swift in Sources */,
 				9F749EAF2631CC3E00AA3C6B /* MLMultiArray+Utils.swift in Sources */,
 				9F0C8D9A253DB12B002E9811 /* SKRecognizedLine.swift in Sources */,
 				9FC114D9243919BD004F576A /* ImagePickerHelper.swift in Sources */,
@@ -1225,6 +1244,7 @@
 				9F749EAD2631CC0100AA3C6B /* DISTILBERTMath.swift in Sources */,
 				9F65983323EDCEA300CDBE0C /* NotePage.swift in Sources */,
 				9FA6239E22E66D73007ED794 /* HandwritingRecognizer.swift in Sources */,
+				9F749F5026385C6500AA3C6B /* ExploreSearchViewCell.swift in Sources */,
 				9F2FF43A249B083D00597AD6 /* NoteDrawing.swift in Sources */,
 				9FF0AC9424412F4C00A82BE8 /* NoteImage.swift in Sources */,
 				9F65983523EDD09F00CDBE0C /* NoteText.swift in Sources */,
@@ -1467,7 +1487,7 @@
 			repositoryURL = "https://github.com/onevcat/Kingfisher.git";
 			requirement = {
 				kind = exactVersion;
-				version = 6.2.1;
+				version = 6.3.0;
 			};
 		};
 		9F2C00042351123700D53EE9 /* XCRemoteSwiftPackageReference "SwiftyJSON" */ = {
