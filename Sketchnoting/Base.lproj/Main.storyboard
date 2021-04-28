@@ -2457,17 +2457,17 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7aY-ga-Jib">
-                                <rect key="frame" x="476" y="69" width="44" height="30"/>
-                                <state key="normal" title="Ignore"/>
+                                <rect key="frame" x="458" y="69" width="62" height="30"/>
+                                <state key="normal" title="Continue"/>
                                 <connections>
-                                    <action selector="ignoreButtonTapped:" destination="4Rl-WJ-Pew" eventType="touchUpInside" id="GcG-mx-IT6"/>
+                                    <action selector="continueButtonTapped:" destination="4Rl-WJ-Pew" eventType="touchUpInside" id="GcG-mx-IT6"/>
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="nry-7X-E7L">
-                                <rect key="frame" x="434" y="69" width="34" height="30"/>
-                                <state key="normal" title="Back"/>
+                                <rect key="frame" x="411" y="69" width="39" height="30"/>
+                                <state key="normal" title="Reset"/>
                                 <connections>
-                                    <action selector="backButtonTapped:" destination="4Rl-WJ-Pew" eventType="touchUpInside" id="mt2-AR-WYo"/>
+                                    <action selector="resetButtonTapped:" destination="4Rl-WJ-Pew" eventType="touchUpInside" id="mt2-AR-WYo"/>
                                 </connections>
                             </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Timeframe:" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="h1m-e4-Q2c">
@@ -2500,10 +2500,10 @@
                     </view>
                     <modalFormSheetSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
                     <connections>
-                        <outlet property="backButton" destination="nry-7X-E7L" id="FLL-XL-QED"/>
                         <outlet property="collectionView" destination="q3e-9K-Zjq" id="wdT-Iw-xkI"/>
-                        <outlet property="ignoreButton" destination="7aY-ga-Jib" id="1EL-1r-Wtm"/>
+                        <outlet property="continueButton" destination="7aY-ga-Jib" id="1EL-1r-Wtm"/>
                         <outlet property="informationLabel" destination="h1m-e4-Q2c" id="oOA-g5-Xyh"/>
+                        <outlet property="resetButton" destination="nry-7X-E7L" id="FLL-XL-QED"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="LZc-Tk-rhl" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>

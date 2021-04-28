@@ -13,4 +13,11 @@ extension Array where Element: Equatable {
         guard let index = firstIndex(of: object) else {return}
         remove(at: index)
     }
+    mutating func remove(at indices: [Int]) {
+        Set(indices)
+            .sorted(by: >)
+            .forEach { rmIndex in
+                self.remove(at: rmIndex)
+            }
+    }
 }

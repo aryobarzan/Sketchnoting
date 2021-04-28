@@ -15,17 +15,16 @@ class SKGraphSearch {
     
     private init() {}
     
-    var graph: WeightedGraph<GraphVertex, Double>!
-    var noteVertexIdx = [Int : Int]()
-    var documentVertexIdx = [Int : Int]()
-    var drawingVertexIdx = [Int : Int]()
+    private var graph: WeightedGraph<GraphVertex, Double>!
+    private var activeGraph: WeightedGraph<GraphVertex, Double>!
     
     func setup() {
         var noteIterator = NeoLibrary.getNoteIterator()
         graph = WeightedGraph<GraphVertex, Double>()
+        var documentVertexIdx = [Int : Int]()
+        var drawingVertexIdx = [Int : Int]()
         while let note = noteIterator.next() {
             let noteIdx = graph.addVertex(GraphNoteVertex(url: note.0, note: note.1))
-            noteVertexIdx[note.1.hashValue] = noteIdx
             for document in note.1.getDocuments() {
                 if documentVertexIdx[document.hashValue] == nil {
                     let documentIdx = graph.addVertex(GraphDocumentVertex(document: document))
@@ -41,38 +40,195 @@ class SKGraphSearch {
                 graph.addEdge(WeightedEdge(u: drawingVertexIdx[drawing.hashValue]!, v: noteIdx, directed: true, weight: 1.0), directed: false)
             }
         }
+        resetActiveGraph()
     }
     
-    func getDocuments(filterOptions: [ExploreSearchDocumentOption] = [ExploreSearchDocumentOption]()) -> [Document] {
-        if filterOptions.isEmpty {
-            return graph.vertices.filter {$0.type == .Document}.map{($0 as! GraphDocumentVertex).document}.sorted{doc1, doc2 in doc1.title < doc2.title}
+    func resetActiveGraph() {
+        activeGraph = graph
+    }
+    
+    func getTimeframeOptions() -> [ExploreSearchTimeframeOption] {
+        var recentCount = 0
+        var olderCount = 0
+        for vertex in activeGraph.vertices {
+            if vertex.type == .Note, let noteVertex = vertex as? GraphNoteVertex {
+                if isNoteRecent(url: noteVertex.url) {
+                    recentCount += 1
+                }
+                else {
+                    olderCount += 1
+                }
+            }
+        }
+        var options = [ExploreSearchTimeframeOption]()
+        if recentCount > 0 && olderCount > 0 {
+            if recentCount > olderCount {
+                options.append(ExploreSearchTimeframeOption(timeframe: .Recent))
+                options.append(ExploreSearchTimeframeOption(timeframe: .Older))
+            }
+            else {
+                options.append(ExploreSearchTimeframeOption(timeframe: .Older))
+                options.append(ExploreSearchTimeframeOption(timeframe: .Recent))
+            }
         }
         else {
-            var documents = [Int : Document]()
-            for (_, noteVertexId) in noteVertexIdx {
-                let edges = graph.edgesForIndex(noteVertexId)
-                var matchCount = 0
-                for filterDocument in filterOptions {
-                    for edge in edges {
-                        if let documentVertex = graph.vertexAtIndex(edge.v) as? GraphDocumentVertex {
-                            if documentVertex.document == filterDocument.document {
-                                matchCount += 1
-                            }
-                        }
+            if recentCount > 0 {
+                options.append(ExploreSearchTimeframeOption(timeframe: .Recent))
+            }
+            else if olderCount > 0 {
+                options.append(ExploreSearchTimeframeOption(timeframe: .Older))
+            }
+        }
+        return options
+    }
+    
+    private func isNoteRecent(url: URL) -> Bool {
+        let modificationDate = NeoLibrary.getModificationDate(url: url)
+        let currentDate = Date()
+        let daysDifference = abs(currentDate.fullDistance(from: modificationDate, resultIn: .day) ?? 0)
+        if daysDifference <= 7 {
+            return true
+        }
+        else {
+            return false
+        }
+    }
+    
+    func applyTimeframe(option: ExploreSearchTimeframeOption) {
+        var toRemove = [Int]()
+        for (vertexIdx, vertex) in activeGraph.vertices.enumerated() {
+            if let noteVertex = vertex as? GraphNoteVertex {
+                let isRecent = isNoteRecent(url: noteVertex.url)
+                switch option.timeframe {
+                case .Recent:
+                    if !isRecent {
+                        toRemove.append(vertexIdx)
                     }
+                    break
+                case .Older:
+                    if isRecent {
+                        toRemove.append(vertexIdx)
+                    }
+                    break
                 }
-                if matchCount == filterOptions.count {
-                    edges.map{(graph.vertexAtIndex($0.v) as! GraphDocumentVertex).document}.forEach {foundDocument in
-                        documents[foundDocument.hashValue] = foundDocument
+            }
+        }
+        toRemove.sorted(by: >).forEach { rmIndex in activeGraph.removeVertexAtIndex(rmIndex)}
+    }
+    
+    func getLengthOptions(timeframeOption: ExploreSearchTimeframeOption? = nil) -> [ExploreSearchLengthOption] {
+        var shortCount = 0
+        var longCount = 0
+        for vertex in activeGraph.vertices {
+            if vertex.type == .Note, let noteVertex = vertex as? GraphNoteVertex {
+                let isShort = isNoteShort(note: noteVertex.note)
+                if isShort {
+                    shortCount += 1
+                }
+                else {
+                    longCount += 1
+                }
+            }
+        }
+        var options = [ExploreSearchLengthOption]()
+        if shortCount > 0 && longCount > 0 {
+            if shortCount > longCount {
+                options.append(ExploreSearchLengthOption(length: .Short))
+                options.append(ExploreSearchLengthOption(length: .Long))
+            }
+            else {
+                options.append(ExploreSearchLengthOption(length: .Long))
+                options.append(ExploreSearchLengthOption(length: .Short))
+            }
+        }
+        else {
+            if shortCount > 0 {
+                options.append(ExploreSearchLengthOption(length: .Short))
+            }
+            else if longCount > 0 {
+                options.append(ExploreSearchLengthOption(length: .Long))
+            }
+        }
+        return options
+    }
+    
+    private func isNoteShort(note: Note) -> Bool {
+        return note.getText(option: .FullText, parse: false).count < 200
+    }
+    
+    func applyLength(option: ExploreSearchLengthOption) {
+        var toRemove = [Int]()
+        for (vertexIdx, vertex) in activeGraph.vertices.enumerated() {
+            if let noteVertex = vertex as? GraphNoteVertex {
+                let isShort = isNoteShort(note: noteVertex.note)
+                switch option.length {
+                case .Short:
+                    if !isShort {
+                        toRemove.append(vertexIdx)
+                    }
+                    break
+                case .Long:
+                    if isShort {
+                        toRemove.append(vertexIdx)
+                    }
+                    break
+                }
+            }
+        }
+        toRemove.sorted(by: >).forEach { rmIndex in activeGraph.removeVertexAtIndex(rmIndex)}
+    }
+    
+    func getDocumentOptions(selectedDocumentOptions: [ExploreSearchDocumentOption] = [ExploreSearchDocumentOption]()) -> [ExploreSearchDocumentOption] {
+        var documents = [(ExploreSearchDocumentOption, Int)]()
+        if selectedDocumentOptions.isEmpty {
+            for (vertexIdx, vertex) in activeGraph.vertices.enumerated() {
+                if vertex.type == .Document, let documentVertex = vertex as? GraphDocumentVertex {
+                    let documentVertexEdges = activeGraph.edgesForIndex(vertexIdx)
+                    if documentVertexEdges.count > 0 {
+                        documents.append((ExploreSearchDocumentOption(document: documentVertex.document), documentVertexEdges.count))
                     }
                 }
             }
-            return documents.map{$0.value}.sorted{doc1, doc2 in doc1.title < doc2.title}
         }
+        else {
+            var documentVertexIdxValid = [Int]()
+            for (vertexIdx, vertex) in activeGraph.vertices.enumerated() {
+                if vertex.type == .Note {
+                    let edges = activeGraph.edgesForIndex(vertexIdx)
+                    var matchCount = 0
+                    for selectedDocumentOption in selectedDocumentOptions {
+                        for edge in edges {
+                            if let documentVertex = activeGraph.vertexAtIndex(edge.v) as? GraphDocumentVertex {
+                                if documentVertex.document == selectedDocumentOption.document {
+                                    matchCount += 1
+                                    break
+                                }
+                            }
+                        }
+                    }
+                    if matchCount == selectedDocumentOptions.count {
+                        documentVertexIdxValid += edges.map{$0.v}.filter{activeGraph.vertexAtIndex($0) is GraphDocumentVertex}
+                    }
+                }
+            }
+            for documentVertexId in documentVertexIdxValid {
+                if let documentVertex = activeGraph.vertexAtIndex(documentVertexId) as? GraphDocumentVertex {
+                    let documentVertexEdges = activeGraph.edgesForIndex(documentVertexId)
+                    if documentVertexEdges.count > 0 {
+                        documents.append((ExploreSearchDocumentOption(document: documentVertex.document), documentVertexEdges.count))
+                    }
+                }
+            }
+        }
+        documents = documents.sorted{item1, item2 in
+            item1.1 > item2.1
+            
+        }
+        return documents.map{$0.0}
     }
 }
 
-class GraphVertex: Codable, Equatable {
+class GraphVertex: Codable, Equatable, Hashable {
     let type: GraphVertexType
     
     init(type: GraphVertexType) {
@@ -95,6 +251,10 @@ class GraphVertex: Codable, Equatable {
     
     static func == (lhs: GraphVertex, rhs: GraphVertex) -> Bool {
         return lhs.type == rhs.type
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(type)
     }
 }
 
@@ -132,6 +292,10 @@ class GraphNoteVertex: GraphVertex {
         note = try container.decode(Note.self, forKey: .note)
         try super.init(from: decoder)
     }
+    
+    override func hash(into hasher: inout Hasher) {
+        hasher.combine(url)
+    }
 }
 
 class GraphDocumentVertex: GraphVertex {
@@ -157,6 +321,10 @@ class GraphDocumentVertex: GraphVertex {
         document = try container.decode(Document.self, forKey: .document)
         try super.init(from: decoder)
     }
+    
+    override func hash(into hasher: inout Hasher) {
+        hasher.combine(document)
+    }
 }
 
 class GraphDrawingVertex: GraphVertex {
@@ -181,5 +349,9 @@ class GraphDrawingVertex: GraphVertex {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         drawing = try container.decode(String.self, forKey: .drawing)
         try super.init(from: decoder)
+    }
+    
+    override func hash(into hasher: inout Hasher) {
+        hasher.combine(drawing)
     }
 }

@@ -11,8 +11,8 @@ import UIKit
 class ExploreSearchViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource {
 
     @IBOutlet weak var informationLabel: UILabel!
-    @IBOutlet weak var backButton: UIButton!
-    @IBOutlet weak var ignoreButton: UIButton!
+    @IBOutlet weak var resetButton: UIButton!
+    @IBOutlet weak var continueButton: UIButton!
     @IBOutlet weak var collectionView: UICollectionView!
     
     var exploreSearchOptions: [ExploreSearchOption] = [ExploreSearchOption]()
@@ -41,17 +41,17 @@ class ExploreSearchViewController: UIViewController, UICollectionViewDelegate, U
     }
     
     func updateState() {
-        backButton.isHidden = false
-        ignoreButton.setTitle("Continue", for: .normal)
-        ignoreButton.setTitleColor(.systemBlue, for: .normal)
+        resetButton.isHidden = false
+        continueButton.setTitle("Continue", for: .normal)
+        continueButton.setTitleColor(.systemBlue, for: .normal)
         switch state {
         case .Timeframe:
-            exploreSearchOptions = exploreSearchTimeframeOptions
+            exploreSearchOptions = SKGraphSearch.shared.getTimeframeOptions()
             informationLabel.text = "Timeframe:"
-            backButton.isHidden = true
+            resetButton.isHidden = true
             break
         case .Length:
-            exploreSearchOptions = exploreSearchLengthOptions
+            exploreSearchOptions = SKGraphSearch.shared.getLengthOptions()
             informationLabel.text = "Document length:"
             break
         case .Drawings:
@@ -59,11 +59,10 @@ class ExploreSearchViewController: UIViewController, UICollectionViewDelegate, U
             informationLabel.text = "Drawing(s):"
             break
         case .Documents:
-            exploreSearchDocumentOptions = SKGraphSearch.shared.getDocuments(filterOptions: selectedOptions[state]!.map{$0 as! ExploreSearchDocumentOption}).map{ExploreSearchDocumentOption(document: $0)}
-            exploreSearchOptions = exploreSearchDocumentOptions
+            exploreSearchOptions = SKGraphSearch.shared.getDocumentOptions(selectedDocumentOptions: selectedOptions[state]!.map{$0 as! ExploreSearchDocumentOption})
             informationLabel.text = "Document(s):"
-            ignoreButton.setTitle("Search", for: .normal)
-            ignoreButton.setTitleColor(.systemGreen, for: .normal)
+            continueButton.setTitle("Search", for: .normal)
+            continueButton.setTitleColor(.systemGreen, for: .normal)
             break
         }
         collectionView.reloadData()
@@ -101,44 +100,38 @@ class ExploreSearchViewController: UIViewController, UICollectionViewDelegate, U
                 selectedOptions[state]!.removeAll()
             }
             selectedOptions[state]!.append(option)
-            if state == .Timeframe || state == .Length {
-                forwardState()
-            }
-            else {
-                collectionView.reloadItems(at: [indexPath])
-            }
+            collectionView.reloadItems(at: [indexPath])
         }
         if state == .Drawings || state == .Documents {
             updateState()
         }
     }
 
-    @IBAction func backButtonTapped(_ sender: UIButton) {
-        switch state {
-        case .Timeframe:
-            break
-        case .Length:
-            state = .Timeframe
-            break
-        case .Drawings:
-            state = .Length
-            break
-        case .Documents:
-            state = .Drawings
-            break
+    @IBAction func resetButtonTapped(_ sender: UIButton) {
+        for possibleState in ExploreSearchState.allCases {
+            selectedOptions[possibleState]!.removeAll()
         }
+        state = .Timeframe
+        SKGraphSearch.shared.resetActiveGraph()
         updateState()
     }
-    @IBAction func ignoreButtonTapped(_ sender: UIButton) {
+    
+    @IBAction func continueButtonTapped(_ sender: UIButton) {
         forwardState()
     }
     
     private func forwardState() {
         switch state {
         case .Timeframe:
+            if !selectedOptions[state]!.isEmpty {
+                SKGraphSearch.shared.applyTimeframe(option: selectedOptions[state]![0] as! ExploreSearchTimeframeOption)
+            }
             state = .Length
             break
         case .Length:
+            if !selectedOptions[state]!.isEmpty {
+                SKGraphSearch.shared.applyLength(option: selectedOptions[state]![0] as! ExploreSearchLengthOption)
+            }
             state = .Drawings
             break
         case .Drawings:
