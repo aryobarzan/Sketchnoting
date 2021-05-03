@@ -62,13 +62,14 @@ class SearchViewController: UIViewController, DrawingSearchDelegate, SKIndexerDe
     
     @IBAction func exploreButtonTapped(_ sender: UIButton) {
         if let exploreSearchVC = self.storyboard?.instantiateViewController(withIdentifier: "ExploreSearchViewController") as? ExploreSearchViewController {
-            exploreSearchVC.modalPresentationStyle = .popover
-            if let popoverPresentationController = exploreSearchVC.popoverPresentationController {
+            exploreSearchVC.modalPresentationStyle = .formSheet
+            present(exploreSearchVC, animated: true, completion: nil)
+            /*if let popoverPresentationController = exploreSearchVC.popoverPresentationController {
                 popoverPresentationController.permittedArrowDirections = .up
                 popoverPresentationController.sourceView = self.view
                 popoverPresentationController.sourceRect = sender.frame
                 present(exploreSearchVC, animated: true, completion: nil)
-            }
+            }*/
         }
     }
     

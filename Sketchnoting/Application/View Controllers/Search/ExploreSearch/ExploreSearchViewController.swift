@@ -144,7 +144,7 @@ class ExploreSearchViewController: UIViewController, UICollectionViewDelegate, U
             if !selectedOptions[state]!.isEmpty {
                 SKGraphSearch.shared.applyDocuments(options: selectedOptions[state]!.map{$0 as! ExploreSearchDocumentOption})
             }
-            //SKGraphSearch.shared.clearEdgelessVertices()
+            SKGraphSearch.shared.clearEdgelessVertices()
             // Perform search
             
             let nodes = SKGraphSearch.shared.getActiveGraph().vertices.enumerated().map{$0.offset}
@@ -176,7 +176,7 @@ class ExploreSearchViewController: UIViewController, UICollectionViewDelegate, U
         view.image = UIImage(systemName: "questionmark.circle.fill")
         let graphVertex = SKGraphSearch.shared.getActiveGraph().vertexAtIndex(node)
         if graphVertex is GraphNoteVertex {
-            view.frame = CGRect(x: 0, y: 0, width: 50, height: 100)
+            view.frame = CGRect(x: 0, y: 0, width: 125, height: 175)
             view.backgroundColor = UIColor.white
             view.layer.borderWidth = 1
             view.layer.borderColor = UIColor.black.cgColor
@@ -189,10 +189,10 @@ class ExploreSearchViewController: UIViewController, UICollectionViewDelegate, U
             }
         }
         else {
-            view.frame = CGRect(x: 0, y: 0, width: 50, height: 50)
+            view.frame = CGRect(x: 0, y: 0, width: 76, height: 76)
             view.backgroundColor = UIColor.brown
             view.layer.masksToBounds = true
-            view.layer.cornerRadius = 25
+            view.layer.cornerRadius = 38
             if let documentVertex = graphVertex as? GraphDocumentVertex {
                 documentVertex.document.retrieveImage(type: .Standard, completion: {result in
                     switch result {
