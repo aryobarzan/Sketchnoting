@@ -7,23 +7,22 @@
 //
 
 import UIKit
+import Graphite
 
-class ExploreSearchViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource {
+class ExploreSearchViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, WeightedGraphPresenterDelegate {
 
     @IBOutlet weak var informationLabel: UILabel!
     @IBOutlet weak var resetButton: UIButton!
     @IBOutlet weak var continueButton: UIButton!
     @IBOutlet weak var collectionView: UICollectionView!
+    @IBOutlet weak var graphContainerView: UIView!
     
     var exploreSearchOptions: [ExploreSearchOption] = [ExploreSearchOption]()
     var state: ExploreSearchState = .Timeframe
     
-    var exploreSearchTimeframeOptions: [ExploreSearchTimeframeOption] = [ExploreSearchTimeframeOption(timeframe: .Recent), ExploreSearchTimeframeOption(timeframe: .Older)]
-    var exploreSearchLengthOptions: [ExploreSearchLengthOption] = [ExploreSearchLengthOption(length: .Short), ExploreSearchLengthOption(length: .Long)]
-    var exploreSearchDrawingOptions: [ExploreSearchDrawingOption] = [ExploreSearchDrawingOption]()
-    var exploreSearchDocumentOptions: [ExploreSearchDocumentOption] = [ExploreSearchDocumentOption]()
-    
     var selectedOptions = [ExploreSearchState : [ExploreSearchOption]]()
+    
+    var graphPresenter: WeightedGraphPresenter!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -55,7 +54,7 @@ class ExploreSearchViewController: UIViewController, UICollectionViewDelegate, U
             informationLabel.text = "Document length:"
             break
         case .Drawings:
-            exploreSearchOptions = exploreSearchDrawingOptions
+            exploreSearchOptions = [ExploreSearchDrawingOption]()
             informationLabel.text = "Drawing(s):"
             break
         case .Documents:
@@ -113,6 +112,10 @@ class ExploreSearchViewController: UIViewController, UICollectionViewDelegate, U
         }
         state = .Timeframe
         SKGraphSearch.shared.resetActiveGraph()
+        graphContainerView.isHidden = true
+        graphContainerView.subviews.forEach { subview in
+            subview.removeFromSuperview()
+        }
         updateState()
     }
     
@@ -138,10 +141,81 @@ class ExploreSearchViewController: UIViewController, UICollectionViewDelegate, U
             state = .Documents
             break
         case .Documents:
+            if !selectedOptions[state]!.isEmpty {
+                SKGraphSearch.shared.applyDocuments(options: selectedOptions[state]!.map{$0 as! ExploreSearchDocumentOption})
+            }
+            //SKGraphSearch.shared.clearEdgelessVertices()
             // Perform search
+            
+            let nodes = SKGraphSearch.shared.getActiveGraph().vertices.enumerated().map{$0.offset}
+            var edges = [Graph.Edge]()
+            for (vertexIdx, _) in SKGraphSearch.shared.getActiveGraph().enumerated() {
+                let edgesVertex = SKGraphSearch.shared.getActiveGraph().edgesForIndex(vertexIdx)
+                for e in edgesVertex {
+                    edges.append(Graph.Edge(nodes: [e.u, e.v], weight: Float(e.weight)))
+                }
+            }
+            let forceDirectedGraph = Graph(nodes: nodes, edges: edges)
+            graphPresenter = WeightedGraphPresenter(graph: Graph(nodes: [], edges: []), view: graphContainerView)
+            graphPresenter.collisionDistance = 0
+            graphPresenter.delegate = self
+            graphPresenter.edgeColor = UIColor.gray
+            graphPresenter.start()
+            graphPresenter.graph = forceDirectedGraph
+            graphPresenter.backgroundColor = .white
+            
+            graphContainerView.isHidden = false
             break
         }
         updateState()
+    }
+    
+    // MARK: WeightedGraphPresenterDelegate
+    func view(for node: Int, presenter: WeightedGraphPresenter) -> UIView {
+        let view = UIImageView()
+        view.image = UIImage(systemName: "questionmark.circle.fill")
+        let graphVertex = SKGraphSearch.shared.getActiveGraph().vertexAtIndex(node)
+        if graphVertex is GraphNoteVertex {
+            view.frame = CGRect(x: 0, y: 0, width: 50, height: 100)
+            view.backgroundColor = UIColor.white
+            view.layer.borderWidth = 1
+            view.layer.borderColor = UIColor.black.cgColor
+            if let noteVertex = graphVertex as? GraphNoteVertex {
+                noteVertex.note.getPreviewImage(completion: {image in
+                    DispatchQueue.main.async {
+                        view.image = image
+                    }
+                })
+            }
+        }
+        else {
+            view.frame = CGRect(x: 0, y: 0, width: 50, height: 50)
+            view.backgroundColor = UIColor.brown
+            view.layer.masksToBounds = true
+            view.layer.cornerRadius = 25
+            if let documentVertex = graphVertex as? GraphDocumentVertex {
+                documentVertex.document.retrieveImage(type: .Standard, completion: {result in
+                    switch result {
+                    case .success(let value):
+                        if let value = value {
+                            DispatchQueue.main.async {
+                                view.image = value
+                            }
+                        }
+                    case .failure(let error):
+                        logger.error(error)
+                    }
+                })
+            }
+        }
+        return view
+    }
+    
+    func configure(view: UIView, for node: Int, presenter: WeightedGraphPresenter) {
+    }
+    
+    func visibleRange(for node: Int, presenter: WeightedGraphPresenter) -> ClosedRange<Float>? {
+        return nil
     }
 }
 

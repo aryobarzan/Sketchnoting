@@ -30,21 +30,21 @@ class SKGraphSearch {
                     let documentIdx = graph.addVertex(GraphDocumentVertex(document: document))
                     documentVertexIdx[document.hashValue] = documentIdx
                 }
-                graph.addEdge(WeightedEdge(u: documentVertexIdx[document.hashValue]!, v: noteIdx, directed: true, weight: 1.0), directed: false)
+                graph.addEdge(WeightedEdge(u: documentVertexIdx[document.hashValue]!, v: noteIdx, directed: true, weight: 0.1), directed: false)
             }
             for drawing in note.1.getDrawingLabels() {
                 if drawingVertexIdx[drawing.hashValue] == nil {
                     let drawingIdx = graph.addVertex(GraphDrawingVertex(drawing: drawing))
                     drawingVertexIdx[drawing.hashValue] = drawingIdx
                 }
-                graph.addEdge(WeightedEdge(u: drawingVertexIdx[drawing.hashValue]!, v: noteIdx, directed: true, weight: 1.0), directed: false)
+                graph.addEdge(WeightedEdge(u: drawingVertexIdx[drawing.hashValue]!, v: noteIdx, directed: true, weight: 0.1), directed: false)
             }
         }
-        resetActiveGraph()
+        activeGraph = graph
     }
     
     func resetActiveGraph() {
-        activeGraph = graph
+        setup()
     }
     
     func getTimeframeOptions() -> [ExploreSearchTimeframeOption] {
@@ -225,6 +225,44 @@ class SKGraphSearch {
             
         }
         return documents.map{$0.0}
+    }
+    
+    func applyDocuments(options: [ExploreSearchDocumentOption]) {
+        var toRemove = [Int]()
+        for (vertexIdx, vertex) in activeGraph.vertices.enumerated() {
+            if vertex.type == .Note {
+                let edges = activeGraph.edgesForIndex(vertexIdx)
+                var matchCount = 0
+                for selectedDocumentOption in options {
+                    for edge in edges {
+                        if let documentVertex = activeGraph.vertexAtIndex(edge.v) as? GraphDocumentVertex {
+                            if documentVertex.document == selectedDocumentOption.document {
+                                matchCount += 1
+                                break
+                            }
+                        }
+                    }
+                }
+                if matchCount != options.count {
+                    toRemove.append(vertexIdx)
+                }
+            }
+        }
+        toRemove.sorted(by: >).forEach { rmIndex in activeGraph.removeVertexAtIndex(rmIndex)}
+    }
+    
+    func clearEdgelessVertices() {
+        var toRemove = [Int]()
+        for (vertexIdx, _) in activeGraph.vertices.enumerated() {
+            if activeGraph.edgesForIndex(vertexIdx).isEmpty {
+                toRemove.append(vertexIdx)
+            }
+        }
+        toRemove.sorted(by: >).forEach { rmIndex in activeGraph.removeVertexAtIndex(rmIndex)}
+    }
+    
+    func getActiveGraph() -> WeightedGraph<GraphVertex, Double> {
+        return activeGraph
     }
 }
 
