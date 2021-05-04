@@ -47,6 +47,7 @@ class NeoDocumentsVC: UIViewController, UICollectionViewDelegate, UISearchBarDel
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.title = "Documents"
+        collectionView.register(UINib(nibName: "DocumentCollectionViewCell", bundle: nil), forCellWithReuseIdentifier: "DocumentCollectionViewCell")
         collectionView.delegate = self
         configureLayout()
         self.dataSource = makeDataSource()
@@ -144,8 +145,8 @@ class NeoDocumentsVC: UIViewController, UICollectionViewDelegate, UISearchBarDel
                 UICollectionViewCell? in
                 // 2
                 let cell = collectionView.dequeueReusableCell(
-                    withReuseIdentifier: "NeoDocumentCell",
-                    for: indexPath) as? NeoDocumentCell
+                    withReuseIdentifier: "DocumentCollectionViewCell",
+                    for: indexPath) as? DocumentCollectionViewCell
                 cell?.document = document
                 return cell
         })

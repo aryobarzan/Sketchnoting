@@ -9,7 +9,7 @@
 import UIKit
 import NVActivityIndicatorView
 import NaturalLanguage
-class SearchViewController: UIViewController, DrawingSearchDelegate, SKIndexerDelegate, UITableViewDelegate, UITableViewDataSource, SearchNoteCellDelegate, UISearchBarDelegate {
+class SearchViewController: UIViewController, DrawingSearchDelegate, SKIndexerDelegate, UITableViewDelegate, UITableViewDataSource, SearchNoteCellDelegate, SearchDocumentCellDelegate, UISearchBarDelegate {
     
     @IBOutlet weak var searchBar: UISearchBar!
     @IBOutlet weak var activityIndicator: NVActivityIndicatorView!
@@ -62,14 +62,8 @@ class SearchViewController: UIViewController, DrawingSearchDelegate, SKIndexerDe
     
     @IBAction func exploreButtonTapped(_ sender: UIButton) {
         if let exploreSearchVC = self.storyboard?.instantiateViewController(withIdentifier: "ExploreSearchViewController") as? ExploreSearchViewController {
-            exploreSearchVC.modalPresentationStyle = .formSheet
+            exploreSearchVC.modalPresentationStyle = .pageSheet
             present(exploreSearchVC, animated: true, completion: nil)
-            /*if let popoverPresentationController = exploreSearchVC.popoverPresentationController {
-                popoverPresentationController.permittedArrowDirections = .up
-                popoverPresentationController.sourceView = self.view
-                popoverPresentationController.sourceRect = sender.frame
-                present(exploreSearchVC, animated: true, completion: nil)
-            }*/
         }
     }
     
@@ -197,6 +191,7 @@ class SearchViewController: UIViewController, DrawingSearchDelegate, SKIndexerDe
             if let documentsItem = item as? SearchTableDocumentsItem {
                 cell.setContent(query: item.query, documents: documentsItem.documents)
             }
+            cell.delegate = self
             return cell
         case .Information:
             let cell = searchTableView.dequeueReusableCell(withIdentifier: "SearchInformationCell", for: indexPath) as! SearchInformationCell
@@ -213,7 +208,7 @@ class SearchViewController: UIViewController, DrawingSearchDelegate, SKIndexerDe
         case .Notes:
             return CGFloat(380)
         case .Documents:
-            return CGFloat(210)
+            return CGFloat(280)
         case .Information:
             return CGFloat(60)
         }
@@ -250,6 +245,16 @@ class SearchViewController: UIViewController, DrawingSearchDelegate, SKIndexerDe
     func tappedNote(url: URL, note: Note) {
         noteToOpen = (url, note)
         Timer.scheduledTimer(timeInterval: 0.2, target: self, selector: #selector(switchToHomeTab), userInfo: nil, repeats: false)
+    }
+    
+    // MARK: SearchDocumentCellDelegate
+    func documentTapped(document: Document) {
+        let documentPreviewVC = UIStoryboard(name: "Main", bundle: Bundle.main).instantiateViewController(withIdentifier: "DocumentPreviewViewController") as? DocumentPreviewViewController
+        if let documentPreviewVC = documentPreviewVC {
+            documentPreviewVC.modalPresentationStyle = .formSheet
+            present(documentPreviewVC, animated: true, completion: nil)
+            documentPreviewVC.document = document
+        }
     }
 }
 

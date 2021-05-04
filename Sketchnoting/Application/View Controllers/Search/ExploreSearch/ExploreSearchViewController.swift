@@ -162,7 +162,7 @@ class ExploreSearchViewController: UIViewController, UICollectionViewDelegate, U
             graphPresenter.edgeColor = UIColor.gray
             graphPresenter.start()
             graphPresenter.graph = forceDirectedGraph
-            graphPresenter.backgroundColor = .white
+            graphPresenter.backgroundColor = .systemBackground
             
             graphContainerView.isHidden = false
             break
@@ -173,13 +173,17 @@ class ExploreSearchViewController: UIViewController, UICollectionViewDelegate, U
     // MARK: WeightedGraphPresenterDelegate
     func view(for node: Int, presenter: WeightedGraphPresenter) -> UIView {
         let view = UIImageView()
+        view.tag = node
+        let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(self.handleVertexTap(_:)))
+        view.addGestureRecognizer(tapGestureRecognizer)
+        view.isUserInteractionEnabled = true
         view.image = UIImage(systemName: "questionmark.circle.fill")
         let graphVertex = SKGraphSearch.shared.getActiveGraph().vertexAtIndex(node)
         if graphVertex is GraphNoteVertex {
-            view.frame = CGRect(x: 0, y: 0, width: 125, height: 175)
+            view.frame = CGRect(x: 0, y: 0, width: 175, height: 250)
             view.backgroundColor = UIColor.white
-            view.layer.borderWidth = 1
-            view.layer.borderColor = UIColor.black.cgColor
+            view.layer.borderWidth = 2
+            view.layer.borderColor = UIColor.systemGray.cgColor
             if let noteVertex = graphVertex as? GraphNoteVertex {
                 noteVertex.note.getPreviewImage(completion: {image in
                     DispatchQueue.main.async {
@@ -189,10 +193,11 @@ class ExploreSearchViewController: UIViewController, UICollectionViewDelegate, U
             }
         }
         else {
-            view.frame = CGRect(x: 0, y: 0, width: 76, height: 76)
-            view.backgroundColor = UIColor.brown
+            view.frame = CGRect(x: 0, y: 0, width: 144, height: 144)
+            view.backgroundColor = UIColor.systemBlue
             view.layer.masksToBounds = true
-            view.layer.cornerRadius = 38
+            view.layer.cornerRadius = 72
+            view.tintColor = .black
             if let documentVertex = graphVertex as? GraphDocumentVertex {
                 documentVertex.document.retrieveImage(type: .Standard, completion: {result in
                     switch result {
@@ -216,6 +221,21 @@ class ExploreSearchViewController: UIViewController, UICollectionViewDelegate, U
     
     func visibleRange(for node: Int, presenter: WeightedGraphPresenter) -> ClosedRange<Float>? {
         return nil
+    }
+    
+    @objc func handleVertexTap(_ sender: UITapGestureRecognizer) {
+        if let vertexView = sender.view {
+            let graphVertex = SKGraphSearch.shared.getActiveGraph().vertexAtIndex(vertexView.tag)
+            if let documentVertex = graphVertex as? GraphDocumentVertex {
+                let documentPreviewVC = UIStoryboard(name: "Main", bundle: Bundle.main).instantiateViewController(withIdentifier: "DocumentPreviewViewController") as? DocumentPreviewViewController
+                if let documentPreviewVC = documentPreviewVC {
+                    documentPreviewVC.modalPresentationStyle = .popover
+                    documentPreviewVC.popoverPresentationController?.sourceView = vertexView
+                    present(documentPreviewVC, animated: true, completion: nil)
+                    documentPreviewVC.document = documentVertex.document
+                }
+            }
+        }
     }
 }
 

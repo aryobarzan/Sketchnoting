@@ -168,6 +168,9 @@
 		9FD29C58223C3CF700CC969A /* UIImageExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD29C57223C3CF700CC969A /* UIImageExtensions.swift */; };
 		9FD5516E246A4364005D14D2 /* RelatedNotesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD5516D246A4364005D14D2 /* RelatedNotesViewController.swift */; };
 		9FD8BB97243D5BE500542BFA /* ImportHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD8BB96243D5BE500542BFA /* ImportHelper.swift */; };
+		9FDD53BD2641DCE000C7F3FB /* DocumentCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FDD53BB2641DCE000C7F3FB /* DocumentCollectionViewCell.swift */; };
+		9FDD53BE2641DCE000C7F3FB /* DocumentCollectionViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9FDD53BC2641DCE000C7F3FB /* DocumentCollectionViewCell.xib */; };
+		9FDD53C02641E30E00C7F3FB /* CircularProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FDD53BF2641E30E00C7F3FB /* CircularProgressView.swift */; };
 		9FDD6CA524AFB7C10093EDF4 /* FileInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FDD6CA424AFB7C10093EDF4 /* FileInfoViewController.swift */; };
 		9FE38C6824F8603E00421BAE /* NeoDraggableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FE38C6724F8603E00421BAE /* NeoDraggableView.swift */; };
 		9FE38C6A24F8607800421BAE /* NoteImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FE38C6924F8607800421BAE /* NoteImageView.swift */; };
@@ -358,6 +361,9 @@
 		9FD29C57223C3CF700CC969A /* UIImageExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIImageExtensions.swift; sourceTree = "<group>"; };
 		9FD5516D246A4364005D14D2 /* RelatedNotesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RelatedNotesViewController.swift; sourceTree = "<group>"; };
 		9FD8BB96243D5BE500542BFA /* ImportHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportHelper.swift; sourceTree = "<group>"; };
+		9FDD53BB2641DCE000C7F3FB /* DocumentCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentCollectionViewCell.swift; sourceTree = "<group>"; };
+		9FDD53BC2641DCE000C7F3FB /* DocumentCollectionViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DocumentCollectionViewCell.xib; sourceTree = "<group>"; };
+		9FDD53BF2641E30E00C7F3FB /* CircularProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircularProgressView.swift; sourceTree = "<group>"; };
 		9FDD6CA424AFB7C10093EDF4 /* FileInfoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileInfoViewController.swift; sourceTree = "<group>"; };
 		9FE38C6724F8603E00421BAE /* NeoDraggableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NeoDraggableView.swift; sourceTree = "<group>"; };
 		9FE38C6924F8607800421BAE /* NoteImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteImageView.swift; sourceTree = "<group>"; };
@@ -429,12 +435,14 @@
 		9F5010CA22491F8900425424 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				9FDD53BA2641DCC600C7F3FB /* Documents */,
 				9FCE9EC42502B36D00166AE2 /* Share */,
 				9FE38C6D24F8864C00421BAE /* Draggable Views */,
 				9FFE07DC232A595D00DBD0AC /* Tags */,
 				9F92D11623217C8300BC0E57 /* Search */,
 				9F75E449230C580300488BBD /* Note Collection View */,
 				9F18E7A723FB4F1600543D78 /* FolderButton.swift */,
+				9FDD53BF2641E30E00C7F3FB /* CircularProgressView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -919,6 +927,15 @@
 			path = "Related Notes";
 			sourceTree = "<group>";
 		};
+		9FDD53BA2641DCC600C7F3FB /* Documents */ = {
+			isa = PBXGroup;
+			children = (
+				9FDD53BB2641DCE000C7F3FB /* DocumentCollectionViewCell.swift */,
+				9FDD53BC2641DCE000C7F3FB /* DocumentCollectionViewCell.xib */,
+			);
+			path = Documents;
+			sourceTree = "<group>";
+		};
 		9FE38C6D24F8864C00421BAE /* Draggable Views */ = {
 			isa = PBXGroup;
 			children = (
@@ -1045,6 +1062,7 @@
 				9F05B5A1232BE4EC00983AF2 /* NoteCollectionViewDetailCell.xib in Resources */,
 				9F945DD6262793ED00B53464 /* bert-base-uncased-vocab.txt in Resources */,
 				9FD29BAC2220524D00CC969A /* Main.storyboard in Resources */,
+				9FDD53BE2641DCE000C7F3FB /* DocumentCollectionViewCell.xib in Resources */,
 				9F92D11A23217CFA00BC0E57 /* SearchFilterView.xib in Resources */,
 				9FB515B7261DF5E8004F91E2 /* FolderCollectionViewCell.xib in Resources */,
 				9F75E44D230C583200488BBD /* NoteCollectionViewCell.xib in Resources */,
@@ -1178,6 +1196,7 @@
 				9FC02C1C23EDB6290051C576 /* File.swift in Sources */,
 				9FAB4B7C244BEF2700DEA46F /* FittableFontLabel.swift in Sources */,
 				9FB9984724868561003773F2 /* MoveFileViewController.swift in Sources */,
+				9FDD53BD2641DCE000C7F3FB /* DocumentCollectionViewCell.swift in Sources */,
 				9F749EAB2631CB7400AA3C6B /* DISTILBERTUtils.swift in Sources */,
 				9F00B9F824C5D56E000153A8 /* NeoDocumentsVC.swift in Sources */,
 				9F92D10E231E95B400BC0E57 /* UICollectionViewExtensions.swift in Sources */,
@@ -1207,6 +1226,7 @@
 				9FD29C472239588E00CC969A /* UIViewExtensions.swift in Sources */,
 				9F8988E325E958EF005CB90B /* Stemmer.swift in Sources */,
 				9FB9984924868700003773F2 /* MoveFileViewCell.swift in Sources */,
+				9FDD53C02641E30E00C7F3FB /* CircularProgressView.swift in Sources */,
 				9FA8C000239B18BA00BAA42B /* TagsViewController.swift in Sources */,
 				9F945DDA262793F400B53464 /* BERTInput.swift in Sources */,
 				9FBF6AB822E9F428001FD730 /* VisionTextLineWrapper.swift in Sources */,
