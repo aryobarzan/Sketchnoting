@@ -48,6 +48,14 @@ class ARDocument: Document {
         return self.URL
     }
     
+    override func getColor() -> UIColor {
+        return #colorLiteral(red: 0.9254902005, green: 0.2352941185, blue: 0.1019607857, alpha: 1)
+    }
+    
+    override func getSymbol() -> UIImage? {
+        return UIImage(systemName: "a.circle")
+    }
+    
     //MARK: Visitable
     override func accept(visitor: DocumentVisitor) {
         visitor.process(document: self)

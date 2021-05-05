@@ -27,12 +27,12 @@ protocol DocumentDelegate {
 }
 
 enum DocumentType: String, Codable, CaseIterable {
-    case TAGME
-    case WAT
-    case BioPortal
-    case Chemistry
-    case ALMAAR
-    case Other
+    case TAGME = "TAGME"
+    case WAT = "WAT"
+    case BioPortal = "BioPortal"
+    case Chemistry = "Chemistry"
+    case ALMAAR = "AR"
+    case Other = "Other"
 }
 
 class Document: Codable, Visitable, Equatable, Hashable {
@@ -110,13 +110,13 @@ class Document: Codable, Visitable, Equatable, Hashable {
     }
     
     // MARK: Image resources downloading
-    public enum DocumentImageType : String {
+    enum DocumentImageType : String {
         case Standard
         case Map
         case Molecule
     }
     
-    public func downloadImage(url: URL, type: DocumentImageType) {
+    func downloadImage(url: URL, type: DocumentImageType) {
         let cache = SKCacheManager.cache
         let key = type.rawValue + "-" + self.documentType.rawValue + "-" + self.title
         logger.info(key)
@@ -169,7 +169,6 @@ class Document: Codable, Visitable, Equatable, Hashable {
     }
     
     internal func retrieveImage(type: DocumentImageType, completion:@escaping (Result<KFCrossPlatformImage?, KingfisherError>) -> ()) {
-        
         let key = type.rawValue + "-" + self.documentType.rawValue + "-" + self.title
         let cache = SKCacheManager.cache
         cache.retrieveImageInDiskCache(forKey: key, completionHandler: { result in
@@ -177,8 +176,16 @@ class Document: Codable, Visitable, Equatable, Hashable {
             })
     }
     
-    public func reload() {
+    func reload() {
         delegate?.documentHasChanged(document: self)
+    }
+    
+    func getColor() -> UIColor {
+        return .systemGray
+    }
+    
+    func getSymbol() -> UIImage? {
+        return UIImage(systemName: "d.circle")
     }
     
     static func == (lhs: Document, rhs: Document) -> Bool {
@@ -188,7 +195,7 @@ class Document: Codable, Visitable, Equatable, Hashable {
         return false
     }
     
-    public func hash(into hasher: inout Hasher) {
+    func hash(into hasher: inout Hasher) {
         hasher.combine(title)
         hasher.combine(documentType)
     }

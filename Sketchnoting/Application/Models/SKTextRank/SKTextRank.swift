@@ -66,6 +66,9 @@ class SKTextRank {
     
     func summarize(text: String, numberOfSentences: Int? = 10, biased: Bool = false) -> String {
         let body = SemanticSearch.shared.tokenize(text: text, unit: .sentence)
+        if body.count <= numberOfSentences ?? 10 {
+            return text
+        }
         let chunkSize = 5
         let chunks = stride(from: 0, to: body.count, by: chunkSize).map {
             Array(body[$0..<min($0 + chunkSize, body.count)])

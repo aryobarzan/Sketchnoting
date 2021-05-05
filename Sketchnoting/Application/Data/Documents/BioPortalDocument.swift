@@ -39,6 +39,14 @@ class BioPortalDocument: Document {
         definition = try container.decode(String.self, forKey: .definition)
     }
     
+    override func getColor() -> UIColor {
+        return #colorLiteral(red: 0.3411764801, green: 0.6235294342, blue: 0.1686274558, alpha: 1)
+    }
+    
+    override func getSymbol() -> UIImage? {
+        return UIImage(systemName: "b.circle")
+    }
+    
     //MARK: Visitable
     override func accept(visitor: DocumentVisitor) {
         visitor.process(document: self)

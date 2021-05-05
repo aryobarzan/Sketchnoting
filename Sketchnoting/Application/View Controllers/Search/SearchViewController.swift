@@ -220,6 +220,7 @@ class SearchViewController: UIViewController, DrawingSearchDelegate, SKIndexerDe
             if let informationItem = item as? SearchTableInformationItem {
                 switch informationItem.informationType {
                 case .Basic, .QuestionAnswer:
+                    self.presentDocumentDetail(document: Document(title: informationItem.query, description: informationItem.message, URL: "empty", documentType: .Other)!)
                     break
                 case .Subqueries:
                     self.items.remove(at: indexPath.row)
@@ -249,12 +250,7 @@ class SearchViewController: UIViewController, DrawingSearchDelegate, SKIndexerDe
     
     // MARK: SearchDocumentCellDelegate
     func documentTapped(document: Document) {
-        let documentPreviewVC = UIStoryboard(name: "Main", bundle: Bundle.main).instantiateViewController(withIdentifier: "DocumentPreviewViewController") as? DocumentPreviewViewController
-        if let documentPreviewVC = documentPreviewVC {
-            documentPreviewVC.modalPresentationStyle = .formSheet
-            present(documentPreviewVC, animated: true, completion: nil)
-            documentPreviewVC.document = document
-        }
+        self.presentDocumentDetail(document: document)
     }
 }
 

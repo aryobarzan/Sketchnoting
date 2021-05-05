@@ -69,4 +69,21 @@ extension UIViewController {
         activityAlert.activityIndicatorAlert?.dismissActivityIndicator()
         activityAlert.activityIndicatorAlert = nil
     }
+    
+    // MARK: Document Detail View Controller
+    
+    func presentDocumentDetail(document: Document, popOverView: UIView? = nil) {
+        let documentDetailVC = UIStoryboard(name: "Main", bundle: Bundle.main).instantiateViewController(withIdentifier: "DocumentDetailViewController") as? DocumentDetailViewController
+        if let documentDetailVC = documentDetailVC {
+            if let popOverView = popOverView {
+                documentDetailVC.modalPresentationStyle = .popover
+                documentDetailVC.popoverPresentationController?.sourceView = popOverView
+            }
+            else {
+                documentDetailVC.modalPresentationStyle = .formSheet
+            }
+            present(documentDetailVC, animated: true, completion: nil)
+            documentDetailVC.setDocument(document: document, isInBookshelf: false)
+        }
+    }
 }

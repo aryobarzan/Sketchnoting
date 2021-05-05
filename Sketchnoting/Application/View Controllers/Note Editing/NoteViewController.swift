@@ -27,7 +27,7 @@ import MLKitDigitalInkRecognition
 
 class NoteViewController: UIViewController, UIPencilInteractionDelegate, UICollectionViewDelegate, NoteDelegate, PKCanvasViewDelegate, PKToolPickerObserver, UIScreenshotServiceDelegate, NoteOptionsDelegate, DocumentsViewControllerDelegate, NotePagesDelegate, VNDocumentCameraViewControllerDelegate, UIDocumentPickerDelegate, RelatedNotesVCDelegate, TextBoxViewControllerDelegate, MoveFileViewControllerDelegate, UIPopoverPresentationControllerDelegate, PDFViewDelegate, NoteLayersDelegate, NeoDraggableViewDelegate {
     
-    private var documentsVC: NeoDocumentsVC!
+    private var documentsVC: DocumentsViewController!
     
     @IBOutlet var backdropView: UIView!
     @IBOutlet var canvasView: PKCanvasView!
@@ -114,7 +114,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             let storyboard = UIStoryboard(name: "Main", bundle: Bundle.main)
-            self.documentsVC = storyboard.instantiateViewController(withIdentifier: "NeoDocumentsVC") as? NeoDocumentsVC
+            self.documentsVC = storyboard.instantiateViewController(withIdentifier: "DocumentsViewController") as? DocumentsViewController
             self.addChild(self.documentsVC)
             self.documentsVC.delegate = self
             self.documentsUnderlyingView.addSubview(self.documentsVC.view)
@@ -659,14 +659,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
             for (view, doc) in conceptHighlights {
                 if view.frame.contains(sender.location(in: canvasView)) {
                     isRecognizingDrawing = false
-                    logger.info("Highlighting concept")
-                    let documentPreviewVC = UIStoryboard(name: "Main", bundle: Bundle.main).instantiateViewController(withIdentifier: "DocumentPreviewViewController") as? DocumentPreviewViewController
-                    if let documentPreviewVC = documentPreviewVC {
-                        documentPreviewVC.modalPresentationStyle = .popover
-                        documentPreviewVC.popoverPresentationController?.sourceView = view
-                        present(documentPreviewVC, animated: true, completion: nil)
-                        documentPreviewVC.document = doc[0]
-                    }
+                    self.presentDocumentDetail(document: doc[0], popOverView: view)
                 }
             }
             if isRecognizingDrawing {

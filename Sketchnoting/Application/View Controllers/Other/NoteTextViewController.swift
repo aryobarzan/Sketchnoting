@@ -77,20 +77,8 @@ class NoteTextViewController: UIViewController {
     }
     @IBAction func summarizeSwitchChanged(_ sender: UISwitch) {
         if sender.isOn {
-            textSegmentedControl.isEnabled = false
-            pagesSegmentedControl.isEnabled = false
-            parsingSegmentedControl.isEnabled = false
-            activityIndicator.isHidden = false
-            Reductio.shared.summarize(text: textView.text, compression: 0.8, completion: { phrases in
-                    logger.info("Summarized version has \(phrases.count) sentences.")
-                    DispatchQueue.main.async {
-                        self.textSegmentedControl.isEnabled = true
-                        self.pagesSegmentedControl.isEnabled = true
-                        self.parsingSegmentedControl.isEnabled = true
-                        self.activityIndicator.isHidden = true
-                        self.textView.text = phrases.joined(separator: " ")
-                    }
-            })
+            let summary = SKTextRank.shared.summarize(text: textView.text, numberOfSentences: 5, biased: false)
+            self.textView.text = summary
         }
         else {
             textView.text = getText()

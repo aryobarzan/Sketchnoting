@@ -39,6 +39,14 @@ class WATDocument: Document {
         wikiPageID = try? container.decode(Double.self, forKey: .wikiPageID)
     }
     
+    override func getColor() -> UIColor {
+        return #colorLiteral(red: 0.8549019694, green: 0.250980407, blue: 0.4784313738, alpha: 1)
+    }
+    
+    override func getSymbol() -> UIImage? {
+        return UIImage(systemName: "w.circle")
+    }
+    
     //MARK: Visitable
     override func accept(visitor: DocumentVisitor) {
         visitor.process(document: self)

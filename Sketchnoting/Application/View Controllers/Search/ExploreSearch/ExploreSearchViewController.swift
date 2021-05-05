@@ -227,13 +227,7 @@ class ExploreSearchViewController: UIViewController, UICollectionViewDelegate, U
         if let vertexView = sender.view {
             let graphVertex = SKGraphSearch.shared.getActiveGraph().vertexAtIndex(vertexView.tag)
             if let documentVertex = graphVertex as? GraphDocumentVertex {
-                let documentPreviewVC = UIStoryboard(name: "Main", bundle: Bundle.main).instantiateViewController(withIdentifier: "DocumentPreviewViewController") as? DocumentPreviewViewController
-                if let documentPreviewVC = documentPreviewVC {
-                    documentPreviewVC.modalPresentationStyle = .popover
-                    documentPreviewVC.popoverPresentationController?.sourceView = vertexView
-                    present(documentPreviewVC, animated: true, completion: nil)
-                    documentPreviewVC.document = documentVertex.document
-                }
+                self.presentDocumentDetail(document: documentVertex.document, popOverView: vertexView)
             }
         }
     }

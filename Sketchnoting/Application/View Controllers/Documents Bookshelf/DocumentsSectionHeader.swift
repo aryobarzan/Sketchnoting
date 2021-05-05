@@ -1,5 +1,5 @@
 //
-//  NeoDocumentsSectionHeader.swift
+//  DocumentsSectionHeader.swift
 //  Sketchnoting
 //
 //  Created by Aryobarzan on 20/07/2020.
@@ -8,9 +8,9 @@
 
 import UIKit
 
-class NeoDocumentsSectionHeader: UICollectionReusableView {
+class DocumentsSectionHeader: UICollectionReusableView {
     static var reuseIdentifier: String {
-        return String(describing: NeoDocumentsSectionHeader.self)
+        return String(describing: DocumentsSectionHeader.self)
     }
     
     lazy var titleLabel: UILabel = {

@@ -11,6 +11,7 @@ import UIKit
 class DocumentCollectionViewCell: UICollectionViewCell {
 
     @IBOutlet weak var previewImageView: UIImageView!
+    @IBOutlet weak var documentTypeImageView: UIImageView!
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var progressView: CircularProgressView!
     override func awakeFromNib() {
@@ -22,6 +23,8 @@ class DocumentCollectionViewCell: UICollectionViewCell {
       didSet {
         previewImageView.image = UIImage(systemName: "questionmark.circle.fill")
         if let document = document {
+            documentTypeImageView.image = document.getSymbol()
+            documentTypeImageView.tintColor = document.getColor()
             document.retrieveImage(type: .Standard, completion: { result in
                 switch result {
                 case .success(let value):

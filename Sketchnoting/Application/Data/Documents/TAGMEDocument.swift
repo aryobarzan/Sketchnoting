@@ -44,6 +44,14 @@ class TAGMEDocument: Document {
         wikiPageID = try? container.decode(Double.self, forKey: .wikiPageID)
     }
     
+    override func getColor() -> UIColor {
+        return #colorLiteral(red: 0.1764705926, green: 0.4980392158, blue: 0.7568627596, alpha: 1)
+    }
+    
+    override func getSymbol() -> UIImage? {
+        return UIImage(systemName: "t.circle")
+    }
+    
     //MARK: Visitable
     override func accept(visitor: DocumentVisitor) {
         visitor.process(document: self)

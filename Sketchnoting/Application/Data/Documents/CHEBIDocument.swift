@@ -27,6 +27,14 @@ class CHEBIDocument: BioPortalDocument {
         loadMoleculeImage()
     }
     
+    override func getColor() -> UIColor {
+        return #colorLiteral(red: 0.9529411793, green: 0.6862745285, blue: 0.1333333403, alpha: 1)
+    }
+    
+    override func getSymbol() -> UIImage? {
+        return UIImage(systemName: "c.circle")
+    }
+    
     //MARK: Visitable
     override func accept(visitor: DocumentVisitor) {
         visitor.process(document: self)

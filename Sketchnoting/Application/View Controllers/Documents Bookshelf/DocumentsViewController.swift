@@ -1,5 +1,5 @@
 //
-//  NeoDocumentsVC.swift
+//  DocumentsViewController.swift
 //  Sketchnoting
 //
 //  Created by Aryobarzan on 20/07/2020.
@@ -16,7 +16,27 @@ protocol DocumentsViewControllerDelegate  {
     func tagmeEpsilonUpdated(value: Float)
 }
 
-class NeoDocumentsVC: UIViewController, UICollectionViewDelegate, UISearchBarDelegate {
+fileprivate class DocumentsSection: Hashable {
+    var id = UUID()
+    var documentType: DocumentType
+    var documents: [Document]
+    
+    init(documentType: DocumentType, documents: [Document]) {
+        self.documentType = documentType
+        self.documents = documents
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
+    
+    static func == (lhs: DocumentsSection, rhs: DocumentsSection) -> Bool {
+        lhs.id == rhs.id
+    }
+}
+
+
+class DocumentsViewController: UIViewController, UICollectionViewDelegate, UISearchBarDelegate {
     
     @IBOutlet weak var searchBar: UISearchBar!
     @IBOutlet weak var showHiddenSwitch: UISwitch!
@@ -26,21 +46,17 @@ class NeoDocumentsVC: UIViewController, UICollectionViewDelegate, UISearchBarDel
     var note: (URL, Note)!
     
     // MARK: - Properties
-    private var sections = [Section]()
+    private var sections = [DocumentsSection]()
     private var dataSource: DataSource!
     private var searchController =  UISearchController(searchResultsController: nil)
     
     private var isSetup = false
     
     // MARK: - Value Types
-    typealias DataSource = UICollectionViewDiffableDataSource<Section, Document>
-    typealias Snapshot = NSDiffableDataSourceSnapshot<Section, Document>
+    fileprivate typealias DataSource = UICollectionViewDiffableDataSource<DocumentsSection, Document>
+    fileprivate typealias Snapshot = NSDiffableDataSourceSnapshot<DocumentsSection, Document>
     
-    // MARK: Detail View
     var documentDetailVC: DocumentDetailViewController!
-    
-    // MARK: Delegate
-    
     var delegate: DocumentsViewControllerDelegate?
     
     // MARK: - Life Cycles
@@ -107,9 +123,9 @@ class NeoDocumentsVC: UIViewController, UICollectionViewDelegate, UISearchBarDel
     
     private func configureLayout() {
         collectionView.register(
-            NeoDocumentsSectionHeader.self,
+            DocumentsSectionHeader.self,
             forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
-            withReuseIdentifier: NeoDocumentsSectionHeader.reuseIdentifier
+            withReuseIdentifier: DocumentsSectionHeader.reuseIdentifier
         )
         collectionView.collectionViewLayout = UICollectionViewCompositionalLayout(sectionProvider: { (sectionIndex, layoutEnvironment) -> NSCollectionLayoutSection? in
             let size = NSCollectionLayoutSize(
@@ -158,8 +174,8 @@ class NeoDocumentsVC: UIViewController, UICollectionViewDelegate, UISearchBarDel
                 .sectionIdentifiers[indexPath.section]
             let view = collectionView.dequeueReusableSupplementaryView(
                 ofKind: kind,
-                withReuseIdentifier: NeoDocumentsSectionHeader.reuseIdentifier,
-                for: indexPath) as? NeoDocumentsSectionHeader
+                withReuseIdentifier: DocumentsSectionHeader.reuseIdentifier,
+                for: indexPath) as? DocumentsSectionHeader
             view?.titleLabel.text = (section.documentType == DocumentType.ALMAAR) ? "AR4OER" : section.documentType.rawValue
             return view
         }
@@ -227,8 +243,8 @@ class NeoDocumentsVC: UIViewController, UICollectionViewDelegate, UISearchBarDel
     
     //
     
-    private func getAllSections() -> [Section] {
-        var s = [Section]()
+    private func getAllSections() -> [DocumentsSection] {
+        var s = [DocumentsSection]()
         for type in DocumentType.allCases {
             var docs = [Document]()
             for doc in note.1.getDocuments(includeHidden: showHiddenSwitch.isOn) {
@@ -239,7 +255,7 @@ class NeoDocumentsVC: UIViewController, UICollectionViewDelegate, UISearchBarDel
             docs.sort(by: {d1, d2 in
                 return d1.title < d2.title
             })
-            let section = Section(documentType: type, documents: docs)
+            let section = DocumentsSection(documentType: type, documents: docs)
             s.append(section)
         }
         s.sort(by: {s1, s2 in
@@ -345,7 +361,7 @@ class NeoDocumentsVC: UIViewController, UICollectionViewDelegate, UISearchBarDel
             self.searchBar.text = searchText
             let allSections = getAllSections()
             DispatchQueue.global(qos: .background).async {
-                var results = [Section]()
+                var results = [DocumentsSection]()
                 
                 var queries = searchText.lowercased().components(separatedBy: ",")
                 if queries.isEmpty {
@@ -366,7 +382,7 @@ class NeoDocumentsVC: UIViewController, UICollectionViewDelegate, UISearchBarDel
                         matches.sort(by: {d1, d2 in
                             return d1.title < d2.title
                         })
-                        results.append(Section(documentType: sec.documentType, documents: matches))
+                        results.append(DocumentsSection(documentType: sec.documentType, documents: matches))
                     }
                 }
                 results.sort(by: {s1, s2 in

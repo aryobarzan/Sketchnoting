@@ -4,6 +4,7 @@
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="18093"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -22,7 +23,7 @@
                             <constraint firstAttribute="height" constant="21" id="lRb-db-8d7"/>
                         </constraints>
                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                        <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <color key="textColor" systemColor="systemBlueColor"/>
                         <nil key="highlightedColor"/>
                     </label>
                     <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="2Mj-k0-UkJ">
@@ -47,6 +48,13 @@
                             </userDefinedRuntimeAttribute>
                         </userDefinedRuntimeAttributes>
                     </view>
+                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="d.circle" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="448-F5-cH4">
+                        <rect key="frame" x="180" y="0.5" width="20" height="19"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="20" id="T2Q-ls-rbW"/>
+                            <constraint firstAttribute="width" constant="20" id="yZf-l1-tKj"/>
+                        </constraints>
+                    </imageView>
                 </subviews>
             </view>
             <viewLayoutGuide key="safeArea" id="ZTg-uK-7eu"/>
@@ -60,8 +68,11 @@
                 <constraint firstItem="2Mj-k0-UkJ" firstAttribute="centerX" secondItem="gTV-IL-0wX" secondAttribute="centerX" id="VBc-iG-8X9"/>
                 <constraint firstItem="jxk-Um-8bG" firstAttribute="leading" secondItem="gTV-IL-0wX" secondAttribute="leading" constant="4" id="f7S-EF-JS1"/>
                 <constraint firstAttribute="trailing" secondItem="jxk-Um-8bG" secondAttribute="trailing" constant="4" id="mq4-2R-2FN"/>
+                <constraint firstAttribute="trailing" secondItem="448-F5-cH4" secondAttribute="trailing" id="oZK-2e-hYg"/>
+                <constraint firstItem="448-F5-cH4" firstAttribute="top" secondItem="gTV-IL-0wX" secondAttribute="top" id="r4K-Ma-m9D"/>
             </constraints>
             <connections>
+                <outlet property="documentTypeImageView" destination="448-F5-cH4" id="faI-tV-moL"/>
                 <outlet property="previewImageView" destination="2Mj-k0-UkJ" id="7FF-wv-Kti"/>
                 <outlet property="progressView" destination="Ww8-14-Z3Y" id="IO1-oo-A39"/>
                 <outlet property="titleLabel" destination="jxk-Um-8bG" id="t3d-TJ-T6W"/>
@@ -70,6 +81,7 @@
         </collectionViewCell>
     </objects>
     <resources>
+        <image name="d.circle" catalog="system" width="128" height="121"/>
         <systemColor name="systemBlueColor">
             <color red="0.0" green="0.47843137254901963" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
