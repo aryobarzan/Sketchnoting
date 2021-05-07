@@ -124,9 +124,11 @@ class DocumentDetailViewController: UIViewController, DocumentVisitor {
     }
     
     private func setDetailDescription(text: String) {
-        contentTextView.text = text
+        let trimmed = text.replacingOccurrences(of: "\\s*(\\p{Po}\\s?)\\s*",
+                                                with: "$1",
+                                                options: [.regularExpression])
+        contentTextView.text = trimmed
     }
-    
     
     @objc func mapImageTapped(tapGestureRecognizer: UITapGestureRecognizer)
     {

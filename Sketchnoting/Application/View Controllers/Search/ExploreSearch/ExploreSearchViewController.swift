@@ -54,7 +54,7 @@ class ExploreSearchViewController: UIViewController, UICollectionViewDelegate, U
             informationLabel.text = "Document length:"
             break
         case .Drawings:
-            exploreSearchOptions = [ExploreSearchDrawingOption]()
+            exploreSearchOptions = SKGraphSearch.shared.getDrawingOptions()
             informationLabel.text = "Drawing(s):"
             break
         case .Documents:
@@ -138,6 +138,9 @@ class ExploreSearchViewController: UIViewController, UICollectionViewDelegate, U
             state = .Drawings
             break
         case .Drawings:
+            if !selectedOptions[state]!.isEmpty {
+                SKGraphSearch.shared.applyDrawings(options: selectedOptions[state]!.map{$0 as! ExploreSearchDrawingOption})
+            }
             state = .Documents
             break
         case .Documents:

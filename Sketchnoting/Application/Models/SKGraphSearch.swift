@@ -178,6 +178,79 @@ class SKGraphSearch {
         toRemove.sorted(by: >).forEach { rmIndex in activeGraph.removeVertexAtIndex(rmIndex)}
     }
     
+    func getDrawingOptions(selectedDrawingOptions: [ExploreSearchDrawingOption] = [ExploreSearchDrawingOption]()) -> [ExploreSearchDrawingOption] {
+        var drawings = [(ExploreSearchDrawingOption, Int)]()
+        if selectedDrawingOptions.isEmpty {
+            for (vertexIdx, vertex) in activeGraph.vertices.enumerated() {
+                if vertex.type == .Drawing, let drawingVertex = vertex as? GraphDrawingVertex {
+                    let drawingVertexEdges = activeGraph.edgesForIndex(vertexIdx)
+                    if drawingVertexEdges.count > 0 {
+                        drawings.append((ExploreSearchDrawingOption(drawing: drawingVertex.drawing), drawingVertexEdges.count))
+                    }
+                }
+            }
+        }
+        else {
+            var drawingVertexIdxValid = [Int]()
+            for (vertexIdx, vertex) in activeGraph.vertices.enumerated() {
+                if vertex.type == .Note {
+                    let edges = activeGraph.edgesForIndex(vertexIdx)
+                    var matchCount = 0
+                    for selectedDrawingOption in selectedDrawingOptions {
+                        for edge in edges {
+                            if let drawingVertex = activeGraph.vertexAtIndex(edge.v) as? GraphDrawingVertex {
+                                if drawingVertex.drawing == selectedDrawingOption.drawing {
+                                    matchCount += 1
+                                    break
+                                }
+                            }
+                        }
+                    }
+                    if matchCount == selectedDrawingOptions.count {
+                        drawingVertexIdxValid += edges.map{$0.v}.filter{activeGraph.vertexAtIndex($0) is GraphDrawingVertex}
+                    }
+                }
+            }
+            for drawingVertexId in drawingVertexIdxValid {
+                if let drawingVertex = activeGraph.vertexAtIndex(drawingVertexId) as? GraphDrawingVertex {
+                    let drawingVertexEdges = activeGraph.edgesForIndex(drawingVertexId)
+                    if drawingVertexEdges.count > 0 {
+                        drawings.append((ExploreSearchDrawingOption(drawing: drawingVertex.drawing), drawingVertexEdges.count))
+                    }
+                }
+            }
+        }
+        drawings = drawings.sorted{item1, item2 in
+            item1.1 > item2.1
+            
+        }
+        return drawings.map{$0.0}
+    }
+    
+    func applyDrawings(options: [ExploreSearchDrawingOption]) {
+        var toRemove = [Int]()
+        for (vertexIdx, vertex) in activeGraph.vertices.enumerated() {
+            if vertex.type == .Note {
+                let edges = activeGraph.edgesForIndex(vertexIdx)
+                var matchCount = 0
+                for selectedDrawingOption in options {
+                    for edge in edges {
+                        if let drawingVertex = activeGraph.vertexAtIndex(edge.v) as? GraphDrawingVertex {
+                            if drawingVertex.drawing == selectedDrawingOption.drawing {
+                                matchCount += 1
+                                break
+                            }
+                        }
+                    }
+                }
+                if matchCount != options.count {
+                    toRemove.append(vertexIdx)
+                }
+            }
+        }
+        toRemove.sorted(by: >).forEach { rmIndex in activeGraph.removeVertexAtIndex(rmIndex)}
+    }
+    
     func getDocumentOptions(selectedDocumentOptions: [ExploreSearchDocumentOption] = [ExploreSearchDocumentOption]()) -> [ExploreSearchDocumentOption] {
         var documents = [(ExploreSearchDocumentOption, Int)]()
         if selectedDocumentOptions.isEmpty {

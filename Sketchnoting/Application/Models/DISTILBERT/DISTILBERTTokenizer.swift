@@ -90,7 +90,6 @@ class DISTILBERTTokenizer {
         }
         
         tokenList.append(individualToken)
-        
         return tokenList.joined(separator: " ")
     }
 }
