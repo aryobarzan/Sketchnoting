@@ -124,9 +124,7 @@ class DocumentDetailViewController: UIViewController, DocumentVisitor {
     }
     
     private func setDetailDescription(text: String) {
-        let trimmed = text.replacingOccurrences(of: "\\s*(\\p{Po}\\s?)\\s*",
-                                                with: "$1",
-                                                options: [.regularExpression])
+        let trimmed = text.replacingOccurrences(of: "\\s*(\\p{Po}\\s?)\\s*", with: "$1", options: [.regularExpression])
         contentTextView.text = trimmed
     }
     

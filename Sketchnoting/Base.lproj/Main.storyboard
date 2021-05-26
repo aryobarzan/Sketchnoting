@@ -2723,6 +2723,53 @@
             </objects>
             <point key="canvasLocation" x="3419.53125" y="2358.984375"/>
         </scene>
+        <!--Simple Text View Controller-->
+        <scene sceneID="KJ6-VS-vHU">
+            <objects>
+                <viewController storyboardIdentifier="SimpleTextViewController" id="ICV-YU-49N" customClass="SimpleTextViewController" customModule="Sketchnoting" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="4A5-1n-c2z">
+                        <rect key="frame" x="0.0" y="0.0" width="768" height="1024"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Result:" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0mn-Ti-um8">
+                                <rect key="frame" x="20" y="20" width="52" height="21"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="21" id="RwX-Gw-VLd"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="GCX-2J-kju">
+                                <rect key="frame" x="20" y="61" width="728" height="943"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                <string key="text">Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nam liber te conscient to factor tum poen legum odioque civiuda.</string>
+                                <color key="textColor" systemColor="labelColor"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="9tV-sb-Cx9"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="9tV-sb-Cx9" firstAttribute="trailing" secondItem="GCX-2J-kju" secondAttribute="trailing" constant="20" id="9Ev-vr-zC5"/>
+                            <constraint firstItem="0mn-Ti-um8" firstAttribute="leading" secondItem="9tV-sb-Cx9" secondAttribute="leading" constant="20" id="BoB-Cr-OMI"/>
+                            <constraint firstItem="GCX-2J-kju" firstAttribute="top" secondItem="0mn-Ti-um8" secondAttribute="bottom" constant="20" id="U2H-Ht-bYe"/>
+                            <constraint firstItem="0mn-Ti-um8" firstAttribute="top" secondItem="9tV-sb-Cx9" secondAttribute="top" constant="20" id="UyS-N9-tNz"/>
+                            <constraint firstItem="9tV-sb-Cx9" firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="0mn-Ti-um8" secondAttribute="trailing" symbolic="YES" id="iT4-VR-Yg4"/>
+                            <constraint firstItem="9tV-sb-Cx9" firstAttribute="bottom" secondItem="GCX-2J-kju" secondAttribute="bottom" constant="20" id="pLl-2U-85N"/>
+                            <constraint firstItem="GCX-2J-kju" firstAttribute="leading" secondItem="9tV-sb-Cx9" secondAttribute="leading" constant="20" id="q2x-1m-ICF"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="bodyTextView" destination="GCX-2J-kju" id="hPR-e1-GIX"/>
+                        <outlet property="titleLabel" destination="0mn-Ti-um8" id="4kA-o2-nzL"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="NMc-y2-MHh" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="3416.40625" y="2996.484375"/>
+        </scene>
         <!--Note Layers View Controller-->
         <scene sceneID="ARm-sL-vho">
             <objects>

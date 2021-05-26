@@ -45,6 +45,7 @@
 		9F5D80F02332D32600552D58 /* SVGImageProcessorExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5D80EF2332D32600552D58 /* SVGImageProcessorExtension.swift */; };
 		9F5D8A30246113DC00934C0E /* WATHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5D8A2F246113DC00934C0E /* WATHelper.swift */; };
 		9F5D8A322461157200934C0E /* WATDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5D8A312461157200934C0E /* WATDocument.swift */; };
+		9F5DFD81265EDB2200E46287 /* SimpleTextViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5DFD80265EDB2200E46287 /* SimpleTextViewController.swift */; };
 		9F5E89F42391CE84002FA8B2 /* DocumentDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5E89F32391CE84002FA8B2 /* DocumentDetailViewController.swift */; };
 		9F5F5D1524328CC100AF79A5 /* DateExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5F5D1424328CC100AF79A5 /* DateExtensions.swift */; };
 		9F65983323EDCEA300CDBE0C /* NotePage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F65983223EDCEA300CDBE0C /* NotePage.swift */; };
@@ -237,6 +238,7 @@
 		9F5D8A312461157200934C0E /* WATDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WATDocument.swift; sourceTree = "<group>"; };
 		9F5D8B2B228B9D7000F56FEC /* CREDITS.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CREDITS.md; sourceTree = "<group>"; };
 		9F5D8B2C228B9EF800F56FEC /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		9F5DFD80265EDB2200E46287 /* SimpleTextViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimpleTextViewController.swift; sourceTree = "<group>"; };
 		9F5E89F32391CE84002FA8B2 /* DocumentDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentDetailViewController.swift; sourceTree = "<group>"; };
 		9F5F5D1424328CC100AF79A5 /* DateExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateExtensions.swift; sourceTree = "<group>"; };
 		9F65983223EDCEA300CDBE0C /* NotePage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotePage.swift; sourceTree = "<group>"; };
@@ -591,6 +593,7 @@
 				9F4BB37324ED807A00ED1E2F /* NoteLayersViewController.swift */,
 				9F4BB37524ED80A200ED1E2F /* NoteLayersViewCell.swift */,
 				9FCE9EC22502AA0A00166AE2 /* ExportViewController.swift */,
+				9F5DFD80265EDB2200E46287 /* SimpleTextViewController.swift */,
 			);
 			path = Other;
 			sourceTree = "<group>";
@@ -1236,6 +1239,7 @@
 				9F318D39244A207300A1B4B5 /* UIFontExtensions.swift in Sources */,
 				9FF8CA4B2609135900A9171B /* SKTextRank.swift in Sources */,
 				9F749EA52631CA8400AA3C6B /* distilbert-squad-384_FP16.mlkitmodel in Sources */,
+				9F5DFD81265EDB2200E46287 /* SimpleTextViewController.swift in Sources */,
 				9F2C0D75248F0E2600F58F5E /* ArrayExtensions.swift in Sources */,
 				9F8551B123A539D9006EB0B1 /* NotePageCollectionViewCell.swift in Sources */,
 				9FBF6ABA22E9F439001FD730 /* VisionTextElementWrapper.swift in Sources */,

@@ -86,4 +86,14 @@ extension UIViewController {
             documentDetailVC.setDocument(document: document, isInBookshelf: false)
         }
     }
+    
+    func presentSimpleTextView(title: String, body: String) {
+        let simpleTextVC = UIStoryboard(name: "Main", bundle: Bundle.main).instantiateViewController(withIdentifier: "SimpleTextViewController") as? SimpleTextViewController
+        if let simpleTextVC = simpleTextVC {
+            simpleTextVC.modalPresentationStyle = .formSheet
+            present(simpleTextVC, animated: true, completion: nil)
+            simpleTextVC.titleText = title
+            simpleTextVC.bodyText = body
+        }
+    }
 }

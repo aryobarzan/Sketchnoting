@@ -29,9 +29,6 @@ class SemanticSearch {
         personSynonyms = ["person"]
     }
     
-    private let SEARCH_THRESHOLD = 0.5
-    private let DRAWING_THRESHOLD = 0.5
-    private let KEYWORD_THRESHOLD = 0.5
     private var locationSynonyms: [String]
     private var personSynonyms: [String]
     
@@ -179,7 +176,7 @@ class SemanticSearch {
         var useFullQuery = useFullQuery
         let queryWords = tokenize(text: query, unit: .word)
         if queryWords.count > 1 { // Longer query
-            var allowed = [NLTag.noun, NLTag.adjective, NLTag.otherWord]
+            var allowed = [NLTag.noun, NLTag.adjective]
             var partsOfSpeech = tag(text: queryWords.joined(separator: " "), scheme: .lexicalClass)
             partsOfSpeech = partsOfSpeech.map{(lemmatize(text: $0.0.lowercased()), $0.1)}
             logger.info(partsOfSpeech)
@@ -254,7 +251,8 @@ class SemanticSearch {
             subqueriesHandler(queries)
         }
         // Expanded Search means a lower threshold for the lexical search, i.e. more tolerant to minor typos
-        let lexicalThreshold = expandedSearch ? 0.9 : 1.0
+        let lexicalThreshold = expandedSearch ? 0.8 : 0.9
+        let semanticThreshold = 0.5
         let searchResultThreshold = expandedSearch ? 0.1 : 0.5
         let searchResultQAThreshold = expandedSearch ? 0.5 : 0.7
         //let bert = BERT()
@@ -273,20 +271,33 @@ class SemanticSearch {
                 var score_noteDocuments = 0.0
                 var noteResult: (URL, Note)?
                 var searchNoteResult: SearchNoteResult?
+                var searchNoteResultExplanation = ""
                 // MARK: Note title
                 let similarityResult = self.getStringSimilarity(betweenQuery: query, and: note.1.getName(), wordEmbedding: wordEmbedding)
-                if similarityResult.lexicalSimilarity >= lexicalThreshold || similarityResult.semanticSimilarity >= self.SEARCH_THRESHOLD {
+                if similarityResult.lexicalSimilarity >= lexicalThreshold || similarityResult.semanticSimilarity >= semanticThreshold {
                     noteResult = note
                     score_noteTitle = similarityResult.getHighestSimilarity()
+                    if similarityResult.lexicalSimilarity >= lexicalThreshold {
+                        searchNoteResultExplanation += "Title: \(similarityResult.lexicalSimilarity*100)% (Lexical: '\(similarityResult.closestLexicalTarget)')\n"
+                    }
+                    if similarityResult.semanticSimilarity >= semanticThreshold {
+                        searchNoteResultExplanation += "Title: \(similarityResult.semanticSimilarity*100)% (Semantic: '\(similarityResult.closestSemanticTarget)')\n"
+                    }
                     //logger.info("[Lexical] Note title ('\(closestTarget)') = \(score)")
                 }
                 // MARK: Note recognized drawings
                 let noteDrawingLabels = note.1.getDrawingLabels()
                 if !noteDrawingLabels.isEmpty {
                     let similarityResult = self.getStringSimilarity(betweenQuery: query, and: note.1.getDrawingLabels().joined(separator: " "), wordEmbedding: wordEmbedding)
-                    if similarityResult.lexicalSimilarity >= lexicalThreshold || similarityResult.semanticSimilarity >= self.DRAWING_THRESHOLD {
+                    if similarityResult.lexicalSimilarity >= lexicalThreshold || similarityResult.semanticSimilarity >= semanticThreshold {
                         noteResult = note
                         score_noteDrawings = similarityResult.getHighestSimilarity()
+                        if similarityResult.lexicalSimilarity >= lexicalThreshold {
+                            searchNoteResultExplanation += "Drawings: \(similarityResult.lexicalSimilarity*100)% (Lexical: '\(similarityResult.closestLexicalTarget)')\n"
+                        }
+                        if similarityResult.semanticSimilarity >= semanticThreshold {
+                            searchNoteResultExplanation += "Drawings: \(similarityResult.semanticSimilarity*100)% (Semantic: '\(similarityResult.closestSemanticTarget)')\n"
+                        }
                         //logger.info("[Semantic] Note drawing ('\(closestTarget)') = \(score)")
                     }
                 }
@@ -298,9 +309,15 @@ class SemanticSearch {
                         let paragraphs = tokenize(text: pageText, unit: .paragraph)
                         for paragraph in paragraphs {
                             let similarityResult = self.getStringSimilarity(betweenQuery: query, and: paragraph, wordEmbedding: wordEmbedding)
-                            if similarityResult.lexicalSimilarity >= lexicalThreshold || similarityResult.semanticSimilarity >= self.SEARCH_THRESHOLD {
+                            if similarityResult.lexicalSimilarity >= lexicalThreshold || similarityResult.semanticSimilarity >= semanticThreshold {
                                 noteResult = note
                                 pageResults.append((pageIndex, similarityResult.closestLexicalTarget.isEmpty ? similarityResult.closestSemanticTarget.trimmingCharacters(in: .whitespacesAndNewlines) : similarityResult.closestLexicalTarget.trimmingCharacters(in: .whitespacesAndNewlines), paragraph.trimmingCharacters(in: .whitespacesAndNewlines), similarityResult.getHighestSimilarity()))
+                                if similarityResult.lexicalSimilarity >= lexicalThreshold {
+                                    searchNoteResultExplanation += "Note Page \(pageIndex+1): \(similarityResult.lexicalSimilarity*100)% (Lexical: '\(similarityResult.closestLexicalTarget)')\n"
+                                }
+                                if similarityResult.semanticSimilarity >= semanticThreshold {
+                                    searchNoteResultExplanation += "Note Page \(pageIndex+1): \(similarityResult.semanticSimilarity*100)% (Semantic: '\(similarityResult.closestSemanticTarget)')\n"
+                                }
                                 if similarityResult.getHighestSimilarity() > score_noteText {
                                     score_noteText = similarityResult.getHighestSimilarity()
                                 }
@@ -318,7 +335,7 @@ class SemanticSearch {
                     var score_documentDescription = 0.0
                     // Document title
                     let similarityResult = self.getStringSimilarity(betweenQuery: query, and: document.title, wordEmbedding: wordEmbedding)
-                    if similarityResult.lexicalSimilarity >= lexicalThreshold || similarityResult.semanticSimilarity >= self.SEARCH_THRESHOLD {
+                    if similarityResult.lexicalSimilarity >= lexicalThreshold || similarityResult.semanticSimilarity >= semanticThreshold {
                         noteResult = note
                         isDocumentMatching = true
                         score_documentTitle = similarityResult.getHighestSimilarity()
@@ -329,7 +346,7 @@ class SemanticSearch {
                     // Document description (abstract)
                     if let description = document.getDescription() {
                         let similarityResult = self.getStringSimilarity(betweenQuery: query, and: description, wordEmbedding: wordEmbedding)
-                        if similarityResult.lexicalSimilarity >= lexicalThreshold || similarityResult.semanticSimilarity >= self.SEARCH_THRESHOLD {
+                        if similarityResult.lexicalSimilarity >= lexicalThreshold || similarityResult.semanticSimilarity >= semanticThreshold {
                             noteResult = note
                             isDocumentMatching = true
                             score_documentDescription = similarityResult.getHighestSimilarity()
@@ -343,16 +360,9 @@ class SemanticSearch {
                         searchResult.documents.append((document, documentScore))
                         // logger.info("Document \(document.title) score = \(documentScore)")
                     }
-                    // MARK: Document types [TODO]
-                    var documentCategories = [String]()
-                    if document.documentType == .TAGME, let tagmeDocument = document as? TAGMEDocument, let tagmeCategories = tagmeDocument.categories {
-                        documentCategories = tagmeCategories
-                        //logger.info(documentCategories)
-                    }
-                    
                 }
                 let highestDocumentSimilarity = max(highestSemanticSimilarity, highestLexicalSimilarity)
-                if highestDocumentSimilarity > self.SEARCH_THRESHOLD {
+                if highestDocumentSimilarity > semanticThreshold {
                     score_noteDocuments = highestDocumentSimilarity
                 }
                 if isQuestion {
@@ -384,8 +394,9 @@ class SemanticSearch {
                 if let noteResult = noteResult {
                     let score = 2 * score_noteTitle + 2 * score_noteText + 2 * score_noteDrawings + score_noteDocuments
                     logger.info("Search score for note '\(note.1.getName())' = \(score)")
-                    searchNoteResult = SearchNoteResult(note: noteResult, noteScore: score, pageHits: pageResults)
+                    searchNoteResult = SearchNoteResult(note: noteResult, noteScore: score, pageHits: pageResults, resultExplanation: searchNoteResultExplanation)
                     searchResult.notes.append(searchNoteResult!)
+                    logger.info(searchNoteResultExplanation)
                     if isQuestion {
                         for noteHit in searchNoteResult!.pageHits.filter({$0.3 >= 1.0}).sorted(by: {pageHit1, pageHit2 in pageHit1.3 > pageHit2.3}).prefix(5)  {
                             let phraseType = checkPhraseType(queryPartsOfSpeech: tag(text: noteHit.2, scheme: .lexicalClass))
@@ -453,7 +464,7 @@ class SemanticSearch {
         if !noteResults.isEmpty {
             let maxSimilarity = noteResults.map{$0.noteScore}.max()!
             let minSimilarity = 0.0
-            noteResults = noteResults.map {SearchNoteResult(note: $0.note, noteScore: ($0.noteScore - minSimilarity)/(maxSimilarity-minSimilarity), pageHits: $0.pageHits)}
+            noteResults = noteResults.map {SearchNoteResult(note: $0.note, noteScore: ($0.noteScore - minSimilarity)/(maxSimilarity-minSimilarity), pageHits: $0.pageHits, resultExplanation: $0.resultExplanation)}
         }
         return noteResults
     }
@@ -610,6 +621,7 @@ struct SearchNoteResult {
     var note: (URL, Note)
     var noteScore: Double
     var pageHits: [(PageIndex, PageHit, PageHitContext, PageHitSimilarity)]
+    var resultExplanation: String = ""
 }
 
 struct StringSimilarityResult {

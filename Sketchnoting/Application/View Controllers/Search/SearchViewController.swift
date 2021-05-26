@@ -248,6 +248,10 @@ class SearchViewController: UIViewController, DrawingSearchDelegate, SKIndexerDe
         Timer.scheduledTimer(timeInterval: 0.2, target: self, selector: #selector(switchToHomeTab), userInfo: nil, repeats: false)
     }
     
+    func tappedExplainNoteResult(noteResult: SearchNoteResult) {
+        self.presentSimpleTextView(title: "Why is note '\(noteResult.note.1.getName())' a result?", body: noteResult.resultExplanation)
+    }
+    
     // MARK: SearchDocumentCellDelegate
     func documentTapped(document: Document) {
         self.presentDocumentDetail(document: document)

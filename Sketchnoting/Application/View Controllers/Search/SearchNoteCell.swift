@@ -10,6 +10,7 @@ import UIKit
 
 protocol SearchNoteCellDelegate {
     func tappedNote(url: URL, note: Note)
+    func tappedExplainNoteResult(noteResult: SearchNoteResult)
 }
 
 class SearchNoteCell: UITableViewCell, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
@@ -59,5 +60,21 @@ class SearchNoteCell: UITableViewCell, UICollectionViewDelegate, UICollectionVie
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let item = noteResults[indexPath.row]
         delegate?.tappedNote(url: item.note.0, note: item.note.1)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
+        return UIContextMenuConfiguration(identifier: nil, previewProvider: nil, actionProvider: { suggestedActions in
+            return self.makeNoteContextMenu(point: point, cellIndexPath: indexPath)
+        })
+    }
+    
+    private func makeNoteContextMenu(point: CGPoint, cellIndexPath: IndexPath) -> UIMenu {
+        let noteResult = self.noteResults[cellIndexPath.row]
+        var menuElements = [UIMenuElement]()
+        let showResultExplanationAction = UIAction(title: "Why this result?", image: UIImage(systemName: "questionmark.circle")) { action in
+            self.delegate?.tappedExplainNoteResult(noteResult: noteResult)
+        }
+        menuElements.append(showResultExplanationAction)
+        return UIMenu(title: noteResult.note.1.getName(), children: menuElements)
     }
 }
