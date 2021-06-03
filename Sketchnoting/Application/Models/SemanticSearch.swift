@@ -107,18 +107,32 @@ class SemanticSearch {
         return sentenceEmbedding
     }
     
-    func createFastTextWordEmbedding() -> NLEmbedding {
-        if let resource = Bundle.main.url(forResource: "FastTextWordEmbedding", withExtension: "mlmodelc"), let embedding = try? NLEmbedding.init(contentsOf: resource) {
-            return embedding
-        }
-        else {
+    enum WordEmbeddingType {
+        case Apple
+        case FastText
+        case GloVe
+    }
+    
+    func createWordEmbedding(type: WordEmbeddingType = .FastText) -> NLEmbedding {
+        switch type {
+        case .Apple:
+            return NLEmbedding.wordEmbedding(for: .english)!
+        case .FastText:
+            if let resource = Bundle.main.url(forResource: "FastTextWordEmbedding", withExtension: "mlmodelc"), let embedding = try? NLEmbedding.init(contentsOf: resource) {
+                return embedding
+            }
+            return NLEmbedding.wordEmbedding(for: .english)!
+        case .GloVe:
+            if let resource = Bundle.main.url(forResource: "GloVeWordEmbedding", withExtension: "mlmodelc"), let embedding = try? NLEmbedding.init(contentsOf: resource) {
+                return embedding
+            }
             return NLEmbedding.wordEmbedding(for: .english)!
         }
     }
     
     //
     private func getTermRelevancy(for terms: [String]) -> [[String]] {
-        let wordEmbedding = createFastTextWordEmbedding()
+        let wordEmbedding = createWordEmbedding()
         // Pre-processing: lemmatize & lowercase the terms
         var terms = terms
         for i in 0..<terms.count {
@@ -127,7 +141,41 @@ class SemanticSearch {
         // Clustering: separate the terms into semantically related groups/'clusters' which will form separate search queries
         var clusters = [[String]]()
         clusters.append([terms[0]])
-        for term in terms[1..<terms.count] {
+        for (idx, term) in terms[1..<terms.count].enumerated() {
+            var minimumDistance = 2.0
+            var closestTerm = ""
+            for (otherIdx, otherTerm) in terms[1..<terms.count].enumerated() {
+                if idx == otherIdx {
+                    continue
+                }
+                let distance = wordEmbedding.distance(between: term, and: otherTerm)
+                if distance < minimumDistance {
+                    minimumDistance = distance
+                    closestTerm = otherTerm
+                }
+                //if closestTerm.isEmpty {
+                  //  closestTerm = otherTerm
+                //}
+            }
+            var isAdded = false
+            if ((2 - minimumDistance)/2.0) > 0.5  {
+                for i in 0..<clusters.count {
+                    if clusters[i].contains(closestTerm) {
+                        clusters[i] = clusters[i] + [term]
+                        isAdded = true
+                        break
+                    }
+                }
+            }
+            if !isAdded {
+                clusters.append([term])
+            }
+        }
+        for cluster in clusters {
+            logger.info("Cluster: \(cluster.joined(separator: " "))")
+        }
+        return clusters
+        /*for term in terms[1..<terms.count] {
             var otherTerms = terms
             otherTerms.remove(object: term)
             var minimumDistance = 2.0
@@ -169,14 +217,14 @@ class SemanticSearch {
         for cluster in clusters {
             logger.info("Cluster: \(cluster.joined(separator: " "))")
         }
-        return clusters
+        return clusters*/
     }
     
     private func preprocess(query: String, useFullQuery: Bool) -> ([String], Bool) {
         var useFullQuery = useFullQuery
         let queryWords = tokenize(text: query, unit: .word)
         if queryWords.count > 1 { // Longer query
-            var allowed = [NLTag.noun, NLTag.adjective, NLTag.number]
+            let allowed = [NLTag.noun, NLTag.adjective, NLTag.number, NLTag.verb]
             var partsOfSpeech = tag(text: queryWords.joined(separator: " "), scheme: .lexicalClass)
             partsOfSpeech = partsOfSpeech.map{(lemmatize(text: $0.0.lowercased()), $0.1)}
             logger.info(partsOfSpeech)
@@ -185,13 +233,11 @@ class SemanticSearch {
             var isQuestion = false
             if phraseType == .Sentence {
                 isQuestion = isQueryQuestion(text: query)
-                if !isQuestion {
-                    allowed.append(NLTag.verb)
-                }
-                else {
+                if isQuestion {
                     useFullQuery = true
                 }
             }
+            
             var retainedQueryTerms = [String]()
             // If the part of speech tagger is very inaccurate (tags every word as OtherWord), just retain every query term
             if partsOfSpeech.filter({$0.1 != NLTag.otherWord}).isEmpty {
@@ -214,10 +260,10 @@ class SemanticSearch {
                 }
                 if uniqueTerms.isEmpty {
                     // If for some reason the query is reduced to 0 terms, just return the original query
-                    return ([lemmatize(text: query.lowercased().trimmingCharacters(in: .whitespacesAndNewlines))], isQuestion)
+                    return ([query.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)], isQuestion)
                 }
                 else {
-                    return ([lemmatize(text: uniqueTerms.joined(separator: " ").trimmingCharacters(in: .whitespacesAndNewlines))], isQuestion)
+                    return ([uniqueTerms.map{lemmatize(text: $0)}.joined(separator: " ").trimmingCharacters(in: .whitespacesAndNewlines)], isQuestion)
                 }
             }
             else {
@@ -257,7 +303,7 @@ class SemanticSearch {
         let searchResultQAThreshold = expandedSearch ? 0.5 : 0.7
         //let bert = BERT()
         let distilbert = DISTILBERT()
-        let wordEmbedding = createFastTextWordEmbedding()
+        let wordEmbedding = createWordEmbedding()
         var noteIterator = NeoLibrary.getNoteIterator()
         for query in queries {
             var mostRecentNotes = [(URL, Note)]()
@@ -466,6 +512,13 @@ class SemanticSearch {
             searchResult.documents = searchResult.documents.filter{$0.1 >= searchResultThreshold}
             searchResult.questionAnswers = searchResult.questionAnswers.filter{$0.2 >= searchResultQAThreshold}
             resultHandler(searchResult)
+            
+            if searchResult.notes.isEmpty {
+                let queryWords = tokenize(text: query, unit: .word)
+                if queryWords.count > 1 {
+                    
+                }
+            }
         }
         logger.info("Search for query '\(originalQuery)' completed.")
         searchFinishHandler()

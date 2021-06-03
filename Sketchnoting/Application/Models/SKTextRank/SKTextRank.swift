@@ -25,7 +25,7 @@ class SKTextRank {
             let index = graph.addVertex(w)
             addedVertices[w] = index
         }
-        let wordEmbedding = SemanticSearch.shared.createFastTextWordEmbedding()
+        let wordEmbedding = SemanticSearch.shared.createWordEmbedding()
         for (i, word) in nounsAndAdjectives.enumerated() {
             let index = addedVertices[word]!
             let N = 3

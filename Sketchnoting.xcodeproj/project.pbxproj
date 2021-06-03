@@ -46,6 +46,7 @@
 		9F5D8A30246113DC00934C0E /* WATHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5D8A2F246113DC00934C0E /* WATHelper.swift */; };
 		9F5D8A322461157200934C0E /* WATDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5D8A312461157200934C0E /* WATDocument.swift */; };
 		9F5DFD81265EDB2200E46287 /* SimpleTextViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5DFD80265EDB2200E46287 /* SimpleTextViewController.swift */; };
+		9F5DFD962667BC7500E46287 /* GloVeWordEmbedding.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 9F5DFD952667BC7500E46287 /* GloVeWordEmbedding.mlmodel */; };
 		9F5E89F42391CE84002FA8B2 /* DocumentDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5E89F32391CE84002FA8B2 /* DocumentDetailViewController.swift */; };
 		9F5F5D1524328CC100AF79A5 /* DateExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5F5D1424328CC100AF79A5 /* DateExtensions.swift */; };
 		9F65983323EDCEA300CDBE0C /* NotePage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F65983223EDCEA300CDBE0C /* NotePage.swift */; };
@@ -239,6 +240,7 @@
 		9F5D8B2B228B9D7000F56FEC /* CREDITS.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CREDITS.md; sourceTree = "<group>"; };
 		9F5D8B2C228B9EF800F56FEC /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		9F5DFD80265EDB2200E46287 /* SimpleTextViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimpleTextViewController.swift; sourceTree = "<group>"; };
+		9F5DFD952667BC7500E46287 /* GloVeWordEmbedding.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = GloVeWordEmbedding.mlmodel; sourceTree = "<group>"; };
 		9F5E89F32391CE84002FA8B2 /* DocumentDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentDetailViewController.swift; sourceTree = "<group>"; };
 		9F5F5D1424328CC100AF79A5 /* DateExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateExtensions.swift; sourceTree = "<group>"; };
 		9F65983223EDCEA300CDBE0C /* NotePage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotePage.swift; sourceTree = "<group>"; };
@@ -804,6 +806,7 @@
 			isa = PBXGroup;
 			children = (
 				9FF4758725FAC5D0003CA74A /* FastTextWordEmbedding.mlmodel */,
+				9F5DFD952667BC7500E46287 /* GloVeWordEmbedding.mlmodel */,
 				9FD29BA52220524D00CC969A /* Sketchnoting */,
 				9FD29BA42220524D00CC969A /* Products */,
 				124769D1803E7C4AE8A1F382 /* Frameworks */,
@@ -1116,6 +1119,7 @@
 				9FD1ADF323A52F7C0013C68E /* NotePagesViewController.swift in Sources */,
 				9F4BB37824EDC02800ED1E2F /* NoteLayer.swift in Sources */,
 				9FC5386B2520DB7700911DBF /* SKRecognizer.swift in Sources */,
+				9F5DFD962667BC7500E46287 /* GloVeWordEmbedding.mlmodel in Sources */,
 				9FAD28F623A52AC700F2203E /* NoteTextViewController.swift in Sources */,
 				9FA8C002239B21D500BAA42B /* TagsCreationViewController.swift in Sources */,
 				9FF4758825FAC5D0003CA74A /* FastTextWordEmbedding.mlmodel in Sources */,
