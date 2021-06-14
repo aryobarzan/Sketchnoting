@@ -62,8 +62,12 @@ class NoteSimilarity {
         }
         else {
             let titleTerms = SemanticSearch.shared.tokenize(text: note.getName(), unit: .word)
-            let noteText = note.getText(parse: parse)
-            var bodyTerms = SemanticSearch.shared.tokenize(text: noteText, unit: .word)
+            let noteText = SKTextRank.shared.summarize(text: note.getText(option: .FullText, parse: parse))
+            var bodySentences = SemanticSearch.shared.tokenize(text: noteText, unit: .sentence)
+            if filterSentences {
+                bodySentences = bodySentences.filter {SemanticSearch.shared.checkPhraseType(queryPartsOfSpeech: SemanticSearch.shared.tag(text: $0, scheme: .lexicalClass)) == .Sentence}
+            }
+            var bodyTerms = SemanticSearch.shared.tokenize(text: bodySentences.joined(separator: " "), unit: .word)
             if bodyTerms.count > 10 && useKeywords {
                 bodyTerms = Reductio.shared.keywords(from: noteText, count: 10)
                 logger.info(bodyTerms.joined(separator: ", "))
@@ -83,9 +87,10 @@ class NoteSimilarity {
             
             var toRemove = [Int]()
             // Lemmatize
+            let wordEmbedding = SemanticSearch.shared.createWordEmbedding(type: .FastText)
             for i in 0..<allTerms.count {
                 let lemmatized = SemanticSearch.shared.lemmatize(text: allTerms[i])
-                if SemanticSearch.shared.getWordEmbedding().contains(lemmatized) {
+                if wordEmbedding.contains(lemmatized) {
                     allTerms[i] = lemmatized
                 }
                 if stopwords.contains(allTerms[i]) {
@@ -96,7 +101,7 @@ class NoteSimilarity {
             allTerms = allTerms.enumerated().filter { !toRemove.contains($0.offset) }.map { $0.element }
             // Insert vector for each term to matrix
             for term in allTerms {
-                let vector = SemanticSearch.shared.getWordEmbedding().vector(for: term)
+                let vector = wordEmbedding.vector(for: term)
                 if vector != nil {
                     matrix.append(normalizeVector ? normalize(vector!) : vector!)
                 }

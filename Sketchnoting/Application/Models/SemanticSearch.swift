@@ -144,7 +144,7 @@ class SemanticSearch {
         for (idx, term) in terms[1..<terms.count].enumerated() {
             var minimumDistance = 2.0
             var closestTerm = ""
-            for (otherIdx, otherTerm) in terms[1..<terms.count].enumerated() {
+            for (otherIdx, otherTerm) in terms[0..<terms.count].enumerated() {
                 if idx == otherIdx {
                     continue
                 }
@@ -234,6 +234,7 @@ class SemanticSearch {
             if phraseType == .Sentence {
                 isQuestion = isQueryQuestion(text: query)
                 if isQuestion {
+                    logger.info("Query is a question.")
                     useFullQuery = true
                 }
             }
@@ -657,6 +658,12 @@ class SemanticSearch {
         let words = tokenize(text: text, unit: .word).map{$0.lowercased()}
         if text.hasSuffix("?") {
             return true
+        }
+        let tags = tag(text: text, scheme: .lexicalClass)
+        if !tags.isEmpty {
+            if tags.first!.1 == NLTag.verb {
+                return true
+            }
         }
         for word in words {
             if questionKeywords.contains(word) {
