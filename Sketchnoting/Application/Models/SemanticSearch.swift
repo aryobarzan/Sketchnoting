@@ -130,6 +130,11 @@ class SemanticSearch {
         }
     }
     
+    private func cosineDistanceToSimilarity(distance: Double) -> Double {
+        let similarity = 1 - distance
+        return (1 + similarity)/2.0
+    }
+    
     //
     private func getTermRelevancy(for terms: [String]) -> [[String]] {
         let wordEmbedding = createWordEmbedding()
@@ -142,15 +147,15 @@ class SemanticSearch {
         var clusters = [[String]]()
         clusters.append([terms[0]])
         for (idx, term) in terms[1..<terms.count].enumerated() {
-            var minimumDistance = 2.0
+            var highestSimilarity = 0.0
             var closestTerm = ""
             for (otherIdx, otherTerm) in terms[0..<terms.count].enumerated() {
                 if idx == otherIdx {
                     continue
                 }
-                let distance = wordEmbedding.distance(between: term, and: otherTerm)
-                if distance < minimumDistance {
-                    minimumDistance = distance
+                let similarity = cosineDistanceToSimilarity(distance: wordEmbedding.distance(between: term, and: otherTerm))
+                if similarity > highestSimilarity {
+                    highestSimilarity = similarity
                     closestTerm = otherTerm
                 }
                 //if closestTerm.isEmpty {
@@ -158,7 +163,7 @@ class SemanticSearch {
                 //}
             }
             var isAdded = false
-            if ((2 - minimumDistance)/2.0) > 0.5  {
+            if highestSimilarity > 0.5  {
                 for i in 0..<clusters.count {
                     if clusters[i].contains(closestTerm) {
                         clusters[i] = clusters[i] + [term]
@@ -589,7 +594,7 @@ class SemanticSearch {
             var temp_closestLexicalTarget = ""
             for word in targetWords {
                 let word = word.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-                let semanticSimilarity = (2.0 - wordEmbedding.distance(between: queryWord, and: word)) / 2.0
+                let semanticSimilarity = cosineDistanceToSimilarity(distance: wordEmbedding.distance(between: queryWord, and: word))
                 if semanticSimilarity > highestSemanticSimilarity {
                     highestSemanticSimilarity = semanticSimilarity
                     temp_closestSemanticTarget = word
