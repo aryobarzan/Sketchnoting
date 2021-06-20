@@ -290,6 +290,12 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
                 if !cancelled {
                     // PDFs, images and text files are first converted to Note objects
                     var createdNotes = [(URL, Note)]()
+                    // MARK: Temporary fix - to be updated
+                    var importedNotes = importedNotes
+                    for (idx, note) in importedNotes.enumerated() {
+                        let url = NeoLibrary.currentLocation.appendingPathComponent(note.1.getName() + ".sketchnote")
+                        importedNotes[idx] = (url, note.1)
+                    }
                     if importedImages.count > 0 {
                         let (url, note) = NeoLibrary.createNoteFrom(images: importedImages)
                         createdNotes.append((url, note))
@@ -313,7 +319,9 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
                     DispatchQueue.main.async {
                         if !cancelled {
                             self.dismissLoadingAlert()
-                            self.showImportVC(importedNotes: createdNotes + importedNotes)
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                                self.showImportVC(importedNotes: createdNotes + importedNotes)
+                            }
                         }
                     }
                 }
