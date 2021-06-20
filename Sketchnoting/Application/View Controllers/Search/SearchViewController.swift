@@ -29,7 +29,6 @@ class SearchViewController: UIViewController, DrawingSearchDelegate, SKIndexerDe
         searchTableView.dataSource = self
         searchTableView.delegate = self
         
-        
     }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)

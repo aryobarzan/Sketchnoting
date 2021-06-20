@@ -100,13 +100,6 @@
 		9F92D11C23217D0500BC0E57 /* SearchFilterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F92D11B23217D0500BC0E57 /* SearchFilterView.swift */; };
 		9F92D11F23217FFF00BC0E57 /* SearchFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F92D11E23217FFF00BC0E57 /* SearchFilter.swift */; };
 		9F942506238A341E006B0E81 /* UIStoryboardSegueWithCompletion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F942505238A341E006B0E81 /* UIStoryboardSegueWithCompletion.swift */; };
-		9F945DD6262793ED00B53464 /* bert-base-uncased-vocab.txt in Resources */ = {isa = PBXBuildFile; fileRef = 9F945DD5262793ED00B53464 /* bert-base-uncased-vocab.txt */; };
-		9F945DD8262793F200B53464 /* BERT.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F945DD7262793F200B53464 /* BERT.swift */; };
-		9F945DDA262793F400B53464 /* BERTInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F945DD9262793F400B53464 /* BERTInput.swift */; };
-		9F945DDC262793F600B53464 /* BERTOutput.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F945DDB262793F600B53464 /* BERTOutput.swift */; };
-		9F945DDE2627940500B53464 /* BERTVocabulary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F945DDD2627940500B53464 /* BERTVocabulary.swift */; };
-		9F945DE02627940900B53464 /* TokenizedString.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F945DDF2627940900B53464 /* TokenizedString.swift */; };
-		9F945DE22627943000B53464 /* BERTQAFP16.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 9F945DE12627943000B53464 /* BERTQAFP16.mlmodel */; };
 		9F9460DF23F5B0460073D709 /* GridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F9460DE23F5B0460073D709 /* GridView.swift */; };
 		9F9460E223F5BAA10073D709 /* Connectivity in Frameworks */ = {isa = PBXBuildFile; productRef = 9F9460E123F5BAA10073D709 /* Connectivity */; };
 		9F96895724679D4000D02F81 /* NoteDoc.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F96895624679D4000D02F81 /* NoteDoc.swift */; };
@@ -292,13 +285,6 @@
 		9F92D11B23217D0500BC0E57 /* SearchFilterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchFilterView.swift; sourceTree = "<group>"; };
 		9F92D11E23217FFF00BC0E57 /* SearchFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchFilter.swift; sourceTree = "<group>"; };
 		9F942505238A341E006B0E81 /* UIStoryboardSegueWithCompletion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIStoryboardSegueWithCompletion.swift; sourceTree = "<group>"; };
-		9F945DD5262793ED00B53464 /* bert-base-uncased-vocab.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "bert-base-uncased-vocab.txt"; sourceTree = "<group>"; };
-		9F945DD7262793F200B53464 /* BERT.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BERT.swift; sourceTree = "<group>"; };
-		9F945DD9262793F400B53464 /* BERTInput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BERTInput.swift; sourceTree = "<group>"; };
-		9F945DDB262793F600B53464 /* BERTOutput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BERTOutput.swift; sourceTree = "<group>"; };
-		9F945DDD2627940500B53464 /* BERTVocabulary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BERTVocabulary.swift; sourceTree = "<group>"; };
-		9F945DDF2627940900B53464 /* TokenizedString.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenizedString.swift; sourceTree = "<group>"; };
-		9F945DE12627943000B53464 /* BERTQAFP16.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; name = BERTQAFP16.mlmodel; path = ../../../../../../../Downloads/FindingAnswersToQuestionsInATextDocument/FindingAnswers/Model/BERTQAFP16.mlmodel; sourceTree = "<group>"; };
 		9F9460DE23F5B0460073D709 /* GridView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GridView.swift; sourceTree = "<group>"; };
 		9F96895624679D4000D02F81 /* NoteDoc.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteDoc.swift; sourceTree = "<group>"; };
 		9F9898302470DC2700E62CD1 /* TextBoxViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextBoxViewController.swift; sourceTree = "<group>"; };
@@ -449,7 +435,6 @@
 			isa = PBXGroup;
 			children = (
 				9F749EA32631CA6D00AA3C6B /* DISTILBERT */,
-				9F945DD4262793E000B53464 /* BERT */,
 				9FF8CA492609134800A9171B /* SKTextRank */,
 				9FFE07E9232A63BA00DBD0AC /* TagsManager.swift */,
 				9F1A0C54249DA60B00E507BC /* SKClipboard.swift */,
@@ -649,20 +634,6 @@
 				9F92D11E23217FFF00BC0E57 /* SearchFilter.swift */,
 			);
 			path = Search;
-			sourceTree = "<group>";
-		};
-		9F945DD4262793E000B53464 /* BERT */ = {
-			isa = PBXGroup;
-			children = (
-				9F945DE12627943000B53464 /* BERTQAFP16.mlmodel */,
-				9F945DD5262793ED00B53464 /* bert-base-uncased-vocab.txt */,
-				9F945DD7262793F200B53464 /* BERT.swift */,
-				9F945DD9262793F400B53464 /* BERTInput.swift */,
-				9F945DDB262793F600B53464 /* BERTOutput.swift */,
-				9F945DDD2627940500B53464 /* BERTVocabulary.swift */,
-				9F945DDF2627940900B53464 /* TokenizedString.swift */,
-			);
-			path = BERT;
 			sourceTree = "<group>";
 		};
 		9FA6238922D371F1007ED794 /* Semantic Annotation */ = {
@@ -1057,7 +1028,6 @@
 				9FD29BB12220525000CC969A /* LaunchScreen.storyboard in Resources */,
 				9FD29BAE2220525000CC969A /* Assets.xcassets in Resources */,
 				9F05B5A1232BE4EC00983AF2 /* NoteCollectionViewDetailCell.xib in Resources */,
-				9F945DD6262793ED00B53464 /* bert-base-uncased-vocab.txt in Resources */,
 				9FD29BAC2220524D00CC969A /* Main.storyboard in Resources */,
 				9FDD53BE2641DCE000C7F3FB /* DocumentCollectionViewCell.xib in Resources */,
 				9F92D11A23217CFA00BC0E57 /* SearchFilterView.xib in Resources */,
@@ -1130,17 +1100,14 @@
 				9F4B38C323EB1E6D00F87B61 /* Notifications.swift in Sources */,
 				9F75E451230D8AE100488BBD /* SettingsManager.swift in Sources */,
 				9F75E482231410A100488BBD /* TAGMEHelper.swift in Sources */,
-				9F945DDE2627940500B53464 /* BERTVocabulary.swift in Sources */,
 				9FCE9EC32502AA0A00166AE2 /* ExportViewController.swift in Sources */,
 				9FB5156226139BDC004F91E2 /* UIAlertControllerExtensions.swift in Sources */,
 				9F65984823F315FE00CDBE0C /* SearchFilterCollectionViewCell.swift in Sources */,
 				9FFE9B3424B3C77200D92FBA /* NeoLibrary.swift in Sources */,
 				9F8988D625E8239E005CB90B /* TextParser.swift in Sources */,
 				9FA6238B22D37213007ED794 /* BioPortalHelper.swift in Sources */,
-				9F945DD8262793F200B53464 /* BERT.swift in Sources */,
 				9F77DBCA23FFD619007C8B7D /* AnnotationUtilities.swift in Sources */,
 				9F0ABB282412E5D400CA5A4E /* SKCacheManager.swift in Sources */,
-				9F945DE22627943000B53464 /* BERTQAFP16.mlmodel in Sources */,
 				9FB87CF924B006B900A262D8 /* ALMAARHelper.swift in Sources */,
 				9FD29C58223C3CF700CC969A /* UIImageExtensions.swift in Sources */,
 				9F8E0D0F25DDC02C00A951B1 /* SemanticSearch.swift in Sources */,
@@ -1168,7 +1135,6 @@
 				9F0C8D9C253DB142002E9811 /* SKRecognizedWord.swift in Sources */,
 				9FAB4B7E244BEF2F00DEA46F /* UILabelExtension.swift in Sources */,
 				9FF0AC962441308B00A82BE8 /* CodableExtensions.swift in Sources */,
-				9F945DE02627940900B53464 /* TokenizedString.swift in Sources */,
 				9FA6239522DE3741007ED794 /* BioPortalDocument.swift in Sources */,
 				9FBC2E0924904DAD002AC8A3 /* AppSearch.swift in Sources */,
 				9FFE07E6232A5FE500DBD0AC /* TagTableViewCell.swift in Sources */,
@@ -1209,7 +1175,6 @@
 				9F65983D23EDD2FA00CDBE0C /* NoteTextComplete.swift in Sources */,
 				9F92D11C23217D0500BC0E57 /* SearchFilterView.swift in Sources */,
 				9FDD6CA524AFB7C10093EDF4 /* FileInfoViewController.swift in Sources */,
-				9F945DDC262793F600B53464 /* BERTOutput.swift in Sources */,
 				9F1A0C53249DA1C600E507BC /* YRipple.swift in Sources */,
 				9F06977024427823002DCE47 /* URLExtensions.swift in Sources */,
 				9FFE07EA232A63BA00DBD0AC /* TagsManager.swift in Sources */,
@@ -1223,7 +1188,6 @@
 				9FB9984924868700003773F2 /* MoveFileViewCell.swift in Sources */,
 				9FDD53C02641E30E00C7F3FB /* CircularProgressView.swift in Sources */,
 				9FA8C000239B18BA00BAA42B /* TagsViewController.swift in Sources */,
-				9F945DDA262793F400B53464 /* BERTInput.swift in Sources */,
 				9FBF6AB822E9F428001FD730 /* VisionTextLineWrapper.swift in Sources */,
 				9FD8BB97243D5BE500542BFA /* ImportHelper.swift in Sources */,
 				9F4BB37424ED807A00ED1E2F /* NoteLayersViewController.swift in Sources */,
