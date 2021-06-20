@@ -93,7 +93,7 @@ class NoteViewController: UIViewController, UIPencilInteractionDelegate, UIColle
         
         SKRecognizer.initializeRecognizers()
         
-        self.canvasView.drawingPolicy = PKCanvasViewDrawingPolicy.pencilOnly
+        self.canvasView.drawingPolicy = PKCanvasViewDrawingPolicy.anyInput
         self.canvasView.delegate = self
         pkToolPicker = PKToolPicker.init()
         pkToolPicker.setVisible(true, forFirstResponder: canvasView)
