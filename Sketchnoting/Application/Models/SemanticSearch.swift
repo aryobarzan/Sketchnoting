@@ -303,7 +303,7 @@ class SemanticSearch {
             subqueriesHandler(queries)
         }
         // Expanded Search means a lower threshold for the lexical search, i.e. more tolerant to minor typos
-        let lexicalThreshold = expandedSearch ? 0.9 : 1.0
+        let lexicalThreshold = expandedSearch ? 0.8 : 0.9
         let semanticThreshold = expandedSearch ? 0.45 : 0.5
         let searchResultThreshold = expandedSearch ? 0.1 : 0.5
         let searchResultQAThreshold = expandedSearch ? 0.5 : 0.7

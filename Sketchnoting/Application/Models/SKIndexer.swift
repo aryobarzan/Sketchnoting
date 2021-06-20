@@ -69,7 +69,7 @@ class SKIndexer {
         for option in options {
             switch option {
             case .Similarity:
-                NoteSimilarity.shared.add(note: note, uniqueOnly: true, useSentenceEmbedding: false, normalizeVector: true, parse: true, useKeywords: false, useDocuments: false, filterSentences: true)
+                NoteSimilarity.shared.add(note: note)
                 break
             case .TFIDF:
                 TF_IDF.shared.addNote(note: note)

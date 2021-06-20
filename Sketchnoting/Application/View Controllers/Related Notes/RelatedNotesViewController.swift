@@ -19,23 +19,16 @@ protocol RelatedNotesVCDelegate {
 
 class RelatedNotesViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
     
-    private enum SimilarityMethod {
-        case TF_IDF
-        case Semantic
-    }
-    
     var note: (URL, Note)!
     var context: RelatedNotesContext = .HomePage
     
     var relatedNotes = [((URL, Note), Double)]()
-    private var similarityMethod: SimilarityMethod = .TF_IDF
     var similarityThreshold: Float = 0.5
     
     var openNote: (URL, Note)?
     var delegate: RelatedNotesVCDelegate?
 
     @IBOutlet weak var countLabel: UILabel!
-    @IBOutlet weak var similaritySegmentedControl: UISegmentedControl!
     @IBOutlet weak var collectionView: UICollectionView!
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -51,20 +44,6 @@ class RelatedNotesViewController: UIViewController, UICollectionViewDataSource, 
     
     @IBAction func doneTapped(_ sender: UIBarButtonItem) {
         self.dismiss(animated: true, completion: nil)
-    }
-    
-    @IBAction func similaritySegmentedControlChanged(_ sender: UISegmentedControl) {
-        var newSimilarityMethod: SimilarityMethod
-        if sender.selectedSegmentIndex == 0 {
-            newSimilarityMethod = .TF_IDF
-        }
-        else {
-            newSimilarityMethod = .Semantic
-        }
-        if newSimilarityMethod != self.similarityMethod {
-            self.similarityMethod = newSimilarityMethod
-            self.refreshRelatedNotes()
-        }
     }
     
     
@@ -98,26 +77,10 @@ class RelatedNotesViewController: UIViewController, UICollectionViewDataSource, 
     }
     
     private func refreshRelatedNotes() {
-        if similarityMethod == .TF_IDF {
-            if !NoteSimilarity.shared.isTFIDFSetup() {
-                NoteSimilarity.shared.setupTFIDF(noteIterator: NeoLibrary.getNoteIterator())
-            }
-            let similarNotes = NoteSimilarity.shared.similarNotes(for: note.1, noteIterator: NeoLibrary.getNoteIterator(), maxResults: 5, similarityMethod: .TFIDF)
-            self.relatedNotes = similarNotes
-        }
-        else {
-            let foundNotes = NoteSimilarity.shared.similarNotes(for: note.1, noteIterator: NeoLibrary.getNoteIterator(), maxResults: 5, similarityMethod: .SemanticMatrix)
-            self.relatedNotes = foundNotes
-        }
+        let foundNotes = NoteSimilarity.shared.similarNotes(for: note.1, noteIterator: NeoLibrary.getNoteIterator(), maxResults: 5, similarityMethod: .SemanticMatrix)
+        self.relatedNotes = foundNotes
+        
         collectionView.reloadData()
         countLabel.text = "Related Notes: (\(Int(relatedNotes.count)))"
-    }
-    @IBAction func refreshButtonTapped(_ sender: UIBarButtonItem) {
-        SKIndexer.shared.cancelIndexing()
-        SKIndexer.shared.indexLibrary(finishHandler: { finished in
-            DispatchQueue.main.async {
-                self.refreshRelatedNotes()
-            }
-        })
     }
 }

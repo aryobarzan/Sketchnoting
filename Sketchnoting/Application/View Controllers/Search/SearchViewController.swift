@@ -29,13 +29,7 @@ class SearchViewController: UIViewController, DrawingSearchDelegate, SKIndexerDe
         searchTableView.dataSource = self
         searchTableView.delegate = self
         
-        /*let wordEmbedding = SemanticSearch.shared.createWordEmbedding(type: .FastText)
-        print((2 - wordEmbedding.distance(between: "skirmish", and: "battle"))/2)
-        print((2 - wordEmbedding.distance(between: "king", and: "man"))/2)
-        print((2 - wordEmbedding.distance(between: "king", and: "queen"))/2)
-        print((2 - wordEmbedding.distance(between: "king", and: "woman"))/2)
-        print((2 - wordEmbedding.distance(between: "science", and: "scientific"))/2)
-        print((2 - wordEmbedding.distance(between: "apple", and: "orange"))/2)*/
+        
     }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)

@@ -38,75 +38,40 @@ class NoteSimilarity {
         self.noteMatrices.removeAll()
     }
     
-    func add(note: Note, uniqueOnly: Bool = false, useSentenceEmbedding: Bool = false, normalizeVector: Bool = false, parse: Bool = false, useKeywords: Bool = false, useDocuments: Bool = false, useNounsOnly: Bool = false, filterSentences: Bool = false) {
+    func add(note: Note) {
         var matrix = [[Double]]()
+        let titleTerms = SemanticSearch.shared.tokenize(text: note.getName(), unit: .word)
+        //let noteText = SKTextRank.shared.summarize(text: note.getText(option: .FullText, parse: true), numberOfSentences: 1)
+        let noteText = note.getText(option: .FullText, parse: true)
+        var bodySentences = SemanticSearch.shared.tokenize(text: noteText, unit: .sentence)
+        // Filter sentences
+        bodySentences = bodySentences.filter {SemanticSearch.shared.checkPhraseType(queryPartsOfSpeech: SemanticSearch.shared.tag(text: $0, scheme: .lexicalClass)) == .Sentence}
+        var bodyTerms = SemanticSearch.shared.tokenize(text: bodySentences.joined(separator: " "), unit: .word)
+        // use Documents
+        // bodyTerms = note.getDocuments().map { $0.title }
+        bodyTerms = SKTextRank.shared.extractKeywords(text: noteText, numberOfKeywords: 10, biased: false, usePostProcessing: false)
+        // use nouns only
+        // let taggedTerms = SemanticSearch.shared.tag(text: noteText, scheme: .lexicalClass)
+        // bodyTerms = taggedTerms.filter {$0.1 == NLTag.noun }.map { $0.0 }
         
-        if useSentenceEmbedding {
-            let titleTerms = SemanticSearch.shared.tokenize(text: note.getName(), unit: .sentence)
-            var bodySentences = SemanticSearch.shared.tokenize(text: SKTextRank.shared.summarize(text: note.getText(option: .FullText, parse: parse)), unit: .sentence)
-            if filterSentences {
-                bodySentences = bodySentences.filter {SemanticSearch.shared.checkPhraseType(queryPartsOfSpeech: SemanticSearch.shared.tag(text: $0, scheme: .lexicalClass)) == .Sentence}
-            }
-            // Convert to set to only retain unique terms
-            var allSentences = (titleTerms + bodySentences).map { $0.lowercased() }
-            if uniqueOnly {
-                allSentences = Array(Set(allSentences))
-            }
-            // Insert vector for each sentence to matrix
-            for sentence in allSentences {
-                let vector = SemanticSearch.shared.getSentenceEmbedding().vector(for: sentence)
-                if vector != nil {
-                    matrix.append(normalizeVector ? normalize(vector!) : vector!)
-                }
+        // Convert to set to only retain unique terms
+        let allTerms = (titleTerms + bodyTerms).map { $0.lowercased() }
+        // unique only
+        var uniqueTerms = [String]()
+        for term in allTerms {
+            if !uniqueTerms.contains(term) && !stopwords.contains(term) {
+                uniqueTerms.append(SemanticSearch.shared.lemmatize(text: term))
             }
         }
-        else {
-            let titleTerms = SemanticSearch.shared.tokenize(text: note.getName(), unit: .word)
-            let noteText = SKTextRank.shared.summarize(text: note.getText(option: .FullText, parse: parse))
-            var bodySentences = SemanticSearch.shared.tokenize(text: noteText, unit: .sentence)
-            if filterSentences {
-                bodySentences = bodySentences.filter {SemanticSearch.shared.checkPhraseType(queryPartsOfSpeech: SemanticSearch.shared.tag(text: $0, scheme: .lexicalClass)) == .Sentence}
-            }
-            var bodyTerms = SemanticSearch.shared.tokenize(text: bodySentences.joined(separator: " "), unit: .word)
-            if bodyTerms.count > 10 && useKeywords {
-                bodyTerms = Reductio.shared.keywords(from: noteText, count: 10)
-                logger.info(bodyTerms.joined(separator: ", "))
-            }
-            else if useDocuments {
-                bodyTerms = note.getDocuments().map { $0.title }
-            }
-            else if useNounsOnly {
-                let taggedTerms = SemanticSearch.shared.tag(text: noteText, scheme: .lexicalClass)
-                bodyTerms = taggedTerms.filter {$0.1 == NLTag.noun }.map { $0.0 }
-            }
-            // Convert to set to only retain unique terms
-            var allTerms = (titleTerms + bodyTerms).map { $0.lowercased() }
-            if uniqueOnly {
-                allTerms = Array(Set(allTerms))
-            }
-            
-            var toRemove = [Int]()
-            // Lemmatize
-            let wordEmbedding = SemanticSearch.shared.createWordEmbedding(type: .FastText)
-            for i in 0..<allTerms.count {
-                let lemmatized = SemanticSearch.shared.lemmatize(text: allTerms[i])
-                if wordEmbedding.contains(lemmatized) {
-                    allTerms[i] = lemmatized
-                }
-                if stopwords.contains(allTerms[i]) {
-                    toRemove.append(i)
-                }
-            }
-            // Remove stop words
-            allTerms = allTerms.enumerated().filter { !toRemove.contains($0.offset) }.map { $0.element }
-            // Insert vector for each term to matrix
-            for term in allTerms {
-                let vector = wordEmbedding.vector(for: term)
-                if vector != nil {
-                    matrix.append(normalizeVector ? normalize(vector!) : vector!)
-                }
+        let wordEmbedding = SemanticSearch.shared.createWordEmbedding(type: .FastText)
+        // Insert vector for each term to matrix
+        for term in uniqueTerms {
+            let vector = wordEmbedding.vector(for: term)
+            if vector != nil {
+                matrix.append(normalize(vector!))
             }
         }
+        logger.info(matrix.count)
         noteMatrices[note.getID()] = transpose(matrix: matrix)
     }
     

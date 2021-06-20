@@ -2547,13 +2547,13 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Related Notes: (0)" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cWj-gX-lCK">
-                                <rect key="frame" x="20" y="112" width="136" height="20"/>
+                                <rect key="frame" x="20" y="64" width="136" height="20"/>
                                 <fontDescription key="fontDescription" name="HelveticaNeue-Bold" family="Helvetica Neue" pointSize="16"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="pAN-s0-tyl">
-                                <rect key="frame" x="20" y="140" width="664" height="824"/>
+                                <rect key="frame" x="20" y="92" width="664" height="872"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <collectionViewFlowLayout key="collectionViewLayout" automaticEstimatedItemSize="YES" minimumLineSpacing="10" minimumInteritemSpacing="10" id="aDm-ey-9sh">
                                     <size key="itemSize" width="128" height="128"/>
@@ -2563,48 +2563,20 @@
                                 </collectionViewFlowLayout>
                                 <cells/>
                             </collectionView>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="(Similarity Method)" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="axe-yr-gGq">
-                                <rect key="frame" x="286.5" y="99" width="131" height="18"/>
-                                <fontDescription key="fontDescription" type="italicSystem" pointSize="15"/>
-                                <nil key="textColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                            <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="VwB-NW-cp9">
-                                <rect key="frame" x="275.5" y="60" width="153" height="32"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="31" id="ArB-Tz-KWv"/>
-                                </constraints>
-                                <segments>
-                                    <segment title="TF-IDF"/>
-                                    <segment title="Semantic"/>
-                                </segments>
-                                <connections>
-                                    <action selector="similaritySegmentedControlChanged:" destination="KcP-EM-pcP" eventType="valueChanged" id="lf6-Q6-jNb"/>
-                                </connections>
-                            </segmentedControl>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="4Ol-1v-hCA"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
-                            <constraint firstItem="VwB-NW-cp9" firstAttribute="centerX" secondItem="bdl-1U-WyQ" secondAttribute="centerX" id="SpJ-c3-hql"/>
+                            <constraint firstItem="4Ol-1v-hCA" firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="cWj-gX-lCK" secondAttribute="trailing" symbolic="YES" id="Gwl-yM-z3c"/>
                             <constraint firstItem="4Ol-1v-hCA" firstAttribute="trailing" secondItem="pAN-s0-tyl" secondAttribute="trailing" constant="20" id="cfE-y8-50n"/>
-                            <constraint firstItem="axe-yr-gGq" firstAttribute="top" secondItem="VwB-NW-cp9" secondAttribute="bottom" constant="8" id="gMl-RQ-Umx"/>
                             <constraint firstItem="4Ol-1v-hCA" firstAttribute="bottom" secondItem="pAN-s0-tyl" secondAttribute="bottom" constant="20" id="geQ-iy-cWr"/>
-                            <constraint firstItem="axe-yr-gGq" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="cWj-gX-lCK" secondAttribute="trailing" constant="8" symbolic="YES" id="hDI-HQ-kjn"/>
                             <constraint firstItem="pAN-s0-tyl" firstAttribute="top" secondItem="cWj-gX-lCK" secondAttribute="bottom" constant="8" id="hJD-lY-vZd"/>
-                            <constraint firstItem="cWj-gX-lCK" firstAttribute="top" secondItem="4Ol-1v-hCA" secondAttribute="top" constant="56" id="hPs-8Y-dL0"/>
+                            <constraint firstItem="cWj-gX-lCK" firstAttribute="top" secondItem="4Ol-1v-hCA" secondAttribute="top" constant="8" id="hPs-8Y-dL0"/>
                             <constraint firstItem="cWj-gX-lCK" firstAttribute="leading" secondItem="4Ol-1v-hCA" secondAttribute="leading" constant="20" id="jfQ-LR-rwF"/>
-                            <constraint firstItem="VwB-NW-cp9" firstAttribute="top" secondItem="4Ol-1v-hCA" secondAttribute="top" constant="4" id="nUO-U9-xxI"/>
                             <constraint firstItem="pAN-s0-tyl" firstAttribute="leading" secondItem="4Ol-1v-hCA" secondAttribute="leading" constant="20" id="p38-8I-g5g"/>
-                            <constraint firstItem="axe-yr-gGq" firstAttribute="centerX" secondItem="bdl-1U-WyQ" secondAttribute="centerX" id="tmv-WT-dbW"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" title="Related Notes" id="mKD-u7-wUT">
-                        <barButtonItem key="leftBarButtonItem" title="Item" image="arrow.clockwise" catalog="system" id="8ZF-YV-zOU">
-                            <connections>
-                                <action selector="refreshButtonTapped:" destination="KcP-EM-pcP" id="dkw-8B-u1o"/>
-                            </connections>
-                        </barButtonItem>
                         <barButtonItem key="rightBarButtonItem" systemItem="done" id="Ptw-Ya-4oC">
                             <connections>
                                 <action selector="doneTapped:" destination="KcP-EM-pcP" id="QoC-iW-Vxa"/>
@@ -2614,7 +2586,6 @@
                     <connections>
                         <outlet property="collectionView" destination="pAN-s0-tyl" id="f6p-UT-ax6"/>
                         <outlet property="countLabel" destination="cWj-gX-lCK" id="76q-sk-1eh"/>
-                        <outlet property="similaritySegmentedControl" destination="VwB-NW-cp9" id="R2z-XG-JOz"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="wE8-Me-3jT" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -3510,7 +3481,6 @@
     </inferredMetricsTieBreakers>
     <resources>
         <image name="antenna.radiowaves.left.and.right" catalog="system" width="128" height="109"/>
-        <image name="arrow.clockwise" catalog="system" width="115" height="128"/>
         <image name="arrow.left" catalog="system" width="128" height="98"/>
         <image name="arrow.left.circle" catalog="system" width="128" height="121"/>
         <image name="arrow.right.circle" catalog="system" width="128" height="121"/>
