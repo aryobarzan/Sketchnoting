@@ -18,6 +18,9 @@ class DocumentDetailViewController: UIViewController, DocumentVisitor {
     @IBOutlet weak var contentTextView: UITextView!
     @IBOutlet weak var backgroundBlurEffect: UIVisualEffectView!
     @IBOutlet weak var typeImageView: UIImageView!
+    @IBOutlet weak var bottomImageView: UIImageView!
+    
+    @IBOutlet weak var contentTextViewBottomConstraint: NSLayoutConstraint!
     
     private var document: Document? {
         didSet {
@@ -48,6 +51,7 @@ class DocumentDetailViewController: UIViewController, DocumentVisitor {
     override func viewDidLoad() {
         super.viewDidLoad()
         let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(mapImageTapped(tapGestureRecognizer:)))
+        bottomImageView.addGestureRecognizer(tapGestureRecognizer)
         previewImage.layer.masksToBounds = true
         previewImage.layer.cornerRadius = 64
         previewImage.layer.borderWidth = 1
@@ -93,7 +97,9 @@ class DocumentDetailViewController: UIViewController, DocumentVisitor {
             self.setDetailDescription(text: definition)
         }
         if let moleculeImage = document.moleculeImage {
-            //bottomImageView.image = moleculeImage
+            self.bottomImageView.image = moleculeImage
+            self.bottomImageView.isHidden = false
+            self.contentTextViewBottomConstraint.constant = self.bottomImageView.frame.height + 30
         }
     }
     
@@ -114,7 +120,9 @@ class DocumentDetailViewController: UIViewController, DocumentVisitor {
                 if let mapImage = value {
                     logger.info("Map image found for document \(document.title).")
                     DispatchQueue.main.async {
-                        //self.bottomImageView.image = mapImage
+                        self.bottomImageView.image = mapImage
+                        self.bottomImageView.isHidden = false
+                        self.contentTextViewBottomConstraint.constant = self.bottomImageView.frame.height + 30
                     }
                 }
             case .failure(_): break

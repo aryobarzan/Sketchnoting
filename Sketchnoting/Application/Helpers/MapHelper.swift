@@ -74,7 +74,6 @@ class MapHelper {
                             return true
                         }
                     }
-                    return false
                     /*let tokens = SemanticSearch.shared.tokenize(text: trimmed, unit: .word)
                     var minimumSimilarity = 999.0
                     let wordEmbedding = SemanticSearch.shared.createFastTextWordEmbedding()
@@ -91,15 +90,14 @@ class MapHelper {
                 }
             }
         }
-        return false
         // MARK: Old method
-        //let placeTerms = ["place", "city", "populated", "country", "capital", "location", "state", "village"]
-        //for term in placeTerms {
-        //    if document.description?.lowercased().contains(term) ?? false {
-        //        return true
-        //    }
-        //}
-        //return false
+        let placeTerms = ["place", "city", "populated", "country", "capital", "location", "state", "village", "province"]
+        for term in placeTerms {
+            if document.getDescription()?.lowercased().contains(term) ?? false {
+                return true
+            }
+        }
+        return false
     }
     
     static func downloadMap(document: Document) {
