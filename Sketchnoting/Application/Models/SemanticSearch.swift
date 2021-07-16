@@ -229,8 +229,8 @@ class SemanticSearch {
         var useFullQuery = useFullQuery
         let queryWords = tokenize(text: query, unit: .word)
         if queryWords.count > 1 { // Longer query
-            let allowed = [NLTag.noun, NLTag.adjective, NLTag.number, NLTag.verb]
-            var partsOfSpeech = tag(text: queryWords.joined(separator: " "), scheme: .lexicalClass)
+            let allowed = [NLTag.noun, NLTag.adjective, NLTag.number] //  NLTag.verb
+            var partsOfSpeech = tag(text: query, scheme: .lexicalClass)
             partsOfSpeech = partsOfSpeech.map{(lemmatize(text: $0.0.lowercased()), $0.1)}
             logger.info(partsOfSpeech)
             let phraseType = checkPhraseType(queryPartsOfSpeech: partsOfSpeech)
@@ -355,7 +355,6 @@ class SemanticSearch {
                 }
                 // MARK: Note body
                 var pageResults = [(PageIndex, PageHit, PageHitContext, PageHitSimilarity)]()
-                var bestNoteBodySimilarityResult: StringSimilarityResult?
                 for (pageIndex, page) in note.1.pages.enumerated() {
                     let pageText = page.getText(option: .FullText, parse: false)
                     if !pageText.isEmpty {
@@ -366,19 +365,16 @@ class SemanticSearch {
                                 noteResult = note
                                 pageResults.append((pageIndex, similarityResult.closestLexicalTarget.isEmpty ? similarityResult.closestSemanticTarget.trimmingCharacters(in: .whitespacesAndNewlines) : similarityResult.closestLexicalTarget.trimmingCharacters(in: .whitespacesAndNewlines), paragraph.trimmingCharacters(in: .whitespacesAndNewlines), similarityResult.getHighestSimilarity()))
                                 if similarityResult.getHighestSimilarity() > score_noteText {
-                                    bestNoteBodySimilarityResult = similarityResult
                                     score_noteText = similarityResult.getHighestSimilarity()
+                                    if similarityResult.lexicalSimilarity >= lexicalThreshold {
+                                        searchNoteResultExplanation += "Body: \(Int(similarityResult.lexicalSimilarity*100))% (Lexical: '\(similarityResult.closestLexicalTarget)')\n"
+                                    }
+                                    if similarityResult.semanticSimilarity >= semanticThreshold {
+                                        searchNoteResultExplanation += "Body: \(Int(similarityResult.semanticSimilarity*100))% (Semantic: '\(similarityResult.closestSemanticTarget)')\n"
+                                    }
                                 }
                             }
                         }
-                    }
-                }
-                if let similarityResult = bestNoteBodySimilarityResult {
-                    if similarityResult.lexicalSimilarity >= lexicalThreshold {
-                        searchNoteResultExplanation += "Body: \(Int(similarityResult.lexicalSimilarity*100))% (Lexical: '\(similarityResult.closestLexicalTarget)')\n"
-                    }
-                    if similarityResult.semanticSimilarity >= semanticThreshold {
-                        searchNoteResultExplanation += "Body: \(Int(similarityResult.semanticSimilarity*100))% (Semantic: '\(similarityResult.closestSemanticTarget)')\n"
                     }
                 }
                 // MARK: Documents
@@ -420,7 +416,7 @@ class SemanticSearch {
                         highestSemanticSimilarity = max(highestSemanticSimilarity, similarityResult.semanticSimilarity)
                         highestLexicalSimilarity = max(highestLexicalSimilarity, similarityResult.lexicalSimilarity)
                     }
-                    if isDocumentMatching {
+                    if isDocumentMatching && searchResult.documents.filter({$0.0 == document}).isEmpty {
                         let documentScore = score_documentTitle + score_documentDescription
                         searchResult.documents.append((document, documentScore))
                         // logger.info("Document \(document.title) score = \(documentScore)")
@@ -588,7 +584,7 @@ class SemanticSearch {
         var closestSemanticTarget = [String]()
         var closestLexicalTarget = [String]()
         for queryWord in queryWords {
-            var highestSemanticSimilarity = 0.0 // Higher is better - Semantic distance
+            var highestSemanticSimilarity = 0.0 // Higher is better - Semantic similarity
             var highestLexicalSimilarity = 0.0 // Higher is better - Damerau-Levenshtein ratio
             var temp_closestSemanticTarget = ""
             var temp_closestLexicalTarget = ""

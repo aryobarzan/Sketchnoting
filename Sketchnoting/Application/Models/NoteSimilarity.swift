@@ -20,12 +20,12 @@ class NoteSimilarity {
     static var shared = NoteSimilarity()
     private init() {}
     
-    func similarNotes(for source: Note, noteIterator: NoteIterator, maxResults: Int = 5, similarityMethod: SimilarityMethod = .SemanticMatrix) -> [((URL, Note), Double)] {
+    func similarNotes(for source: Note, noteIterator: NoteIterator, maxResults: Int = 5, similarityMethod: SimilarityMethod = .SemanticCentroid) -> [((URL, Note), Double)] {
         switch similarityMethod {
         case .SemanticMatrix:
             return semanticMatrix_similarNotes(for: source, noteIterator: noteIterator, maxResults: maxResults)
         case .SemanticCentroid:
-            return [((URL, Note), Double)]()
+            return semanticCentroid_similarNotes(for: source, noteIterator: noteIterator, maxResults: maxResults)
         case .TFIDF:
             return TFIDF_similarNotesFor(for: source, noteIterator: noteIterator, maxResults: maxResults)
         }
@@ -36,6 +36,41 @@ class NoteSimilarity {
     
     func clear() {
         self.noteMatrices.removeAll()
+    }
+    
+    func add2(note: Note) {
+        var matrix = [[Double]]()
+        let titleTerms = SemanticSearch.shared.tokenize(text: note.getName(), unit: .word)
+        let noteText = SKTextRank.shared.summarize(text: note.getText(option: .FullText, parse: true), numberOfSentences: 1)
+        var bodySentences = SemanticSearch.shared.tokenize(text: noteText, unit: .sentence)
+        // Filter sentences
+        bodySentences = bodySentences.filter {SemanticSearch.shared.checkPhraseType(queryPartsOfSpeech: SemanticSearch.shared.tag(text: $0, scheme: .lexicalClass)) == .Sentence}
+        let bodyTerms = SemanticSearch.shared.tokenize(text: bodySentences.joined(separator: " "), unit: .word)
+        // use Documents
+        // bodyTerms = note.getDocuments().map { $0.title }
+        // use nouns only
+        // let taggedTerms = SemanticSearch.shared.tag(text: noteText, scheme: .lexicalClass)
+        // bodyTerms = taggedTerms.filter {$0.1 == NLTag.noun }.map { $0.0 }
+        
+        // Convert to set to only retain unique terms
+        let allTerms = (titleTerms + bodyTerms).map { $0.lowercased() }
+        // unique only
+        var uniqueTerms = [String]()
+        for term in allTerms {
+            if !uniqueTerms.contains(term) && !stopwords.contains(term) {
+                uniqueTerms.append(SemanticSearch.shared.lemmatize(text: term))
+            }
+        }
+        let wordEmbedding = SemanticSearch.shared.createWordEmbedding(type: .FastText)
+        // Insert vector for each term to matrix
+        for term in uniqueTerms {
+            let vector = wordEmbedding.vector(for: term)
+            if vector != nil {
+                matrix.append(normalize(vector!))
+            }
+        }
+        logger.info(matrix.count)
+        noteMatrices[note.getID()] = transpose(matrix: matrix)
     }
     
     func add(note: Note) {
@@ -308,6 +343,42 @@ class NoteSimilarity {
         return matrix
     }
     
+    // MARK: Semantic centroid technique
+    private func semanticCentroid_similarNotes(for source: Note, noteIterator: NoteIterator, maxResults: Int = 5) -> [((URL, Note), Double)] {
+        // Source note is either not indexed yet or has no text to be indexed
+        if noteMatrices[source.getID()] == nil || noteMatrices[source.getID()]!.isEmpty {
+            return [((URL, Note), Double)]()
+        }
+        
+        var similarNotes = [((URL, Note), Double)]()
+        
+        var noteIterator = noteIterator
+        while let note = noteIterator.next() {
+            if note.1 == source || noteMatrices[note.1.getID()] == nil || noteMatrices[note.1.getID()]!.isEmpty {
+                continue
+            }
+            let similarity = similarityAverage(matrix1: noteMatrices[source.getID()]!, matrix2: noteMatrices[note.1.getID()]!)
+            if similarNotes.isEmpty {
+                similarNotes.append((note, similarity))
+            }
+            else {
+                var isInserted = false
+                for i in 0..<similarNotes.count {
+                    if similarity > similarNotes[i].1 {
+                        similarNotes.insert((note, similarity), at: i)
+                        isInserted = true
+                        break
+                    }
+                }
+                if !isInserted {
+                    similarNotes.append((note, similarity))
+                }
+            }
+        }
+        let maxResults = max(1, maxResults)
+        return Array(similarNotes.prefix(maxResults))
+    }
+    
     // MARK: TF-IDF technique
     private var note_TFIDF = [String : [Double]]()
     
@@ -408,30 +479,4 @@ class NoteSimilarity {
         let maxResults = max(1, maxResults)
         return Array(similarNotes.prefix(maxResults))
     }
-    
-    // MARK: Note clustering
-    /*private func clusterNotes(noteIterator: NoteIterator, centroidCount: Int = 2){
-        let centroidCount = max(2, centroidCount)
-        let noteMatrixValues = self.noteMatrices.map {$0.value}
-        var centroids = Array(noteMatrixValues.shuffled().prefix(centroidCount))
-        var clusters = [Int : [[Double]]]()
-        
-        for matrix in noteMatrixValues {
-            var closestCentroidIdx: Int = 0
-            var highestSimilarity: Double = 0.0
-            for (i, centroid) in centroids.enumerated() {
-                let similarity = self.similarity(between: matrix, and: centroid)
-                if similarity > highestSimilarity {
-                    highestSimilarity = similarity
-                    closestCentroidIdx = i
-                }
-            }
-            if clusters[closestCentroidIdx] == nil {
-                clusters[closestCentroidIdx] = [[Double]]()
-            }
-            var list = clusters[closestCentroidIdx]
-            list.append(matrix)
-            clusters[closestCentroidIdx] = list
-        }
-    }*/
 }

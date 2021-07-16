@@ -46,12 +46,12 @@ class ExploreSearchViewController: UIViewController, UICollectionViewDelegate, U
         switch state {
         case .Timeframe:
             exploreSearchOptions = SKGraphSearch.shared.getTimeframeOptions()
-            informationLabel.text = "Timeframe:"
+            informationLabel.text = "Time frame:"
             resetButton.isHidden = true
             break
         case .Length:
             exploreSearchOptions = SKGraphSearch.shared.getLengthOptions()
-            informationLabel.text = "Document length:"
+            informationLabel.text = "Note length:"
             break
         case .Drawings:
             exploreSearchOptions = SKGraphSearch.shared.getDrawingOptions()
@@ -59,7 +59,7 @@ class ExploreSearchViewController: UIViewController, UICollectionViewDelegate, U
             break
         case .Documents:
             exploreSearchOptions = SKGraphSearch.shared.getDocumentOptions(selectedDocumentOptions: selectedOptions[state]!.map{$0 as! ExploreSearchDocumentOption})
-            informationLabel.text = "Document(s):"
+            informationLabel.text = "Related document(s):"
             continueButton.setTitle("Search", for: .normal)
             continueButton.setTitleColor(.systemGreen, for: .normal)
             break

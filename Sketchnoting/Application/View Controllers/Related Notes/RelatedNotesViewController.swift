@@ -54,6 +54,7 @@ class RelatedNotesViewController: UIViewController, UICollectionViewDataSource, 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "NoteCollectionViewCell", for: indexPath as IndexPath) as! NoteCollectionViewCell
         cell.setFile(url: self.relatedNotes[indexPath.item].0.0, file: self.relatedNotes[indexPath.item].0.1, progress: self.relatedNotes[indexPath.item].1)
+        cell.toggleSelectionMode(status: false)
         return cell
     }
     
@@ -77,8 +78,11 @@ class RelatedNotesViewController: UIViewController, UICollectionViewDataSource, 
     }
     
     private func refreshRelatedNotes() {
-        let foundNotes = NoteSimilarity.shared.similarNotes(for: note.1, noteIterator: NeoLibrary.getNoteIterator(), maxResults: 5, similarityMethod: .SemanticMatrix)
+        let foundNotes = NoteSimilarity.shared.similarNotes(for: note.1, noteIterator: NeoLibrary.getNoteIterator(), maxResults: 5, similarityMethod: .SemanticCentroid)
         self.relatedNotes = foundNotes
+        for relatedNote in relatedNotes {
+            logger.info("\(relatedNote.0.1.getName()): \(relatedNote.1)")
+        }
         
         collectionView.reloadData()
         countLabel.text = "Related Notes: (\(Int(relatedNotes.count)))"
