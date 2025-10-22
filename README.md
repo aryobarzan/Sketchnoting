@@ -69,3 +69,9 @@ There is documentation in the various .swift files, but the general structure of
 Outside of the Application folder, there are various other folders related to the third-party libraries used by the app (see CREDITS.md), except for the Extensions folder, which adds some extra functions to existing Swift classes.
 
 The main source code is under the Sketchnoting/Application folder.
+
+## Publications
+
+Several publications have been released regarding Sketchnoting:
+> - [Semantic and Interactive Search in an Advanced Note-Taking App for Learning Material](https://link.springer.com/chapter/10.1007/978-3-031-05657-4_2)
+> - [Enhanced sketchnoting through semantic integration of learning material](https://link.springer.com/chapter/10.1007/978-3-030-32475-9_25)
