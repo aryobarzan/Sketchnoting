@@ -3,9 +3,24 @@
 Sketchnoting is a note-taking app designed for iPad. Its premise is to support both handwriting and sketching in a note using an Apple Pencil, though it also includes an extensive set of other features aimed at helping students with their studies:
 - **Text Recognition**: the user's handwriting is automatically recognized in the background. This allows the user to not only copy it to their clipboard, but also to enable other features, such as the app's search and semantic annotation functionalities.
 - **Drawing Recognition:** the user can draw basic shapes and objects, which Sketchnoting will recognize and label in the background. Subsequently, the user can search for their notes by using keywords related to their sketches. For example, if their drawing includes a lightning shape, they can search for "lightning" to retrieve the note.
+
+<div align="center">
+  <img src="./screenshots/Sketchnoting.jpg" alt="Note with handwritten text and a drawn lightning shape" width="400">
+</div>
+
 - **PDF Import**: the user can import PDF files, which are integrated into their notes.
+
+<div align="center">
+  <img src="./screenshots/PDF.jpg" alt="PDF imported into a Sketchnoting note" width="400">
+</div>
+
 - **Pagination**: a note can have multiple pages.
-- **Semantic Annotation**: The textual content of a note is used to extract named concepts and to fetch relevant documents, which the user can directly view within the app. Sources include Wikipedia articles, but also more domain-specific ones, such as [BioPortal](https://bioportal.bioontology.org/) and [CHEBI](https://www.ebi.ac.uk/chebi/).
+- **Semantic Annotation**: The textual content of a note is used to extract named concepts and to fetch relevant documents, which the user can directly view within the app. Sources include Wikipedia articles, but also more domain-specific ones, such as [BioPortal](https://bioportal.bioontology.org/) and [CHEBI](https://www.ebi.ac.uk/chebi/), as well as integrated AR models.
+
+<div align="center">
+  <img src="./screenshots/SemanticAnnotation.jpg" alt="Semantic annotations for a note's content" width="400">
+</div>
+
 - **Search**: the user can rely on various aspects of their notes to search for them.
     - Textual content: the recognized handwritten text and the content of imported PDFs are used for the search indexing.
     - Drawings: the user can search for drawings in their notes, based on their labels.
@@ -14,10 +29,25 @@ Sketchnoting is a note-taking app designed for iPad. Its premise is to support b
 - **Semantic Search**: in addition to its standard approach based on lexical search, with the usage of TF-IDF for the indexing, the user can also use semantically related keywords to search for their notes. For example, if their note contains the word "Shakespeare", they could look it up using the label "theatre play", even if the latter is not explicitly mentioned anywhere in the note.
     - This feature is enabled using a word embedding (FastText), which is used to represent the search keywords and the textual content of a note as vectors. The word vectors are then compared for semantic similarity using the cosine distance.
     - The search also performs various pre-processing steps, such as tokenization and lematization, as well as word clustering in case of a longer search query. The latter leads to separate searches.
+
+<div align="center">
+  <img src="./screenshots/SemanticSearch.jpg" alt="Semantic search" width="400">
+</div>
+
 - **Question-Answering**: when performing a search, the app will also attempt to recognize whether the user's query forms a question. If so, it will attempt to directly answer their question by applying a question-answering model (DistillBERT).
+
+<div align="center">
+  <img src="./screenshots/QuestionAnswering.jpg" alt="Question answering for a search query" width="400">
+</div>
+
 - **Hybrid Search**: the lexical search, semantic search and question-answering do not have to be explicitly selected by the user. Rather, they rely on a singular text field to enter their query, with Sketchnoting automatically performing the various search types when appropriate.
 - **Search Filtering**: instead of entering a search query, the user can also select filters (time frame, note length, drawings, related documents).
 - **Graph View**: the search results of the "Search Filtering" feature are displayed in a visual manner, using a [force-directed graph](https://en.wikipedia.org/wiki/Force-directed_graph_drawing). This graph view not only highlights the relations between the notes, but they are also displayed in a manner such that their visualization (nodes) do not overlap.
+
+<div align="center">
+  <img src="./screenshots/GraphView.jpg" alt="Force-directed graph for visualizing search results" width="400">
+</div>
+
 - **Similar Notes**: the user can also select a note in their library and choose to look for related notes in their library.
     - The note similarity is enabled as follows:
         1. The main keywords are extracted from each note's textual content using TextRank.
@@ -29,6 +59,11 @@ Sketchnoting is a note-taking app designed for iPad. Its premise is to support b
         6. Two notes are then compared to each other based on the cosine distance between their centroids.
     - In addition to the centroid-based method, a matrix-based approach is also integrated. Here, rather than averaging the word vectors, they are all retained as part of a matrix representation. The similarity is then determined by multiplying the notes' respective matrices and by finally computing the resulting matrix' norm.
         - By default, the centroid-based approach is enabled, as the matrix approach has a much higher memory cost and its accuracy gain over the centroid approach is not that significant.
+
+<div align="center">
+  <img src="./screenshots/RelatedNotes.jpg" alt="Related notes based on semantic similarity" width="400">
+</div>
+
 - **Library Organization**: the user can organize their notes into folders, with support for nested folders. When importing an external note or PDF into their library, Sketchnoting will attempt to suggest an existing folder in which it can be stored by relying on the "Similar Notes" functionality.
 - **Note Sharing**: Sketchnoting integrates Apple's "Multipeer Connectivity" framework to support sharing notes between nearby devices without the need for user accounts or online connectivity.
 
@@ -52,7 +87,7 @@ git lfs install
 git lfs pull
 ```
 
-## Installing the app and running
+## Installing and running the app
 To build and run the application on a physical iPad or on an iPad simulator, follow these steps: (Note that you need a macOS device and Xcode)
 
 - Open the Sketchnoting project in Xcode, find the 'Pods' project and remove all references to this project.
@@ -64,7 +99,6 @@ To build and run the application on a physical iPad or on an iPad simulator, fol
 - Select your prefered simulator / physical device to build the app for (note - iPad only).
 - Run the app! (In case you want to run the app on a physical device, open the root 'Sketchnoting' file in the Project Navigator in Xcode and setup an Apple Provisioning Profile under General>Signing)
 
---------------
 ## Code structure
 There is documentation in the various .swift files, but the general structure of the project is as follows:
 
