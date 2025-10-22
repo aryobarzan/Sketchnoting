@@ -132,7 +132,7 @@ class DocumentsViewController: UIViewController, UICollectionViewDelegate, UISea
                 widthDimension: NSCollectionLayoutDimension.fractionalWidth(1),
                 heightDimension: NSCollectionLayoutDimension.absolute(200)
             )
-            let itemCount = Int(self.collectionView.frame.width / 210) //(self.collectionView.frame.size.width > 650) ? 3 : 2
+            let itemCount = max(1,Int(self.collectionView.frame.width / 210)) //(self.collectionView.frame.size.width > 650) ? 3 : 2
             let item = NSCollectionLayoutItem(layoutSize: size)
             let group = NSCollectionLayoutGroup.horizontal(layoutSize: size, subitem: item, count: itemCount)
             let section = NSCollectionLayoutSection(group: group)

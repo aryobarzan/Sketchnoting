@@ -24,5 +24,4 @@ There is documentation in the various .swift files, but the general structure of
 
 Outside of the Application folder, there are various other folders related to the third-party libraries used by the app (see CREDITS.md), except for the Extensions folder, which adds some extra functions to existing Swift classes.
 
-
-The main code is thus under the Sketchnoting/Application folder.
+The main source code is under the Sketchnoting/Application folder.

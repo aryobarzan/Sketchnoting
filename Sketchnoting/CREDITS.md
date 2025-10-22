@@ -9,12 +9,3 @@ All external resources (third-party) used by the Sketchnoting application are li
 - Drawing Recognition trained model: https://github.com/hetelek/GuessMyDrawing-ios
 
 - Icons used for buttons in the application: https://material.io/tools/icons/
-
----------------------
-
-The following resources are used by the Sketchnoting app via CocoaPods, a library which helps install third party libraries automatically: https://cocoapods.org/
-
-- Alamofire - used for API calls
-- Firebase - text recognition framework
-- LGButton - button framework
-- PDFGenerator - used to generate pdfs from notes

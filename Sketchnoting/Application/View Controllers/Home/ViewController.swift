@@ -20,8 +20,91 @@ import PencilKit
 import MobileCoreServices
 import VisionKit
 import Photos
+import PDFKit
 
-class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextFieldDelegate, MCSessionDelegate, MCBrowserViewControllerDelegate, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UIApplicationDelegate, UIPopoverPresentationControllerDelegate, UIDocumentPickerDelegate, VNDocumentCameraViewControllerDelegate, UICollectionViewDragDelegate, UICollectionViewDropDelegate, FolderButtonDelegate, RelatedNotesVCDelegate, MoveFileViewControllerDelegate {
+// MARK: - Custom Errors
+enum FileOperationError: LocalizedError {
+    case deletionFailed(String)
+    case moveFailed(String)
+    case importFailed(String)
+    case exportFailed(String)
+    case renameFailed(String)
+    case invalidFile
+    case accessDenied
+    
+    var errorDescription: String? {
+        switch self {
+        case .deletionFailed(let reason):
+            return "Failed to delete file: \(reason)"
+        case .moveFailed(let reason):
+            return "Failed to move file: \(reason)"
+        case .importFailed(let reason):
+            return "Failed to import file: \(reason)"
+        case .exportFailed(let reason):
+            return "Failed to export file: \(reason)"
+        case .renameFailed(let reason):
+            return "Failed to rename file: \(reason)"
+        case .invalidFile:
+            return "The file is invalid or corrupted"
+        case .accessDenied:
+            return "Access to the file was denied"
+        }
+    }
+}
+
+// MARK: - View State Management
+enum ViewState {
+    case loading
+    case loaded
+    case empty
+    case error(Error)
+    case importing
+    case exporting
+    case searching
+}
+
+enum LoadingState {
+    case notStarted
+    case inProgress
+    case completed
+    case failed(Error)
+}
+
+class ViewController: UIViewController {
+    
+    // MARK: - View State
+    private var viewState: ViewState = .loading {
+        didSet {
+            updateUIForCurrentState()
+        }
+    }
+    
+    private var loadingState: LoadingState = .notStarted {
+        didSet {
+            updateLoadingIndicator()
+        }
+    }
+    
+    // MARK: - Constants
+    private enum Constants {
+        static let cellCornerRadius: CGFloat = 5
+        static let gridCellWidth: CGFloat = 200
+        static let gridCellHeight: CGFloat = 300
+        static let listCellHeight: CGFloat = 100
+        static let gridFolderHeight: CGFloat = 150
+        
+        enum SegueIdentifier {
+            static let newSketchnote = "NewSketchnote"
+            static let editSketchnote = "EditSketchnote"
+            static let noteSharing = "NoteSharing"
+            static let export = "Export"
+            static let manageTags = "ManageTags"
+            static let editNoteTags = "EditNoteTags"
+            static let showRelatedHomePage = "showRelatedHomePage"
+            static let moveFileHome = "MoveFileHome"
+            static let settings = "Settings"
+        }
+    }
     
     @IBOutlet weak var navigationHierarchyScrollView: UIScrollView!
     @IBOutlet weak var navigationHierarchyStackView: UIStackView!
@@ -87,54 +170,243 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     // This function initializes the home page view.
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.navigationController?.setNavigationBarHidden(true, animated: false)
-        self.tabBarController?.tabBar.isHidden = false
-        
+        setupNavigationAndTabBar()
+        setupBadges()
+        setupMultipeerConnectivity()
+        setupCollectionView()
+        setupNotifications()
+        loadInitialData()
+        updateViewState()
+    }
+    
+    // MARK: - Setup Methods
+    
+    private func setupNavigationAndTabBar() {
+        navigationController?.setNavigationBarHidden(true, animated: false)
+        tabBarController?.tabBar.isHidden = false
         ToastManager.shared.isTapToDismissEnabled = true
-        
+    }
+    
+    private func setupBadges() {
         activeFiltersBadge = BadgeHub(view: filtersButton)
         activeFiltersBadge.scaleCircleSize(by: 0.45)
         
         receivedNotesBadge = BadgeHub(view: receivedNotesButton)
         receivedNotesBadge.scaleCircleSize(by: 0.45)
-        
-        // The note-sharing related variables are instantiated
+    }
+    
+    private func setupMultipeerConnectivity() {
         peerID = MCPeerID(displayName: UIDevice.current.name)
         mcSession = MCSession(peer: peerID, securityIdentity: nil, encryptionPreference: .required)
         mcSession.delegate = self
-        
+    }
+    
+    private func setupCollectionView() {
         noteListViewButton.layer.masksToBounds = true
-        noteListViewButton.layer.cornerRadius = 5
+        noteListViewButton.layer.cornerRadius = Constants.cellCornerRadius
         
-        noteCollectionView.register(UINib(nibName: noteCollectionViewCellIdentifier, bundle: nil), forCellWithReuseIdentifier: noteCollectionViewCellIdentifier)
-        noteCollectionView.register(UINib(nibName: folderCollectionViewCellIdentifier, bundle: nil), forCellWithReuseIdentifier: folderCollectionViewCellIdentifier)
-        noteCollectionView.register(UINib(nibName: noteCollectionViewDetailCellIdentifier, bundle: nil), forCellWithReuseIdentifier: noteCollectionViewDetailCellIdentifier)
+        noteCollectionView.register(UINib(nibName: noteCollectionViewCellIdentifier, bundle: nil), 
+                                  forCellWithReuseIdentifier: noteCollectionViewCellIdentifier)
+        noteCollectionView.register(UINib(nibName: folderCollectionViewCellIdentifier, bundle: nil), 
+                                  forCellWithReuseIdentifier: folderCollectionViewCellIdentifier)
+        noteCollectionView.register(UINib(nibName: noteCollectionViewDetailCellIdentifier, bundle: nil), 
+                                  forCellWithReuseIdentifier: noteCollectionViewDetailCellIdentifier)
+        
         noteCollectionView.dragDelegate = self
         noteCollectionView.dropDelegate = self
         noteCollectionView.dragInteractionEnabled = true
-
-        self.noteLoadingIndicator.isHidden = false
-        self.noteLoadingIndicator.startAnimating()
-        self.newNoteButton.isEnabled = false
-        DispatchQueue.main.asyncAfter(deadline: .now()) {
-            self.updateDisplayedNotes(true)
-            self.updateFoldersHierarchy()
-            logger.info("User Library loaded.")
-            self.noteLoadingIndicator.stopAnimating()
-            self.noteLoadingIndicator.isHidden = true
-            self.newNoteButton.isEnabled = true
+    }
+    
+    private func setupNotifications() {
+        let notificationCenter = NotificationCenter.default
+        notificationCenter.addObserver(self, 
+                                     selector: #selector(notifiedFileImport(_:)), 
+                                     name: NSNotification.Name(rawValue: Notifications.NOTIFICATION_IMPORT_NOTE), 
+                                     object: nil)
+        notificationCenter.addObserver(self, 
+                                     selector: #selector(notifiedReceiveSketchnote(_:)), 
+                                     name: NSNotification.Name(rawValue: Notifications.NOTIFICATION_RECEIVE_NOTE), 
+                                     object: nil)
+        notificationCenter.addObserver(self, 
+                                     selector: #selector(notifiedDeviceVisibility(_:)), 
+                                     name: NSNotification.Name(rawValue: Notifications.NOTIFICATION_DEVICE_VISIBILITY), 
+                                     object: nil)
+    }
+    
+    private func loadInitialData() {
+        viewState = .loading
+        loadingState = .inProgress
+        
+        DispatchQueue.main.asyncAfter(deadline: .now()) { [weak self] in
+            guard let self = self else { return }
+            
+            do {
+                // Load files from NeoLibrary
+                let files = NeoLibrary.getFiles()
+                
+                if files.isEmpty {
+                    self.viewState = .empty
+                } else {
+                    self.items = [
+                        files.filter { !($0.1 is Note) }, // Folders
+                        files.filter { $0.1 is Note }     // Notes
+                    ]
+                    self.viewState = .loaded
+                }
+                
+                self.updateFoldersHierarchy()
+                self.loadingState = .completed
+                logger.info("User Library loaded successfully.")
+                
+            } catch {
+                logger.error("Failed to load User Library: \(error)")
+                self.viewState = .error(error)
+                self.loadingState = .failed(error)
+            }
         }
-        
-        let notificationCentre = NotificationCenter.default
-        notificationCentre.addObserver(self, selector: #selector(self.notifiedFileImport(_:)), name: NSNotification.Name(rawValue: Notifications.NOTIFICATION_IMPORT_NOTE), object: nil)
-        notificationCentre.addObserver(self, selector: #selector(self.notifiedReceiveSketchnote(_:)), name: NSNotification.Name(rawValue: Notifications.NOTIFICATION_RECEIVE_NOTE), object: nil)
-        notificationCentre.addObserver(self, selector: #selector(self.notifiedDeviceVisibility(_:)), name: NSNotification.Name(rawValue: Notifications.NOTIFICATION_DEVICE_VISIBILITY), object: nil)
-        
+    }
+    
+    // MARK: - State Management
+    
+    private func updateViewState() {
         if noteCollectionViewState == .List {
-            noteListViewButton.backgroundColor = self.view.tintColor
+            noteListViewButton.backgroundColor = view.tintColor
             noteListViewButton.tintColor = .black
         }
-        self.updateClipboardButton()
+        updateClipboardButton()
+    }
+    
+    private func updateUIForCurrentState() {
+        switch viewState {
+        case .loading:
+            noteLoadingIndicator.startAnimating()
+            noteLoadingIndicator.isHidden = false
+            newNoteButton.isEnabled = false
+            noteCollectionView.isHidden = true
+            
+        case .loaded:
+            noteLoadingIndicator.stopAnimating()
+            noteLoadingIndicator.isHidden = true
+            newNoteButton.isEnabled = true
+            noteCollectionView.isHidden = false
+            updateDisplayedNotes(true)
+            
+        case .empty:
+            noteLoadingIndicator.stopAnimating()
+            noteLoadingIndicator.isHidden = true
+            newNoteButton.isEnabled = true
+            noteCollectionView.isHidden = false
+            // Could show an empty state view here
+            
+        case .error(let error):
+            noteLoadingIndicator.stopAnimating()
+            noteLoadingIndicator.isHidden = true
+            newNoteButton.isEnabled = true
+            noteCollectionView.isHidden = false
+            showErrorAlert(error)
+            
+        case .importing:
+            noteLoadingIndicator.startAnimating()
+            noteLoadingIndicator.isHidden = false
+            newNoteButton.isEnabled = false
+            
+        case .exporting:
+            noteLoadingIndicator.startAnimating()
+            noteLoadingIndicator.isHidden = false
+            
+        case .searching:
+            noteLoadingIndicator.startAnimating()
+            noteLoadingIndicator.isHidden = false
+        }
+    }
+    
+    private func updateLoadingIndicator() {
+        switch loadingState {
+        case .notStarted:
+            noteLoadingIndicator.stopAnimating()
+            noteLoadingIndicator.isHidden = true
+            
+        case .inProgress:
+            noteLoadingIndicator.startAnimating()
+            noteLoadingIndicator.isHidden = false
+            
+        case .completed:
+            noteLoadingIndicator.stopAnimating()
+            noteLoadingIndicator.isHidden = true
+            
+        case .failed(let error):
+            noteLoadingIndicator.stopAnimating()
+            noteLoadingIndicator.isHidden = true
+            showErrorAlert(error)
+        }
+    }
+    
+    // MARK: - Alert Helpers
+    
+    /// Shows a confirmation alert with custom actions
+    /// - Parameters:
+    ///   - title: Alert title
+    ///   - message: Alert message
+    ///   - confirmTitle: Title for confirm button
+    ///   - confirmStyle: Style for confirm button
+    ///   - cancelTitle: Title for cancel button
+    ///   - completion: Callback for confirm action
+    private func showConfirmationAlert(title: String,
+                                     message: String,
+                                     confirmTitle: String = "Confirm",
+                                     confirmStyle: UIAlertAction.Style = .destructive,
+                                     cancelTitle: String = "Cancel",
+                                     completion: @escaping () -> Void) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        
+        let confirmAction = UIAlertAction(title: confirmTitle, style: confirmStyle) { _ in
+            completion()
+        }
+        let cancelAction = UIAlertAction(title: cancelTitle, style: .cancel)
+        
+        alert.addAction(confirmAction)
+        alert.addAction(cancelAction)
+        
+        present(alert, animated: true)
+    }
+    
+    /// Shows an error alert with a single OK button
+    /// - Parameters:
+    ///   - error: The error to display
+    ///   - completion: Optional callback after dismissal
+    private func showErrorAlert(_ error: Error, completion: (() -> Void)? = nil) {
+        let alert = UIAlertController(title: "Error",
+                                    message: error.localizedDescription,
+                                    preferredStyle: .alert)
+        
+        let okAction = UIAlertAction(title: "OK", style: .default) { _ in
+            completion?()
+        }
+        alert.addAction(okAction)
+        
+        present(alert, animated: true)
+    }
+    
+    /// Shows an action sheet with custom actions
+    /// - Parameters:
+    ///   - title: Action sheet title
+    ///   - message: Action sheet message
+    ///   - actions: Array of actions to include
+    ///   - sourceView: View to present from (for iPad)
+    private func showActionSheet(title: String?,
+                               message: String?,
+                               actions: [UIAlertAction],
+                               sourceView: UIView) {
+        let alert = UIAlertController(title: title,
+                                    message: message,
+                                    preferredStyle: .actionSheet)
+        
+        actions.forEach { alert.addAction($0) }
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+        
+        alert.popoverPresentationController?.sourceView = sourceView
+        
+        present(alert, animated: true)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -277,56 +549,95 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         }
     }
     
+    /// Manages the import of files from URLs
+    /// - Parameter urls: Array of URLs to import
     private func manageFileImport(urls: [URL]) {
-        if urls.count > 0 {
-            var cancelled = false
-            self.displayLoadingAlert(title: "Loading", subtitle: "Importing \(Int(urls.count)) selected file(s)...") {
-                // Cancelled by user
-                logger.info("File import cancelled by user.")
-                ImportHelper.cancelImports()
-                cancelled = true
-            }
-            ImportHelper.importItems(urls: urls) { importedNotes, importedImages, importedPDFs, importedTexts in
-                if !cancelled {
-                    // PDFs, images and text files are first converted to Note objects
-                    var createdNotes = [(URL, Note)]()
-                    // MARK: Temporary fix - to be updated
-                    var importedNotes = importedNotes
-                    for (idx, note) in importedNotes.enumerated() {
-                        let url = NeoLibrary.currentLocation.appendingPathComponent(note.1.getName() + ".sketchnote")
-                        importedNotes[idx] = (url, note.1)
+        guard !urls.isEmpty else { return }
+        
+        var cancelled = false
+        viewState = .importing
+        
+        self.displayLoadingAlert(
+            title: "Loading",
+            subtitle: "Importing \(urls.count) selected file(s)..."
+        ) {
+            logger.info("File import cancelled by user.")
+            ImportHelper.cancelImports()
+            cancelled = true
+            self.viewState = .loaded
+        }
+        
+        ImportHelper.importItems(urls: urls) { [weak self] importedNotes, importedImages, importedPDFs, importedTexts in
+            guard let self = self, !cancelled else { return }
+            
+            do {
+                let createdNotes = try self.processImportedFiles(
+                    notes: importedNotes,
+                    images: importedImages,
+                    pdfs: importedPDFs,
+                    texts: importedTexts
+                )
+                
+                DispatchQueue.main.async {
+                    self.dismissLoadingAlert()
+                    self.viewState = .loaded
+                    
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                        self.showImportVC(importedNotes: createdNotes)
                     }
-                    if importedImages.count > 0 {
-                        let (url, note) = NeoLibrary.createNoteFrom(images: importedImages)
-                        createdNotes.append((url, note))
-                        logger.info("New note from imported images.")
-                    }
-                    if importedTexts.count > 0 {
-                        let (url, note) = NeoLibrary.createNoteFrom(typedTexts: importedTexts)
-                        createdNotes.append((url, note))
-                        logger.info("New note from imported text files.")
-                    }
-                    for pdf in importedPDFs {
-                        if pdf.pageCount > 0 {
-                            let (url, note) = NeoLibrary.createNoteFrom(pdf: pdf)
-                            createdNotes.append((url, note))
-                            if cancelled {
-                                break
-                            }
-                            logger.info("New note from imported pdf.")
-                        }
-                    }
-                    DispatchQueue.main.async {
-                        if !cancelled {
-                            self.dismissLoadingAlert()
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                                self.showImportVC(importedNotes: createdNotes + importedNotes)
-                            }
-                        }
-                    }
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    self.dismissLoadingAlert()
+                    self.viewState = .error(error)
                 }
             }
         }
+    }
+    
+    /// Processes different types of imported files
+    /// - Parameters:
+    ///   - notes: Imported notes
+    ///   - images: Imported images
+    ///   - pdfs: Imported PDFs
+    ///   - texts: Imported text files
+    /// - Returns: Array of created notes with their URLs
+    /// - Throws: FileOperationError if processing fails
+    private func processImportedFiles(notes: [(URL, Note)],
+                                    images: [UIImage],
+                                    pdfs: [PDFDocument],
+                                    texts: [NoteTypedText]) throws -> [(URL, Note)] {
+        var createdNotes = [(URL, Note)]()
+        
+        // Process imported notes
+        var processedNotes = notes
+        for (idx, note) in notes.enumerated() {
+            let url = NeoLibrary.currentLocation.appendingPathComponent(note.1.getName() + ".sketchnote")
+            processedNotes[idx] = (url, note.1)
+        }
+        
+        // Process images
+        if !images.isEmpty {
+            let (url, note) = NeoLibrary.createNoteFrom(images: images)
+            createdNotes.append((url, note))
+            logger.info("New note from imported images.")
+        }
+        
+        // Process texts
+        if !texts.isEmpty {
+            let (url, note) = NeoLibrary.createNoteFrom(typedTexts: texts)
+            createdNotes.append((url, note))
+            logger.info("New note from imported text files.")
+        }
+        
+        // Process PDFs
+        for pdf in pdfs where pdf.pageCount > 0 {
+            let (url, note) = NeoLibrary.createNoteFrom(pdf: pdf)
+            createdNotes.append((url, note))
+            logger.info("New note from imported pdf.")
+        }
+        
+        return createdNotes + processedNotes
     }
     
     private func showImportVC(importedNotes: [(URL, Note)]) {
@@ -344,10 +655,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
             navigationController.modalPresentationStyle = .pageSheet
             present(navigationController, animated: true, completion: nil)
         }
-    }
-    
-    func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
-        self.manageFileImport(urls: urls)
     }
     
     private func displayDocumentPicker() {
@@ -393,26 +700,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         present(scannerVC, animated: true)
     }
     
-    func documentCameraViewController(_ controller: VNDocumentCameraViewController, didFinishWith scan: VNDocumentCameraScan) {
-        controller.dismiss(animated: true, completion: nil)
-        
-        var images = [UIImage]()
-        for i in 0..<scan.pageCount {
-            let image = scan.imageOfPage(at: i)
-            images.append(image)
-        }
-        let (url, note) = NeoLibrary.createNoteFrom(images: images)
-        NeoLibrary.saveSynchronously(note: note, url: url)
-        logger.info("New note from scanned images.")
-        self.updateDisplayedNotes(true)
-    }
-    func documentCameraViewControllerDidCancel(_ controller: VNDocumentCameraViewController) {
-        controller.dismiss(animated: true, completion: nil)
-    }
-    func documentCameraViewController(_ controller: VNDocumentCameraViewController, didFailWithError error: Error) {
-        logger.error(error)
-        controller.dismiss(animated: true, completion: nil)
-    }
+
     
     // MARK: Note display management
     private func updateDisplayedNotes(_ animated: Bool) {
@@ -507,14 +795,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         spacerView.removeFromSuperview()
         spacerView.setContentHuggingPriority(.defaultLow, for: .horizontal)
         navigationHierarchyStackView.addArrangedSubview(spacerView)
-    }
-    
-    func onTap(directoryURL: URL) {
-        if NeoLibrary.currentLocation != directoryURL {
-            NeoLibrary.currentLocation = directoryURL
-            self.updateDisplayedNotes(false)
-            self.updateFoldersHierarchy()
-        }
     }
     
     @IBAction func noteListViewButtonTapped(_ sender: UIButton) {
@@ -730,43 +1010,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     }
     
     // Multipeer Connectivity - The following functions are related to the note-sharing feature.
-
-    func session(_ session: MCSession, didReceive stream: InputStream, withName streamName: String, fromPeer peerID: MCPeerID) {
-    }
-    
-    func session(_ session: MCSession, didStartReceivingResourceWithName resourceName: String, fromPeer peerID: MCPeerID, with progress: Progress) {
-    }
-    
-    func session(_ session: MCSession, didFinishReceivingResourceWithName resourceName: String, fromPeer peerID: MCPeerID, at localURL: URL?, withError error: Error?) {
-    }
-    
-    func browserViewControllerDidFinish(_ browserViewController: MCBrowserViewController) {
-        dismiss(animated: true)
-        // After the user has selected the nearby devices to send a note to, the main sharing function shareNote is called
-        if sketchnoteToShare != nil {
-            self.sendNoteInternal(url: sketchnoteToShare!.0, note: sketchnoteToShare!.1)
-        }
-    }
-    
-    func browserViewControllerWasCancelled(_ browserViewController: MCBrowserViewController) {
-        dismiss(animated: true)
-        sketchnoteToShare = nil
-    }
-    
-    func session(_ session: MCSession, peer peerID: MCPeerID, didChange state: MCSessionState) {
-        switch state {
-        case MCSessionState.connected:
-            print("Connected: \(peerID.displayName)")
-            
-        case MCSessionState.connecting:
-            print("Connecting: \(peerID.displayName)")
-            
-        case MCSessionState.notConnected:
-            print("Not Connected: \(peerID.displayName)")
-        default:
-            print("Non recognized state of session")
-        }
-    }
     
     private func sendNoteInternal(url: URL, note: Note) {
         if mcSession.connectedPeers.count > 0 {
@@ -783,12 +1026,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         }
     }
     
-    
-    // When the user's device receives a shared note, this function is called to let the device know and to handle it.
-    // In turn, a NoteShareView is displayed for the user to let them know.
-    func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
-    }
-    
     func joinSession() {
         let mcBrowser = MCBrowserViewController(serviceType: "hws-kb", session: mcSession)
         mcBrowser.delegate = self
@@ -801,76 +1038,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     @IBOutlet weak var noteCollectionView: UICollectionView!
     
     var items: [[(URL, File)]] = Array(repeating: [], count: 2)
-
-    func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return 2
-    }
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return self.items[section].count
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let item = self.items[indexPath.section][indexPath.row]
-        switch self.noteCollectionViewState {
-        case .Grid:
-            if item.1 is Note {
-                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: noteCollectionViewCellIdentifier, for: indexPath as IndexPath) as! NoteCollectionViewCell
-                cell.toggleSelectionMode(status: self.isMultipleSelectionActive)
-                cell.setFile(url: item.0, file: item.1)
-                return cell
-            }
-            else { // Folder
-                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: folderCollectionViewCellIdentifier, for: indexPath as IndexPath) as! FolderCollectionViewCell
-                cell.toggleSelectionMode(status: self.isMultipleSelectionActive)
-                cell.setFile(url: item.0, file: item.1)
-                return cell
-            }
-            
-        case .List:
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: noteCollectionViewDetailCellIdentifier, for: indexPath as IndexPath) as! NoteCollectionViewDetailCell
-            cell.toggleSelectionMode(status: self.isMultipleSelectionActive)
-            cell.setFile(url: item.0, file: item.1)
-            return cell
-        }
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let item = self.items[indexPath.section][indexPath.row]
-        switch self.noteCollectionViewState {
-        case .Grid:
-            if item.1 is Note {
-                return CGSize(width: CGFloat(200), height: CGFloat(300))
-            }
-            else { // Folder
-                return CGSize(width: CGFloat(200), height: CGFloat(150))
-            }
-            
-        case .List:
-            return CGSize(width: collectionView.bounds.size.width - CGFloat(10), height: CGFloat(100))
-        }
-    }
-    
-    
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let item = self.items[indexPath.section][indexPath.row]
-        if self.isMultipleSelectionActive {
-            self.selectedFiles[item.0] = item.1
-            updateSelectAllButton()
-        }
-        else {
-            self.open(url: item.0, file: item.1)
-        }
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
-        let item = self.items[indexPath.section][indexPath.row]
-        if self.isMultipleSelectionActive {
-            if self.selectedFiles[item.0] != nil {
-                self.selectedFiles[item.0] = nil
-            }
-            updateSelectAllButton()
-        }
-    }
     
     public func open(url: URL, file: File) {
         if let note = file as? Note {
@@ -928,23 +1095,48 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     }
     
     var filesToMove = [(URL, File)]()
+    /// Initiates the move operation for a file
+    /// - Parameters:
+    ///   - url: The current URL of the file
+    ///   - file: The file to move
     private func moveFile(url: URL, file: File) {
-        self.filesToMove = [(URL, File)]()
-        self.filesToMove.append((url, file))
-        self.performSegue(withIdentifier: "MoveFileHome", sender: self)
+        do {
+            try validateFileOperation(url: url, file: file)
+            self.filesToMove = [(url, file)]
+            self.performSegue(withIdentifier: Constants.SegueIdentifier.moveFileHome, sender: self)
+        } catch {
+            showErrorAlert(error)
+        }
     }
-    // MoveFileViewControllerDelegate
-    func movedFiles(items: [(URL, File)]) {
-        self.updateDisplayedNotes(true)
-    }
-    func selectedFolder(url: URL, for notes: [(URL, File)]) {
+    
+    /// Validates if a file operation can be performed
+    /// - Parameters:
+    ///   - url: The URL of the file
+    ///   - file: The file object
+    /// - Throws: FileOperationError if validation fails
+    private func validateFileOperation(url: URL, file: File) throws {
+        guard FileManager.default.fileExists(atPath: url.path) else {
+            throw FileOperationError.invalidFile
+        }
         
+        guard FileManager.default.isWritableFile(atPath: url.path) else {
+            throw FileOperationError.accessDenied
+        }
     }
-    // Related Notes VC delegate
-    func openRelatedNote(url: URL, note: Note) {
-        self.open(url: url, file: note)
-    }
-    func mergedNotes(note1: Note, note2: Note) {
+    
+    /// Performs the actual file move operation
+    /// - Parameters:
+    ///   - file: The file to move
+    ///   - sourceURL: The source URL
+    ///   - destinationURL: The destination URL
+    /// - Throws: FileOperationError if move fails
+    private func performFileMove(file: File, from sourceURL: URL, to destinationURL: URL) throws {
+        do {
+            try FileManager.default.moveItem(at: sourceURL, to: destinationURL)
+            self.updateDisplayedNotes(true)
+        } catch {
+            throw FileOperationError.moveFailed(error.localizedDescription)
+        }
     }
     
     var selectedCellForTagEditing: UICollectionViewCell?
@@ -970,64 +1162,43 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
         }
     }
     
+    // MARK: - File Operations
+    
+    /// Deletes a file from the workspace
+    /// - Parameters:
+    ///   - url: The URL of the file to delete
+    ///   - file: The file object to delete
     private func deleteFile(url: URL, file: File) {
-        let alert = UIAlertController(title: "Delete File", message: "Are you sure you want to delete this file?", preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "Delete", style: .destructive, handler: { action in
-            self.items[0].removeAll{$0.0 == url}
-            self.items[1].removeAll{$0.0 == url}
+        showConfirmationAlert(
+            title: "Delete File",
+            message: "Are you sure you want to delete '\(file.getName())'?",
+            confirmTitle: "Delete"
+        ) {
+            do {
+                try self.performFileDeletion(url: url)
+                self.view.makeToast("File deleted successfully")
+            } catch {
+                self.showErrorAlert(error)
+            }
+        }
+    }
+    
+    /// Performs the actual file deletion operation
+    /// - Parameter url: The URL of the file to delete
+    /// - Throws: FileOperationError if deletion fails
+    private func performFileDeletion(url: URL) throws {
+        do {
+            try FileManager.default.removeItem(at: url)
+            self.items[0].removeAll { $0.0 == url }
+            self.items[1].removeAll { $0.0 == url }
             NeoLibrary.delete(url: url)
             self.noteCollectionView.reloadData()
-        }))
-        alert.addAction(UIAlertAction(title: "Cancel", style: .default, handler: { action in
-              logger.info("Not deleting file.")
-        }))
-        self.present(alert, animated: true, completion: nil)
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, itemsForBeginning session: UIDragSession, at indexPath: IndexPath) -> [UIDragItem] {
-        let item = self.items[indexPath.section][indexPath.row]
-        let itemProvider = NSItemProvider(object: item.1.getName() as NSString)
-        let dragItem = UIDragItem(itemProvider: itemProvider)
-        return [dragItem]
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, canHandle session: UIDropSession) -> Bool {
-      return true
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, performDropWith coordinator: UICollectionViewDropCoordinator) {
-        guard let destinationIndexPath = coordinator.destinationIndexPath else {
-          return
-        }
-        coordinator.items.forEach { dropItem in
-          guard let sourceIndexPath = dropItem.sourceIndexPath else {
-            return
-          }
-          collectionView.performBatchUpdates({
-            let sourceFile = self.items[sourceIndexPath.section][sourceIndexPath.row]
-            let destinationItem = self.items[destinationIndexPath.section][destinationIndexPath.row]
-            if !(destinationItem.1 is Note) { // Folder
-                logger.info("Moving file to folder.")
-                _ = NeoLibrary.move(file: sourceFile.1, from: sourceFile.0, to: destinationItem.0)
-                self.updateDisplayedNotes(false)
-            }
-          }, completion: nil)
+        } catch {
+            throw FileOperationError.deletionFailed(error.localizedDescription)
         }
     }
     
-    
-    func collectionView(_ collectionView: UICollectionView, dropSessionDidUpdate session: UIDropSession, withDestinationIndexPath destinationIndexPath: IndexPath?) -> UICollectionViewDropProposal {
-        if let destinationIndexPath = destinationIndexPath {
-            let file = self.items[destinationIndexPath.section][destinationIndexPath.row]
-            if file.1 is Note {
-                return UICollectionViewDropProposal(operation: .forbidden, intent: .insertIntoDestinationIndexPath)
-            }
-            else {
-                return UICollectionViewDropProposal(operation: .move, intent: .insertIntoDestinationIndexPath)
-            }
-        }
-        return UICollectionViewDropProposal(operation: .forbidden, intent: .insertIntoDestinationIndexPath)
-    }
+
     
     // MARK: Selection
     @IBAction func selectionModeButtonTapped(_ sender: UIButton) {
@@ -1148,5 +1319,222 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate, UITextField
     }
     func clearClipboardTapped() {
         self.view.makeToast("Cleared SKClipboard.")
+    }
+}
+
+// MARK: - UICollectionView Delegate & DataSource
+extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource {
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
+        return 2
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return self.items[section].count
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let item = self.items[indexPath.section][indexPath.row]
+        switch self.noteCollectionViewState {
+        case .Grid:
+            if item.1 is Note {
+                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: noteCollectionViewCellIdentifier, for: indexPath as IndexPath) as! NoteCollectionViewCell
+                cell.toggleSelectionMode(status: self.isMultipleSelectionActive)
+                cell.setFile(url: item.0, file: item.1)
+                return cell
+            } else {
+                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: folderCollectionViewCellIdentifier, for: indexPath as IndexPath) as! FolderCollectionViewCell
+                cell.toggleSelectionMode(status: self.isMultipleSelectionActive)
+                cell.setFile(url: item.0, file: item.1)
+                return cell
+            }
+            
+        case .List:
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: noteCollectionViewDetailCellIdentifier, for: indexPath as IndexPath) as! NoteCollectionViewDetailCell
+            cell.toggleSelectionMode(status: self.isMultipleSelectionActive)
+            cell.setFile(url: item.0, file: item.1)
+            return cell
+        }
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let item = self.items[indexPath.section][indexPath.row]
+        if self.isMultipleSelectionActive {
+            self.selectedFiles[item.0] = item.1
+            updateSelectAllButton()
+        } else {
+            self.open(url: item.0, file: item.1)
+        }
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
+        let item = self.items[indexPath.section][indexPath.row]
+        if self.isMultipleSelectionActive {
+            self.selectedFiles[item.0] = nil
+            updateSelectAllButton()
+        }
+    }
+}
+
+// MARK: - UICollectionViewDelegateFlowLayout
+extension ViewController: UICollectionViewDelegateFlowLayout {
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        let item = self.items[indexPath.section][indexPath.row]
+        switch self.noteCollectionViewState {
+        case .Grid:
+            if item.1 is Note {
+                return CGSize(width: Constants.gridCellWidth, height: Constants.gridCellHeight)
+            } else {
+                return CGSize(width: Constants.gridCellWidth, height: Constants.gridFolderHeight)
+            }
+        case .List:
+            return CGSize(width: collectionView.bounds.size.width - 10, height: Constants.listCellHeight)
+        }
+    }
+}
+
+// MARK: - Multipeer Connectivity
+extension ViewController: MCSessionDelegate, MCBrowserViewControllerDelegate {
+    func session(_ session: MCSession, peer peerID: MCPeerID, didChange state: MCSessionState) {
+        switch state {
+        case .connected:
+            print("Connected: \(peerID.displayName)")
+        case .connecting:
+            print("Connecting: \(peerID.displayName)")
+        case .notConnected:
+            print("Not Connected: \(peerID.displayName)")
+        @unknown default:
+            print("Unknown session state")
+        }
+    }
+    
+    func session(_ session: MCSession, didReceive stream: InputStream, withName streamName: String, fromPeer peerID: MCPeerID) {}
+    
+    func session(_ session: MCSession, didStartReceivingResourceWithName resourceName: String, fromPeer peerID: MCPeerID, with progress: Progress) {}
+    
+    func session(_ session: MCSession, didFinishReceivingResourceWithName resourceName: String, fromPeer peerID: MCPeerID, at localURL: URL?, withError error: Error?) {}
+    // When the user's device receives a shared note, this function is called to let the device know and to handle it.
+        // In turn, a NoteShareView is displayed for the user to let them know.
+    func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
+       
+    }
+    
+    func browserViewControllerDidFinish(_ browserViewController: MCBrowserViewController) {
+        dismiss(animated: true)
+        if let noteToShare = sketchnoteToShare {
+            self.sendNoteInternal(url: noteToShare.0, note: noteToShare.1)
+        }
+    }
+    
+    func browserViewControllerWasCancelled(_ browserViewController: MCBrowserViewController) {
+        dismiss(animated: true)
+        sketchnoteToShare = nil
+    }
+}
+
+// MARK: - Document Picker & Scanner
+extension ViewController: UIDocumentPickerDelegate, VNDocumentCameraViewControllerDelegate {
+    func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
+        self.manageFileImport(urls: urls)
+    }
+    
+    func documentCameraViewController(_ controller: VNDocumentCameraViewController, didFinishWith scan: VNDocumentCameraScan) {
+        controller.dismiss(animated: true, completion: nil)
+        
+        var images = [UIImage]()
+        for i in 0..<scan.pageCount {
+            let image = scan.imageOfPage(at: i)
+            images.append(image)
+        }
+        let (url, note) = NeoLibrary.createNoteFrom(images: images)
+        NeoLibrary.saveSynchronously(note: note, url: url)
+        logger.info("New note from scanned images.")
+        self.updateDisplayedNotes(true)
+    }
+    
+    func documentCameraViewControllerDidCancel(_ controller: VNDocumentCameraViewController) {
+        controller.dismiss(animated: true, completion: nil)
+    }
+    
+    func documentCameraViewController(_ controller: VNDocumentCameraViewController, didFailWithError error: Error) {
+        logger.error(error)
+        controller.dismiss(animated: true, completion: nil)
+    }
+}
+
+// MARK: - Drag & Drop
+extension ViewController: UICollectionViewDragDelegate, UICollectionViewDropDelegate {
+    func collectionView(_ collectionView: UICollectionView, itemsForBeginning session: UIDragSession, at indexPath: IndexPath) -> [UIDragItem] {
+        let item = self.items[indexPath.section][indexPath.row]
+        let itemProvider = NSItemProvider(object: item.1.getName() as NSString)
+        let dragItem = UIDragItem(itemProvider: itemProvider)
+        return [dragItem]
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, canHandle session: UIDropSession) -> Bool {
+        return true
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, performDropWith coordinator: UICollectionViewDropCoordinator) {
+        guard let destinationIndexPath = coordinator.destinationIndexPath else { return }
+        
+        coordinator.items.forEach { dropItem in
+            guard let sourceIndexPath = dropItem.sourceIndexPath else { return }
+            
+            collectionView.performBatchUpdates({
+                let sourceFile = self.items[sourceIndexPath.section][sourceIndexPath.row]
+                let destinationItem = self.items[destinationIndexPath.section][destinationIndexPath.row]
+                if !(destinationItem.1 is Note) {
+                    logger.info("Moving file to folder.")
+                    _ = NeoLibrary.move(file: sourceFile.1, from: sourceFile.0, to: destinationItem.0)
+                    self.updateDisplayedNotes(false)
+                }
+            })
+        }
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, dropSessionDidUpdate session: UIDropSession, withDestinationIndexPath destinationIndexPath: IndexPath?) -> UICollectionViewDropProposal {
+        guard let destinationIndexPath = destinationIndexPath else {
+            return UICollectionViewDropProposal(operation: .forbidden, intent: .insertIntoDestinationIndexPath)
+        }
+        
+        let file = self.items[destinationIndexPath.section][destinationIndexPath.row]
+        return file.1 is Note
+            ? UICollectionViewDropProposal(operation: .forbidden, intent: .insertIntoDestinationIndexPath)
+            : UICollectionViewDropProposal(operation: .move, intent: .insertIntoDestinationIndexPath)
+    }
+}
+
+// MARK: - Other Delegates
+extension ViewController: UIGestureRecognizerDelegate, UITextFieldDelegate, UIPopoverPresentationControllerDelegate {}
+
+// MARK: - Custom Delegates
+extension ViewController: FolderButtonDelegate, RelatedNotesVCDelegate, MoveFileViewControllerDelegate {
+    func onTap(directoryURL: URL) {
+        if NeoLibrary.currentLocation != directoryURL {
+            NeoLibrary.currentLocation = directoryURL
+            self.updateDisplayedNotes(false)
+            self.updateFoldersHierarchy()
+        }
+    }
+    
+    func openRelatedNote(url: URL, note: Note) {
+        self.open(url: url, file: note)
+    }
+    
+    func mergedNotes(note1: Note, note2: Note) {}
+    
+    func movedFiles(items: [(URL, File)]) {
+        self.updateDisplayedNotes(true)
+    }
+    
+    func selectedFolder(url: URL, for notes: [(URL, File)]) {
+        for (sourceURL, file) in notes {
+            do {
+                let destinationURL = url.appendingPathComponent(file.getName())
+                try performFileMove(file: file, from: sourceURL, to: destinationURL)
+            } catch {
+                showErrorAlert(error)
+            }
+        }
     }
 }
