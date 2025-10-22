@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import Firebase
 import Alamofire
 import MultipeerConnectivity
 import SwiftyBeaver
@@ -34,8 +33,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         SKCacheManager.cache.diskStorage.config.expiration = .never
         SKCacheManager.cache.diskStorage.config.sizeLimit = 1000 * 1024 * 1024 // 1GB
         SKCacheManager.cache.memoryStorage.config.countLimit = 150
-
-        FirebaseApp.configure()
         
         if SettingsManager.firstAppStartup() {
             _ = NeoLibrary.getHomeDirectoryURL() // Critical (causes infinite loop otherwise on first time app run)

@@ -44,6 +44,14 @@ Some minimal work has been done to update the third-party packages and fix some 
 
 Note that Git LFS (Large File Storage) has been used for this repository due to the inclusion of two ML models. (FastTextWordEmbedding.mlmodel, distilbert-squad-384_FP16.mlkitmodel)
 
+To properly download the large files after cloning the repository, do the following:
+1. Install [Git LFS](https://git-lfs.com/)
+2. Within the root directory of the project, run:
+```shell
+git lfs install
+git lfs pull
+```
+
 ## Installing the app and running
 To build and run the application on a physical iPad or on an iPad simulator, follow these steps: (Note that you need a macOS device and Xcode)
 

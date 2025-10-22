@@ -3,9 +3,6 @@ platform :ios, '14.0'
 # use_frameworks!
 use_modular_headers!
 target 'Sketchnoting' do
-  pod 'Firebase/MLVision'
-  # If using an on-device API:
-  # pod 'Firebase/MLVisionTextModel'
   pod 'PocketSVG', '~> 2.0'
   pod 'SVGKit'
   pod 'Repeat'

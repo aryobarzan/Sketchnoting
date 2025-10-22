@@ -121,6 +121,7 @@ class SemanticSearch {
                 return embedding
             }
             return NLEmbedding.wordEmbedding(for: .english)!
+        }
     }
     
     private func cosineDistanceToSimilarity(distance: Double) -> Double {
