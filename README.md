@@ -32,7 +32,7 @@ Sketchnoting is a note-taking app designed for iPad. Its premise is to support b
 - **Library Organization**: the user can organize their notes into folders, with support for nested folders. When importing an external note or PDF into their library, Sketchnoting will attempt to suggest an existing folder in which it can be stored by relying on the "Similar Notes" functionality.
 - **Note Sharing**: Sketchnoting integrates Apple's "Multipeer Connectivity" framework to support sharing notes between nearby devices without the need for user accounts or online connectivity.
 
-Sketchnoting was developed as part of a Master's thesis at the University of Luxembourg. If you wish to learn more about the project, feel free to contact me for a copy of the thesis.
+Sketchnoting was developed as part of a Master thesis at the University of Luxembourg. If you wish to learn more about the project, feel free to contact me for a copy of the thesis.
 
 ## State of the App
 
