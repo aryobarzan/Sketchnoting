@@ -110,7 +110,6 @@ class SemanticSearch {
     enum WordEmbeddingType {
         case Apple
         case FastText
-        case GloVe
     }
     
     func createWordEmbedding(type: WordEmbeddingType = .FastText) -> NLEmbedding {
@@ -122,12 +121,6 @@ class SemanticSearch {
                 return embedding
             }
             return NLEmbedding.wordEmbedding(for: .english)!
-        case .GloVe:
-            if let resource = Bundle.main.url(forResource: "GloVeWordEmbedding", withExtension: "mlmodelc"), let embedding = try? NLEmbedding.init(contentsOf: resource) {
-                return embedding
-            }
-            return NLEmbedding.wordEmbedding(for: .english)!
-        }
     }
     
     private func cosineDistanceToSimilarity(distance: Double) -> Double {
