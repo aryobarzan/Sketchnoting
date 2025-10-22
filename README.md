@@ -40,6 +40,10 @@ Note that this application was developed in 2021, and it has not received any up
 
 Some minimal work has been done to update the third-party packages and fix some Swift-related issues, such that the app can be built using the latest Xcode version.
 
+## Git LFS
+
+Note that Git LFS (Large File Storage) has been used for this repository due to the inclusion of two ML models. (FastTextWordEmbedding.mlmodel, distilbert-squad-384_FP16.mlkitmodel)
+
 ## Installing the app and running
 To build and run the application on a physical iPad or on an iPad simulator, follow these steps: (Note that you need a macOS device and Xcode)
 
